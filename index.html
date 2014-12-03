@@ -52,6 +52,16 @@
                   <li><a href="#" id="load-sample6">Central plant metabolism</a></li>
                 </ul>
               </li>
+              <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                  Random
+                  <b class="right-caret"></b>
+                </a>
+                <ul class="dropdown-menu">
+                  <li><a href="#" id="random-graph-properties">Random Graph Properties</a></li>
+                  <li><a href="#" id="generate-random-graph">Generate</a></li>
+                </ul>
+              </li>
               <li><a href="#" id="save-as-sbgnml">Save...</a></li>
               <li class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">
@@ -150,6 +160,10 @@
 
   <div id="sbgn-layout-table" title="Layout Properties">
     <!-- sbgn layout table will be shown here -->
+  </div>
+
+  <div id="random-graph-table" title="Random Graph Properties">
+      <!-- random graph table will be shown here -->
   </div>
 
   <div id="biogene-container" style="display: none">
@@ -319,6 +333,127 @@
       </table>
   </script>
 
+    <script type="text/template" id="random-graph-settings-template">
+      <table class="table-condensed layout-table">
+          <tr>
+            <td>
+                <span class="add-on layout-text"> # Of Nodes </span>
+            </td>
+            <td>
+                <input id="random-no-of-nodes" type="text" class="input-small layout-text" value= <%= noOfNodes %> >
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+                <span class="add-on layout-text"> # Of Edges </span>
+            </td>
+            <td>
+                <input id="random-no-of-edges" type="text" class="input-small layout-text" value= <%= noOfEdges %> >
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+                <span class="add-on layout-text"> Maximum Depth </span>
+            </td>
+            <td>
+                <input id="random-max-depth" type="text" class="input-small layout-text" value= <%= maxDepth %> >
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+                <span class="add-on layout-text"> # Of Siblings </span>
+            </td>
+            <td>
+                <input id="random-no-of-siblings" type="text" class="input-small layout-text" value= <%= noOfSiblings %> >
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+                <span class="add-on layout-text"> Minimum Node Width </span>
+            </td>
+            <td>
+                <input id="random-min-node-width" type="text" class="input-small layout-text" value= <%= minNodeSize.width %> >
+            </td>
+          </tr>
+
+            <tr>
+            <td>
+                <span class="add-on layout-text"> Minimum Node Height </span>
+            </td>
+            <td>
+                <input id="random-min-node-height" type="text" class="input-small layout-text" value= <%= minNodeSize.height %> >
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+                <span class="add-on layout-text"> Maximum Node Width </span>
+            </td>
+            <td>
+                <input id="random-max-node-width" type="text" class="input-small layout-text" value= <%= maxNodeSize.width %> >
+            </td>
+          </tr>
+
+            <tr>
+            <td>
+                <span class="add-on layout-text"> Maximum Node Height </span>
+            </td>
+            <td>
+                <input id="random-max-node-height" type="text" class="input-small layout-text" value= <%= maxNodeSize.height %> >
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+                <span class="add-on layout-text"> Percentage Of Inter-graph Edges </span>
+            </td>
+            <td>
+                <input id="random-percent-ige" type="text" class="input-small layout-text" value= <%= percentageOfIGEs %> >
+            </td>
+          </tr>
+
+          <!--tr>
+              <td>
+                  <span class="add-on layout-text"> Minimum Number Of Children </span>
+              </td>
+              <td>
+                  <input id="random-min-no-of-children" type="text" class="input-small layout-text" value= <!--%= minNumberOfChildren %> >
+              </td>
+          </tr>
+
+          <tr>
+              <td>
+                  <span class="add-on layout-text"> Maximum Number Of Children </span>
+              </td>
+              <td>
+                  <input id="random-max-no-of-children" type="text" class="input-small layout-text" value= <!--%= maxNumberOfChildren %> >
+              </td>
+          </tr-->
+
+          <tr>
+              <td>
+                  <span class="add-on layout-text"> Probability Of Branch Pruning </span>
+              </td>
+              <td>
+                  <input id="random-probability-of-branch-pruning" type="text" class="input-small layout-text" value= <%= probabilityOfBranchPruning %> >
+              </td>
+          </tr>
+
+          <tr id="layout-buttons">
+            <td>
+                <button id="save-random-config" class="btn btn-default" >Save</button>
+            </td>
+            <td>
+                <button id="default-random-config" class="btn btn-default">Default</button>
+            </td>
+          </tr>
+      </table>
+  </script>
+
  <!-- BioGeneView template for backbone.js -->
   <script type="text/template" id="biogene-template">
       <div class='node-details-text'>
@@ -399,6 +534,7 @@
   <script src="js/extensions/cytoscape.renderer.canvas.sbgn-renderer.js"></script>
 
   <script src="js/utils/json-to-sbgnml-converter.js"></script>
+  <script src="js/utils/random-graph-creator.js"></script>
   <script src="js/utils/sbgnml-to-json-converter.js"></script>
   <script src="js/utils/sbgn-filtering.js"></script>
 

@@ -29,6 +29,11 @@ var sbgnStyleSheet = cytoscape.stylesheet()
             'padding-left' : '20',
             'padding-right' : '20'
         })
+        .selector("node[sbgnclass='random']")
+        .css({
+            'content' : 'data(random.label)',
+            'shape' : 'rectangle'
+        })
         .selector("node[sbgnclass!='complex'][sbgnclass!='compartment'][sbgnclass!='submap']")
         .css({
             'width' : 'data(sbgnbbox.w)',
@@ -333,6 +338,83 @@ var SBGNLayout = Backbone.View.extend({
         $("#default-layout").die("click").live("click", function(evt){
             self.copyProperties();
             self.template = _.template($("#layout-settings-template").html(), self.currentLayoutProperties);
+            $(self.el).html(self.template);
+        });
+
+        return this;
+    }
+});
+
+var RandomGraphPanel = Backbone.View.extend({
+    defaultProperties: {
+	    noOfNodes: 50,
+	    noOfEdges: 10,
+	    maxDepth: 3,
+	    noOfSiblings: 5,
+	    minNodeSize: {
+		    width: 15,
+		    height: 15
+	    },
+	    maxNodeSize: {
+		    width: 50,
+		    height: 50
+	    },
+	    percentageOfIGEs: 30,
+	    probabilityOfBranchPruning: 0.5,
+	    canvasSize: {
+		    width: 640,
+		    height: 480
+	    }
+    },
+    currentProperties: null,
+    initialize: function() {
+        var self = this;
+        self.copyProperties();
+        self.template = _.template($("#random-graph-settings-template").html(), self.currentProperties);
+    },
+    copyProperties: function(){
+        this.currentProperties = _.clone(this.defaultProperties);
+    },
+    generateGraph: function(){
+        var options = this.currentProperties;
+        var graphGenerator = new RandomGraphCreator(options);
+	    var graph = graphGenerator.generateGraph();
+
+	    (new SBGNContainer({
+			el: '#sbgn-network-container',
+			model : {cytoscapeJsGraph : graph}
+		})).render();
+
+	    // TODO cy.layout(options);
+    },
+
+    render: function(){
+        var self = this;
+        self.template = _.template($("#random-graph-settings-template").html(), self.currentProperties);
+        $(self.el).html(self.template);
+
+        $(self.el).dialog();
+
+        $("#save-random-config").die("click").live("click", function(evt) {
+            self.currentProperties.noOfNodes = parseInt($("#random-no-of-nodes").val());
+	        self.currentProperties.noOfEdges = parseInt($("#random-no-of-edges").val());
+	        self.currentProperties.maxDepth = parseInt($("#random-max-depth").val());
+	        self.currentProperties.noOfSiblings = parseInt($("#random-no-of-siblings").val());
+	        self.currentProperties.minNodeSize.width = parseInt($("#random-min-node-width").val());
+	        self.currentProperties.minNodeSize.height = parseInt($("#random-min-node-height").val());
+	        self.currentProperties.maxNodeSize.width = parseInt($("#random-max-node-width").val());
+	        self.currentProperties.maxNodeSize.height = parseInt($("#random-max-node-height").val());
+	        self.currentProperties.percentageOfIGEs = parseInt($("#random-percent-ige").val());
+	        //self.currentProperties.minNumberOfChildren = parseInt($("#random-min-no-of-children").val());
+	        //self.currentProperties.maxNumberOfChildren = parseInt($("#random-max-no-of-children").val());
+	        self.currentProperties.probabilityOfBranchPruning = parseFloat($("#random-probability-of-branch-pruning").val());
+
+	        $(self.el).dialog('close');
+        });
+
+        $("#default-random-config").die("click").live("click", function(evt){
+            self.copyProperties();
+            self.template = _.template($("#random-graph-settings-template").html(), self.currentProperties);
             $(self.el).html(self.template);
         });
 
