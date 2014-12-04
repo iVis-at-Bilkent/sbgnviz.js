@@ -194,6 +194,14 @@ $( document ).ready( function() {
     });
 
     $("#perform-layout").click(function(e){
+	    cy.nodes().removeData("ports");
+	    cy.edges().removeData("portsource");
+	    cy.edges().removeData("porttarget");
+
+	    cy.nodes().data("ports", []);
+	    cy.edges().data("portsource", []);
+	    cy.edges().data("porttarget", []);
+
         sbgnLayoutProp.applyLayout();
     });
 
