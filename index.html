@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <title>SBGNViz.js</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- jQuery UI -->
+    <link href="css/jquery-ui-1.10.3.custom.css" rel="stylesheet">
+    
+    <link href="css/jquery.fancybox-1.3.4.css" rel="stylesheet">
+
+    <!-- Loading Bootstrap -->
+    <link href="css/bootstrap.css" rel="stylesheet">
+
+    <!-- Loading cytoscape.js plugins -->
+    <link href="css/cytoscape.js-panzoom.css" rel="stylesheet" type="text/css" />
+    <link href="css/font-awesome-4.0.3/css/font-awesome.css" rel="stylesheet" type="text/css" />
+    <link href="css/jquery.qtip.min.css" rel="stylesheet" type="text/css" />
+
+    <link href="css/sbgn-viz.css" rel="stylesheet">
+
+  </head>
+
+  <body>
+
+  <div class="nav-menu">
+   <nav class="navbar navbar-default sbgn-nav-bar" role="navigation">
+     <div>
+        <ul class="nav navbar-nav">
+
+          <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+               File 
+               <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+              <input id="file-input" type="file" style="display:none" />
+              <li><a href="#" type="file" id="load-file">Load...</a></li>
+              <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                  Samples
+                  <b class="right-caret"></b>
+                </a>
+                <ul class="dropdown-menu">
+                  <li><a href="#" id="load-sample1">Activated STAT1alpha induction of the IRF1 gene</a></li>
+                  <li><a href="#" id="load-sample2">Glycolysis</a></li>
+                  <li><a href="#" id="load-sample3">MAPK cascade</a></li>
+                  <li><a href="#" id="load-sample4">Neuronal/Muscle signalling</a></li>
+                  <li><a href="#" id="load-sample5">Insulin-like Growth Factor (IGF) signalling</a></li>
+                  <li><a href="#" id="load-sample6">Central plant metabolism</a></li>
+                </ul>
+              </li>
+              <li><a href="#" id="save-as-sbgnml">Save...</a></li>
+              <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                  Save as Image 
+                  <b class="right-caret"></b>
+                </a>
+                <ul class="dropdown-menu">
+                  <li><a href="#" id="save-as-png">PNG</a></li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+
+
+          <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+               Layout 
+               <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+              <li><a href="#" id="perform-layout">Perform Layout</a></li>
+              <li><a href="#" id="layout-properties">Layout Properties...</a></li>
+            </ul>
+          </li>
+
+          <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+               Edit 
+               <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+              <li><a href="#" id="hide-selected">Hide Selected</a></li>
+              <li><a href="#" id="show-selected">Show Selected</a></li>
+              <li><a href="#" id="show-all">Show All</a></li>
+              <li class="divider"></li>
+              <li><a href="#" id="delete-selected">Delete Selected</a></li>
+            </ul>
+          </li>
+
+          <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+               Highlight 
+               <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+              <li><a href="#" id="neighbors-of-selected">Neighbors of Selected</a></li>
+              <li><a href="#" id="processes-of-selected">Processes of Selected</a></li>
+              <li><a href="#" id="remove-highlights">Remove Highlights</a></li>
+
+            </ul>
+          </li>
+
+          <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+               Legends 
+               <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+              <li><a href="#" id="node-legend">Node Legend</a></li>
+              <li><a href="#" id="edge-legend">Interaction Legend</a></li>
+            </ul>
+          </li>
+
+
+          <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+               Help 
+               <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+              <li><a href="#" id="quick-help">Quick Help</a></li>
+              <li><a href="#">How to Use</a></li>
+              <li><a href="#" id="about">About</a></li>
+            </ul>
+          </li>
+        </ul>
+     </div>
+  </nav>
+  </div>
+
+  <div id="sbgn-info-content">
+    <table width="100%" height="100%" align="center" valign="center">
+        <tr>
+          <td>
+          <span class="input-file" id="file-name"></span>
+         </td>
+         <td>
+          <span class="sbgn-label">SBGN<i>Viz</i>.js</span>
+         </td>
+       </tr>
+    </table>
+  </div>
+
+  <div id="sbgn-network-container">
+  </div>
+
+  <div id="sbgn-layout-table" title="Layout Properties">
+    <!-- sbgn layout table will be shown here -->
+  </div>
+
+  <div id="biogene-container" style="display: none">
+  </div>
+
+  <div id="box">
+  </div>
+
+  <!-- templates -->
+  <script type="text/template" id="node-legend-template">
+    <div class="sbgn-frame">
+      <h2 class="sbgn-text">Node Legend</h2>
+      <img src="images/node_legend_sbgn.png" alt="" class="centered">
+    </div>
+  </script>
+
+  <script type="text/template" id="edge-legend-template">
+    <div class="sbgn-frame">
+      <h2 class="sbgn-text">Interaction Legend</h2>
+      <img src="images/interaction_legend_sbgn.png" alt="" class="centered">
+    </div>
+  </script>
+
+  <script type="text/template" id="about-template">
+    <div class="sbgn-frame">
+      <h2 class="sbgn-text">About</h2>
+
+       <table width="100%" height="100%" align="center" valign="center">
+         <tr><td>
+          <img src="images/i-vis.png" alt="" class="centered">
+         </td></tr>
+         
+         <tr><td>
+          <img src="images/cbio.png" alt="" class="centered">
+         </td></tr>
+         
+         <tr><td>
+          <p class="sbgn-text">SBGN<i>Viz</i>.js version 1.0</p>
+         </td></tr>
+         
+         <tr><td>
+          <p class="address-text marg">i-Vis information Visualization Group</p>
+          <p class="address-text">Bilkent University, Ankara, Turkey</p>
+         </td></tr>
+         
+         <tr><td>
+          <p class="address-text marg">Memorial Sloan-Kettering Cancer Center</p>
+          <p class="address-text">New York, USA</p>
+         </td></tr>
+         
+         <tr><td>
+         <p class="address-text marg">
+          <a href="mailto:ivis@cs.bilkent.edu.tr" target="_top">ivis@cs.bilkent.edu.tr</a>
+          </p>
+         <p class="address-text">
+          <a href="https://code.google.com/p/sbgnviz-js" target="_blank">https://code.google.com/p/sbgnviz-js</a>
+          </p>
+         </td></tr>
+       </table>
+    </div>
+  </script>
+
+  <script type="text/template" id="quick-help-template">
+      <div class="sbgn-frame quick-help">
+          <h2 class="sbgn-text">Quick Help</h2>
+          <div class="quick-help-content">
+              <table align="center" valign="center">
+                  <tr>
+                      <td><b>File | Samples | &lt;sample file&gt;</b>:
+                      Load a sample model from file in SBGN-ML</td>
+                  </tr>
+                  <tr>
+                      <td><b>File | Load</b>:
+                      Load a model from file in SBGN-ML</td>
+                  </tr>
+                  <tr>
+                      <td><b>Left-click</b>:
+                      Full label of the node</td>
+                  </tr>
+                  <tr>
+                      <td><b>Right-click</b>:
+                      Detailed properties of a macro-molecule from BioGene</td>
+                  </tr>
+              </table>
+          </div>
+      </div>
+  </script>
+
+  <script type="text/template" id="loading-small-template">
+      <p class="sbgn-text"> <%= name %> </p>
+      <img class="centered" src="images/loading-small.gif" height="auto" width="auto" align="middle">
+  </script>
+
+  <script type="text/template" id="layout-settings-template">
+      <table class="table-condensed layout-table">
+          <tr>
+            <td>
+                <span class="add-on layout-text"> Node Repulsion </span>
+            </td>
+            <td>
+                <input id="node-repulsion" type="text" class="input-small layout-text" value= <%= nodeRepulsion %> >
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+                <span class="add-on layout-text"> Node Overlap </span>
+            </td>
+            <td>
+                <input id="node-overlap" type="text" class="input-small layout-text" value= <%= nodeOverlap %> >
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+                <span class="add-on layout-text"> Ideal Edge Length </span>
+            </td>
+            <td>
+                <input id="ideal-edge-length" type="text" class="input-small layout-text" value= <%= idealEdgeLength %> >
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+                <span class="add-on layout-text"> Edge Elasticity </span>
+            </td>
+            <td>
+                <input id="edge-elasticity" type="text" class="input-small layout-text" value= <%= edgeElasticity %> >
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+                <span class="add-on layout-text"> Nesting Factor </span>
+            </td>
+            <td>
+                <input id="nesting-factor" type="text" class="input-small layout-text" value= <%= nestingFactor %> >
+            </td>
+          </tr>
+
+            <tr>
+            <td>
+                <span class="add-on layout-text"> Gravity </span>
+            </td>
+            <td>
+                <input id="gravity" type="text" class="input-small layout-text" value= <%= gravity %> >
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+                <span class="add-on layout-text"> Number of Iterations </span>
+            </td>
+            <td>
+                <input id="num-iter" type="text" class="input-small layout-text" value= <%= numIter %> >
+            </td>
+          </tr>
+
+          <tr id="layout-buttons">
+            <td>
+                <button id="save-layout" class="btn btn-default" >Save</button>
+            </td>
+            <td>
+                <button id="default-layout" class="btn btn-default">Default</button>
+            </td>
+          </tr>
+      </table>
+  </script>
+
+ <!-- BioGeneView template for backbone.js -->
+  <script type="text/template" id="biogene-template">
+      <div class='node-details-text'>
+          <table class="table table-condensed table-striped" cellspacing="10">
+              <tr class="biogene-info biogene-description node-details-summary">
+                  <th valign="top">Gene Summary:</th>
+                  <td colspan="2" class="expandable">
+                      <%=geneSummary %>
+                  </td>
+              </tr>
+              <tr class="biogene-info biogene-aliases">
+                  <th valign="top">Aliases:</th>
+                  <td>
+                      <%=geneAliases %>
+                  </td>
+              </tr>
+              <tr class="biogene-info biogene-description">
+                  <th>Description:</th>
+                  <td class="expandable">
+                      <%=geneDescription %>
+                  </td>
+              </tr>
+              <tr class="biogene-info biogene-location">
+                  <th valign="top">Chromosome Location:</th>
+                  <td>
+                      <%=geneLocation %>
+                  </td>
+              </tr>
+              <tr class="biogene-info biogene-uniprot-links">
+                  <th valign="top">UniProt ID:</th>
+                  <td>
+                      <a href='http://www.uniprot.org/uniprot/<%= geneUniprotId %>' target='blank'>
+                          <%=geneUniprotId %>
+                      </a>
+                      <span class='biogene-uniprot-links-extra'>
+                            <%= geneUniprotLinks %>
+                        </span>
+                  </td>
+              </tr>
+              <tr class="biogene-info biogene-id">
+                  <th valign="top">Gene ID:</th>
+                  <td>
+                      <a href='http://www.ncbi.nlm.nih.gov/gene?term=<%= geneId %>' target='blank'>
+                          <%=geneId %>
+                      </a>
+                  </td>
+              </tr>
+          </table>
+      </div>
+  </script>
+
+  <script type="text/template" id="uniprot-link-template">
+      <a href="http://www.uniprot.org/uniprot/<%= id %>" target="_blank">
+          <%=id %>
+      </a>
+  </script>
+
+    <script type="text/template" id="noty-info">
+      Right click to a node to see its detailed information
+  </script>
+
+
+  <script src="js/libraries/jquery-1.8.2.min.js"></script>
+  <script src="js/libraries/jquery.fancybox-1.3.4.pack.js"></script>
+  <script src="js/libraries/jquery.expander-min.js"></script>
+  <script src="js/libraries/jquery.qtip.min.js"></script>
+  <script src="js/libraries/bootstrap.min.js"></script>
+  <script src="js/libraries/jquery-ui-1.10.3.custom.min.js"></script>
+  <script src="js/libraries/underscore.js"></script>
+  <script src="js/libraries/backbone-min.js"></script>
+  <script src="js/libraries/cytoscape.min.js"></script>
+  <script src="js/libraries/cytoscape.js-panzoom.js"></script>
+  <script src="js/libraries/cytoscape.js-qtip.js"></script>
+  <script src="js/libraries/FileSaver.js"></script>
+  <script src="js/libraries/jquery.noty.packaged.min.js"></script>
+
+  <script src="js/extensions/cytoscape.layout.tiled-cose.js"></script>
+  <script src="js/extensions/cytoscape.renderer.canvas.sbgn-renderer.js"></script>
+
+  <script src="js/utils/json-to-sbgnml-converter.js"></script>
+  <script src="js/utils/sbgnml-to-json-converter.js"></script>
+  <script src="js/utils/sbgn-filtering.js"></script>
+
+  <script src="js/components/sample-app-cytoscape-sbgn.js"></script>
+  <script src="js/components/sample-app-menu-functions.js"></script>
+  <script src="js/components/biogene-info.js"></script>
+
+  </body>
+</html>
