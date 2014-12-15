@@ -286,11 +286,11 @@ var SBGNContainer = Backbone.View.extend({
 var SBGNLayout = Backbone.View.extend({
     defaultLayoutProperties: {
         name: 'cose',
-        nodeRepulsion: 10000,
+        nodeRepulsion: 800000,
         nodeOverlap: 10,
         idealEdgeLength: 10,
-        edgeElasticity: 100,
-        nestingFactor: 5,
+        edgeElasticity: 20,
+        nestingFactor: 3,
         gravity: 250,
         numIter: 300
     },
