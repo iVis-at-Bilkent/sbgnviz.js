@@ -120,5 +120,5 @@ Below are some sample screenshots from SBGNViz.js, illustrating some of its capa
 
 ## Team
 
-  * Mecit Sari, Ugur Dogrusoz, Istemi Bahceci, [i-Vis at Bilkent University](http://www.cs.bilkent.edu.tr/~ivis)
+  * Mecit Sari, Ugur Dogrusoz, Istemi Bahceci, Ayhun Tekat, Metin Can Siper [i-Vis at Bilkent University](http://www.cs.bilkent.edu.tr/~ivis)
   * Selcuk Onur Sumer, Bulent Arman Aksoy, Ozgun Babur, Emek Demir [cBio at MSKCC](http://cbio.mskcc.org)
