@@ -11,10 +11,10 @@ var sbgnStyleSheet = cytoscape.stylesheet()
         .selector("node[sbgnclass='complex']")
         .css({
             'background-color' : '#F4F3EE',
-            'padding-bottom' : '20',
-            'padding-top' : '20',
-            'padding-left' : '20',
-            'padding-right' : '20'
+            'padding-bottom' : '15',
+            'padding-top' : '15',
+            'padding-left' : '15',
+            'padding-right' : '15'
         })
         .selector("node[sbgnclass='compartment']")
         .css({
@@ -24,10 +24,10 @@ var sbgnStyleSheet = cytoscape.stylesheet()
             'text-valign' : 'bottom',
             'text-halign' : 'center',
             'font-size' : '20',
-            'padding-bottom' : '20',
-            'padding-top' : '20',
-            'padding-left' : '20',
-            'padding-right' : '20'
+            'padding-bottom' : '10',
+            'padding-top' : '10',
+            'padding-left' : '10',
+            'padding-right' : '10'
         })
         .selector("node[sbgnclass!='complex'][sbgnclass!='compartment'][sbgnclass!='submap']")
         .css({
