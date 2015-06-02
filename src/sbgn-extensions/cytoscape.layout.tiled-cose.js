@@ -35,7 +35,7 @@
     debug               : false,
 
     // Node repulsion (non overlapping) multiplier
-    nodeRepulsion       : 800000,
+    nodeRepulsion       : 10000,
     
     // Node repulsion (overlapping) multiplier
     nodeOverlap         : 10,
@@ -44,16 +44,16 @@
     idealEdgeLength     : 10,
     
     // Divisor to compute edge forces
-    edgeElasticity      : 20,
+    edgeElasticity      : 100,
     
     // Nesting factor (multiplier) to compute ideal edge length for nested edges
-    nestingFactor       : 3,
+    nestingFactor       : 5, 
     
     // Gravity force (constant)
     gravity             : 250, 
     
     // Maximum number of iterations to perform
-    numIter             : 300,
+    numIter             : 100,
     
     // Initial temperature (maximum node displacement)
     initialTemp         : 200,

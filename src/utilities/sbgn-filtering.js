@@ -53,8 +53,8 @@ var sbgnFiltering = {
     },
 
     removeHighlights: function(){
-        cy.nodes(":visible").nodes("[highlighted!='true']").removeCss(this.notHighlightNode);
-        cy.edges(":visible").edges("[highlighted!='true']").removeCss(this.notHighlightEdge);
+        cy.nodes(":visible").nodes("[highlighted!='true']").removeCss();
+        cy.edges(":visible").edges("[highlighted!='true']").removeCss();
         cy.nodes(":visible").nodes().removeData("highlighted");
         cy.edges(":visible").edges().removeData("highlighted");
     },
@@ -62,8 +62,8 @@ var sbgnFiltering = {
     highlightGraph: function(nodes, edges){
         cy.nodes(":visible").nodes("[highlighted!='true']").css(this.notHighlightNode);
         cy.edges(":visible").edges("[highlighted!='true']").css(this.notHighlightEdge);
-        cy.nodes(":visible").nodes("[highlighted='true']").removeCss(this.notHighlightNode);
-        cy.edges(":visible").edges("[highlighted='true']").removeCss(this.notHighlightEdge);
+        cy.nodes(":visible").nodes("[highlighted='true']").removeCss();
+        cy.edges(":visible").edges("[highlighted='true']").removeCss();
         // cy.nodes("[highlighted=true]").not(nodes).css(this.notHighlightNode);
         // cy.edges().not(edges).css(this.notHighlightEdge);
     },

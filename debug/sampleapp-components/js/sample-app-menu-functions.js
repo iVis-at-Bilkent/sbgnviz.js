@@ -135,9 +135,9 @@ $( document ).ready( function() {
     });
 
     $("#load-sample4").click(function(e){
-        var xmlObject = loadXMLDoc('samples/neuronal_muscle_signalling.xml');
+        var xmlObject = loadXMLDoc('samples/polyq_proteins_interference.xml');
         
-        setFileContent("neuronal_muscle_signalling.sbgnml");
+        setFileContent("polyq_proteins_interference.sbgnml");
 
         (new SBGNContainer({
             el: '#sbgn-network-container',
@@ -157,9 +157,20 @@ $( document ).ready( function() {
     });
 
     $("#load-sample6").click(function(e){
-        var xmlObject = loadXMLDoc('samples/sample6.xml');
+        var xmlObject = loadXMLDoc('samples/atm_mediated_phosphorylation_of_repair_proteins.xml');
         
-        setFileContent("sample6.xml");
+        setFileContent("atm_mediated_phosphorylation_of_repair_proteins.sbgnml");
+
+        (new SBGNContainer({
+            el: '#sbgn-network-container',
+            model : {cytoscapeJsGraph : sbgnmlToJson.convert(xmlObject)}
+        })).render();
+    });
+    
+    $("#load-sample7").click(function(e){
+        var xmlObject = loadXMLDoc('samples/vitamins_b6_activation_to_pyridoxal_phosphate.xml');
+        
+        setFileContent("vitamins_b6_activation_to_pyridoxal_phosphatesbgnml");
 
         (new SBGNContainer({
             el: '#sbgn-network-container',

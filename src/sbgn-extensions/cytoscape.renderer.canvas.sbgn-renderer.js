@@ -107,23 +107,6 @@
 		}
 	};
 
-	function checkPointRoughSelection(render, node, x, y, nodeThreshold){
-		//TODO: do it for all classes in sbgn, create a sbgn class array to check
-		if(sbgnShapes[render.getNodeShape(node)]){
-			return CanvasRenderer.nodeShapes[render.getNodeShape(node)].checkPointRough(x, y,
-				node,
-				nodeThreshold);
-		}
-		else{
-			return CanvasRenderer.nodeShapes[render.getNodeShape(node)].checkPointRough(x, y,
-				node._private.style["border-width"].pxValue / 2,
-				render.getNodeWidth(node) + nodeThreshold, 
-				render.getNodeHeight(node) + nodeThreshold,
-				node._private.position.x,
-				node._private.position.y);
-		}
-	};
-
 	function checkPointSelection(render, node, x, y, nodeThreshold){
 		//TODO: do it for all classes in sbgn, create a sbgn class array to check
 		if(sbgnShapes[render.getNodeShape(node)]){
@@ -342,8 +325,7 @@
 		// Check nodes
 		for (var i = 0; i < nodes.length; i++) {
 			
-			if (checkPointRoughSelection(this, nodes[i], x, y, nodeThreshold) &&
-				checkPointSelection(this, nodes[i], x, y, nodeThreshold)) {
+			if (checkPointSelection(this, nodes[i], x, y, nodeThreshold)) {
 				
 				if (visibleElementsOnly) {
 					if (nodes[i]._private.style["opacity"].value != 0
@@ -515,74 +497,116 @@
 	};
 
 	CanvasRenderer.prototype.drawArrowheads = function(context, edge, drawOverlayInstead) {
-		if( drawOverlayInstead ){ return; } // don't do anything for overlays 
+   if( drawOverlayInstead ){ return; } // don't do anything for overlays 
 
-		// Displacement gives direction for arrowhead orientation
-		var dispX, dispY;
+    var rs = edge._private.rscratch;
+    var self = this;
+    var isHaystack = rs.edgeType === 'haystack';
 
-		var startX = edge._private.rscratch.arrowStartX;
-		var startY = edge._private.rscratch.arrowStartY;
+    // Displacement gives direction for arrowhead orientation
+    var dispX, dispY;
+    var startX, startY, endX, endY;
 
-		var style = edge._private.style;
+    var srcPos = edge.source().position();
+    var tgtPos = edge.target().position();
 
-		// var srcPos = edge.source().position();
-		var srcPos = addPortReplacementIfAny(edge.source()[0], edge._private.data.portsource);
+    if( isHaystack ){
+      startX = rs.haystackPts[0];
+      startY = rs.haystackPts[1];
+      endX = rs.haystackPts[2];
+      endY = rs.haystackPts[3];
+    } else {
+      startX = rs.arrowStartX;
+      startY = rs.arrowStartY;
+      endX = rs.arrowEndX;
+      endY = rs.arrowEndY;
+    }
 
-		dispX = startX - srcPos.x;
-		dispY = startY - srcPos.y;
+    var style = edge._private.style;
+    
+    function drawArrowhead( prefix, x, y, dispX, dispY ){
+      var arrowShape = style[prefix + '-arrow-shape'].value;
 
-		if( !isNaN(startX) && !isNaN(startY) && !isNaN(dispX) && !isNaN(dispY) ){
+      if( arrowShape === 'none' ){
+        return;
+      }
 
-			var gco = context.globalCompositeOperation;
+      var gco = context.globalCompositeOperation;
 
-			context.globalCompositeOperation = 'destination-out';
+      var arrowClearFill = style[prefix + '-arrow-fill'].value === 'hollow' ? 'both' : 'filled';
+      var arrowFill = style[prefix + '-arrow-fill'].value;
 
-			this.fillStyle(context, 255, 255, 255, 1);
+      if( arrowShape === 'half-triangle-overshot' ){
+        arrowFill = 'hollow';
+        arrowClearFill = 'hollow';
+      }
 
-			this.drawArrowShape(context, 'filled', style['source-arrow-shape'].value, 
-			startX, startY, dispX, dispY);
+      if( style.opacity.value !== 1 ){ // then extra clear is needed
+        context.globalCompositeOperation = 'destination-out';
+        
+        self.fillStyle(context, 255, 255, 255, 1);
+        
+        self.drawArrowShape( edge, prefix, context, 
+          arrowClearFill, style['width'].pxValue, style[prefix + '-arrow-shape'].value, 
+          x, y, dispX, dispY
+        );
 
-			context.globalCompositeOperation = gco;
+        context.globalCompositeOperation = gco;
+      } // otherwise, the opaque arrow clears it for free :)
 
-			var color = style['source-arrow-color'].value;
-			this.fillStyle(context, color[0], color[1], color[2], style.opacity.value);
+      var color = style[prefix + '-arrow-color'].value;
+      self.fillStyle(context, color[0], color[1], color[2], style.opacity.value);
 
-			this.drawArrowShape(context, style['source-arrow-fill'].value, style['source-arrow-shape'].value, 
-			startX, startY, dispX, dispY);
+      self.drawArrowShape( edge, prefix, context, 
+        arrowFill, style['width'].pxValue, style[prefix + '-arrow-shape'].value, 
+        x, y, dispX, dispY
+      );
+    }
 
-		} else {
-			// window.badArrow = true;
-			// debugger;
-		}
+    dispX = startX - srcPos.x;
+    dispY = startY - srcPos.y;
 
-		var endX = edge._private.rscratch.arrowEndX;
-		var endY = edge._private.rscratch.arrowEndY;
+    if( !isHaystack && !isNaN(startX) && !isNaN(startY) && !isNaN(dispX) && !isNaN(dispY) ){
+      drawArrowhead( 'source', startX, startY, dispX, dispY );
 
-		// var tgtPos = edge.target().position();
-		var tgtPos = addPortReplacementIfAny(edge.target()[0], edge._private.data.porttarget);
+    } else {
+      // window.badArrow = true;
+      // debugger;
+    }
+    
+    var midX = rs.midX;
+    var midY = rs.midY;
 
-		dispX = endX - tgtPos.x;
-		dispY = endY - tgtPos.y;
+    if( isHaystack ){
+      midX = ( startX + endX )/2;
+      midY = ( startY + endY )/2;
+    }
 
-		if( !isNaN(endX) && !isNaN(endY) && !isNaN(dispX) && !isNaN(dispY) ){
+    dispX = startX - endX;
+    dispY = startY - endY;
 
-			var gco = context.globalCompositeOperation;
+    if( rs.edgeType === 'self' ){
+      dispX = 1;
+      dispY = -1;
+    }
 
-			context.globalCompositeOperation = 'destination-out';
+    if( !isNaN(midX) && !isNaN(midY) ){
+      drawArrowhead( 'mid-target', midX, midY, dispX, dispY );
+    }
 
-			this.fillStyle(context, 255, 255, 255, 1);
+    dispX *= -1;
+    dispY *= -1;
 
-			this.drawArrowShape(context, 'filled', style['target-arrow-shape'].value,
-			endX, endY, dispX, dispY);
-
-			context.globalCompositeOperation = gco;
-
-			var color = style['target-arrow-color'].value;
-			this.fillStyle(context, color[0], color[1], color[2], style.opacity.value);
-
-			this.drawArrowShape(context, style['target-arrow-fill'].value, style['target-arrow-shape'].value,
-			endX, endY, dispX, dispY);
-		}
+    if( !isNaN(midX) && !isNaN(midY) ){
+      drawArrowhead( 'mid-source', midX, midY, dispX, dispY );
+    }
+    
+    dispX = endX - tgtPos.x;
+    dispY = endY - tgtPos.y;
+    
+    if( !isHaystack && !isNaN(endX) && !isNaN(endY) && !isNaN(dispX) && !isNaN(dispY) ){
+      drawArrowhead( 'target', endX, endY, dispX, dispY );
+    }
 	};
 
 
@@ -1745,7 +1769,7 @@
 	}
 
 	$$.sbgn.drawDynamicLabelText = function(context, textProp){
-		var textHeight = parseInt(textProp.height/3);
+		var textHeight = parseInt(textProp.height/(2.45));
 		textProp.color = "#0f0f0f";
 		textProp.font = textHeight + "px Arial";
 		$$.sbgn.drawText(context, textProp);
@@ -1758,7 +1782,7 @@
 		var stateLabel = (stateVariable == null /*|| typeof stateVariable === undefined */) ? stateValue : 
 			stateValue + "@" + stateVariable;
 		
-		var fontSize = parseInt(textProp.height/2);
+		var fontSize = parseInt(textProp.height/1.5);
 
 		textProp.font = fontSize + "px Arial";
 		textProp.label = stateLabel;
@@ -1767,7 +1791,7 @@
 	};
 
 	$$.sbgn.drawInfoText = function(context, textProp){
-		var fontSize = parseInt(textProp.height/2);
+		var fontSize = parseInt(textProp.height/1.5);
 		textProp.font = fontSize + "px Arial";
 		textProp.color = "#0f0f0f";
 		$$.sbgn.drawText(context, textProp);
@@ -2440,43 +2464,6 @@
 		return false;
 	};
 
-	$$.sbgn.checkPointRoughStateAndInfoBoxes = function(node, x, y, 
-		centerX, centerY){
-		var stateAndInfos = node._private.data.sbgnstatesandinfos;
-		var stateCount = 0, infoCount = 0;
-		var padding = node._private.style["border-width"].pxValue / 2;
-
-		for(var i = 0 ; i < stateAndInfos.length ; i++){
-			var state = stateAndInfos[i];
-			var stateWidth = state.bbox.w;
-			var stateHeight = state.bbox.h;
-			var stateCenterX = state.bbox.x + centerX;
-			var stateCenterY = state.bbox.y + centerY;
-
-			if(state.clazz == "state variable" && stateCount < 2){//draw ellipse
-				return true;
-				var stateCheckPointRough = nodeShapes["ellipse"].checkPointRough(
-					x, y, padding, stateWidth, stateHeight, stateCenterX, stateCenterY);
-				
-				if(stateCheckPointRough == true)
-					return true;
-
-				stateCount++;
-			}
-			else if(state.clazz == "unit of information" && infoCount < 2){//draw rectangle
-				var infoCheckPointRough = nodeShapes["roundrectangle"].checkPointRough(
-					x, y, padding, stateWidth, stateHeight, stateCenterX, stateCenterY);
-				
-				if(infoCheckPointRough == true)
-					return true;
-
-				infoCount++;
-			}
-
-		}
-		return false;
-	};
-
 	$$.sbgn.intersectLineStateAndInfoBoxes = function(node, x, y){
 		var centerX = node._private.position.x;
 		var centerY = node._private.position.y;
@@ -2887,7 +2874,7 @@
 		'uncertain process', 'association', 'dissociation', 'phenotype', 'compartment',
 		'tag', 'and operator', 'or operator', 'not operator', 'and', 'or', 'not',
 		'nucleic acid feature multimer', 'macromolecule multimer', 'simple chemical multimer', 
-		'complex multimer');
+		'complex multimer', 'submap', 'terminal');
 
 	var nodeShapes = CanvasRenderer.nodeShapes;
 
@@ -3022,37 +3009,6 @@
 			}
 
 			return nodeIntersectBox || stateAndInfoIntersectBox || multimerIntersectBox;
-		},
-
-		checkPointRough: function(x, y, node, threshold) {
-			var centerX = node._private.position.x;
-			var centerY = node._private.position.y;
-			var width = node.width();
-			var height = node.height();
-			var padding = node._private.style["border-width"].pxValue / 2;
-			var multimerPadding = nodeShapes["complex"].multimerPadding;
-			var cornerLength = nodeShapes["complex"].cornerLength;
-
-			nodeShapes["complex"].points = $$.sbgn.generateComplexShapePoints(cornerLength, 
-				width, height);
-
-			var nodeCheckPointRough = $$.math.checkInBoundingBox(
-				x, y, nodeShapes["complex"].points, 
-					padding, width, height, centerX, centerY);
-
-			var stateAndInfoCheckPointRough = $$.sbgn.checkPointRoughStateAndInfoBoxes(node,
-				x, y, centerX, centerY);
-
-			//check whether sbgn class includes multimer substring or not
-			var multimerCheckPointRough = false;
-			if($$.sbgn.isMultimer(node)){
-				multimerCheckPointRough = $$.math.checkInBoundingBox(
-					x, y, nodeShapes["complex"].points, 
-					padding, width, height, 
-					centerX + multimerPadding, centerY + multimerPadding);
-			}
-
-			return nodeCheckPointRough || stateAndInfoCheckPointRough || multimerCheckPointRough;
 		},
 
 		checkPoint: function(x, y, node, threshold) {
@@ -3206,32 +3162,6 @@
 			return nodeIntersectBox || stateAndInfoIntersectBox || multimerIntersectBox;
 		},
 
-		checkPointRough: function(x, y, node, threshold) {
-			var centerX = node._private.position.x;
-			var centerY = node._private.position.y;
-			var width = node.width() + threshold;
-			var height = node.height() + threshold;
-			var padding = node._private.style["border-width"].pxValue / 2;
-			var multimerPadding = nodeShapes["macromolecule"].multimerPadding;
-
-			var nodeCheckPointRough = $$.math.checkInBoundingBox(
-				x, y, nodeShapes["macromolecule"].points, 
-					padding, width, height, centerX, centerY);
-
-			var stateAndInfoCheckPointRough = $$.sbgn.checkPointRoughStateAndInfoBoxes(node,
-				x, y, centerX, centerY);
-
-			//check whether sbgn class includes multimer substring or not
-			var multimerCheckPointRough = false;
-			if($$.sbgn.isMultimer(node)){
-				multimerCheckPointRough = $$.math.checkInBoundingBox(
-				x, y, nodeShapes["macromolecule"].points, 
-					padding, width, height, centerX + multimerPadding, centerY + multimerPadding);
-			}
-
-			return nodeCheckPointRough || stateAndInfoCheckPointRough || multimerCheckPointRough;
-		},
-
 		checkPoint: function(x, y, node, threshold) {
 			var centerX = node._private.position.x;
 			var centerY = node._private.position.y;
@@ -3368,34 +3298,6 @@
 			return nodeIntersectBox || stateAndInfoIntersectBox || multimerIntersectBox;
 		},
 
-		checkPointRough: function(x, y, node, threshold) {
-			var centerX = node._private.position.x;
-			var centerY = node._private.position.y;
-			var width = node.width();
-			var height = node.height();
-			var padding = node._private.style["border-width"].pxValue / 2;
-			var cornerRadius = $$.math.getRoundRectangleRadius(width, height);
-			var multimerPadding = nodeShapes["nucleic acid feature"].multimerPadding;
-
-			var nodeCheckPointRough = $$.math.checkInBoundingBox(
-				x, y, nodeShapes["nucleic acid feature"].points, 
-					padding, width, height, centerX, centerY);
-
-			var stateAndInfoCheckPointRough = $$.sbgn.checkPointRoughStateAndInfoBoxes(node,
-				x, y, centerX, centerY);
-
-			//check whether sbgn class includes multimer substring or not
-			var multimerCheckPointRough = false;
-			if($$.sbgn.isMultimer(node)){
-				multimerCheckPointRough = $$.math.checkInBoundingBox(
-				x, y, nodeShapes["nucleic acid feature"].points, 
-					padding, width, height, 
-					centerX + multimerPadding, centerY + multimerPadding);
-			}
-
-			return nodeCheckPointRough || stateAndInfoCheckPointRough || multimerCheckPointRough;
-		},
-
 		checkPoint: function(x, y, node, threshold) {
 			var centerX = node._private.position.x;
 			var centerY = node._private.position.y;
@@ -3501,23 +3403,6 @@
 
 			return nodeIntersectBox || stateAndInfoIntersectBox;
 
-		},
-
-		checkPointRough: function(x, y, node, threshold) {
-			var centerX = node._private.position.x;
-			var centerY = node._private.position.y;
-			var width = node.width();
-			var height = node.height();
-			var padding = node._private.style["border-width"].pxValue / 2;
-
-			var nodeCheckPointRough = $$.math.checkInBoundingBox(
-				x, y, nodeShapes["perturbing agent"].points, 
-					padding, width, height, centerX, centerY);
-
-			var stateAndInfoCheckPointRough = $$.sbgn.checkPointRoughStateAndInfoBoxes(node,
-				x, y, centerX, centerY);
-
-			return nodeCheckPointRough || stateAndInfoCheckPointRough;
 		},
 
 		checkPoint: function(x, y, node, threshold) {
@@ -3649,31 +3534,6 @@
 
 		},
 
-		checkPointRough: function(x, y, node, threshold) {
-			var centerX = node._private.position.x;
-			var centerY = node._private.position.y;;
-			var width = node.width();
-			var height = node.height();
-			var padding = node._private.style["border-width"].pxValue / 2;
-			var multimerPadding = nodeShapes["simple chemical"].multimerPadding;
-
-			var nodeCheckPointRough = nodeShapes["roundrectangle"].checkPointRough(x, y, 
-				padding, width, height, centerX, centerY);
-
-			var stateAndInfoCheckPointRough = $$.sbgn.checkPointRoughStateAndInfoBoxes(node,
-				x, y, centerX, centerY);
-
-			//check whether sbgn class includes multimer substring or not
-			var multimerCheckPointRough = false;
-			if($$.sbgn.isMultimer(node)){
-				multimerCheckPointRough = nodeShapes["ellipse"].checkPointRough(x, y, 
-				padding, width, height, 
-				centerX + multimerPadding, centerY + multimerPadding);
-			}
-
-			return nodeCheckPointRough || stateAndInfoCheckPointRough || multimerCheckPointRough;
-		},
-
 		checkPoint: function(x, y, node, threshold) {
 			var centerX = node._private.position.x;
 			var centerY = node._private.position.y;;
@@ -3769,18 +3629,6 @@
 
 		},
 
-		checkPointRough: function(x, y, node, threshold) {
-			var centerX = node._private.position.x;
-			var centerY = node._private.position.y;
-			var width = node.width() + threshold;
-			var height = node.height() + threshold;
-			var padding = node._private.style["border-width"].pxValue / 2;
-
-			return nodeShapes["ellipse"].checkPointRough(x, y, padding, width, height, 
-				centerX, centerY);
-
-		},
-
 		checkPoint: function(x, y, node, threshold) {
 			var centerX = node._private.position.x;
 			var centerY = node._private.position.y;
@@ -3852,18 +3700,6 @@
 			return renderer.boxIntersectPolygon(x1, y1, x2, y2,
 					points, width, height, centerX, centerY, [0, -1], padding);
 
-		},
-
-		checkPointRough: function(x, y, node, threshold) {
-			var centerX = node._private.position.x;
-			var centerY = node._private.position.y;
-			var width = node.width();
-			var height = node.height();
-			var padding = node._private.style["border-width"].pxValue / 2;
-			
-			return $$.math.checkInBoundingBox(
-				x, y, nodeShapes["tag"].points, 
-					padding, width, height, centerX, centerY);
 		},
 
 		checkPoint: function(x, y, node, threshold) {
@@ -3952,23 +3788,6 @@
 
 		},
 
-		checkPointRough: function(x, y, node, threshold) {
-			var centerX = node._private.position.x;
-			var centerY = node._private.position.y;;
-			var width = node.width();
-			var height = node.height();
-			var padding = node._private.style["border-width"].pxValue / 2;
-
-			var nodeCheckPointRough = nodeShapes["ellipse"].checkPointRough(x, y, 
-				padding, width, height, centerX, centerY);
-
-			var stateAndInfoCheckPointRough = $$.sbgn.checkPointRoughStateAndInfoBoxes(node,
-				x, y, centerX, centerY);
-
-			return nodeCheckPointRough || stateAndInfoCheckPointRough;
-
-		},
-
 		checkPoint: function(x, y, node, threshold) {
 			var centerX = node._private.position.x;
 			var centerY = node._private.position.y;;
@@ -4036,10 +3855,6 @@
 
 			return nodeShapes['ellipse'].intersectLine(x1, y1, x2, y2, width,
 				height, centerX, centerY, padding);
-		},
-
-		checkPointRough: function(x, y, node, threshold) {
-			return true;
 		},
 
 		checkPoint: function(x, y, node, threshold) {
@@ -4112,18 +3927,6 @@
 			return renderer.boxIntersectPolygon(x1, y1, x2, y2,
 					points, width, height, centerX, centerY, [0, -1], padding);
 
-		},
-
-		checkPointRough: function(x, y, node, threshold) {
-			var centerX = node._private.position.x;
-			var centerY = node._private.position.y;
-			var width = node.width();
-			var height = node.height();
-			var padding = node._private.style["border-width"].pxValue / 2;
-			
-			return $$.math.checkInBoundingBox(
-				x, y, nodeShapes["phenotype"].points, 
-					padding, width, height, centerX, centerY);
 		},
 
 		checkPoint: function(x, y, node, threshold) {
@@ -4207,10 +4010,6 @@
 
 		},
 
-		checkPointRough: function(x, y, node, threshold) {
-			return true;
-		},
-
 		checkPoint: function(x, y, node, threshold) {
 			var centerX = node._private.position.x;
 			var centerY = node._private.position.y;
@@ -4287,10 +4086,6 @@
 	      
 			return $$.math.boxIntersectEllipse(
 				x1, y1, x2, y2, padding, width, height, centerX, centerY);
-	    },
-	    
-	    checkPointRough: function(x, y, node, threshold) {
-	      return true;
 	    },
 	    
 	    checkPoint: function(x, y, node, threshold) {
@@ -4371,18 +4166,6 @@
 				points, width, height, nodeX, nodeY, [0, -1], padding);
 		},
 
-		checkPointRough: function(x, y, node, threshold) {
-			var centerX = node._private.position.x;
-			var centerY = node._private.position.y;
-			var width = node.width();
-			var height = node.height();
-			var padding = node._private.style['border-width'].pxValue / 2;
-
-			return $$.math.checkInBoundingBox(
-				x, y, nodeShapes['process'].points, 
-					padding, width, height, centerX, centerY);
-		},
-
 		checkPoint: function(x, y, node, threshold) {
 			var centerX = node._private.position.x;
 			var centerY = node._private.position.y;
@@ -4412,6 +4195,8 @@
 	nodeShapes['not'] = nodeShapes['not operator'];
 
 	nodeShapes['compartment'] = nodeShapes['roundrectangle'];
+	nodeShapes['submap'] = nodeShapes['roundrectangle'];
+	nodeShapes['terminal'] = nodeShapes['ellipse'];
 
 	//adding multimer shapes
 	nodeShapes['macromolecule multimer'] = nodeShapes['macromolecule'];
@@ -4448,6 +4233,24 @@
     	return (x1 <= x && x <= x2) && (y1 <= y && y <= y2);
   	};
 
+	var transform = function(x, y, size, angle, translation){
+		angle = -angle; // b/c of notation used in arrow draw fn
+
+		var xRotated = x * Math.cos(angle) - y * Math.sin(angle);
+		var yRotated = x * Math.sin(angle) + y * Math.cos(angle);
+
+		var xScaled = xRotated * size;
+		var yScaled = yRotated * size;
+
+		var xTranslated = xScaled + translation.x;
+		var yTranslated = yScaled + translation.y;
+
+		return {
+			x: xTranslated,
+			y: yTranslated
+		};
+	};
+
 	arrowShapes['necessary stimulation'] = {
 	    trianglePoints: [
 	      -0.15, -0.3,
@@ -4469,19 +4272,22 @@
 	    
 	    roughCollide: bbCollide,
 	    
-	    draw: function(context) {
+	    draw: function(context, size, angle, translation) {
 	    	var points = arrowShapes['necessary stimulation'].trianglePoints;
 	   		var linePoints = arrowShapes['necessary stimulation'].linePoints;
 
-	   		context.beginPath();
-	    	for (var i = 0; i < points.length / 2 + 1 ; i++) {
-	        	context.lineTo(points[(i * 2)% points.length], 
-	        		points[(i * 2 + 1)% points.length]);
-	      	}
-	      	context.closePath();
+			for (var i = 0; i < points.length / 2; i++) {
+				var pt = transform( points[i * 2], points[i * 2 + 1], size, angle, translation );
 
-	      	context.moveTo(linePoints[0], linePoints[1]);
-	      	context.lineTo(linePoints[2], linePoints[3]);
+				context.lineTo(pt.x, pt.y);
+			}
+			context.closePath();
+
+			var pt1 = transform( linePoints[0], linePoints[1], size, angle, translation );
+			var pt2 = transform( linePoints[2], linePoints[3], size, angle, translation );
+
+	      	context.moveTo(pt1.x, pt1.y);
+	      	context.lineTo(pt2.x, pt2.y);
 
 	    },
 	    

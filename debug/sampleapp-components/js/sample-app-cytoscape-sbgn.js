@@ -23,7 +23,7 @@ var sbgnStyleSheet = cytoscape.stylesheet()
             'content' : 'data(sbgnlabel)',
             'text-valign' : 'bottom',
             'text-halign' : 'center',
-            'font-size' : '20',
+            'font-size' : '16',
             'padding-bottom' : '10',
             'padding-top' : '10',
             'padding-left' : '10',
@@ -167,7 +167,7 @@ var SBGNContainer = Backbone.View.extend({
                 container.cytoscapePanzoom(panProps);
 
                 cy.on('mouseover', 'node', function(evt){
-
+                  
                 });
 
                 cy.on('cxttap','node', function(event){
@@ -286,13 +286,14 @@ var SBGNContainer = Backbone.View.extend({
 var SBGNLayout = Backbone.View.extend({
     defaultLayoutProperties: {
         name: 'cose',
-        nodeRepulsion: 800000,
+        nodeRepulsion: 4500,
         nodeOverlap: 10,
-        idealEdgeLength: 10,
-        edgeElasticity: 20,
-        nestingFactor: 3,
-        gravity: 250,
-        numIter: 300
+        idealEdgeLength: 50,
+        edgeElasticity: 0.45,
+        nestingFactor: 0.1,
+        gravity: 0.4,
+        numIter: 2500,
+        tile: true
     },
     currentLayoutProperties: null,
 
@@ -319,14 +320,20 @@ var SBGNLayout = Backbone.View.extend({
         $(self.el).dialog();        
 
         $("#save-layout").die("click").live("click", function(evt){
-            self.currentLayoutProperties.nodeRepulsion = document.getElementById("node-repulsion").value;
-            self.currentLayoutProperties.nodeOverlap = document.getElementById("node-overlap").value;
-            self.currentLayoutProperties.idealEdgeLength = document.getElementById("ideal-edge-length").value;
-            self.currentLayoutProperties.edgeElasticity = document.getElementById("edge-elasticity").value;
-            self.currentLayoutProperties.nestingFactor = document.getElementById("nesting-factor").value;
-            self.currentLayoutProperties.gravity = document.getElementById("gravity").value;
-            self.currentLayoutProperties.numIter = document.getElementById("num-iter").value;
-
+            self.currentLayoutProperties.nodeRepulsion  = Number(document.getElementById("node-repulsion").value);
+            self.currentLayoutProperties.nodeOverlap    = Number(document.getElementById("node-overlap").value);
+            self.currentLayoutProperties.idealEdgeLength= Number(document.getElementById("ideal-edge-length").value);
+            self.currentLayoutProperties.edgeElasticity = Number(document.getElementById("edge-elasticity").value);
+            self.currentLayoutProperties.nestingFactor  = Number(document.getElementById("nesting-factor").value);
+            self.currentLayoutProperties.gravity        = Number(document.getElementById("gravity").value);
+            self.currentLayoutProperties.numIter        = Number(document.getElementById("num-iter").value);
+            self.currentLayoutProperties.tile           = document.getElementById("tile").checked ;
+            
+//            if(self.currentLayoutProperties.tile === "true")
+//              self.currentLayoutProperties.tile = true;
+//            else
+//              self.currentLayoutProperties.tile = false;
+            
             $(self.el).dialog('close');
         });
 
