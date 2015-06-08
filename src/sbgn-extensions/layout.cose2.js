@@ -3591,6 +3591,8 @@
       FDLayoutConstants.DEFAULT_GRAVITY_STRENGTH = options.gravity;
     if (options.numIter != null)
       FDLayoutConstants.MAX_ITERATIONS = options.numIter;
+    
+    layoutOptionsPack.animate = options.animate;
   }
 
   FDLayoutConstants.MAX_ITERATIONS = 2500;
@@ -3908,22 +3910,28 @@
       this.calcGravitationalForces();
       this.moveNodes();
       this.animate();
-//      if (this.totalIterations % 50 == 0) {
-//        var allNodes = this.graphManager.getAllNodes();
-//        var pData = {};
-//        for (var i = 0; i < allNodes.length; i++) {
-//          var rect = allNodes[i].rect;
-//          var id = allNodes[i].id;
-//          pData[id] = {
-//            id: id,
-//            x: rect.x,
-//            y: rect.y,
-//            w: rect.width,
-//            h: rect.height
-//          };
-//        }
-//        broadcast({pData: pData});
-//      }
+      if (layoutOptionsPack.animate && this.totalIterations % 20 == 0) {
+        /*var start = new Date().getTime();
+        for (var i = 0; i < 1e7; i++) {
+          if ((new Date().getTime() - start) > 1000){
+            break;
+          }
+        }*/
+        var allNodes = this.graphManager.getAllNodes();
+        var pData = {};
+        for (var i = 0; i < allNodes.length; i++) {
+          var rect = allNodes[i].rect;
+          var id = allNodes[i].id;
+          pData[id] = {
+            id: id,
+            x: rect.x,
+            y: rect.y,
+            w: rect.width,
+            h: rect.height
+          };
+        }
+        broadcast({pData: pData});
+      }
     }
     while (this.totalIterations < this.maxIterations);
 
@@ -4273,7 +4281,9 @@
     // Lower temperature threshold (below this point the layout will end)
     minTemp: 1,
     // For enabling tiling
-    tile: true
+    tile: true,
+    //whether to make animation while performing the layout
+    animate: false
   };
 
   var layout = new CoSELayout();
@@ -4604,9 +4614,10 @@
           var theId = ele.data('id');
           var pNode = pData[theId];
           if (pNode == null) {
+            var parent = this.parent()[0];
             return{
-              x: 0,
-              y: 0
+              x: parent.position("x"),
+              y: parent.position("y")
             }
           }
           return {
