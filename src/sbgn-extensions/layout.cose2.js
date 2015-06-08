@@ -1118,8 +1118,6 @@
       yWorld = this.lworldOrgY +
               ((y - this.ldeviceOrgY) * this.lworldExtY / deviceExtY);
     }
-
-
     return yWorld;
   }
 
@@ -1176,42 +1174,10 @@
 // Section: Instance variables
 // -----------------------------------------------------------------------------
     /*
-     * Source and target nodes of this edge
-     */
-    this.source = null;
-    this.target = null;
-
-    /*
-     * Whether this edge is an intergraph one
-     */
-    this.isInterGraph;
-
-    /*
-     * The length of this edge ( l = sqrt(x^2 + y^2) )
-     */
-    this.length;
-    this.lengthX;
-    this.lengthY;
-
-    /*
      * Whether source and target node rectangles intersect, requiring special
      * treatment
      */
     this.isOverlapingSourceAndTarget = false;
-
-    /*
-     * Bend points for this edge
-     */
-    this.bendpoints;
-
-    /*
-     * Lowest common ancestor graph (lca), and source and target nodes in lca
-     */
-    this.lca;
-    this.sourceInLca;
-    this.targetInLca;
-
-    this.vGraphObject;
 
     /*
      * Constructor
@@ -1411,36 +1377,6 @@
 
   function LGraph(parent, obj2, vGraph) {
     LGraphObject.call(this, vGraph);
-    /*
-     * Nodes maintained by this graph
-     */
-    this.nodes;
-
-    /*
-     * Edges whose source and target nodes are in this graph
-     */
-    this.edges;
-
-    /*
-     * Owner graph manager
-     */
-    this.graphManager;
-
-    /*
-     * Parent node of this graph. This should never be null (the parent of the
-     * root graph is the root node) when this graph is part of a compound
-     * structure (i.e. a graph manager).
-     */
-    this.parent;
-
-    /*
-     * Geometry of this graph (i.e. that of its tightest bounding rectangle,
-     * also taking margins into account)
-     */
-    this.top;
-    this.left;
-    this.bottom;
-    this.right;
 
     /*
      * Estimated size of this graph based on estimated sizes of its contents
@@ -1451,14 +1387,6 @@
      * Margins of this graph to be applied on bouding rectangle of its contents
      */
     this.margin = LayoutConstants.DEFAULT_GRAPH_MARGIN;
-
-    /*
-     * Whether the graph is connected or not, taking indirect edges (e.g. an
-     * edge connecting a child node of a node of this graph to another node of
-     * this graph) into account.
-     */
-    this.isConnected;
-
 
     this.edges = [];
     this.nodes = [];
@@ -1988,58 +1916,14 @@
    */
 
   function LGraphManager(layout) {
-    /*
-     * Graphs maintained by this graph manager, including the root of the
-     * nesting hierarchy
-     */
-    this.graphs = null;
-
-    /*
-     * Inter-graph edges in this graph manager. Notice that all inter-graph
-     * edges go here, not in any of the edge lists of individual graphs (either
-     * source or target node's owner graph).
-     */
-    this.edges = null;
-
-    /*
-     * All nodes (excluding the root node) and edges (including inter-graph
-     * edges) in this graph manager. For efficiency purposes we hold references
-     * of all layout objects that we operate on in arrays. These lists are
-     * generated once we know that the topology of the graph manager is fixed,
-     * immediately before layout starts.
-     */
-    this.allNodes = null;
-    this.allEdges = null;
-
-    /*
-     * Similarly we have a list of nodes for which gravitation should be
-     * applied. This is determined once, prior to layout, and used afterwards.
-     */
-    this.allNodesToApplyGravitation = null;
-
-    /*
-     * The root of the inclusion/nesting hierarchy of this compound structure
-     */
-    this.rootGraph = null;
 
     /*
      * Layout object using this graph manager
      */
     this.layout = layout;
 
-    /*
-     * Cluster Manager of all graphs managed by this graph manager
-     */
-//  this.clusterManager = null;
-
-
     this.graphs = [];
     this.edges = [];
-    this.allNodes = null;
-    this.allEdges = null;
-    this.allNodesToApplyGravitation = null;
-    this.rootGraph = null;
-//  this.clusterManager = new ClusterManager();
   }
 
   /**
@@ -2625,16 +2509,6 @@
   };
 
   function LGraphObject(vGraphObject) {
-    /**
-     * Associated view object
-     */
-    this.vGraphObject = null;
-
-    /**
-     * Label
-     */
-    this.label = null;
-
     this.vGraphObject = vGraphObject;
   }
 
@@ -2659,34 +2533,6 @@
     if (gm.graphManager != null)
       gm = gm.graphManager;
 
-    // -----------------------------------------------------------------------------
-    // Section: Instance variables
-    // -----------------------------------------------------------------------------
-    /*
-     * Owner graph manager of this node
-     */
-    this.graphManager = null;
-
-    /**
-     * Possibly null child graph of this node
-     */
-    this.child;
-
-    /*
-     * Owner graph of this node; cannot be null
-     */
-    this.owner;
-
-    /*
-     * List of edges incident with this node
-     */
-    this.edges;
-
-    /*
-     * Geometry of this node
-     */
-    this.rect;
-
     /*
      * Estimated initial size (needed for compound node size estimation)
      */
@@ -2702,9 +2548,7 @@
     // -----------------------------------------------------------------------------
     // Section: Constructors and initialization
     // -----------------------------------------------------------------------------
-    //in java: super(vNode);
     this.vGraphObject = vNode;
-    //in java: this.initialize();
     this.edges = [];
     
     this.graphManager = gm;
@@ -3191,29 +3035,12 @@
     /*
      * Geometric abstraction of the compound graph
      */
-    //this.graphManager = null;
-
-    /*
-     * Whether layout is finished or not
-     */
-    this.isLayoutFinished = null;
-
-    /*
-     * Whether this layout is a sub-layout of another one (e.g. CoSE called
-     * within CiSE for laying out the cluster graph)
-     */
-    this.isSubLayout = null;
 
     /**
      * This is used for creation of bendpoints by using dummy nodes and edges.
      * Maps an LEdge to its dummy bendpoint path.
      */
     this.edgeToDummyNodes = new HashMap();
-
-    /**
-     * Indicates whether the layout is called remotely or not.
-     */
-    this.isRemoteUse = null;
 
     this.graphManager = new LGraphManager(this);//this.newGraphManager();
     this.isLayoutFinished = false;
@@ -4023,34 +3850,6 @@
     this.totalDisplacement = 0.0;
     this.oldTotalDisplacement = 0.0;
     this.maxIterations = FDLayoutConstants.MAX_ITERATIONS;
-    this.totalIterations = null;
-
-    /**
-     * Number of layout iterations that has not been animated (rendered)
-     */
-    this.notAnimatedIterations = null;
-
-    /**
-     * Threshold for convergence (calculated according to graph to be laid out)
-     */
-    this.totalDisplacementThreshold = null;
-
-    /**
-     * Maximum node displacement in allowed in one iteration
-     */
-    this.maxNodeDisplacement = null;
-
-    /**
-     * Repulsion range & edge size of a grid
-     */
-    this.repulsionRange = null;
-
-    /**
-     * Screen is divided into grid of squares.
-     * At each iteration, each node is placed in its grid square(s)
-     * Grid is re-calculated after every tenth iteration.
-     */
-    this.grid = null;
   }
 
   FDLayout.prototype = Object.create(Layout.prototype);
@@ -4534,23 +4333,6 @@
 
     // alternative constructor is handled inside LNode
     FDLayoutNode.call(this, gm, loc, size, vNode);
-// -----------------------------------------------------------------------------
-// Section: Instance variables
-// -----------------------------------------------------------------------------
-    /**
-     * This node is constructed by contracting pred1 and pred2 from Mi-1
-     * next is constructed by contracting this node and another node from Mi
-     */
-    this.pred1;
-    this.pred2;
-    this.next;
-
-    /**
-     * Processed flag for CoSENode is needed during the coarsening process
-     * a node can be the next node of two different nodes. 
-     * so it can already be processed during the coarsening process
-     */
-    this.processed;
   }
 
 
@@ -4558,10 +4340,7 @@
   for (var prop in FDLayoutNode) {
     CoSENode[prop] = FDLayoutNode[prop];
   }
-
-// -----------------------------------------------------------------------------
-// Section: Remaining methods
-// -----------------------------------------------------------------------------
+  
   /*
    * This method recalculates the displacement related attributes of this
    * object. These attributes are calculated at each layout iteration once,
@@ -4569,24 +4348,12 @@
    */
   CoSENode.prototype.move = function ()
   {
-//  throw "buraya bak bakalim extend ettigin class'dan graphManager gelmiş mi"
     var layout = this.graphManager.getLayout();
     this.displacementX = layout.coolingFactor *
             (this.springForceX + this.repulsionForceX + this.gravitationForceX);
     this.displacementY = layout.coolingFactor *
             (this.springForceY + this.repulsionForceY + this.gravitationForceY);
 
-//  if (Math.abs(this.displacementX) > layout.maxNodeDisplacement)
-//  {
-//    this.displacementX = layout.maxNodeDisplacement *
-//            IMath.sign(this.displacementX);
-//  }
-//
-//  if (Math.abs(this.displacementY) > layout.maxNodeDisplacement)
-//  {
-//    this.displacementY = layout.maxNodeDisplacement *
-//            IMath.sign(this.displacementY);
-//  }
 
     if (Math.abs(this.displacementX) > layout.coolingFactor * layout.maxNodeDisplacement)
     {
@@ -4694,9 +4461,6 @@
 
   function CoSELayout() {
     FDLayout.call(this);
-    this.level = null;
-    this.noOfLevels = null;
-    this.MList = null;
   }
 
   CoSELayout.prototype = Object.create(FDLayout.prototype);
@@ -4806,8 +4570,6 @@
   };
 
   CoSELayout.prototype.runSpringEmbedder = function () {
-    var functions = {};
-
     do
     {
       this.totalIterations++;
@@ -4822,7 +4584,6 @@
         this.coolingFactor = this.initialCoolingFactor *
                 ((this.maxIterations - this.totalIterations) / this.maxIterations);
 
-//				this.updateAnnealingProbability();
       }
       this.totalDisplacement = 0;
       this.graphManager.updateBounds();
