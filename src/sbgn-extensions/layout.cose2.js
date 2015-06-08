@@ -1,5 +1,5 @@
 ;
-(function ($$) {
+(function ($$) { 'use strict';
   function DimensionD(width, height) {
     this.width = 0;
     this.height = 0;
@@ -668,12 +668,12 @@
     this.y += dim.height;
     return this;
   };
-  
+
   function RandomSeed() {
   }
   RandomSeed.seed = 1;
   RandomSeed.x = 0;
-  
+
   RandomSeed.nextDouble = function () {
     RandomSeed.x = Math.sin(RandomSeed.seed++) * 10000;
     return RandomSeed.x - Math.floor(RandomSeed.x);
@@ -900,7 +900,7 @@
   {
     this.ldeviceExtY = dey;
   }
-  
+
   Transform.prototype.transformX = function (x)
   {
     var xDevice = 0.0;
@@ -1205,7 +1205,7 @@
 
   LGraph.prototype.add = function (obj1, sourceNode, targetNode) {
     if (sourceNode == null && targetNode == null) {
-      newNode = obj1;
+      var newNode = obj1;
       if (this.graphManager == null) {
         throw "Graph has no graph mgr!";
       }
@@ -1218,7 +1218,7 @@
       return newNode;
     }
     else {
-      newEdge = obj1;
+      var newEdge = obj1;
       if (!(this.getNodes().indexOf(sourceNode) > -1 && (this.getNodes().indexOf(targetNode)) > -1)) {
         throw "Source or target not in graph!";
       }
@@ -1488,7 +1488,7 @@
       return this.parent.getInclusionTreeDepth();
     }
   };
-  
+
   LGraph.prototype.getEstimatedSize = function ()
   {
     if (this.estimatedSize == Integer.MIN_VALUE) {
@@ -1789,7 +1789,7 @@
     }
     return this.allNodes;
   };
-  
+
   LGraphManager.prototype.resetAllNodes = function ()
   {
     this.allNodes = null;
@@ -1875,7 +1875,7 @@
     // Is second node an ancestor of the first one?
     var ownerGraph = firstNode.getOwner();
     var parentNode;
-    
+
     do
     {
       parentNode = ownerGraph.getParent();
@@ -2008,7 +2008,7 @@
         break;
       }
       var secondOwnerGraph = secondNode.getOwner();
-      
+
       do
       {
         if (secondOwnerGraph == null)
@@ -2025,7 +2025,7 @@
 
       firstOwnerGraph = firstOwnerGraph.getParent().getOwner();
     } while (true);
-    
+
     return firstOwnerGraph;
   };
 
@@ -2088,7 +2088,7 @@
     this.vGraphObject = vNode;
     this.edges = [];
     this.graphManager = gm;
-    
+
     if (size != null && loc != null)
       this.rect = new RectangleD(loc.x, loc.y, size.width, size.height);
     else
@@ -2135,7 +2135,7 @@
   {
     return this.rect.height;
   };
-  
+
   LNode.prototype.setHeight = function (height)
   {
     this.rect.height = height;
@@ -2981,7 +2981,7 @@
       return (a * sliderValue + b);
     }
   };
-  
+
   /**
    * This method finds and returns the center of the given nodes, assuming
    * that the given nodes form a tree in themselves.
@@ -3433,61 +3433,57 @@
     var repulsionForceX;
     var repulsionForceY;
 
-    if (rectA.intersects(rectB))
-            // two nodes overlap
-            {
-              // calculate separation amount in x and y directions
-              IGeometry.calcSeparationAmount(rectA,
-                      rectB,
-                      overlapAmount,
-                      FDLayoutConstants.DEFAULT_EDGE_LENGTH / 2.0);
+    if (rectA.intersects(rectB))// two nodes overlap
+    {
+      // calculate separation amount in x and y directions
+      IGeometry.calcSeparationAmount(rectA,
+              rectB,
+              overlapAmount,
+              FDLayoutConstants.DEFAULT_EDGE_LENGTH / 2.0);
 
-              repulsionForceX = overlapAmount[0];
-              repulsionForceY = overlapAmount[1];
-            }
-    else
-            // no overlap
-            {
-              // calculate distance
+      repulsionForceX = overlapAmount[0];
+      repulsionForceY = overlapAmount[1];
+    }
+    else// no overlap
+    {
+      // calculate distance
 
-              if (this.uniformLeafNodeSizes &&
-                      nodeA.getChild() == null && nodeB.getChild() == null)
-                      // simply base repulsion on distance of node centers
-                      {
-                        distanceX = rectB.getCenterX() - rectA.getCenterX();
-                        distanceY = rectB.getCenterY() - rectA.getCenterY();
-                      }
-              else
-                      // use clipping points
-                      {
-                        IGeometry.getIntersection(rectA, rectB, clipPoints);
+      if (this.uniformLeafNodeSizes &&
+              nodeA.getChild() == null && nodeB.getChild() == null)// simply base repulsion on distance of node centers              
+      {
+        distanceX = rectB.getCenterX() - rectA.getCenterX();
+        distanceY = rectB.getCenterY() - rectA.getCenterY();
+      }
+      else// use clipping points              
+      {
+        IGeometry.getIntersection(rectA, rectB, clipPoints);
 
-                        distanceX = clipPoints[2] - clipPoints[0];
-                        distanceY = clipPoints[3] - clipPoints[1];
-                      }
+        distanceX = clipPoints[2] - clipPoints[0];
+        distanceY = clipPoints[3] - clipPoints[1];
+      }
 
-              // No repulsion range. FR grid variant should take care of this.
-              if (Math.abs(distanceX) < FDLayoutConstants.MIN_REPULSION_DIST)
-              {
-                distanceX = IMath.sign(distanceX) *
-                        FDLayoutConstants.MIN_REPULSION_DIST;
-              }
+      // No repulsion range. FR grid variant should take care of this.
+      if (Math.abs(distanceX) < FDLayoutConstants.MIN_REPULSION_DIST)
+      {
+        distanceX = IMath.sign(distanceX) *
+                FDLayoutConstants.MIN_REPULSION_DIST;
+      }
 
-              if (Math.abs(distanceY) < FDLayoutConstants.MIN_REPULSION_DIST)
-              {
-                distanceY = IMath.sign(distanceY) *
-                        FDLayoutConstants.MIN_REPULSION_DIST;
-              }
+      if (Math.abs(distanceY) < FDLayoutConstants.MIN_REPULSION_DIST)
+      {
+        distanceY = IMath.sign(distanceY) *
+                FDLayoutConstants.MIN_REPULSION_DIST;
+      }
 
-              distanceSquared = distanceX * distanceX + distanceY * distanceY;
-              distance = Math.sqrt(distanceSquared);
+      distanceSquared = distanceX * distanceX + distanceY * distanceY;
+      distance = Math.sqrt(distanceSquared);
 
-              repulsionForce = this.repulsionConstant / distanceSquared;
+      repulsionForce = this.repulsionConstant / distanceSquared;
 
-              // Project force onto x and y axes
-              repulsionForceX = repulsionForce * distanceX / distance;
-              repulsionForceY = repulsionForce * distanceY / distance;
-            }
+      // Project force onto x and y axes
+      repulsionForceX = repulsionForce * distanceX / distance;
+      repulsionForceY = repulsionForce * distanceY / distance;
+    }
 
     // Apply forces on the two nodes
     nodeA.repulsionForceX -= repulsionForceX;
@@ -3514,38 +3510,31 @@
     absDistanceX = Math.abs(distanceX);
     absDistanceY = Math.abs(distanceY);
 
-    // Apply gravitation only if the node is "roughly" outside the
-    // bounds of the initial estimate for the bounding rect of the owner
-    // graph. We relax (not as much for the compounds) the estimated
-    // size here since the initial estimates seem to be rather "tight".
+    if (node.getOwner() == this.graphManager.getRoot())// in the root graph           
+    {
+      Math.floor(80);
+      estimatedSize = Math.floor(ownerGraph.getEstimatedSize() *
+              this.gravityRangeFactor);
 
-    if (node.getOwner() == this.graphManager.getRoot())
-            // in the root graph
-            {
-              Math.floor(80);
-              estimatedSize = Math.floor(ownerGraph.getEstimatedSize() *
-                      this.gravityRangeFactor);
+      if (absDistanceX > estimatedSize || absDistanceY > estimatedSize)
+      {
+        node.gravitationForceX = -this.gravityConstant * distanceX;
+        node.gravitationForceY = -this.gravityConstant * distanceY;
+      }
+    }
+    else// inside a compound           
+    {
+      estimatedSize = Math.floor((ownerGraph.getEstimatedSize() *
+              this.compoundGravityRangeFactor));
 
-              if (absDistanceX > estimatedSize || absDistanceY > estimatedSize)
-              {
-                node.gravitationForceX = -this.gravityConstant * distanceX;
-                node.gravitationForceY = -this.gravityConstant * distanceY;
-              }
-            }
-    else
-            // inside a compound
-            {
-              estimatedSize = Math.floor((ownerGraph.getEstimatedSize() *
-                      this.compoundGravityRangeFactor));
-
-              if (absDistanceX > estimatedSize || absDistanceY > estimatedSize)
-              {
-                node.gravitationForceX = -this.gravityConstant * distanceX *
-                        this.compoundGravityConstant;
-                node.gravitationForceY = -this.gravityConstant * distanceY *
-                        this.compoundGravityConstant;
-              }
-            }
+      if (absDistanceX > estimatedSize || absDistanceY > estimatedSize)
+      {
+        node.gravitationForceX = -this.gravityConstant * distanceX *
+                this.compoundGravityConstant;
+        node.gravitationForceY = -this.gravityConstant * distanceY *
+                this.compoundGravityConstant;
+      }
+    }
   };
 
   FDLayout.prototype.isConverged = function () {
@@ -3579,7 +3568,7 @@
       }
     }
   };
-  
+
   FDLayout.prototype.calcRepulsionRange = function () {
     return 0.0;
   };
@@ -3637,40 +3626,25 @@
   function FDLayoutNode(gm, loc, size, vNode) {
     // alternative constructor is handled inside LNode
     LNode.call(this, gm, loc, size, vNode);
-// -----------------------------------------------------------------------------
-// Section: Instance variables
-// -----------------------------------------------------------------------------
-    /*
-     * Spring, repulsion and gravitational forces acting on this node
-     */
+    //Spring, repulsion and gravitational forces acting on this node
     this.springForceX = 0;
     this.springForceY = 0;
     this.repulsionForceX = 0;
     this.repulsionForceY = 0;
     this.gravitationForceX = 0;
     this.gravitationForceY = 0;
-
-    /*
-     * Amount by which this node is to be moved in this iteration
-     */
+    //Amount by which this node is to be moved in this iteration
     this.displacementX = 0;
     this.displacementY = 0;
 
-    /**
-     * Start and finish grid coordinates that this node is fallen into
-     */
+    //Start and finish grid coordinates that this node is fallen into
     this.startX = 0;
     this.finishX = 0;
     this.startY = 0;
     this.finishY = 0;
 
-    /**
-     * Geometric neighbors of this node 
-     */
+    //Geometric neighbors of this node 
     this.surrounding = [];
-
-//    this.move = FDLayoutNode.prototype.move;
-//    this.setGridCoordinates = FDLayoutNode.prototype.setGridCoordinates;
   }
 
   FDLayoutNode.prototype = Object.create(LNode.prototype);
@@ -3679,12 +3653,6 @@
     FDLayoutNode[prop] = LNode[prop];
   }
 
-// -----------------------------------------------------------------------------
-// Section: FR-Grid Variant Repulsion Force Calculation
-// -----------------------------------------------------------------------------
-  /**
-   * This method sets start and finish grid coordinates
-   */
   FDLayoutNode.prototype.setGridCoordinates = function (_startX, _finishX, _startY, _finishY)
   {
     this.startX = _startX;
@@ -3694,22 +3662,7 @@
 
   };
 
-// -----------------------------------------------------------------------------
-// Section: Remaining methods
-// -----------------------------------------------------------------------------
-  /*
-   * This method recalculates the displacement related attributes of this
-   * object. These attributes are calculated at each layout iteration once,
-   * for increasing the speed of the layout.
-   */
-  FDLayoutNode.prototype.move = function ()
-  {
-    throw "Abstract method is not overridden: FDLayoutNode->move()";
-  };
-
   function CoSENode(gm, loc, size, vNode) {
-
-    // alternative constructor is handled inside LNode
     FDLayoutNode.call(this, gm, loc, size, vNode);
   }
 
@@ -3718,12 +3671,7 @@
   for (var prop in FDLayoutNode) {
     CoSENode[prop] = FDLayoutNode[prop];
   }
-  
-  /*
-   * This method recalculates the displacement related attributes of this
-   * object. These attributes are calculated at each layout iteration once,
-   * for increasing the speed of the layout.
-   */
+
   CoSENode.prototype.move = function ()
   {
     var layout = this.graphManager.getLayout();
@@ -3775,10 +3723,6 @@
     this.displacementY = 0;
   };
 
-  /*
-   * This method applies the transformation of a compound node (denoted as
-   * root) to all the nodes in its children graph
-   */
   CoSENode.prototype.propogateDisplacementToChildren = function (dX, dY)
   {
     var nodes = this.getChild().getNodes();
@@ -3799,9 +3743,6 @@
     }
   };
 
-// -----------------------------------------------------------------------------
-// Section: Getters and setters
-// -----------------------------------------------------------------------------
   CoSENode.prototype.setPred1 = function (pred1)
   {
     this.pred1 = pred1;
@@ -3905,8 +3846,6 @@
     if (createBendsAsNeeded)
     {
       this.createBendpoints();
-
-      // reset edge list, since the topology has changed
       this.graphManager.resetAllEdges();
     }
 
@@ -3932,7 +3871,6 @@
       }
       // The graph associated with this layout is not flat or a forest
       else
-
       {
         this.positionNodesRandomly();
       }
@@ -4164,7 +4102,6 @@
 
     // Traverse all neighbors of this node and recursively call this
     // function.
-
     var neighborEdges = [];
     var childCount = neighborEdges.length;
 
@@ -4259,7 +4196,6 @@
     LGraphManager.call(this, layout);
   }
 
-//Extends LGraphManager
   CoSEGraphManager.prototype = Object.create(LGraphManager.prototype);
   for (var prop in LGraphManager) {
     CoSEGraphManager[prop] = LGraphManager[prop];
@@ -4269,7 +4205,6 @@
     LGraph.call(this, parent, graphMgr, vGraph);
   }
 
-//extends LGraph
   CoSEGraph.prototype = Object.create(LGraph.prototype);
   for (var prop in LGraph) {
     CoSEGraph[prop] = LGraph[prop];
@@ -4295,8 +4230,7 @@
   CoSEConstants.DEFAULT_USE_MULTI_LEVEL_SCALING = false;
   CoSEConstants.DEFAULT_RADIAL_SEPARATION = FDLayoutConstants.DEFAULT_EDGE_LENGTH;
   CoSEConstants.DEFAULT_COMPONENT_SEPERATION = 60;
-
-  'use strict';//-----------------------------------------------------------------------------------------------------------------
+  
   _CoSELayout.allChildren = [];
   _CoSELayout.idToLNode = {};
   _CoSELayout.toBeTiled = {};
@@ -4355,11 +4289,7 @@
     _CoSELayout.idToLNode = {};
     _CoSELayout.toBeTiled = {};
     layout = new CoSELayout();
-    //var options = this.options;
-//    var layout = this;
-
-    // cy is automatically populated for us in the constructor
-    this.cy = this.options.cy; // jshint ignore:line;
+    this.cy = this.options.cy; 
     var after = this;
 
     this.cy.trigger('layoutstart');
@@ -4394,10 +4324,8 @@
     else {
       // Find zero degree nodes and create a complex for each level
       var memberGroups = this.groupZeroDegreeMembers();
-
       // Tile and clear children of each complex
       var tiledMemberPack = this.clearComplexes(this.options);
-
       // Separately tile and clear zero degree nodes for each level
       var tiledZeroDegreeNodes = this.clearZeroDegreeMembers(memberGroups);
     }
@@ -4463,16 +4391,16 @@
               var posX = node.position('x');
               var posY = node.position('y');
               var h = node.height();
-              
+
               var temp = node.parent()[0];
-              
-              while (temp != null){
-                if(_CoSELayout.toBeTiled[temp.id()]){
+
+              while (temp != null) {
+                if (_CoSELayout.toBeTiled[temp.id()]) {
                   return;
                 }
                 temp = temp.parent()[0];
               }
-              
+
               pData[ 'nodes' ].push({
                 id: nodeId,
                 pid: parentId,
@@ -4509,8 +4437,6 @@
       //to the main thread with the result map
       var layout_t = new CoSELayout();
       var gm_t = layout_t.newGraphManager();
-
-//      var root_t = gm_t.addRoot();
       var ngraph = gm_t.layout.newGraph();
       var nnode = gm_t.layout.newNode(null);
       var root = gm_t.add(ngraph, nnode);
@@ -4526,8 +4452,6 @@
       //A map of node id to corresponding node position and sizes
       //it is to be returned at the end of the thread function
       var result = {};
-
-//      log("here 6");
 
       //this function is similar to processChildrenList function in the main thread
       //it is to process the nodes in correct order recursively
@@ -4593,9 +4517,6 @@
         var sourceNode = idToLNode_t[edge.source];
         var targetNode = idToLNode_t[edge.target];
         var e1 = gm_t.add(layout_t.newEdge(), sourceNode, targetNode);
-
-//        if (sourceNode.owner.getNodes().indexOf(sourceNode) > -1 && targetNode.owner.getNodes().indexOf(targetNode) > -1)
-//          var e1 = gm.add(layout.newEdge(), sourceNode, targetNode);
       }
 
       //run the layout crated in this thread
@@ -4617,11 +4538,11 @@
       seeds.rsSeed = RandomSeed.seed;
       seeds.rsX = RandomSeed.x;
       var pass = {
-        result : result,
-        seeds : seeds 
+        result: result,
+        seeds: seeds
       }
       //return the result map to pass it to the then function as parameter
-      return pass;//.runLayout();
+      return pass;
     }).then(function (pass) {
       var result = pass.result;
       var seeds = pass.seeds;
@@ -4637,15 +4558,12 @@
         lNode.rect.height = node.h;
       }
       if (after.options.tile) {
-
         // Repopulate members
         after.repopulateZeroDegreeMembers(tiledZeroDegreeNodes);
-
         after.repopulateComplexes(tiledMemberPack);
-
         after.cy.nodes().updateCompoundBounds();
       }
-      
+
       after.cy.nodes().positions(function (i, ele) {
         var theId = ele.data('id');
         var lNode = _CoSELayout.idToLNode[theId];
@@ -4659,8 +4577,6 @@
 
       if (after.options.fit)
         after.options.cy.fit(after.options.padding);
-
-      console.log(FDLayoutConstants.DEFAULT_EDGE_LENGTH);
 
       //trigger layoutready when each node has had its position set at least once
       if (!ready) {
@@ -4687,14 +4603,12 @@
         after.cy.nodes().positions(function (i, ele) {
           var theId = ele.data('id');
           var pNode = pData[theId];
-          if(pNode == null){
+          if (pNode == null) {
             return{
               x: 0,
               y: 0
             }
           }
-//          console.log(theId + "\t" + lNode.getRect().getX() + "\t" + lNode.getRect().getY());
-
           return {
             x: pNode.x,
             y: pNode.y
@@ -4706,9 +4620,6 @@
           after.one('layoutready', after.options.ready);
           after.trigger({type: 'layoutready', layout: after});
         }
-
-//        after.cy.one('layoutready', after.options.ready);
-//        after.cy.trigger('layoutready');
         return;
       }
     });
@@ -4754,11 +4665,6 @@
     return true;
   }
 
-  /**
-   * This method finds each zero degree node in the graph that are not owned by a complex. 
-   * If the number of zero degree nodes at any level is less than 2, no need to tile. 
-   * Otherwise, create a dummy complex for each group. 
-   */
   _CoSELayout.prototype.groupZeroDegreeMembers = function () {
     // array of [parent_id x oneDegreeNode_id] 
     var tempMemberGroups = [];
@@ -4806,10 +4712,6 @@
     return memberGroups;
   };
 
-  /**
-   *  This method finds all the roots in the graph and performs depth first search
-   *  to find all complexes.
-   */
   _CoSELayout.prototype.performDFSOnComplexes = function (options) {
     var complexOrder = [];
 
@@ -4830,10 +4732,6 @@
     return complexOrder;
   };
 
-  /**
-   * Removes children of each complex in the given list. Return a map of 
-   * complexes and their children.
-   */
   _CoSELayout.prototype.clearComplexes = function (options) {
     var childGraphMap = [];
 
@@ -4849,8 +4747,6 @@
       childGraphMap[complexOrder[i].id()] = complexOrder[i].children();
 
       // Remove children of complexes 
-//      lComplexNode.child.nodes = []; 
-//      this.gm.remove(lComplexNode.child);
       lComplexNode.child = null;
     }
 
@@ -4860,10 +4756,6 @@
     return tiledMemberPack;
   };
 
-  /**
-   * This method tiles each given member group separately. After each group is tiled,
-   * the members are removed from the graph.
-   */
   _CoSELayout.prototype.clearZeroDegreeMembers = function (memberGroups) {
     var tiledZeroDegreePack = [];
 
@@ -4879,31 +4771,20 @@
     return tiledZeroDegreePack;
   };
 
-  /**
-   *  Make the child graph of each complex visible and adjust the orientations
-   */
   _CoSELayout.prototype.repopulateComplexes = function (tiledMemberPack) {
     for (var i in tiledMemberPack) {
       var lComplexNode = _CoSELayout.idToLNode[i];
 
-//      this.adjustLocations(tiledMemberPack[i], lComplexNode.rect.x - lComplexNode.rect.width / 2, 
-//        lComplexNode.rect.y - lComplexNode.rect.height / 2 );
       this.adjustLocations(tiledMemberPack[i], lComplexNode.rect.x, lComplexNode.rect.y);
     }
   };
 
-  /**
-   * This method restores the deleted zero degree members and when the repopulation 
-   * is completed, associated dummy complex is removed from the graph.
-   */
   _CoSELayout.prototype.repopulateZeroDegreeMembers = function (tiledPack) {
     for (var i in tiledPack) {
       var complex = this.cy.getElementById(i);
       var complexNode = _CoSELayout.idToLNode[i];
 
       // Adjust the positions of nodes wrt its complex
-//        this.adjustLocations(tiledPack[i], complexNode.rect.x - complexNode.rect.width / 2, 
-//          complexNode.rect.y - complexNode.rect.height / 2 );
       this.adjustLocations(tiledPack[i], complexNode.rect.x, complexNode.rect.y);
 
       // Remove the dummy complex
@@ -4948,10 +4829,6 @@
     }
   };
 
-  /**
-   * Tile the children nodes of each complex and set the estimated width and height values
-   * for future layout operations
-   */
   _CoSELayout.prototype.tileComplexMembers = function (childGraphMap) {
     var tiledMemberPack = [];
 
@@ -4968,9 +4845,6 @@
     return tiledMemberPack;
   };
 
-  /**
-   *  This method places each node in the given list.
-   */
   _CoSELayout.prototype.tileNodes = function (nodes) {
     var organization = {
       rows: [],
@@ -4995,9 +4869,6 @@
 
       this.gm.resetAllNodes();
       this.gm.getAllNodes();
-
-//      this.gm.resetAllEdges();
-//      this.gm.getAllEdges();
 
       layoutNodes.push(lNode);
     }
@@ -5031,11 +4902,6 @@
     return organization;
   };
 
-  /**
-   * This method performs tiling. If a new row is needed, it creates the row
-   * and places the new node there. Otherwise, it places the node to the end
-   * of the specified row.
-   */
   _CoSELayout.prototype.insertNodeToRow = function (organization, node, rowIndex) {
     var minComplexSize = organization.complexMargin * 2;
 
@@ -5079,9 +4945,7 @@
     organization.rows[rowIndex].push(node);
   };
 
-  /**
-   * Scans the rows of an organization and returns the one with the min width
-   */
+  //Scans the rows of an organization and returns the one with the min width
   _CoSELayout.prototype.getShortestRowIndex = function (organization) {
     var r = -1;
     var min = Number.MAX_VALUE;
@@ -5095,9 +4959,7 @@
     return r;
   };
 
-  /**
-   * Scans the rows of an organization and returns the one with the max width
-   */
+  //Scans the rows of an organization and returns the one with the max width
   _CoSELayout.prototype.getLongestRowIndex = function (organization) {
     var r = -1;
     var max = Number.MIN_VALUE;
@@ -5163,10 +5025,9 @@
     return add_to_row_ratio < add_new_row_ratio;
   };
 
-  /**
-   * If moving the last node from the longest row and adding it to the last
-   * row makes the bounding box smaller, do it.
-   */
+
+  //If moving the last node from the longest row and adding it to the last
+  //row makes the bounding box smaller, do it.
   _CoSELayout.prototype.shiftToLastRow = function (organization) {
     var longest = this.getLongestRowIndex(organization);
     var last = organization.rowWidth.length - 1;
@@ -5254,8 +5115,7 @@
       }
     }
   };
-  
+
   // register the layout
   $$('layout', 'cose2', _CoSELayout);
-
 })(cytoscape);
