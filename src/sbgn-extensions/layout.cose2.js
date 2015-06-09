@@ -3888,6 +3888,7 @@
   };
 
   CoSELayout.prototype.runSpringEmbedder = function () {
+    var lastFrame = new Date().getTime();
     do
     {
       this.totalIterations++;
@@ -3910,13 +3911,13 @@
       this.calcGravitationalForces();
       this.moveNodes();
       this.animate();
-      if (layoutOptionsPack.animate && this.totalIterations % 20 == 0) {
-        /*var start = new Date().getTime();
+      if (layoutOptionsPack.animate && this.totalIterations % 1 == 0) {
         for (var i = 0; i < 1e7; i++) {
-          if ((new Date().getTime() - start) > 1000){
+          if ((new Date().getTime() - lastFrame) > 50){
             break;
           }
-        }*/
+        }
+        lastFrame = new Date().getTime();
         var allNodes = this.graphManager.getAllNodes();
         var pData = {};
         for (var i = 0; i < allNodes.length; i++) {
@@ -4283,7 +4284,7 @@
     // For enabling tiling
     tile: true,
     //whether to make animation while performing the layout
-    animate: false
+    animate: true
   };
 
   var layout = new CoSELayout();
@@ -4625,6 +4626,9 @@
             y: pNode.y
           };
         });
+
+        if (after.options.fit)
+          after.options.cy.fit(after.options.padding);
 
         if (!ready) {
           ready = true;
