@@ -47,9 +47,10 @@
                                         <li><a href="#" id="load-sample1">Activated STAT1alpha induction of the IRF1 gene</a></li>
                                         <li><a href="#" id="load-sample2">Glycolysis</a></li>
                                         <li><a href="#" id="load-sample3">MAPK cascade</a></li>
-                                        <li><a href="#" id="load-sample4">Neuronal/Muscle signalling</a></li>
+                                        <li><a href="#" id="load-sample4">PolyQ proteins interference</a></li>
                                         <li><a href="#" id="load-sample5">Insulin-like Growth Factor (IGF) signalling</a></li>
-                                        <li><a href="#" id="load-sample6">Central plant metabolism</a></li>
+                                        <li><a href="#" id="load-sample6">ATM mediated phosphorylation of repair proteins</a></li>
+                                        <li><a href="#" id="load-sample7">Vitamins B6 activation to pyridoxal phosphate</a></li>
                                     </ul>
                                 </li>
                                 <li><a href="#" id="save-as-sbgnml">Save...</a></li>
@@ -245,87 +246,87 @@
 
         <script type="text/template" id="layout-settings-template">
             <table class="table-condensed layout-table">
-                <tr>
-                  <td>
-                      <span class="add-on layout-text"> Node Repulsion </span>
-                  </td>
-                  <td>
-                      <input id="node-repulsion" type="text" class="input-small layout-text" value= <%= nodeRepulsion %> >
-                  </td>
-                </tr>
+            <tr>
+            <td>
+            <span class="add-on layout-text"> Node Repulsion </span>
+            </td>
+            <td>
+            <input id="node-repulsion" type="text" class="input-small layout-text" value= <%= nodeRepulsion %> >
+            </td>
+            </tr>
 
-                <tr>
-                  <td>
-                      <span class="add-on layout-text"> Node Overlap </span>
-                  </td>
-                  <td>
-                      <input id="node-overlap" type="text" class="input-small layout-text" value= <%= nodeOverlap %> >
-                  </td>
-                </tr>
+            <tr>
+            <td>
+            <span class="add-on layout-text"> Node Overlap </span>
+            </td>
+            <td>
+            <input id="node-overlap" type="text" class="input-small layout-text" value= <%= nodeOverlap %> >
+            </td>
+            </tr>
 
-                <tr>
-                  <td>
-                      <span class="add-on layout-text"> Ideal Edge Length </span>
-                  </td>
-                  <td>
-                      <input id="ideal-edge-length" type="text" class="input-small layout-text" value= <%= idealEdgeLength %> >
-                  </td>
-                </tr>
+            <tr>
+            <td>
+            <span class="add-on layout-text"> Ideal Edge Length </span>
+            </td>
+            <td>
+            <input id="ideal-edge-length" type="text" class="input-small layout-text" value= <%= idealEdgeLength %> >
+            </td>
+            </tr>
 
-                <tr>
-                  <td>
-                      <span class="add-on layout-text"> Edge Elasticity </span>
-                  </td>
-                  <td>
-                      <input id="edge-elasticity" type="text" class="input-small layout-text" value= <%= edgeElasticity %> >
-                  </td>
-                </tr>
+            <tr>
+            <td>
+            <span class="add-on layout-text"> Edge Elasticity </span>
+            </td>
+            <td>
+            <input id="edge-elasticity" type="text" class="input-small layout-text" value= <%= edgeElasticity %> >
+            </td>
+            </tr>
 
-                <tr>
-                  <td>
-                      <span class="add-on layout-text"> Nesting Factor </span>
-                  </td>
-                  <td>
-                      <input id="nesting-factor" type="text" class="input-small layout-text" value= <%= nestingFactor %> >
-                  </td>
-                </tr>
+            <tr>
+            <td>
+            <span class="add-on layout-text"> Nesting Factor </span>
+            </td>
+            <td>
+            <input id="nesting-factor" type="text" class="input-small layout-text" value= <%= nestingFactor %> >
+            </td>
+            </tr>
 
-                  <tr>
-                  <td>
-                      <span class="add-on layout-text"> Gravity </span>
-                  </td>
-                  <td>
-                      <input id="gravity" type="text" class="input-small layout-text" value= <%= gravity %> >
-                  </td>
-                </tr>
+            <tr>
+            <td>
+            <span class="add-on layout-text"> Gravity </span>
+            </td>
+            <td>
+            <input id="gravity" type="text" class="input-small layout-text" value= <%= gravity %> >
+            </td>
+            </tr>
 
-                <tr>
-                  <td>
-                      <span class="add-on layout-text"> Number of Iterations </span>
-                  </td>
-                  <td>
-                      <input id="num-iter" type="text" class="input-small layout-text" value= <%= numIter %> >
-                  </td>
-                </tr>
-  
-                  <tr>
-                  <td>
-                      <span class="add-on layout-text"> Enable Tiling </span>
-                  </td>
-            
-                  <td>
-                      <input id="tile" type="checkbox" class="input-small layout-text" <% if (tile){ %> checked<%}%>>
-                  </td>
-                </tr>
+            <tr>
+            <td>
+            <span class="add-on layout-text"> Number of Iterations </span>
+            </td>
+            <td>
+            <input id="num-iter" type="text" class="input-small layout-text" value= <%= numIter %> >
+            </td>
+            </tr>
 
-                <tr id="layout-buttons">
-                  <td>
-                      <button id="save-layout" class="btn btn-default" >Save</button>
-                  </td>
-                  <td>
-                      <button id="default-layout" class="btn btn-default">Default</button>
-                  </td>
-                </tr>
+            <tr>
+            <td>
+            <span class="add-on layout-text"> Enable Tiling </span>
+            </td>
+
+            <td>
+            <input id="tile" type="checkbox" class="input-small layout-text" <% if (tile){ %> checked<%}%>>
+            </td>
+            </tr>
+
+            <tr id="layout-buttons">
+            <td>
+            <button id="save-layout" class="btn btn-default" >Save</button>
+            </td>
+            <td>
+            <button id="default-layout" class="btn btn-default">Default</button>
+            </td>
+            </tr>
             </table>
         </script>
 

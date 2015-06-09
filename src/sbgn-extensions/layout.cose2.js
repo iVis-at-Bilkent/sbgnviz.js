@@ -3911,9 +3911,9 @@
       this.calcGravitationalForces();
       this.moveNodes();
       this.animate();
-      if (layoutOptionsPack.animate && this.totalIterations % 1 == 0) {
+      if (layoutOptionsPack.animate && this.totalIterations % 4 == 0) {
         for (var i = 0; i < 1e7; i++) {
-          if ((new Date().getTime() - lastFrame) > 50){
+          if ((new Date().getTime() - lastFrame) > 25){
             break;
           }
         }
