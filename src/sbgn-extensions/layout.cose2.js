@@ -4104,7 +4104,6 @@
     // Make polar to java cordinate conversion.
     var cos_teta = Math.cos(teta);
     var x_ = distance * Math.cos(teta);
-    console.log(x_);
     var y_ = distance * Math.sin(teta);
 
     node.setCenter(x_, y_);
@@ -4347,9 +4346,6 @@
       var sourceNode = _CoSELayout.idToLNode[edge.data("source")];
       var targetNode = _CoSELayout.idToLNode[edge.data("target")];
       var e1 = gm.add(layout.newEdge(), sourceNode, targetNode);
-
-      if (sourceNode.owner.getNodes().indexOf(sourceNode) > -1 && targetNode.owner.getNodes().indexOf(targetNode) > -1)
-        var e1 = gm.add(layout.newEdge(), sourceNode, targetNode);
     }
 
 
@@ -4578,7 +4574,6 @@
       after.cy.nodes().positions(function (i, ele) {
         var theId = ele.data('id');
         var lNode = _CoSELayout.idToLNode[theId];
-        console.log(theId + "\t" + lNode.getRect().getX() + "\t" + lNode.getRect().getY());
 
         return {
           x: lNode.getRect().getCenterX(),
@@ -4609,8 +4604,6 @@
       }
       var pData = e.message.pData;
       if (pData != null) {
-        console.log("pdata received");
-
         after.cy.nodes().positions(function (i, ele) {
           var theId = ele.data('id');
           var pNode = pData[theId];
