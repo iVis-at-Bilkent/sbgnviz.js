@@ -293,7 +293,8 @@ var SBGNLayout = Backbone.View.extend({
         nestingFactor: 0.1,
         gravity: 0.4,
         numIter: 2500,
-        tile: true
+        tile: true,
+        animate: false
     },
     currentLayoutProperties: null,
 
@@ -328,11 +329,7 @@ var SBGNLayout = Backbone.View.extend({
             self.currentLayoutProperties.gravity        = Number(document.getElementById("gravity").value);
             self.currentLayoutProperties.numIter        = Number(document.getElementById("num-iter").value);
             self.currentLayoutProperties.tile           = document.getElementById("tile").checked ;
-            
-//            if(self.currentLayoutProperties.tile === "true")
-//              self.currentLayoutProperties.tile = true;
-//            else
-//              self.currentLayoutProperties.tile = false;
+            self.currentLayoutProperties.animate        = document.getElementById("animate").checked ;
             
             $(self.el).dialog('close');
         });
