@@ -10,11 +10,7 @@ var sbgnStyleSheet = cytoscape.stylesheet()
         })
         .selector("node[sbgnclass='complex']")
         .css({
-            'background-color' : '#F4F3EE',
-            'padding-bottom' : '15',
-            'padding-top' : '15',
-            'padding-left' : '15',
-            'padding-right' : '15'
+            'background-color' : '#F4F3EE'
         })
         .selector("node[sbgnclass='compartment']")
         .css({
@@ -23,11 +19,7 @@ var sbgnStyleSheet = cytoscape.stylesheet()
             'content' : 'data(sbgnlabel)',
             'text-valign' : 'bottom',
             'text-halign' : 'center',
-            'font-size' : '16',
-            'padding-bottom' : '10',
-            'padding-top' : '10',
-            'padding-left' : '10',
-            'padding-right' : '10'
+            'font-size' : '16'
         })
         .selector("node[sbgnclass!='complex'][sbgnclass!='compartment'][sbgnclass!='submap']")
         .css({
@@ -160,6 +152,82 @@ var SBGNContainer = Backbone.View.extend({
             ready: function()
             {
                 window.cy = this;
+
+                var nodes = cy.nodes();
+                var total = 0;
+                var numOfSimples = 0;
+                
+                for(var i = 0; i < nodes.length; i++){
+                  var theNode = nodes[i];
+                  if(theNode.children() == null || theNode.children().length == 0){
+                    total += Number(theNode._private.data.sbgnbbox.w);
+                    total += Number(theNode._private.data.sbgnbbox.h);
+                    numOfSimples++;
+                  }
+                }
+                
+                var calc_padding = Math.floor(total/(2*numOfSimples));
+                
+                //calculate the paddings of complex structures
+                complex_padding_left = 0.2 * calc_padding;
+                complex_padding_right = 0.2 * calc_padding;
+                complex_padding_top = 0.2 * calc_padding;
+                complex_padding_bottom = 0.2 * calc_padding;
+            
+                //calculate the paddings of compartment structures
+                compartment_padding_left = 0.2 * calc_padding;
+                compartment_padding_right = 0.2 * calc_padding;
+                compartment_padding_top = 0.2 * calc_padding;
+                compartment_padding_bottom = 0.2 * calc_padding;
+                
+                //check if complex paddins are at least 10
+                if(complex_padding_left < 10){
+                  complex_padding_left = 10;
+                }
+                
+                if(complex_padding_right < 10){
+                  complex_padding_right = 10;
+                }
+                
+                if(complex_padding_top < 10){
+                  complex_padding_top = 10;
+                }
+                
+                //check if compartment paddins are at least 10
+                if(compartment_padding_bottom < 10){
+                  compartment_padding_bottom = 10;
+                }
+                
+                if(compartment_padding_left < 10){
+                  compartment_padding_left = 10;
+                }
+                
+                if(compartment_padding_right < 10){
+                  compartment_padding_right = 10;
+                }
+                
+                if(compartment_padding_top < 10){
+                  compartment_padding_top = 10;
+                }
+                
+                if(compartment_padding_bottom < 10){
+                  compartment_padding_bottom = 10;
+                }
+                
+                //refresh the complex paddings
+                cy.$("node[sbgnclass='complex']").css('padding-left', '' + complex_padding_left);                
+                cy.$("node[sbgnclass='complex']").css('padding-right', '' + complex_padding_right);  
+                cy.$("node[sbgnclass='complex']").css('padding-top', '' + complex_padding_top);                
+                cy.$("node[sbgnclass='complex']").css('padding-bottom', '' + complex_padding_bottom);
+                
+                //refresh the compartment paddings
+                cy.$("node[sbgnclass='compartment']").css('padding-left', '' + compartment_padding_left);                
+                cy.$("node[sbgnclass='compartment']").css('padding-right', '' + compartment_padding_right);  
+                cy.$("node[sbgnclass='compartment']").css('padding-top', '' + compartment_padding_top);                
+                cy.$("node[sbgnclass='compartment']").css('padding-bottom', '' + compartment_padding_bottom);
+                
+                //To refresh the nodes on the screen apply the preset layout
+                cy.layout({name: 'preset'});
 
                 var panProps = ({
                     fitPadding: 10,
