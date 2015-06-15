@@ -5,7 +5,7 @@ var jsonToSbgnml = {
 
         //add headers
         sbgnmlText = sbgnmlText + "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>\n";
-        sbgnmlText = sbgnmlText + "<sbgn xmlns='http://sbgn.org/libsbgn/pd/0.1'>\n";
+        sbgnmlText = sbgnmlText + "<sbgn xmlns='http://sbgn.org/libsbgn/0.2'>\n";
         sbgnmlText = sbgnmlText + "<map>\n";
 
         //adding glyph sbgnml
