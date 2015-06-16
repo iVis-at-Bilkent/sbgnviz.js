@@ -215,7 +215,7 @@ var SBGNContainer = Backbone.View.extend({
                   geneClass != 'unspecified entity')
             return;
 
-          var queryScriptURL = "php/BioGeneQuery.php";
+          var queryScriptURL = "sampleapp-components/php/BioGeneQuery.php";
           var geneName = node._private.data.sbgnlabel;
 
           // set the query parameters
