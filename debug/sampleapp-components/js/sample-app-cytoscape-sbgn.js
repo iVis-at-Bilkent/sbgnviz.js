@@ -1,413 +1,381 @@
+var refreshPaddings = function (newPaddingRelative) {
+  if(window.paddingRelative == newPaddingRelative){
+    return;
+  }
+  
+  window.paddingRelative = newPaddingRelative;
+  
+  var nodes = cy.nodes();
+  var total = 0;
+  var numOfSimples = 0;
+
+  for (var i = 0; i < nodes.length; i++) {
+    var theNode = nodes[i];
+    if (theNode.children() == null || theNode.children().length == 0) {
+      total += Number(theNode._private.data.sbgnbbox.w);
+      total += Number(theNode._private.data.sbgnbbox.h);
+      numOfSimples++;
+    }
+  }
+
+  var calc_padding = (newPaddingRelative / 100) * Math.floor(total / (2 * numOfSimples));
+
+  //check if calculated padding is at least 10
+  if (calc_padding < 10) {
+    calc_padding = 10;
+  }
+
+  //refresh the complex paddings
+  cy.$("node[sbgnclass='complex']").css('padding-left', '' + calc_padding);
+  cy.$("node[sbgnclass='complex']").css('padding-right', '' + calc_padding);
+  cy.$("node[sbgnclass='complex']").css('padding-top', '' + calc_padding);
+  cy.$("node[sbgnclass='complex']").css('padding-bottom', '' + calc_padding);
+
+  //refresh the compartment paddings
+  cy.$("node[sbgnclass='compartment']").css('padding-left', '' + calc_padding);
+  cy.$("node[sbgnclass='compartment']").css('padding-right', '' + calc_padding);
+  cy.$("node[sbgnclass='compartment']").css('padding-top', '' + calc_padding);
+  cy.$("node[sbgnclass='compartment']").css('padding-bottom', '' + calc_padding);
+
+  //To refresh the nodes on the screen apply the preset layout
+  cy.layout({name: 'preset'});
+}
+
 var sbgnStyleSheet = cytoscape.stylesheet()
         .selector("node")
         .css({
-            'border-width' : 1.5,
-            'border-color' : '#555',
-            'background-color' : '#f6f6f6',
-            'font-size' : 11,
-            'shape' : 'data(sbgnclass)',
-            'background-opacity' : '0.5'
+          'border-width': 1.5,
+          'border-color': '#555',
+          'background-color': '#f6f6f6',
+          'font-size': 11,
+          'shape': 'data(sbgnclass)',
+          'background-opacity': '0.5'
         })
         .selector("node[sbgnclass='complex']")
         .css({
-            'background-color' : '#F4F3EE'
+          'background-color': '#F4F3EE'
         })
         .selector("node[sbgnclass='compartment']")
         .css({
-            'background-opacity' : '0',
-            'background-color' : '#FFFFFF',
-            'content' : 'data(sbgnlabel)',
-            'text-valign' : 'bottom',
-            'text-halign' : 'center',
-            'font-size' : '16'
+          'background-opacity': '0',
+          'background-color': '#FFFFFF',
+          'content': 'data(sbgnlabel)',
+          'text-valign': 'bottom',
+          'text-halign': 'center',
+          'font-size': '16'
         })
         .selector("node[sbgnclass!='complex'][sbgnclass!='compartment'][sbgnclass!='submap']")
         .css({
-            'width' : 'data(sbgnbbox.w)',
-            'height' : 'data(sbgnbbox.h)'
+          'width': 'data(sbgnbbox.w)',
+          'height': 'data(sbgnbbox.h)'
         })
         .selector("node:selected")
         .css({
-            'border-color' : '#d67614',
-            'target-arrow-color' : '#000',
-            'text-outline-color' : '#000'
+          'border-color': '#d67614',
+          'target-arrow-color': '#000',
+          'text-outline-color': '#000'
         })
         .selector("node:active")
         .css({
-            'background-opacity' : '0.7',
-            'overlay-color' : '#d67614',
-            'overlay-padding' : '14'
+          'background-opacity': '0.7',
+          'overlay-color': '#d67614',
+          'overlay-padding': '14'
         })
         .selector("edge")
         .css({
-            'line-color' : '#555',
-            'target-arrow-fill' : 'hollow',
-            'source-arrow-fill' : 'hollow',
-            'width': 1.5,
-            'target-arrow-color': '#555',
-            'source-arrow-color': '#555',
-            'target-arrow-shape' : 'data(sbgnclass)'
+          'line-color': '#555',
+          'target-arrow-fill': 'hollow',
+          'source-arrow-fill': 'hollow',
+          'width': 1.5,
+          'target-arrow-color': '#555',
+          'source-arrow-color': '#555',
+          'target-arrow-shape': 'data(sbgnclass)'
         })
         .selector("edge[sbgnclass='inhibition']")
         .css({
-            'target-arrow-fill' : 'filled'
+          'target-arrow-fill': 'filled'
         })
         .selector("edge[sbgnclass='consumption']")
         .css({
-            'target-arrow-shape' : 'none',
-            'source-arrow-shape' : 'data(sbgnclass)',
-            'line-style' : 'consumption'
+          'target-arrow-shape': 'none',
+          'source-arrow-shape': 'data(sbgnclass)',
+          'line-style': 'consumption'
         })
         .selector("edge[sbgnclass='production']")
         .css({
-            'target-arrow-fill' : 'filled',
-            'line-style' : 'production'
+          'target-arrow-fill': 'filled',
+          'line-style': 'production'
         })
         .selector("edge:selected")
         .css({
-            'line-color' : '#d67614',
-            'source-arrow-color': '#d67614',
-            'target-arrow-color': '#d67614'
+          'line-color': '#d67614',
+          'source-arrow-color': '#d67614',
+          'target-arrow-color': '#d67614'
         })
         .selector("edge:active")
         .css({
-            'background-opacity' : '0.7',
-            'overlay-color' : '#d67614',
-            'overlay-padding' : '8'
+          'background-opacity': '0.7',
+          'overlay-color': '#d67614',
+          'overlay-padding': '8'
         })
         .selector("core")
         .css({
-            'selection-box-color' : '#d67614',
-            'selection-box-opacity' : '0.2',
-            'selection-box-border-color' : '#d67614'
+          'selection-box-color': '#d67614',
+          'selection-box-opacity': '0.2',
+          'selection-box-border-color': '#d67614'
         })
         .selector(".ui-cytoscape-edgehandles-source")
         .css({
-            'border-color': '#5CC2ED',
-            'border-width': 3
+          'border-color': '#5CC2ED',
+          'border-width': 3
         })
         .selector(".ui-cytoscape-edgehandles-target, node.ui-cytoscape-edgehandles-preview")
         .css({
-            'background-color': '#5CC2ED'
+          'background-color': '#5CC2ED'
         })
         .selector("edge.ui-cytoscape-edgehandles-preview")
         .css({
-            'line-color' : '#5CC2ED'
+          'line-color': '#5CC2ED'
         })
         .selector("node.ui-cytoscape-edgehandles-preview, node.intermediate")
         .css({
-            'shape' : 'rectangle',
-            'width' : 15,
-            'height' : 15
-}); // end of sbgnStyleSheet
+          'shape': 'rectangle',
+          'width': 15,
+          'height': 15
+        }); // end of sbgnStyleSheet
 
 var NotyView = Backbone.View.extend({
-    render: function() {
-        //this.model["theme"] = " twitter bootstrap";
-        this.model["layout"] = "bottomRight";
-        this.model["timeout"] = 8000;
-        this.model["text"] = "Right click on a gene to see its details!";
+  render: function () {
+    //this.model["theme"] = " twitter bootstrap";
+    this.model["layout"] = "bottomRight";
+    this.model["timeout"] = 8000;
+    this.model["text"] = "Right click on a gene to see its details!";
 
-        noty(this.model);
-        return this;
-    }
+    noty(this.model);
+    return this;
+  }
 });
 
 var SBGNContainer = Backbone.View.extend({
-    cyStyle: sbgnStyleSheet,
+  cyStyle: sbgnStyleSheet,
+  render: function () {
+    (new NotyView({
+      template: "#noty-info",
+      model: {}
+    })).render();
 
-    render: function(){
-        (new NotyView({
-            template: "#noty-info",
-            model: {}
-        })).render();
-
-        var container = $(this.el);
-        // container.html("");
-        // container.append(_.template($("#loading-template").html()));
+    var container = $(this.el);
+    // container.html("");
+    // container.append(_.template($("#loading-template").html()));
 
 
-        var cytoscapeJsGraph = (this.model.cytoscapeJsGraph);
+    var cytoscapeJsGraph = (this.model.cytoscapeJsGraph);
 
-        var positionMap = {};
+    var positionMap = {};
 
-        //add position information to data for preset layout
-        for (var i = 0 ; i < cytoscapeJsGraph.nodes.length ; i++){
-            var xPos = cytoscapeJsGraph.nodes[i].data.sbgnbbox.x;
-            var yPos = cytoscapeJsGraph.nodes[i].data.sbgnbbox.y;
-            positionMap[cytoscapeJsGraph.nodes[i].data.id] = {'x':xPos, 'y':yPos};
-        }
-
-        var cyOptions = {
-            elements: cytoscapeJsGraph,
-            style: sbgnStyleSheet,
-            layout: { 
-                name: 'preset',
-                positions: positionMap
-            },
-            showOverlay: false,
-            minZoom: 0.125,
-            maxZoom: 16,
-
-            ready: function()
-            {
-                window.cy = this;
-
-                var nodes = cy.nodes();
-                var total = 0;
-                var numOfSimples = 0;
-                
-                for(var i = 0; i < nodes.length; i++){
-                  var theNode = nodes[i];
-                  if(theNode.children() == null || theNode.children().length == 0){
-                    total += Number(theNode._private.data.sbgnbbox.w);
-                    total += Number(theNode._private.data.sbgnbbox.h);
-                    numOfSimples++;
-                  }
-                }
-                
-                var calc_padding = Math.floor(total/(2*numOfSimples));
-                
-                //calculate the paddings of complex structures
-                complex_padding_left = 0.2 * calc_padding;
-                complex_padding_right = 0.2 * calc_padding;
-                complex_padding_top = 0.2 * calc_padding;
-                complex_padding_bottom = 0.2 * calc_padding;
-            
-                //calculate the paddings of compartment structures
-                compartment_padding_left = 0.2 * calc_padding;
-                compartment_padding_right = 0.2 * calc_padding;
-                compartment_padding_top = 0.2 * calc_padding;
-                compartment_padding_bottom = 0.2 * calc_padding;
-                
-                //check if complex paddins are at least 10
-                if(complex_padding_left < 10){
-                  complex_padding_left = 10;
-                }
-                
-                if(complex_padding_right < 10){
-                  complex_padding_right = 10;
-                }
-                
-                if(complex_padding_top < 10){
-                  complex_padding_top = 10;
-                }
-                
-                //check if compartment paddins are at least 10
-                if(compartment_padding_bottom < 10){
-                  compartment_padding_bottom = 10;
-                }
-                
-                if(compartment_padding_left < 10){
-                  compartment_padding_left = 10;
-                }
-                
-                if(compartment_padding_right < 10){
-                  compartment_padding_right = 10;
-                }
-                
-                if(compartment_padding_top < 10){
-                  compartment_padding_top = 10;
-                }
-                
-                if(compartment_padding_bottom < 10){
-                  compartment_padding_bottom = 10;
-                }
-                
-                //refresh the complex paddings
-                cy.$("node[sbgnclass='complex']").css('padding-left', '' + complex_padding_left);                
-                cy.$("node[sbgnclass='complex']").css('padding-right', '' + complex_padding_right);  
-                cy.$("node[sbgnclass='complex']").css('padding-top', '' + complex_padding_top);                
-                cy.$("node[sbgnclass='complex']").css('padding-bottom', '' + complex_padding_bottom);
-                
-                //refresh the compartment paddings
-                cy.$("node[sbgnclass='compartment']").css('padding-left', '' + compartment_padding_left);                
-                cy.$("node[sbgnclass='compartment']").css('padding-right', '' + compartment_padding_right);  
-                cy.$("node[sbgnclass='compartment']").css('padding-top', '' + compartment_padding_top);                
-                cy.$("node[sbgnclass='compartment']").css('padding-bottom', '' + compartment_padding_bottom);
-                
-                //To refresh the nodes on the screen apply the preset layout
-                cy.layout({name: 'preset'});
-
-                var panProps = ({
-                    fitPadding: 10,
-                });
-                container.cytoscapePanzoom(panProps);
-
-                cy.on('mouseover', 'node', function(evt){
-                  
-                });
-
-                cy.on('cxttap','node', function(event){
-                    var node = this;
-                    $(".qtip").remove();
-
-                    var geneClass = node._private.data.sbgnclass;
-                    if(geneClass != 'macromolecule' && geneClass != 'nucleic acid feature' &&
-                        geneClass != 'unspecified entity')
-                        return;
-
-                    var queryScriptURL = "php/BioGeneQuery.php";
-                    var geneName = node._private.data.sbgnlabel;
-                    
-                    // set the query parameters
-                    var queryParams = 
-                    {
-                        query: geneName,
-                        org: "human",
-                        format: "json",
-                    };
-
-                    cy.getElementById(node.id()).qtip({
-                        content: {
-                            text: function(event, api) {
-                                $.ajax({
-                                    type: "POST",
-                                    url: queryScriptURL,
-                                    async: true,
-                                    data: queryParams,
-                                })
-                                .then(function(content) {
-                                    queryResult = JSON.parse(content);
-                                    if(queryResult.count > 0 && queryParams.query != "" && typeof queryParams.query != 'undefined')
-                                    {
-                                        var info = (new BioGeneView(
-                                        {
-                                            el: '#biogene-container',
-                                            model: queryResult.geneInfo[0]
-                                        })).render();
-                                        var html = $('#biogene-container').html();
-                                        api.set('content.text', html);
-                                    }
-                                    else{
-                                        api.set('content.text', "No additional information available &#013; for the selected node!");
-                                    }
-                                }, function(xhr, status, error) {
-                                    api.set('content.text', "Error retrieving data: " + error);
-                                });
-                                api.set('content.title', node._private.data.sbgnlabel);
-                                return _.template($("#loading-small-template").html());
-                            }
-                        },
-                        show: {
-                            ready: true
-                        },
-                        position: {
-                            my: 'top center',
-                            at: 'bottom center',
-                            adjust: {
-                              cyViewport: true
-                            },
-                            effect: false
-                        },
-                        style: {
-                            classes: 'qtip-bootstrap',
-                            tip: {
-                              width: 16,
-                              height: 8
-                            }
-                        }
-                    });
-                });
-
-                cy.on('tap','node', function(event){
-                    var node = this;
-                    $(".qtip").remove();
-
-                    if(event.originalEvent.shiftKey)
-                        return;
-
-                    var label = node._private.data.sbgnlabel;
-
-                    if(typeof label === 'undefined' || label == "")
-                        return;
-
-                    cy.getElementById(node.id()).qtip({
-                        content : label,
-                        show: {
-                            ready: true,
-                        },
-                        position: {
-                            my: 'top center',
-                            at: 'bottom center',
-                            adjust: {
-                              cyViewport: true
-                            }
-                        },
-                        style: {
-                            classes: 'qtip-bootstrap',
-                            tip: {
-                              width: 16,
-                              height: 8
-                            }
-                        }
-                    });
-                });
-            }
-        };
-        container.html("");
-        container.cy(cyOptions);
-        return this;
+    //add position information to data for preset layout
+    for (var i = 0; i < cytoscapeJsGraph.nodes.length; i++) {
+      var xPos = cytoscapeJsGraph.nodes[i].data.sbgnbbox.x;
+      var yPos = cytoscapeJsGraph.nodes[i].data.sbgnbbox.y;
+      positionMap[cytoscapeJsGraph.nodes[i].data.id] = {'x': xPos, 'y': yPos};
     }
+
+    var cyOptions = {
+      elements: cytoscapeJsGraph,
+      style: sbgnStyleSheet,
+      layout: {
+        name: 'preset',
+        positions: positionMap
+      },
+      showOverlay: false,
+      minZoom: 0.125,
+      maxZoom: 16,
+      ready: function ()
+      {
+        window.cy = this;
+        var newPaddingRelative = 20;
+
+        refreshPaddings(newPaddingRelative);
+
+        var panProps = ({
+          fitPadding: 10,
+        });
+        container.cytoscapePanzoom(panProps);
+
+        cy.on('mouseover', 'node', function (evt) {
+
+        });
+
+        cy.on('cxttap', 'node', function (event) {
+          var node = this;
+          $(".qtip").remove();
+
+          var geneClass = node._private.data.sbgnclass;
+          if (geneClass != 'macromolecule' && geneClass != 'nucleic acid feature' &&
+                  geneClass != 'unspecified entity')
+            return;
+
+          var queryScriptURL = "php/BioGeneQuery.php";
+          var geneName = node._private.data.sbgnlabel;
+
+          // set the query parameters
+          var queryParams =
+                  {
+                    query: geneName,
+                    org: "human",
+                    format: "json",
+                  };
+
+          cy.getElementById(node.id()).qtip({
+            content: {
+              text: function (event, api) {
+                $.ajax({
+                  type: "POST",
+                  url: queryScriptURL,
+                  async: true,
+                  data: queryParams,
+                })
+                        .then(function (content) {
+                          queryResult = JSON.parse(content);
+                          if (queryResult.count > 0 && queryParams.query != "" && typeof queryParams.query != 'undefined')
+                          {
+                            var info = (new BioGeneView(
+                                    {
+                                      el: '#biogene-container',
+                                      model: queryResult.geneInfo[0]
+                                    })).render();
+                            var html = $('#biogene-container').html();
+                            api.set('content.text', html);
+                          }
+                          else {
+                            api.set('content.text', "No additional information available &#013; for the selected node!");
+                          }
+                        }, function (xhr, status, error) {
+                          api.set('content.text', "Error retrieving data: " + error);
+                        });
+                api.set('content.title', node._private.data.sbgnlabel);
+                return _.template($("#loading-small-template").html());
+              }
+            },
+            show: {
+              ready: true
+            },
+            position: {
+              my: 'top center',
+              at: 'bottom center',
+              adjust: {
+                cyViewport: true
+              },
+              effect: false
+            },
+            style: {
+              classes: 'qtip-bootstrap',
+              tip: {
+                width: 16,
+                height: 8
+              }
+            }
+          });
+        });
+
+        cy.on('tap', 'node', function (event) {
+          var node = this;
+          $(".qtip").remove();
+
+          if (event.originalEvent.shiftKey)
+            return;
+
+          var label = node._private.data.sbgnlabel;
+
+          if (typeof label === 'undefined' || label == "")
+            return;
+
+          cy.getElementById(node.id()).qtip({
+            content: label,
+            show: {
+              ready: true,
+            },
+            position: {
+              my: 'top center',
+              at: 'bottom center',
+              adjust: {
+                cyViewport: true
+              }
+            },
+            style: {
+              classes: 'qtip-bootstrap',
+              tip: {
+                width: 16,
+                height: 8
+              }
+            }
+          });
+        });
+      }
+    };
+    container.html("");
+    container.cy(cyOptions);
+    return this;
+  }
 });
 
 var SBGNLayout = Backbone.View.extend({
-    defaultLayoutProperties: {
-        name: 'cose2',
-        nodeRepulsion: 4500,
-        nodeOverlap: 10,
-        idealEdgeLength: 50,
-        edgeElasticity: 0.45,
-        nestingFactor: 0.1,
-        gravity: 0.4,
-        numIter: 2500,
-        tile: true,
-        animate: false
-    },
-    currentLayoutProperties: null,
+  defaultLayoutProperties: {
+    name: 'cose2',
+    nodeRepulsion: 4500,
+    nodeOverlap: 10,
+    idealEdgeLength: 50,
+    edgeElasticity: 0.45,
+    nestingFactor: 0.1,
+    gravity: 0.4,
+    numIter: 2500,
+    paddingRelative: 20,
+    tile: true,
+    animate: false
+  },
+  currentLayoutProperties: null,
+  initialize: function () {
+    var self = this;
+    self.copyProperties();
+    self.template = _.template($("#layout-settings-template").html(), self.currentLayoutProperties);
+  },
+  copyProperties: function () {
+    this.currentLayoutProperties = _.clone(this.defaultLayoutProperties);
+  },
+  applyLayout: function () {
+    var options = this.currentLayoutProperties;
+    cy.layout(options);
+  },
+  render: function () {
+    var self = this;
+    self.template = _.template($("#layout-settings-template").html(), self.currentLayoutProperties);
+    $(self.el).html(self.template);
 
-    initialize: function() {
-        var self = this;
-        self.copyProperties();
-        self.template = _.template($("#layout-settings-template").html(), self.currentLayoutProperties);
-    },
+    $(self.el).dialog();
 
-    copyProperties: function(){
-        this.currentLayoutProperties = _.clone(this.defaultLayoutProperties);
-    },
+    $("#save-layout").die("click").live("click", function (evt) {
+      self.currentLayoutProperties.nodeRepulsion   = Number(document.getElementById("node-repulsion").value);
+      self.currentLayoutProperties.nodeOverlap     = Number(document.getElementById("node-overlap").value);
+      self.currentLayoutProperties.idealEdgeLength = Number(document.getElementById("ideal-edge-length").value);
+      self.currentLayoutProperties.edgeElasticity  = Number(document.getElementById("edge-elasticity").value);
+      self.currentLayoutProperties.nestingFactor   = Number(document.getElementById("nesting-factor").value);
+      self.currentLayoutProperties.gravity         = Number(document.getElementById("gravity").value);
+      self.currentLayoutProperties.numIter         = Number(document.getElementById("num-iter").value);
+      self.currentLayoutProperties.paddingRelative = Number(document.getElementById("padding-relative").value);
+      self.currentLayoutProperties.tile            = document.getElementById("tile").checked;
+      self.currentLayoutProperties.animate         = document.getElementById("animate").checked;
 
-    applyLayout: function(){
-        var options = this.currentLayoutProperties;
-        cy.layout( options );
-    },
+      refreshPaddings(self.currentLayoutProperties.paddingRelative);
 
-    render: function(){
-        var self = this;
-        self.template = _.template($("#layout-settings-template").html(), self.currentLayoutProperties);
-        $(self.el).html(self.template);
+      $(self.el).dialog('close');
+    });
 
-        $(self.el).dialog();        
+    $("#default-layout").die("click").live("click", function (evt) {
+      self.copyProperties();
+      self.template = _.template($("#layout-settings-template").html(), self.currentLayoutProperties);
+      $(self.el).html(self.template);
+    });
 
-        $("#save-layout").die("click").live("click", function(evt){
-            self.currentLayoutProperties.nodeRepulsion  = Number(document.getElementById("node-repulsion").value);
-            self.currentLayoutProperties.nodeOverlap    = Number(document.getElementById("node-overlap").value);
-            self.currentLayoutProperties.idealEdgeLength= Number(document.getElementById("ideal-edge-length").value);
-            self.currentLayoutProperties.edgeElasticity = Number(document.getElementById("edge-elasticity").value);
-            self.currentLayoutProperties.nestingFactor  = Number(document.getElementById("nesting-factor").value);
-            self.currentLayoutProperties.gravity        = Number(document.getElementById("gravity").value);
-            self.currentLayoutProperties.numIter        = Number(document.getElementById("num-iter").value);
-            self.currentLayoutProperties.tile           = document.getElementById("tile").checked ;
-            self.currentLayoutProperties.animate        = document.getElementById("animate").checked ;
-            
-            $(self.el).dialog('close');
-        });
-
-        $("#default-layout").die("click").live("click", function(evt){
-            self.copyProperties();
-            self.template = _.template($("#layout-settings-template").html(), self.currentLayoutProperties);
-            $(self.el).html(self.template);
-        });
-
-        return this;
-    }
+    return this;
+  }
 });
