@@ -202,11 +202,44 @@ var SBGNContainer = Backbone.View.extend({
         });
         container.cytoscapePanzoom(panProps);
 
-        cy.on('mouseover', 'node', function (evt) {
+        cy.on('mouseover', 'node', function (event) {
+           var node = this;
+          $(".qtip").remove();
 
+          if (event.originalEvent.shiftKey)
+            return;
+
+          var label = node._private.data.sbgnlabel;
+
+          if (typeof label === 'undefined' || label == "")
+            return;
+
+          cy.getElementById(node.id()).qtip({
+            content: label,
+            show: {
+              ready: true,
+            },
+            position: {
+              my: 'top center',
+              at: 'bottom center',
+              adjust: {
+                cyViewport: true
+              }
+            },
+            style: {
+              classes: 'qtip-bootstrap',
+              tip: {
+                width: 16,
+                height: 8
+              }
+            }
+          });
+            
         });
+        
+        
 
-        cy.on('cxttap', 'node', function (event) {
+        cy.on('tap', 'node', function (event) {
           var node = this;
           $(".qtip").remove();
 
@@ -267,40 +300,6 @@ var SBGNContainer = Backbone.View.extend({
                 cyViewport: true
               },
               effect: false
-            },
-            style: {
-              classes: 'qtip-bootstrap',
-              tip: {
-                width: 16,
-                height: 8
-              }
-            }
-          });
-        });
-
-        cy.on('tap', 'node', function (event) {
-          var node = this;
-          $(".qtip").remove();
-
-          if (event.originalEvent.shiftKey)
-            return;
-
-          var label = node._private.data.sbgnlabel;
-
-          if (typeof label === 'undefined' || label == "")
-            return;
-
-          cy.getElementById(node.id()).qtip({
-            content: label,
-            show: {
-              ready: true,
-            },
-            position: {
-              my: 'top center',
-              at: 'bottom center',
-              adjust: {
-                cyViewport: true
-              }
             },
             style: {
               classes: 'qtip-bootstrap',
