@@ -118,7 +118,13 @@ Below are some sample screenshots from SBGNViz.js, illustrating some of its capa
 
 <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
 
+## Credits
+
+Please cite the following when you use SBGNViz.js:
+
+M. Sari, I. Bahceci, U. Dogrusoz, S.O. Sumer, B.A. Aksoy, O. Babur, E. Demir, "[SBGNViz: a tool for visualization and complexity management of SBGN process description maps](http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0128985)", PLoS ONE, 10(6), e0128985, 2015.
+
 ## Team
 
-  * Mecit Sari, Ugur Dogrusoz, Istemi Bahceci, Ayhun Tekat, Metin Can Siper [i-Vis at Bilkent University](http://www.cs.bilkent.edu.tr/~ivis)
-  * Selcuk Onur Sumer, Bulent Arman Aksoy, Ozgun Babur, Emek Demir [cBio at MSKCC](http://cbio.mskcc.org)
+  * Mecit Sari, Ugur Dogrusoz, Istemi Bahceci, Ayhun Tekat, Metin Can Siper, M.Furkan Sahin, [i-Vis at Bilkent University](http://www.cs.bilkent.edu.tr/~ivis)
+  * Selcuk Onur Sumer, Bulent Arman Aksoy, Ozgun Babur, Emek Demir, [cBio at MSKCC](http://cbio.mskcc.org)
