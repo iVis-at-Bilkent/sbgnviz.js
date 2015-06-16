@@ -331,7 +331,7 @@ var SBGNLayout = Backbone.View.extend({
     numIter: 2500,
     paddingRelative: 20,
     tile: true,
-    animate: false
+    animate: true
   },
   currentLayoutProperties: null,
   initialize: function () {
