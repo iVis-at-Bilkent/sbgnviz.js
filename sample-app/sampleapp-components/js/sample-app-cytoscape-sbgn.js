@@ -1,10 +1,4 @@
-var refreshPaddings = function (newPaddingRelative) {
-  if(window.paddingRelative == newPaddingRelative){
-    return;
-  }
-  
-  window.paddingRelative = newPaddingRelative;
-  
+var refreshPaddings = function () {
   var nodes = cy.nodes();
   var total = 0;
   var numOfSimples = 0;
@@ -18,24 +12,24 @@ var refreshPaddings = function (newPaddingRelative) {
     }
   }
 
-  var calc_padding = (newPaddingRelative / 100) * Math.floor(total / (2 * numOfSimples));
+  var calc_padding = Math.floor(total / (2 * numOfSimples));
 
-  //check if calculated padding is at least 10
-  if (calc_padding < 10) {
-    calc_padding = 10;
+  var complexesAndCompartments = cy.$("node[sbgnclass='complex'], node[sbgnclass='compartment']");
+  for(var i = 0; i < complexesAndCompartments.length; i++){
+    var theNode = complexesAndCompartments[i];
+    var thePercentadge = parseInt(theNode.css('padding-relative'), 10);
+    var thePadding = calc_padding * thePercentadge / 100;
+    
+    if(thePadding < 10){
+      thePadding = 10;
+    }
+    
+    //refresh the paddings
+    theNode.css('padding-left', thePadding);
+    theNode.css('padding-right', thePadding);
+    theNode.css('padding-top', thePadding);
+    theNode.css('padding-bottom', thePadding);
   }
-
-  //refresh the complex paddings
-  cy.$("node[sbgnclass='complex']").css('padding-left', '' + calc_padding);
-  cy.$("node[sbgnclass='complex']").css('padding-right', '' + calc_padding);
-  cy.$("node[sbgnclass='complex']").css('padding-top', '' + calc_padding);
-  cy.$("node[sbgnclass='complex']").css('padding-bottom', '' + calc_padding);
-
-  //refresh the compartment paddings
-  cy.$("node[sbgnclass='compartment']").css('padding-left', '' + calc_padding);
-  cy.$("node[sbgnclass='compartment']").css('padding-right', '' + calc_padding);
-  cy.$("node[sbgnclass='compartment']").css('padding-top', '' + calc_padding);
-  cy.$("node[sbgnclass='compartment']").css('padding-bottom', '' + calc_padding);
 
   //To refresh the nodes on the screen apply the preset layout
   cy.layout({name: 'preset'});
@@ -49,7 +43,8 @@ var sbgnStyleSheet = cytoscape.stylesheet()
           'background-color': '#f6f6f6',
           'font-size': 11,
           'shape': 'data(sbgnclass)',
-          'background-opacity': '0.5'
+          'background-opacity': '0.5',
+          'padding-relative': 20
         })
         .selector("node[sbgnclass='complex']")
         .css({
@@ -193,9 +188,7 @@ var SBGNContainer = Backbone.View.extend({
       ready: function ()
       {
         window.cy = this;
-        var newPaddingRelative = 20;
-
-        refreshPaddings(newPaddingRelative);
+        refreshPaddings();
 
         var panProps = ({
           fitPadding: 10,
@@ -361,7 +354,6 @@ var SBGNLayout = Backbone.View.extend({
     nestingFactor: 0.1,
     gravity: 0.4,
     numIter: 2500,
-    paddingRelative: 20,
     tile: true,
     animate: true
   },
@@ -393,11 +385,8 @@ var SBGNLayout = Backbone.View.extend({
       self.currentLayoutProperties.nestingFactor   = Number(document.getElementById("nesting-factor").value);
       self.currentLayoutProperties.gravity         = Number(document.getElementById("gravity").value);
       self.currentLayoutProperties.numIter         = Number(document.getElementById("num-iter").value);
-      self.currentLayoutProperties.paddingRelative = Number(document.getElementById("padding-relative").value);
       self.currentLayoutProperties.tile            = document.getElementById("tile").checked;
       self.currentLayoutProperties.animate         = document.getElementById("animate").checked;
-
-      refreshPaddings(self.currentLayoutProperties.paddingRelative);
 
       $(self.el).dialog('close');
     });
