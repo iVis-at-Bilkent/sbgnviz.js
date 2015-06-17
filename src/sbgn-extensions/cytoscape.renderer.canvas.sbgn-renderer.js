@@ -50,6 +50,7 @@
   var lineStyles = $$.style.types.lineStyle.enums;
   lineStyles.push("consumption", "production");
   
+  //added padding-relative property to css features
   $$.style.properties.push({name: 'padding-relative', type: $$.style.types.percent});
   $$.style.properties['padding-relative'] = {name: 'padding-relative', type: $$.style.types.percent};
 
