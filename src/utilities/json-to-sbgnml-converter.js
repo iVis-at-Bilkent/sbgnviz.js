@@ -6,7 +6,7 @@ var jsonToSbgnml = {
         //add headers
         sbgnmlText = sbgnmlText + "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>\n";
         sbgnmlText = sbgnmlText + "<sbgn xmlns='http://sbgn.org/libsbgn/0.2'>\n";
-        sbgnmlText = sbgnmlText + "<map>\n";
+        sbgnmlText = sbgnmlText + "<map language='process description'>\n";
 
         //adding glyph sbgnml
         cy.nodes(":visible").each(function(){
@@ -132,6 +132,7 @@ var jsonToSbgnml = {
         //Temporary hack to resolve "undefined" arc source and targets
         var arcTarget = edge._private.data.porttarget;
         var arcSource = edge._private.data.portsource;
+        var arcId = arcSource + "-" + arcTarget;
 
         if (arcSource.length === 0) 
             arcSource = edge._private.data.source;
@@ -140,7 +141,8 @@ var jsonToSbgnml = {
             arcTarget = edge._private.data.target;
 
 
-        sbgnmlText = sbgnmlText + "<arc target='" + arcTarget +
+        sbgnmlText = sbgnmlText + "<arc id='" + arcId + 
+            "' target='" + arcTarget +
             "' source='" + arcSource + "' class='" +
             edge._private.data.sbgnclass + "'>\n";
 
