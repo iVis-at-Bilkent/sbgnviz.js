@@ -193,6 +193,9 @@ var SBGNContainer = Backbone.View.extend({
           initialize: function () {
             var self = this;
             self.copyProperties();
+            if(window.paddingRelative != null){
+              this.currentSBGNProperties.paddingRelative = window.paddingRelative;
+            }
             self.template = _.template($("#sbgn-properties-template").html(), self.currentSBGNProperties);
           },
           copyProperties: function () {
