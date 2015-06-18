@@ -19,6 +19,7 @@ $( document ).ready( function() {
     var sbgnLayoutProp = new SBGNLayout({
         el: '#sbgn-layout-table'
     });
+    
 
     $("body").on("change", "#file-input", function(e) {
         if ($("#file-input").val() == "") {
@@ -208,6 +209,10 @@ $( document ).ready( function() {
 
     $("#layout-properties").click(function(e){
         sbgnLayoutProp.render();
+    });
+    
+    $("#sbgn-properties").click(function(e){
+        sbgnProperties.render();
     });
 
     $("#perform-layout").click(function(e){
