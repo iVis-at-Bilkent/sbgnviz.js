@@ -1,4 +1,7 @@
 var refreshPaddings = function () {
+  if (window.paddingRelative == null) {
+    window.paddingRelative = parseInt(cy.$("node").css('padding-relative'), 10);
+  }
   var nodes = cy.nodes();
   var total = 0;
   var numOfSimples = 0;
@@ -12,24 +15,17 @@ var refreshPaddings = function () {
     }
   }
 
-  var calc_padding = Math.floor(total / (2 * numOfSimples));
+  var calc_padding = (paddingRelative / 100) * Math.floor(total / (2 * numOfSimples));
+
+  if (calc_padding < 10) {
+    calc_padding = 10;
+  }
 
   var complexesAndCompartments = cy.$("node[sbgnclass='complex'], node[sbgnclass='compartment']");
-  for(var i = 0; i < complexesAndCompartments.length; i++){
-    var theNode = complexesAndCompartments[i];
-    var thePercentadge = parseInt(theNode.css('padding-relative'), 10);
-    var thePadding = calc_padding * thePercentadge / 100;
-    
-    if(thePadding < 10){
-      thePadding = 10;
-    }
-    
-    //refresh the paddings
-    theNode.css('padding-left', thePadding);
-    theNode.css('padding-right', thePadding);
-    theNode.css('padding-top', thePadding);
-    theNode.css('padding-bottom', thePadding);
-  }
+  complexesAndCompartments.css('padding-left', calc_padding);
+  complexesAndCompartments.css('padding-right', calc_padding);
+  complexesAndCompartments.css('padding-top', calc_padding);
+  complexesAndCompartments.css('padding-bottom', calc_padding);
 
   //To refresh the nodes on the screen apply the preset layout
   cy.layout({name: 'preset'});
@@ -188,6 +184,51 @@ var SBGNContainer = Backbone.View.extend({
       ready: function ()
       {
         window.cy = this;
+
+        var SBGNProperties = Backbone.View.extend({
+          defaultSBGNProperties: {
+            paddingRelative: parseInt(cy.$("node").css('padding-relative'), 10)
+          },
+          currentSBGNProperties: null,
+          initialize: function () {
+            var self = this;
+            self.copyProperties();
+            self.template = _.template($("#sbgn-properties-template").html(), self.currentSBGNProperties);
+          },
+          copyProperties: function () {
+            this.currentSBGNProperties = _.clone(this.defaultSBGNProperties);
+          },
+          render: function () {
+            var self = this;
+            self.template = _.template($("#sbgn-properties-template").html(), self.currentSBGNProperties);
+            $(self.el).html(self.template);
+
+            $(self.el).dialog();
+
+            $("#save-sbgn").die("click").live("click", function (evt) {
+              self.currentSBGNProperties.paddingRelative = Number(document.getElementById("padding-relative").value);
+              if (paddingRelative != self.currentSBGNProperties.paddingRelative) {
+                paddingRelative = self.currentSBGNProperties.paddingRelative;
+                refreshPaddings();
+              }
+
+              $(self.el).dialog('close');
+            });
+
+            $("#default-sbgn").die("click").live("click", function (evt) {
+              self.copyProperties();
+              self.template = _.template($("#sbgn-properties-template").html(), self.currentSBGNProperties);
+              $(self.el).html(self.template);
+            });
+
+            return this;
+          }
+        });
+
+        window.sbgnProperties = new SBGNProperties({
+          el: '#sbgn-properties-table'
+        });
+
         refreshPaddings();
 
         var panProps = ({
@@ -196,7 +237,7 @@ var SBGNContainer = Backbone.View.extend({
         container.cytoscapePanzoom(panProps);
 
         cy.on('mouseover', 'node', function (event) {
-           var node = this;
+          var node = this;
           $(".qtip").remove();
 
           if (event.originalEvent.shiftKey)
@@ -227,11 +268,11 @@ var SBGNContainer = Backbone.View.extend({
               }
             }
           });
-            
+
         });
-        
-        cy.on('cxttap', 'node', function(event){
-            var node = this;
+
+        cy.on('cxttap', 'node', function (event) {
+          var node = this;
           $(".qtip").remove();
 
           var geneClass = node._private.data.sbgnclass;
@@ -334,7 +375,7 @@ var SBGNContainer = Backbone.View.extend({
               }
             }
           });
-          
+
         });
       }
     };
@@ -378,15 +419,15 @@ var SBGNLayout = Backbone.View.extend({
     $(self.el).dialog();
 
     $("#save-layout").die("click").live("click", function (evt) {
-      self.currentLayoutProperties.nodeRepulsion   = Number(document.getElementById("node-repulsion").value);
-      self.currentLayoutProperties.nodeOverlap     = Number(document.getElementById("node-overlap").value);
+      self.currentLayoutProperties.nodeRepulsion = Number(document.getElementById("node-repulsion").value);
+      self.currentLayoutProperties.nodeOverlap = Number(document.getElementById("node-overlap").value);
       self.currentLayoutProperties.idealEdgeLength = Number(document.getElementById("ideal-edge-length").value);
-      self.currentLayoutProperties.edgeElasticity  = Number(document.getElementById("edge-elasticity").value);
-      self.currentLayoutProperties.nestingFactor   = Number(document.getElementById("nesting-factor").value);
-      self.currentLayoutProperties.gravity         = Number(document.getElementById("gravity").value);
-      self.currentLayoutProperties.numIter         = Number(document.getElementById("num-iter").value);
-      self.currentLayoutProperties.tile            = document.getElementById("tile").checked;
-      self.currentLayoutProperties.animate         = document.getElementById("animate").checked;
+      self.currentLayoutProperties.edgeElasticity = Number(document.getElementById("edge-elasticity").value);
+      self.currentLayoutProperties.nestingFactor = Number(document.getElementById("nesting-factor").value);
+      self.currentLayoutProperties.gravity = Number(document.getElementById("gravity").value);
+      self.currentLayoutProperties.numIter = Number(document.getElementById("num-iter").value);
+      self.currentLayoutProperties.tile = document.getElementById("tile").checked;
+      self.currentLayoutProperties.animate = document.getElementById("animate").checked;
 
       $(self.el).dialog('close');
     });

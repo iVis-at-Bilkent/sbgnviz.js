@@ -64,6 +64,7 @@
                                         <li><a href="#" id="save-as-jpg">JPG</a></li>
                                     </ul>
                                 </li>
+                                <li><a href="#" id="sbgn-properties">SBGN Properties...</a></li>
                             </ul>
                         </li>
 
@@ -152,6 +153,10 @@
 
         <div id="sbgn-layout-table" title="Layout Properties">
             <!-- sbgn layout table will be shown here -->
+        </div>
+    
+        <div id="sbgn-properties-table" title="SBGN Properties">
+            <!-- sbgn properties table will be shown here -->
         </div>
 
         <div id="biogene-container" style="display: none">
@@ -340,6 +345,28 @@
             </td>
             <td>
             <button id="default-layout" class="btn btn-default">Default</button>
+            </td>
+            </tr>
+            </table>
+        </script>
+        
+        <script type="text/template" id="sbgn-properties-template">
+            <table class="table-condensed layout-table">
+            <tr>
+            <td>
+            <span class="add-on layout-text"> Padding Relative </span>
+            </td>
+            <td>
+            <input id="padding-relative" type="text" class="input-small layout-text" value= <%= paddingRelative %> >
+            </td>
+            </tr>
+    
+            <tr id="sbgn-buttons">
+            <td>
+            <button id="save-sbgn" class="btn btn-default" >Save</button>
+            </td>
+            <td>
+            <button id="default-sbgn" class="btn btn-default">Default</button>
             </td>
             </tr>
             </table>
