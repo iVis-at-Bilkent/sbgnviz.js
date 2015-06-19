@@ -4111,6 +4111,7 @@
     // Traverse all neighbors of this node and recursively call this
     // function.
     var neighborEdges = [];
+    neighborEdges = neighborEdges.concat(node.getEdges());
     var childCount = neighborEdges.length;
 
     if (parentOfNode != null)
@@ -4157,7 +4158,7 @@
             i = (++i) % incEdgesCount)
     {
       var currentNeighbor =
-              neighborEdges.get(i).getOtherEnd(node);
+              neighborEdges[i].getOtherEnd(node);
 
       // Don't back traverse to root node in current tree.
       if (currentNeighbor == parentOfNode)
@@ -4169,7 +4170,7 @@
               (startAngle + branchCount * stepAngle) % 360;
       var childEndAngle = (childStartAngle + stepAngle) % 360;
 
-      this.branchRadialLayout(currentNeighbor,
+      CoSELayout.branchRadialLayout(currentNeighbor,
               node,
               childStartAngle, childEndAngle,
               distance + radialSeparation, radialSeparation);
