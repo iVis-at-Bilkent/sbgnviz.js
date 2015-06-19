@@ -181,6 +181,9 @@ var SBGNContainer = Backbone.View.extend({
       showOverlay: false,
       minZoom: 0.125,
       maxZoom: 16,
+      boxSelectionEnabled: true,
+      motionBlur: true,
+      wheelSensitivity: 0.1,
       ready: function ()
       {
         window.cy = this;
