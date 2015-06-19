@@ -3889,6 +3889,8 @@
 
   CoSELayout.prototype.runSpringEmbedder = function () {
     var lastFrame = new Date().getTime();
+    var initialAnimationPeriod = 25;
+    var animationPeriod = initialAnimationPeriod;
     do
     {
       this.totalIterations++;
@@ -3902,6 +3904,7 @@
 
         this.coolingFactor = this.initialCoolingFactor *
                 ((this.maxIterations - this.totalIterations) / this.maxIterations);
+        animationPeriod = Math.ceil(initialAnimationPeriod * Math.sqrt(this.coolingFactor));
 
       }
       this.totalDisplacement = 0;
@@ -3911,7 +3914,7 @@
       this.calcGravitationalForces();
       this.moveNodes();
       this.animate();
-      if (layoutOptionsPack.animate && this.totalIterations % 10 == 0) {
+      if (layoutOptionsPack.animate && this.totalIterations % animationPeriod == 0) {
         for (var i = 0; i < 1e7; i++) {
           if ((new Date().getTime() - lastFrame) > 25){
             break;
