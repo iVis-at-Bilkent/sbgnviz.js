@@ -4287,7 +4287,7 @@
     animate: true
   };
 
-  var layout = new CoSELayout();
+  _CoSELayout.layout = new CoSELayout();
   function _CoSELayout(options) {
 
     this.options = $$.util.extend({}, defaults, options);
@@ -4296,38 +4296,22 @@
   }
 
   _CoSELayout.prototype.run = function () {
-    _CoSELayout.allChildren = [];
     _CoSELayout.idToLNode = {};
     _CoSELayout.toBeTiled = {};
-    layout = new CoSELayout();
+    _CoSELayout.layout = new CoSELayout();
     this.cy = this.options.cy; 
     var after = this;
 
     this.cy.trigger('layoutstart');
 
-    var gm = layout.newGraphManager();
+    var gm = _CoSELayout.layout.newGraphManager();
     this.gm = gm;
 
-    this.cy.nodes();
     var nodes = this.cy.nodes();
-    ;
     var edges = this.cy.edges();
 
     this.root = gm.addRoot();
-    this.orphans = [];
-    for (var i = 0; i < nodes.length; i++) {
-      var theNode = nodes[i];
-      var p_id = theNode.data("parent");
-      if (p_id != null) {
-        if (_CoSELayout.allChildren[p_id] == null) {
-          _CoSELayout.allChildren[p_id] = [];
-        }
-        _CoSELayout.allChildren[p_id].push(theNode);
-      }
-      else {
-        this.orphans.push(theNode);
-      }
-    }
+    this.orphans = nodes.orphans();
 
     if (!this.options.tile) {
       this.processChildrenList(this.root, this.orphans);
@@ -4346,7 +4330,7 @@
       var edge = edges[i];
       var sourceNode = _CoSELayout.idToLNode[edge.data("source")];
       var targetNode = _CoSELayout.idToLNode[edge.data("target")];
-      var e1 = gm.add(layout.newEdge(), sourceNode, targetNode);
+      var e1 = gm.add(_CoSELayout.layout.newEdge(), sourceNode, targetNode);
     }
 
 
@@ -5098,7 +5082,7 @@
 
       if (theChild.width() != null
               && theChild.height() != null) {
-        theNode = parent.add(new CoSENode(layout.graphManager,
+        theNode = parent.add(new CoSENode(_CoSELayout.layout.graphManager,
                 new PointD(theChild.position('x'), theChild.position('y')),
                 new DimensionD(parseFloat(theChild.width()),
                         parseFloat(theChild.height()))));
@@ -5119,7 +5103,7 @@
 
       if (children_of_children != null && children_of_children.length > 0) {
         var theNewGraph;
-        theNewGraph = layout.getGraphManager().add(layout.newGraph(), theNode);
+        theNewGraph = _CoSELayout.layout.getGraphManager().add(_CoSELayout.layout.newGraph(), theNode);
         this.processChildrenList(theNewGraph, children_of_children);
       }
     }
