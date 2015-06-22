@@ -29,6 +29,11 @@ var refreshPaddings = function () {
 
   //To refresh the nodes on the screen apply the preset layout
   cy.layout({name: 'preset'});
+  refreshDynamicLabelSize();
+}
+
+var refreshDynamicLabelSize = function(){
+  cy.forceRender();
 }
 
 var sbgnStyleSheet = cytoscape.stylesheet()
@@ -40,7 +45,8 @@ var sbgnStyleSheet = cytoscape.stylesheet()
           'font-size': 11,
           'shape': 'data(sbgnclass)',
           'background-opacity': '0.5',
-          'padding-relative': 20
+          'padding-relative': 20,
+          'dynamic-label-size': 'regular'
         })
         .selector("node[sbgnclass='complex']")
         .css({
@@ -190,7 +196,8 @@ var SBGNContainer = Backbone.View.extend({
 
         var SBGNProperties = Backbone.View.extend({
           defaultSBGNProperties: {
-            paddingRelative: parseInt(cy.$("node").css('padding-relative'), 10)
+            paddingRelative: parseInt(cy.$("node").css('padding-relative'), 10),
+            dynamicLabelSize: cy.$("node").css('dynamic-label-size')
           },
           currentSBGNProperties: null,
           initialize: function () {
@@ -198,6 +205,9 @@ var SBGNContainer = Backbone.View.extend({
             self.copyProperties();
             if(window.paddingRelative != null){
               this.currentSBGNProperties.paddingRelative = window.paddingRelative;
+            }
+            if(window.dynamicLabelSize != null){
+              this.currentSBGNProperties.dynamicLabelSize = window.dynamicLabelSize;
             }
             self.template = _.template($("#sbgn-properties-template").html(), self.currentSBGNProperties);
           },
@@ -213,9 +223,14 @@ var SBGNContainer = Backbone.View.extend({
 
             $("#save-sbgn").die("click").live("click", function (evt) {
               self.currentSBGNProperties.paddingRelative = Number(document.getElementById("padding-relative").value);
+              self.currentSBGNProperties.dynamicLabelSize = $('input[name=dynamic-label-size]:checked').val()
               if (paddingRelative != self.currentSBGNProperties.paddingRelative) {
                 paddingRelative = self.currentSBGNProperties.paddingRelative;
                 refreshPaddings();
+              }
+              if (dynamicLabelSize != self.currentSBGNProperties.dynamicLabelSize) {
+                dynamicLabelSize = self.currentSBGNProperties.dynamicLabelSize;
+                cy.forceRender();
               }
 
               $(self.el).dialog('close');

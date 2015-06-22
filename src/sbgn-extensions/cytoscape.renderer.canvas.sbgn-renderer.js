@@ -50,9 +50,15 @@
   var lineStyles = $$.style.types.lineStyle.enums;
   lineStyles.push("consumption", "production");
   
-  //added padding-relative property to css features
+  //add padding-relative property to css features
   $$.style.properties.push({name: 'padding-relative', type: $$.style.types.percent});
   $$.style.properties['padding-relative'] = {name: 'padding-relative', type: $$.style.types.percent};
+  
+  //add dynamic-label-size property to css features
+  $$.style.types.dynamicLabelSize = { enums: ['small', 'regular', 'large'] };
+  $$.style.properties.push({name: 'dynamic-label-size', type: $$.style.types.dynamicLabelSize});
+  $$.style.properties['dynamic-label-size'] = {name: 'dynamic-label-size', type: $$.style.types.dynamicLabelSize};
+  
 
   function drawSelection(render, context, node) {
     //TODO: do it for all classes in sbgn, create a sbgn class array to check
@@ -1770,7 +1776,7 @@
     var width;
     var text = (typeof textProp.label === 'undefined') ? "" : textProp.label;
     var len = text.length;
-    var ellipsis = "...";
+    var ellipsis = "..";
 
     //if(context.measureText(text).width < textProp.width)
     //	return text;
@@ -1820,7 +1826,23 @@
   }
 
   $$.sbgn.drawDynamicLabelText = function (context, textProp) {
-    var textHeight = parseInt(textProp.height / (2.45));
+    if(window.dynamicLabelSize == null){
+      window.dynamicLabelSize = cy.$("node").css('dynamic-label-size');
+    }
+    
+    var dynamicLabelSizeCoefficient;
+    
+    if(dynamicLabelSize == 'small'){
+      dynamicLabelSizeCoefficient = 0.75;
+    }
+    else if(dynamicLabelSize == 'regular'){
+      dynamicLabelSizeCoefficient = 1;
+    }
+    else if(dynamicLabelSize == 'large'){
+      dynamicLabelSizeCoefficient = 1.25;
+    }
+    
+    var textHeight = parseInt(textProp.height / (2.45)) * dynamicLabelSizeCoefficient;
     textProp.color = "#0f0f0f";
     textProp.font = textHeight + "px Arial";
     $$.sbgn.drawText(context, textProp);
@@ -2041,6 +2063,7 @@
 
     var halfWidth = width / 2;
     var halfHeight = height / 2;
+    
     //var cornerRadius = $$.math.getRoundRectangleRadius(width, height);
     var cornerRadius = Math.min(halfWidth, halfHeight);
     context.translate(x, y);
@@ -3497,8 +3520,9 @@
               width - padding, height - padding, cloneMarker, false,
               node._private.style['background-opacity'].value);
 
+      var simple_chemical_coefficient = 1.05;
       var nodeProp = {'label': label, 'centerX': centerX, 'centerY': centerY,
-        'opacity': node._private.style['text-opacity'].value, 'width': node.width(), 'height': node.height()};
+        'opacity': node._private.style['text-opacity'].value, 'width': node.width(), 'height': node.height() * simple_chemical_coefficient};
       $$.sbgn.drawDynamicLabelText(context, nodeProp);
 
       $$.sbgn.drawStateAndInfos(node, context, centerX, centerY);
