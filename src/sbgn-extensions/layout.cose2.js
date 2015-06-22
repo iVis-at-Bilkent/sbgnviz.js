@@ -3928,8 +3928,8 @@
           var id = allNodes[i].id;
           pData[id] = {
             id: id,
-            x: rect.x,
-            y: rect.y,
+            x: rect.getCenterX(),
+            y: rect.getCenterY(),
             w: rect.width,
             h: rect.height
           };
