@@ -32,10 +32,6 @@ var refreshPaddings = function () {
   refreshDynamicLabelSize();
 }
 
-var refreshDynamicLabelSize = function(){
-  cy.forceRender();
-}
-
 var sbgnStyleSheet = cytoscape.stylesheet()
         .selector("node")
         .css({
