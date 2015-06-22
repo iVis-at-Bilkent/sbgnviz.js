@@ -84,7 +84,7 @@ $( document ).ready( function() {
 	});
 
 	$("#how-to-use").click(function(e) {
-		var url = "http://www.cs.bilkent.edu.tr/~ivis/sbgnviz-js/SBGNViz.js-1.0.UG.pdf";
+		var url = "http://www.cs.bilkent.edu.tr/~ivis/sbgnviz-js/SBGNViz.js-1.x.UG.pdf";
 		var win = window.open(url, '_blank');
 		win.focus();
 	});
