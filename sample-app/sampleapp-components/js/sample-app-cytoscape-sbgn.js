@@ -29,7 +29,6 @@ var refreshPaddings = function () {
 
   //To refresh the nodes on the screen apply the preset layout
   cy.layout({name: 'preset'});
-  refreshDynamicLabelSize();
 }
 
 var sbgnStyleSheet = cytoscape.stylesheet()
