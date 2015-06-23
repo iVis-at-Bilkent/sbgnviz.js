@@ -1,12 +1,12 @@
 var SBGNStyleProperties = {
-  'padding-relative': 20,
+  'compound-padding': 20,
   'dynamic-label-size': 'regular'
 };
 
 var refreshPaddings = function () {
   //If padding relative is not set yet set it by css value
-  if (window.paddingRelative == null) {
-    window.paddingRelative = parseInt(cy.$("node").css('padding-relative'), 10);
+  if (window.compoundPadding == null) {
+    window.compoundPadding = parseInt(cy.$("node").css('compound-padding'), 10);
   }
   var nodes = cy.nodes();
   var total = 0;
@@ -21,7 +21,7 @@ var refreshPaddings = function () {
     }
   }
 
-  var calc_padding = (paddingRelative / 100) * Math.floor(total / (2 * numOfSimples));
+  var calc_padding = (compoundPadding / 100) * Math.floor(total / (2 * numOfSimples));
 
   if (calc_padding < 10) {
     calc_padding = 10;
@@ -46,7 +46,7 @@ var sbgnStyleSheet = cytoscape.stylesheet()
           'font-size': 11,
           'shape': 'data(sbgnclass)',
           'background-opacity': '0.5',
-          'padding-relative': SBGNStyleProperties['padding-relative'],
+          'compound-padding': SBGNStyleProperties['compound-padding'],
           'dynamic-label-size': SBGNStyleProperties['dynamic-label-size']
         })
         .selector("node[sbgnclass='complex']")
@@ -410,7 +410,7 @@ var SBGNLayout = Backbone.View.extend({
 
 var SBGNProperties = Backbone.View.extend({
   defaultSBGNProperties: {
-    paddingRelative: parseInt(SBGNStyleProperties['padding-relative'], 10),
+    compoundPadding: parseInt(SBGNStyleProperties['compound-padding'], 10),
     dynamicLabelSize: SBGNStyleProperties['dynamic-label-size']
   },
   currentSBGNProperties: null,
@@ -430,12 +430,12 @@ var SBGNProperties = Backbone.View.extend({
     $(self.el).dialog();
 
     $("#save-sbgn").die("click").live("click", function (evt) {
-      self.currentSBGNProperties.paddingRelative = Number(document.getElementById("padding-relative").value);
-      self.currentSBGNProperties.dynamicLabelSize = $('input[name=dynamic-label-size]:checked').val()
+      self.currentSBGNProperties.compoundPadding = Number(document.getElementById("compound-padding").value);
+      self.currentSBGNProperties.dynamicLabelSize = $('select[name="dynamic-label-size"] option:selected').val();
       
       //Refresh paddings if needed
-      if (paddingRelative != self.currentSBGNProperties.paddingRelative) {
-        paddingRelative = self.currentSBGNProperties.paddingRelative;
+      if (compoundPadding != self.currentSBGNProperties.compoundPadding) {
+        compoundPadding = self.currentSBGNProperties.compoundPadding;
         refreshPaddings();
       }
       //Refresh label size if needed

@@ -155,7 +155,7 @@
             <!-- sbgn layout table will be shown here -->
         </div>
     
-        <div id="sbgn-properties-table" title="Properties">
+        <div id="sbgn-properties-table" title="Properties" style="display: inline">
             <!-- sbgn properties table will be shown here -->
         </div>
 
@@ -354,21 +354,23 @@
             <table class="table-condensed layout-table">
             <tr>
             <td>
-            <span class="add-on layout-text"> Padding Relative </span>
+            <span class="add-on layout-text"> Compound Padding </span>
             </td>
             <td>
-            <input id="padding-relative" type="text" class="input-small layout-text" value= <%= paddingRelative %> >
+            <input id="compound-padding" type="text" class="input-small layout-text" value= <%= compoundPadding %> > %
             </td>
             </tr>
     
             <tr>
             <td>
-            <span class="add-on layout-text"> Dynamic Label Size </span>
+            <span class="add-on layout-text"> Label Size </span>
             </td>
             <td>
-            <input type="radio" id="dynamic-label-size_small" name="dynamic-label-size" value="small" <% if (dynamicLabelSize == 'small'){ %> checked<%}%> > <label for="dynamic-label-size_small">Small</label>
-            <input type="radio" id="dynamic-label-size_regular" name="dynamic-label-size" value="regular" <% if (dynamicLabelSize == 'regular'){ %> checked<%}%> > <label for="dynamic-label-size_regular">Regular</label>
-            <input type="radio" id="dynamic-label-size_large" name="dynamic-label-size" value="large" <% if (dynamicLabelSize == 'large'){ %> checked<%}%> > <label for="dynamic-label-size_large">Large</label>
+            <select name="dynamic-label-size">
+            <option id="dynamic-label-size_small" value="small" <% if (dynamicLabelSize == 'small'){ %> selected<%}%> > Small </option>
+            <option id="dynamic-label-size_regular" value="regular" <% if (dynamicLabelSize == 'regular'){ %> selected<%}%> > Regular </option>
+            <option id="dynamic-label-size_large" value="large" <% if (dynamicLabelSize == 'large'){ %> selected<%}%> > Large </option>
+            </select>
             </td>
             </tr>
     

@@ -50,9 +50,9 @@
   var lineStyles = $$.style.types.lineStyle.enums;
   lineStyles.push("consumption", "production");
   
-  //add padding-relative property to css features
-  $$.style.properties.push({name: 'padding-relative', type: $$.style.types.percent});
-  $$.style.properties['padding-relative'] = {name: 'padding-relative', type: $$.style.types.percent};
+  //add compound-padding property to css features
+  $$.style.properties.push({name: 'compound-padding', type: $$.style.types.percent});
+  $$.style.properties['compound-padding'] = {name: 'compound-padding', type: $$.style.types.percent};
   
   //add dynamic-label-size property to css features
   $$.style.types.dynamicLabelSize = { enums: ['small', 'regular', 'large'] };
@@ -3521,9 +3521,8 @@
               width - padding, height - padding, cloneMarker, false,
               node._private.style['background-opacity'].value);
 
-      var simple_chemical_coefficient = 1.05;
       var nodeProp = {'label': label, 'centerX': centerX, 'centerY': centerY,
-        'opacity': node._private.style['text-opacity'].value, 'width': node.width(), 'height': node.height() * simple_chemical_coefficient};
+        'opacity': node._private.style['text-opacity'].value, 'width': node.width(), 'height': node.height()};
       $$.sbgn.drawDynamicLabelText(context, nodeProp);
 
       $$.sbgn.drawStateAndInfos(node, context, centerX, centerY);
