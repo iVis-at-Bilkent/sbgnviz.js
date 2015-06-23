@@ -356,6 +356,7 @@
             <td>
             <span class="add-on layout-text"> Compound Padding </span>
             </td>
+            
             <td>
             <input id="compound-padding" type="text" class="input-small layout-text" value= <%= compoundPadding %> > %
             </td>
@@ -365,12 +366,23 @@
             <td>
             <span class="add-on layout-text"> Label Size </span>
             </td>
+            
             <td>
             <select name="dynamic-label-size">
             <option id="dynamic-label-size_small" value="small" <% if (dynamicLabelSize == 'small'){ %> selected<%}%> > Small </option>
             <option id="dynamic-label-size_regular" value="regular" <% if (dynamicLabelSize == 'regular'){ %> selected<%}%> > Regular </option>
             <option id="dynamic-label-size_large" value="large" <% if (dynamicLabelSize == 'large'){ %> selected<%}%> > Large </option>
             </select>
+            </td>
+            </tr>
+    
+            <tr>
+            <td>
+            <span class="add-on layout-text"> Fit Labels To Nodes </span>
+            </td>
+
+            <td>
+            <input id="fit-labels-to-nodes" type="checkbox" class="input-small layout-text" <% if (fitLabelsToNodes){ %> checked<%}%>>
             </td>
             </tr>
     

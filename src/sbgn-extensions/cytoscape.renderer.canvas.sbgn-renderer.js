@@ -49,16 +49,21 @@
   var renderer = CanvasRenderer.prototype;
   var lineStyles = $$.style.types.lineStyle.enums;
   lineStyles.push("consumption", "production");
-  
+
   //add compound-padding property to css features
   $$.style.properties.push({name: 'compound-padding', type: $$.style.types.percent});
   $$.style.properties['compound-padding'] = {name: 'compound-padding', type: $$.style.types.percent};
-  
+
   //add dynamic-label-size property to css features
-  $$.style.types.dynamicLabelSize = { enums: ['small', 'regular', 'large'] };
+  $$.style.types.dynamicLabelSize = {enums: ['small', 'regular', 'large']};
   $$.style.properties.push({name: 'dynamic-label-size', type: $$.style.types.dynamicLabelSize});
   $$.style.properties['dynamic-label-size'] = {name: 'dynamic-label-size', type: $$.style.types.dynamicLabelSize};
-  
+
+  //add fit-labels-to-nodes property to css features
+  $$.style.types.trueOrFalse = {enums: ['true', 'false']};
+  $$.style.properties.push({name: 'fit-labels-to-nodes', type: $$.style.types.trueOrFalse});
+  $$.style.properties['fit-labels-to-nodes'] = {name: 'fit-labels-to-nodes', type: $$.style.types.trueOrFalse};
+
 
   function drawSelection(render, context, node) {
     //TODO: do it for all classes in sbgn, create a sbgn class array to check
@@ -1773,6 +1778,14 @@
   };
 
   function truncateText(textProp, context) {
+    //If fit labels to nodes is not set yet set it by css value
+    if(window.fitLabelsToNodes == null){
+      window.fitLabelsToNodes = (cy.$("node").css('fit-labels-to-nodes') == 'true');
+    }
+    //If fit labels to nodes is false do not truncate
+    if(window.fitLabelsToNodes == false){
+      return textProp.label;
+    }
     var width;
     var text = (typeof textProp.label === 'undefined') ? "" : textProp.label;
     var len = text.length;
@@ -1827,22 +1840,22 @@
 
   $$.sbgn.drawDynamicLabelText = function (context, textProp) {
     //If dynamic label size is not set yet set it by css value
-    if(window.dynamicLabelSize == null){
+    if (window.dynamicLabelSize == null) {
       window.dynamicLabelSize = cy.$("node").css('dynamic-label-size');
     }
-    
+
     var dynamicLabelSizeCoefficient;
-    
-    if(dynamicLabelSize == 'small'){
+
+    if (dynamicLabelSize == 'small') {
       dynamicLabelSizeCoefficient = 0.75;
     }
-    else if(dynamicLabelSize == 'regular'){
+    else if (dynamicLabelSize == 'regular') {
       dynamicLabelSizeCoefficient = 1;
     }
-    else if(dynamicLabelSize == 'large'){
+    else if (dynamicLabelSize == 'large') {
       dynamicLabelSizeCoefficient = 1.25;
     }
-    
+
     var textHeight = parseInt(textProp.height / (2.45)) * dynamicLabelSizeCoefficient;
     textProp.color = "#0f0f0f";
     textProp.font = textHeight + "px Arial";
@@ -2064,7 +2077,7 @@
 
     var halfWidth = width / 2;
     var halfHeight = height / 2;
-    
+
     //var cornerRadius = $$.math.getRoundRectangleRadius(width, height);
     var cornerRadius = Math.min(halfWidth, halfHeight);
     context.translate(x, y);

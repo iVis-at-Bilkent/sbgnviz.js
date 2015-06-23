@@ -1,10 +1,11 @@
 var SBGNStyleProperties = {
   'compound-padding': 20,
-  'dynamic-label-size': 'regular'
+  'dynamic-label-size': 'regular',
+  'fit-labels-to-nodes': 'true'
 };
 
 var refreshPaddings = function () {
-  //If padding relative is not set yet set it by css value
+  //If compound padding is not set yet set it by css value
   if (window.compoundPadding == null) {
     window.compoundPadding = parseInt(cy.$("node").css('compound-padding'), 10);
   }
@@ -47,7 +48,8 @@ var sbgnStyleSheet = cytoscape.stylesheet()
           'shape': 'data(sbgnclass)',
           'background-opacity': '0.5',
           'compound-padding': SBGNStyleProperties['compound-padding'],
-          'dynamic-label-size': SBGNStyleProperties['dynamic-label-size']
+          'dynamic-label-size': SBGNStyleProperties['dynamic-label-size'],
+          'fit-labels-to-nodes': SBGNStyleProperties['fit-labels-to-nodes']
         })
         .selector("node[sbgnclass='complex']")
         .css({
@@ -411,7 +413,8 @@ var SBGNLayout = Backbone.View.extend({
 var SBGNProperties = Backbone.View.extend({
   defaultSBGNProperties: {
     compoundPadding: parseInt(SBGNStyleProperties['compound-padding'], 10),
-    dynamicLabelSize: SBGNStyleProperties['dynamic-label-size']
+    dynamicLabelSize: SBGNStyleProperties['dynamic-label-size'],
+    fitLabelsToNodes: SBGNStyleProperties['fit-labels-to-nodes']
   },
   currentSBGNProperties: null,
   initialize: function () {
@@ -432,6 +435,7 @@ var SBGNProperties = Backbone.View.extend({
     $("#save-sbgn").die("click").live("click", function (evt) {
       self.currentSBGNProperties.compoundPadding = Number(document.getElementById("compound-padding").value);
       self.currentSBGNProperties.dynamicLabelSize = $('select[name="dynamic-label-size"] option:selected').val();
+      self.currentSBGNProperties.fitLabelsToNodes = document.getElementById("fit-labels-to-nodes").checked;
       
       //Refresh paddings if needed
       if (compoundPadding != self.currentSBGNProperties.compoundPadding) {
@@ -441,6 +445,11 @@ var SBGNProperties = Backbone.View.extend({
       //Refresh label size if needed
       if (dynamicLabelSize != self.currentSBGNProperties.dynamicLabelSize) {
         dynamicLabelSize = self.currentSBGNProperties.dynamicLabelSize;
+        cy.forceRender();
+      }
+      //Refresh truncations if needed
+      if (fitLabelsToNodes != self.currentSBGNProperties.fitLabelsToNodes) {
+        fitLabelsToNodes = self.currentSBGNProperties.fitLabelsToNodes;
         cy.forceRender();
       }
 
