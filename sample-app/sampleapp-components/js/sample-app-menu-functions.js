@@ -140,6 +140,38 @@ $(document).ready(function () {
 
   $("#load-sample4").click(function (e) {
     var xmlObject = loadXMLDoc('samples/polyq_proteins_interference.xml');
+    
+	$("#quick-help").click(function(e){
+		e.preventDefault();
+		$.fancybox(
+			_.template($("#quick-help-template").html(), {}),
+			{
+				'autoDimensions' : false,
+				'width' : 420,
+				'height' : "auto",
+				'transitionIn' : 'none',
+				'transitionOut' : 'none'
+			});
+	});
+
+	$("#how-to-use").click(function(e) {
+		var url = "http://www.cs.bilkent.edu.tr/~ivis/sbgnviz-js/SBGNViz.js-1.x.UG.pdf";
+		var win = window.open(url, '_blank');
+		win.focus();
+	});
+
+    $("#about").click(function(e){
+        e.preventDefault();
+        $.fancybox(
+        _.template($("#about-template").html(), {}),
+        {
+            'autoDimensions' : false,
+            'width' : 300,
+            'height' : 320,
+            'transitionIn' : 'none',
+            'transitionOut' : 'none',
+        });
+    });
 
     setFileContent("polyq_proteins_interference.sbgnml");
 
