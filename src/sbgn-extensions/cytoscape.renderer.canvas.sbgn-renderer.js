@@ -1826,6 +1826,7 @@
   }
 
   $$.sbgn.drawDynamicLabelText = function (context, textProp) {
+    //If dynamic label size is not set yet set it by css value
     if(window.dynamicLabelSize == null){
       window.dynamicLabelSize = cy.$("node").css('dynamic-label-size');
     }

@@ -1,4 +1,10 @@
+var SBGNStyleProperties = {
+  'padding-relative': 20,
+  'dynamic-label-size': 'regular'
+};
+
 var refreshPaddings = function () {
+  //If padding relative is not set yet set it by css value
   if (window.paddingRelative == null) {
     window.paddingRelative = parseInt(cy.$("node").css('padding-relative'), 10);
   }
@@ -40,8 +46,8 @@ var sbgnStyleSheet = cytoscape.stylesheet()
           'font-size': 11,
           'shape': 'data(sbgnclass)',
           'background-opacity': '0.5',
-          'padding-relative': 20,
-          'dynamic-label-size': 'regular'
+          'padding-relative': SBGNStyleProperties['padding-relative'],
+          'dynamic-label-size': SBGNStyleProperties['dynamic-label-size']
         })
         .selector("node[sbgnclass='complex']")
         .css({
@@ -188,62 +194,6 @@ var SBGNContainer = Backbone.View.extend({
       ready: function ()
       {
         window.cy = this;
-
-        var SBGNProperties = Backbone.View.extend({
-          defaultSBGNProperties: {
-            paddingRelative: parseInt(cy.$("node").css('padding-relative'), 10),
-            dynamicLabelSize: cy.$("node").css('dynamic-label-size')
-          },
-          currentSBGNProperties: null,
-          initialize: function () {
-            var self = this;
-            self.copyProperties();
-            if(window.paddingRelative != null){
-              this.currentSBGNProperties.paddingRelative = window.paddingRelative;
-            }
-            if(window.dynamicLabelSize != null){
-              this.currentSBGNProperties.dynamicLabelSize = window.dynamicLabelSize;
-            }
-            self.template = _.template($("#sbgn-properties-template").html(), self.currentSBGNProperties);
-          },
-          copyProperties: function () {
-            this.currentSBGNProperties = _.clone(this.defaultSBGNProperties);
-          },
-          render: function () {
-            var self = this;
-            self.template = _.template($("#sbgn-properties-template").html(), self.currentSBGNProperties);
-            $(self.el).html(self.template);
-
-            $(self.el).dialog();
-
-            $("#save-sbgn").die("click").live("click", function (evt) {
-              self.currentSBGNProperties.paddingRelative = Number(document.getElementById("padding-relative").value);
-              self.currentSBGNProperties.dynamicLabelSize = $('input[name=dynamic-label-size]:checked').val()
-              if (paddingRelative != self.currentSBGNProperties.paddingRelative) {
-                paddingRelative = self.currentSBGNProperties.paddingRelative;
-                refreshPaddings();
-              }
-              if (dynamicLabelSize != self.currentSBGNProperties.dynamicLabelSize) {
-                dynamicLabelSize = self.currentSBGNProperties.dynamicLabelSize;
-                cy.forceRender();
-              }
-
-              $(self.el).dialog('close');
-            });
-
-            $("#default-sbgn").die("click").live("click", function (evt) {
-              self.copyProperties();
-              self.template = _.template($("#sbgn-properties-template").html(), self.currentSBGNProperties);
-              $(self.el).html(self.template);
-            });
-
-            return this;
-          }
-        });
-
-        window.sbgnProperties = new SBGNProperties({
-          el: '#sbgn-properties-table'
-        });
 
         refreshPaddings();
 
@@ -451,6 +401,55 @@ var SBGNLayout = Backbone.View.extend({
     $("#default-layout").die("click").live("click", function (evt) {
       self.copyProperties();
       self.template = _.template($("#layout-settings-template").html(), self.currentLayoutProperties);
+      $(self.el).html(self.template);
+    });
+
+    return this;
+  }
+});
+
+var SBGNProperties = Backbone.View.extend({
+  defaultSBGNProperties: {
+    paddingRelative: parseInt(SBGNStyleProperties['padding-relative'], 10),
+    dynamicLabelSize: SBGNStyleProperties['dynamic-label-size']
+  },
+  currentSBGNProperties: null,
+  initialize: function () {
+    var self = this;
+    self.copyProperties();
+    self.template = _.template($("#sbgn-properties-template").html(), self.currentSBGNProperties);
+  },
+  copyProperties: function () {
+    this.currentSBGNProperties = _.clone(this.defaultSBGNProperties);
+  },
+  render: function () {
+    var self = this;
+    self.template = _.template($("#sbgn-properties-template").html(), self.currentSBGNProperties);
+    $(self.el).html(self.template);
+
+    $(self.el).dialog();
+
+    $("#save-sbgn").die("click").live("click", function (evt) {
+      self.currentSBGNProperties.paddingRelative = Number(document.getElementById("padding-relative").value);
+      self.currentSBGNProperties.dynamicLabelSize = $('input[name=dynamic-label-size]:checked').val()
+      
+      //Refresh paddings if needed
+      if (paddingRelative != self.currentSBGNProperties.paddingRelative) {
+        paddingRelative = self.currentSBGNProperties.paddingRelative;
+        refreshPaddings();
+      }
+      //Refresh label size if needed
+      if (dynamicLabelSize != self.currentSBGNProperties.dynamicLabelSize) {
+        dynamicLabelSize = self.currentSBGNProperties.dynamicLabelSize;
+        cy.forceRender();
+      }
+
+      $(self.el).dialog('close');
+    });
+
+    $("#default-sbgn").die("click").live("click", function (evt) {
+      self.copyProperties();
+      self.template = _.template($("#sbgn-properties-template").html(), self.currentSBGNProperties);
       $(self.el).html(self.template);
     });
 
