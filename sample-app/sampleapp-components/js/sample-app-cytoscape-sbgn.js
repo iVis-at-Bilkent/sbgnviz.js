@@ -364,7 +364,8 @@ var SBGNLayout = Backbone.View.extend({
     gravity: 0.4,
     numIter: 2500,
     tile: true,
-    animate: true
+    animate: true,
+    randomize: true
   },
   currentLayoutProperties: null,
   initialize: function () {
@@ -396,6 +397,7 @@ var SBGNLayout = Backbone.View.extend({
       self.currentLayoutProperties.numIter = Number(document.getElementById("num-iter").value);
       self.currentLayoutProperties.tile = document.getElementById("tile").checked;
       self.currentLayoutProperties.animate = document.getElementById("animate").checked;
+      self.currentLayoutProperties.randomize = !document.getElementById("incremental").checked;
 
       $(self.el).dialog('close');
     });

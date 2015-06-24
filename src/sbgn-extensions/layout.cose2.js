@@ -2312,6 +2312,8 @@
     var randomCenterX;
     var randomCenterY;
 
+    broadcast({log: "scatter"});
+
     var minX = -LayoutConstants.INITIAL_WORLD_BOUNDARY;
     var maxX = LayoutConstants.INITIAL_WORLD_BOUNDARY;
     randomCenterX = LayoutConstants.WORLD_CENTER_X +
@@ -3591,7 +3593,8 @@
       FDLayoutConstants.DEFAULT_GRAVITY_STRENGTH = options.gravity;
     if (options.numIter != null)
       FDLayoutConstants.MAX_ITERATIONS = options.numIter;
-    
+
+    layoutOptionsPack.incremental = !(options.randomize);
     layoutOptionsPack.animate = options.animate;
   }
 
@@ -4261,7 +4264,7 @@
     // Padding on fit
     padding: 10,
     // Whether to enable incremental mode
-    incremental: false,
+    randomize: false,
     // Whether to use the JS console to print debug messages
     debug: false,
     // Node repulsion (non overlapping) multiplier
