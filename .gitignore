@@ -1,1 +1,10 @@
 /nbproject
+*.xml
+
+.idea/vcs.xml
+
+.idea/sbgnviz-js.iml
+
+.idea/modules.xml
+
+.idea/misc.xml
