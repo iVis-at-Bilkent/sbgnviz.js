@@ -4257,20 +4257,14 @@
     // Called on `layoutstop`
     stop: function () {
     },
-    // Number of iterations between consecutive screen positions update (0 -> only updated on the end)
-    refresh: 0,
     // Whether to fit the network view after when done
     fit: true,
     // Padding on fit
     padding: 10,
     // Whether to enable incremental mode
     randomize: false,
-    // Whether to use the JS console to print debug messages
-    debug: false,
     // Node repulsion (non overlapping) multiplier
     nodeRepulsion: 4500,
-    // Node repulsion (overlapping) multiplier
-    nodeOverlap: 10,
     // Ideal edge (non nested) length
     idealEdgeLength: 50,
     // Divisor to compute edge forces
@@ -4281,12 +4275,6 @@
     gravity: 0.4,
     // Maximum number of iterations to perform
     numIter: 2500,
-    // Initial temperature (maximum node displacement)
-    initialTemp: 200,
-    // Cooling factor (how the temperature is reduced between consecutive iterations
-    coolingFactor: 0.95,
-    // Lower temperature threshold (below this point the layout will end)
-    minTemp: 1,
     // For enabling tiling
     tile: true,
     //whether to make animation while performing the layout
