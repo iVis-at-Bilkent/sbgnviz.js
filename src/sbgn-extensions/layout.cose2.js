@@ -2312,8 +2312,6 @@
     var randomCenterX;
     var randomCenterY;
 
-    broadcast({log: "scatter"});
-
     var minX = -LayoutConstants.INITIAL_WORLD_BOUNDARY;
     var maxX = LayoutConstants.INITIAL_WORLD_BOUNDARY;
     randomCenterX = LayoutConstants.WORLD_CENTER_X +
