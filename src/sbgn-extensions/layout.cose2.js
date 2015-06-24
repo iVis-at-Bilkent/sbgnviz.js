@@ -4310,8 +4310,8 @@
     var gm = _CoSELayout.layout.newGraphManager();
     this.gm = gm;
 
-    var nodes = this.cy.nodes();
-    var edges = this.cy.edges();
+    var nodes = this.options.eles.nodes();
+    var edges = this.options.eles.edges();
 
     this.root = gm.addRoot();
     this.orphans = nodes.orphans();
@@ -4369,8 +4369,8 @@
     t1.require(CoSELayout);
     t1.require(CoSENode);
 
-    var nodes = this.cy.nodes();
-    var edges = this.cy.edges();
+    var nodes = this.options.eles.nodes();
+    var edges = this.options.eles.edges();
 
     // First I need to create the data structure to pass to the worker
     var pData = {
@@ -4556,10 +4556,10 @@
         // Repopulate members
         after.repopulateZeroDegreeMembers(tiledZeroDegreeNodes);
         after.repopulateComplexes(tiledMemberPack);
-        after.cy.nodes().updateCompoundBounds();
+        after.options.eles.nodes().updateCompoundBounds();
       }
 
-      after.cy.nodes().positions(function (i, ele) {
+      after.options.eles.nodes().positions(function (i, ele) {
         var theId = ele.data('id');
         var lNode = _CoSELayout.idToLNode[theId];
 
@@ -4592,7 +4592,7 @@
       }
       var pData = e.message.pData;
       if (pData != null) {
-        after.cy.nodes().positions(function (i, ele) {
+        after.options.eles.nodes().positions(function (i, ele) {
           var theId = ele.data('id');
           var pNode = pData[theId];
           if (pNode == null) {
@@ -4667,7 +4667,7 @@
     var memberGroups = [];
 
     // Find all zero degree nodes which aren't covered by a complex
-    var zeroDegree = this.cy.nodes().filter(function (i, ele) {
+    var zeroDegree = this.options.eles.nodes().filter(function (i, ele) {
       if (this.degree(false) == 0 && ele.parent().length > 0 && !getToBeTiled(ele.parent()[0]))
         return true;
       else
@@ -4712,7 +4712,7 @@
     var complexOrder = [];
 
     // Find roots
-    var roots = this.options.cy.filter(function (i, ele) {
+    var roots = this.options.eles.filter(function (i, ele) {
       if (ele.isParent() == true)
         return true;
       return false;
@@ -5079,7 +5079,7 @@
     var size = children.length;
     for (var i = 0; i < size; i++) {
       var theChild = children[i];
-      this.cy.nodes().length;
+      this.options.eles.nodes().length;
       var children_of_children = theChild.children();
       var theNode;
 

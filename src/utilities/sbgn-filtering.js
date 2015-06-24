@@ -1,6 +1,5 @@
 var sbgnFiltering = {
-    
-    hiddenEles: null,
+
 	notHighlightNode : {'border-opacity': 0.3, 'text-opacity' : 0.3, 'background-opacity': 0.3},
     notHighlightEdge : {'opacity':0.3, 'text-opacity' : 0.3, 'background-opacity': 0.3},
     processTypes : ['process', 'omitted process', 'uncertain process', 
@@ -17,38 +16,22 @@ var sbgnFiltering = {
         var allNodes = cy.nodes(":visible");
         var selectedNodes = cy.nodes(":selected");
         var nodesToShow = this.expandRemainingNodes(selectedNodes, allNodes);
-        var edges = allNodes.connectedEdges();
-        var eles = allNodes.not(nodesToShow).remove();
-        eles = eles.union(edges);
-        if(this.hiddenEles == null){
-          this.hiddenEles = eles;
-        }
-        else{
-          this.hiddenEles = this.hiddenEles.union(eles);
-        }
-        this.hiddenEles.unselect();
+        this.applyFilter(allNodes.not(nodesToShow));
+
+        cy.elements(":selected").unselect();
     },
 
     showSelected: function(){       
         var allNodes = cy.nodes();
         var selectedNodes = cy.nodes(":selected");
         var nodesToShow = this.expandNodes(selectedNodes);
-        var edges = allNodes.connectedEdges();
-        var eles = allNodes.not(nodesToShow).remove();
-        eles = eles.union(edges);
-        if(this.hiddenEles == null){
-          this.hiddenEles = eles;
-        }
-        else{
-          this.hiddenEles = this.hiddenEles.union(eles);
-        }
-        this.hiddenEles.unselect();
+        this.applyFilter(allNodes.not(nodesToShow));
+
+        cy.elements(":selected").unselect();
     },
 
     showAll: function(){
-        this.hiddenEles.restore();
-        this.hiddenEles = null;
-        this.removeFilter();
+        this.removeFilter();     
     },
 
     highlightNeighborsofSelected: function(){
@@ -129,11 +112,12 @@ var sbgnFiltering = {
 
     applyFilter: function(nodesToFilterOut){
         //nodesToFilterOut = nodesToFilterOut.add(nodesToFilterOut.descendants());
-        nodesToFilterOut.hide();
+//        nodesToFilterOut.hide();
+        nodesToFilterOut.css('visibility', 'hidden');
         //nodesToFilterOut.data(filterType, true);
     },
 
     removeFilter: function(){
-        cy.elements().show();
+        cy.elements().css('visibility', 'visible');
     }
 };

@@ -377,7 +377,7 @@ var SBGNLayout = Backbone.View.extend({
   },
   applyLayout: function () {
     var options = this.currentLayoutProperties;
-    cy.layout(options);
+    cy.elements().filter(':visible').layout(options);
   },
   render: function () {
     var self = this;
