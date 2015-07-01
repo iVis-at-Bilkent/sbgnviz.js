@@ -1,7 +1,8 @@
 var SBGNStyleProperties = {
   'compound-padding': 20,
   'dynamic-label-size': 'regular',
-  'fit-labels-to-nodes': 'true'
+  'fit-labels-to-nodes': 'true',
+  'expanded-callopsed': 'expanded'
 };
 
 var refreshPaddings = function () {
@@ -38,6 +39,101 @@ var refreshPaddings = function () {
   cy.layout({name: 'preset'});
 }
 
+//Some nodes are initilized as callopsed this method handles them
+var initCallopsedNodes = function () {
+  var orphans = cy.nodes().orphans();
+  for (var i = 0; i < orphans.length; i++) {
+    var root = orphans[i];
+    callopseBottomUp(root);
+  }
+}
+
+//callopse the nodes in bottom up order 
+var callopseBottomUp = function (root) {
+  var children = root.children();
+  for (var i = 0; i < children.length; i++) {
+    var node = children[i];
+    if (node.is("[sbgnclass!='complex']") && node.is("[sbgnclass!='compartment']")) {
+      continue;
+    }
+    if (node.css('expanded-callopsed') == 'callopsed') {
+      callopseBottomUp(node);
+    }
+  }
+  if (( root.is("[sbgnclass='complex']") || root.is("[sbgnclass='compartment']") )
+          && root.css('expanded-callopsed') == 'callopsed') {
+    callopseNode(root);
+  }
+}
+
+var expandNode = function (node) {
+}
+
+var callopseNode = function (node) {
+  var children = node.children();
+  for (var i = 0; i < children.length; i++) {
+    var child = children[i];
+    barrowEdgesOfCallopsedChildren(node, child);
+  }
+
+  var callopsedChildren = children.remove();
+  node._private.data.callopsedChildren = callopsedChildren;
+  node.css('expanded-callopsed', 'callopsed');
+  node.css('width', 100);
+  node.css('height', 100);
+}
+
+var barrowEdgesOfCallopsedChildren = function (root, childNode) {
+  var children = childNode.children();
+  for (var i = 0; i < children.length; i++) {
+    var child = children[i];
+    barrowEdgesOfCallopsedChildren(root, child);
+  }
+
+  var edges = childNode.connectedEdges();
+  var _edgesOfCallopsedChildren = [];
+
+  for (var i = 0; i < edges.length; i++) {
+    var edge = edges[i];
+    var source = edge.data("source");
+    var target = edge.data("target");
+
+    //store the data of the original edge
+    //to restore when the node is expanded
+    _edgesOfCallopsedChildren.push({
+      id: edge.id(),
+      source: source,
+      target: target
+    });
+    //Inherit the css
+    var css = edge.css();
+
+    //If the change source and/or target of the edge in the 
+    //case of they are equal to the id of the callopsed child
+    if (source == childNode.id()) {
+      source = root.id();
+    }
+    if (target == childNode.id()) {
+      target = root.id();
+    }
+
+    edge.remove();
+
+    //create the new edge with the same id and new source
+    //and target
+    cy.add({
+      group: "edges",
+      data: {id: edge.id(), source: source, target: target},
+      css: css
+    });
+  }
+  root._private.data.edgesOfCallopsedChildren = _edgesOfCallopsedChildren;
+}
+
+var repairEdgesOfCallopsedChildren = function (node) {
+
+}
+
 var sbgnStyleSheet = cytoscape.stylesheet()
         .selector("node")
         .css({
@@ -53,7 +149,8 @@ var sbgnStyleSheet = cytoscape.stylesheet()
         })
         .selector("node[sbgnclass='complex']")
         .css({
-          'background-color': '#F4F3EE'
+          'background-color': '#F4F3EE',
+          'expanded-callopsed': SBGNStyleProperties['expanded-callopsed']
         })
         .selector("node[sbgnclass='compartment']")
         .css({
@@ -62,7 +159,8 @@ var sbgnStyleSheet = cytoscape.stylesheet()
           'content': 'data(sbgnlabel)',
           'text-valign': 'bottom',
           'text-halign': 'center',
-          'font-size': '16'
+          'font-size': '16',
+          'expanded-callopsed': SBGNStyleProperties['expanded-callopsed']
         })
         .selector("node[sbgnclass!='complex'][sbgnclass!='compartment'][sbgnclass!='submap']")
         .css({
@@ -197,6 +295,8 @@ var SBGNContainer = Backbone.View.extend({
       {
         window.cy = this;
 
+        initCallopsedNodes();
+
         refreshPaddings();
 
         var panProps = ({
@@ -206,6 +306,7 @@ var SBGNContainer = Backbone.View.extend({
 
         cy.on('mouseover', 'node', function (event) {
           var node = this;
+
           $(".qtip").remove();
 
           if (event.originalEvent.shiftKey)
@@ -313,6 +414,27 @@ var SBGNContainer = Backbone.View.extend({
 
         cy.on('tap', 'node', function (event) {
           var node = this;
+          
+          var cyPosX = event.cyPosition.x;
+          var cyPosY = event.cyPosition.y;
+
+          if (cyPosX >= node._private.data.expandCallopseStartX
+                  && cyPosX <= node._private.data.expandCallopseEndX
+                  && cyPosY >= node._private.data.expandCallopseStartY
+                  && cyPosY <= node._private.data.expandCallopseEndY) {
+            var expandedOrCallopsed = this.css('expanded-callopsed');
+            if (expandedOrCallopsed == 'expanded') {
+              this.css('expanded-callopsed', 'callopsed');
+              callopseNode(this);
+            }
+            else {
+              this.css('expanded-callopsed', 'expanded');
+              expandNode(this);
+            }
+//            this.children().remove();
+            console.log(this.selected());
+          }
+          
           $(".qtip").remove();
 
           if (event.originalEvent.shiftKey)
@@ -438,7 +560,7 @@ var SBGNProperties = Backbone.View.extend({
       self.currentSBGNProperties.compoundPadding = Number(document.getElementById("compound-padding").value);
       self.currentSBGNProperties.dynamicLabelSize = $('select[name="dynamic-label-size"] option:selected').val();
       self.currentSBGNProperties.fitLabelsToNodes = document.getElementById("fit-labels-to-nodes").checked;
-      
+
       //Refresh paddings if needed
       if (compoundPadding != self.currentSBGNProperties.compoundPadding) {
         compoundPadding = self.currentSBGNProperties.compoundPadding;

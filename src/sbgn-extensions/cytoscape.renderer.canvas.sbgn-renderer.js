@@ -64,6 +64,10 @@
   $$.style.properties.push({name: 'fit-labels-to-nodes', type: $$.style.types.trueOrFalse});
   $$.style.properties['fit-labels-to-nodes'] = {name: 'fit-labels-to-nodes', type: $$.style.types.trueOrFalse};
 
+  //add expanded-callopsed property to css features
+  $$.style.types.expandedOrCallopsed = {enums: ['expanded', 'callopsed']};
+  $$.style.properties.push({name: 'expanded-callopsed', type: $$.style.types.expandedOrCallopsed});
+  $$.style.properties['expanded-callopsed'] = {name: 'expanded-callopsed', type: $$.style.types.expandedOrCallopsed};
 
   function drawSelection(render, context, node) {
     //TODO: do it for all classes in sbgn, create a sbgn class array to check
@@ -80,6 +84,34 @@
               render.getNodeWidth(node),
               render.getNodeHeight(node)); //node._private.data.weight / 5.0
     }
+    
+    if(node.is("[sbgnclass!='complex']") && node.is("[sbgnclass!='compartment']")){
+      return;
+    }
+    
+    //Draw expand-callopse rectangles
+    var expandedOrCallopsed = node.css('expanded-callopsed');
+    
+    node._private.data.expandCallopseStartX = node._private.position.x - render.getNodeWidth(node) / 2 + 5;
+    node._private.data.expandCallopseStartY = node._private.position.y - render.getNodeHeight(node) / 2 + 5;
+    node._private.data.expandCallopseEndX = node._private.data.expandCallopseStartX + 12;
+    node._private.data.expandCallopseEndY = node._private.data.expandCallopseStartY + 12;
+
+    context.rect(
+            node._private.data.expandCallopseStartX,
+            node._private.data.expandCallopseStartY,
+            12,
+            12);
+
+    context.moveTo(node._private.data.expandCallopseStartX, node._private.data.expandCallopseStartY + 5);
+    context.lineTo(node._private.data.expandCallopseStartX + 10, node._private.data.expandCallopseStartY + 5);
+
+    if (expandedOrCallopsed == 'callopsed') {
+      context.moveTo(node._private.data.expandCallopseStartX + 5, node._private.data.expandCallopseStartY);
+      context.lineTo(node._private.data.expandCallopseStartX + 5, node._private.data.expandCallopseStartY + 10);
+    }
+
+    context.stroke();
   }
   ;
 
@@ -1779,11 +1811,11 @@
 
   function truncateText(textProp, context) {
     //If fit labels to nodes is not set yet set it by css value
-    if(window.fitLabelsToNodes == null){
+    if (window.fitLabelsToNodes == null) {
       window.fitLabelsToNodes = (cy.$("node").css('fit-labels-to-nodes') == 'true');
     }
     //If fit labels to nodes is false do not truncate
-    if(window.fitLabelsToNodes == false){
+    if (window.fitLabelsToNodes == false) {
       return textProp.label;
     }
     var width;
