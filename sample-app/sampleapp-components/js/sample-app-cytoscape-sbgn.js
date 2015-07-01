@@ -67,6 +67,11 @@ var callopseBottomUp = function (root) {
 }
 
 var expandNode = function (node) {
+  if(node._private.data.callopsedChildren != null){
+    node._private.data.callopsedChildren.restore();
+    repairEdgesOfCallopsedChildren(node);
+    node._private.data.callopsedChildren = null;
+  }
 }
 
 var callopseNode = function (node) {
@@ -76,11 +81,27 @@ var callopseNode = function (node) {
     barrowEdgesOfCallopsedChildren(node, child);
   }
 
-  var callopsedChildren = children.remove();
-  node._private.data.callopsedChildren = callopsedChildren;
+  var callopsedChildren = null;
+  removeChildren(node, node);
   node.css('expanded-callopsed', 'callopsed');
-  node.css('width', 100);
-  node.css('height', 100);
+//  node.css('width', 100);
+//  node.css('height', 100);
+}
+
+var removeChildren = function(node, root){
+  var children = node.children();
+  
+  for(var i = 0; i < children.length; i++){
+    var child = children[i];
+    removeChildren(child, root);
+    var removedChild = child.remove();
+    if(root._private.data.callopsedChildren == null){
+      root._private.data.callopsedChildren = removedChild;
+    }
+    else{
+      root._private.data.callopsedChildren = root._private.data.callopsedChildren.union(removedChild);
+    }
+  }
 }
 
 var barrowEdgesOfCallopsedChildren = function (root, childNode) {
@@ -91,23 +112,27 @@ var barrowEdgesOfCallopsedChildren = function (root, childNode) {
   }
 
   var edges = childNode.connectedEdges();
-  var _edgesOfCallopsedChildren = [];
 
   for (var i = 0; i < edges.length; i++) {
     var edge = edges[i];
+
     var source = edge.data("source");
     var target = edge.data("target");
-
-    //store the data of the original edge
-    //to restore when the node is expanded
-    _edgesOfCallopsedChildren.push({
-      id: edge.id(),
-      source: source,
-      target: target
-    });
-
     var sourceNode = edge.source();
     var targetNode = edge.target();
+
+    var newEdge = edge.jsons()[0];
+    var removedEdge = edge.remove();
+    //store the data of the original edge
+    //to restore when the node is expanded
+    if (root._private.data.edgesOfCallopsedChildren == null) {
+      root._private.data.edgesOfCallopsedChildren = removedEdge;
+    }
+    else {
+      root._private.data.edgesOfCallopsedChildren =
+              root._private.data.edgesOfCallopsedChildren.union(removedEdge);
+    }
+
     //Do not handle the inner edges
     if (!isOuterNode(sourceNode, root) && !isOuterNode(targetNode, root)) {
       continue;
@@ -123,21 +148,28 @@ var barrowEdgesOfCallopsedChildren = function (root, childNode) {
     }
 
     //prepare the new edge by changing the older source and/or target
-    var newEdge = edge.jsons()[0];
     newEdge.data.portsource = source;
     newEdge.data.porttarget = target;
     newEdge.data.source = source;
     newEdge.data.target = target;
 
     //remove the older edge and add the new one
-    edge.remove();
     cy.add(newEdge);
   }
-  root._private.data.edgesOfCallopsedChildren = _edgesOfCallopsedChildren;
 }
 
 var repairEdgesOfCallopsedChildren = function (node) {
-
+  var edgesOfCallopsedChildren = node._private.data.edgesOfCallopsedChildren;
+  if(edgesOfCallopsedChildren == null){
+    return;
+  }
+  for (var i = 0; i < edgesOfCallopsedChildren.length; i++) {
+    var oldEdge = cy.getElementById(edgesOfCallopsedChildren[i]._private.data.id);
+    if(oldEdge != null)
+      oldEdge.remove();
+  }
+  edgesOfCallopsedChildren.restore();
+  node._private.data.edgesOfCallopsedChildren = null;
 }
 
 /*node is an outer node of root 
