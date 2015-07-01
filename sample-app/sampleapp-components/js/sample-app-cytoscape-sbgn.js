@@ -60,7 +60,7 @@ var callopseBottomUp = function (root) {
       callopseBottomUp(node);
     }
   }
-  if (( root.is("[sbgnclass='complex']") || root.is("[sbgnclass='compartment']") )
+  if ((root.is("[sbgnclass='complex']") || root.is("[sbgnclass='compartment']"))
           && root.css('expanded-callopsed') == 'callopsed') {
     callopseNode(root);
   }
@@ -105,8 +105,13 @@ var barrowEdgesOfCallopsedChildren = function (root, childNode) {
       source: source,
       target: target
     });
-    //Inherit the css
-    var css = edge.css();
+
+    var sourceNode = edge.source();
+    var targetNode = edge.target();
+    //Do not handle the inner edges
+    if (!isOuterNode(sourceNode, root) && !isOuterNode(targetNode, root)) {
+      continue;
+    }
 
     //If the change source and/or target of the edge in the 
     //case of they are equal to the id of the callopsed child
@@ -117,21 +122,36 @@ var barrowEdgesOfCallopsedChildren = function (root, childNode) {
       target = root.id();
     }
 
-    edge.remove();
+    //prepare the new edge by changing the older source and/or target
+    var newEdge = edge.jsons()[0];
+    newEdge.data.portsource = source;
+    newEdge.data.porttarget = target;
+    newEdge.data.source = source;
+    newEdge.data.target = target;
 
-    //create the new edge with the same id and new source
-    //and target
-    cy.add({
-      group: "edges",
-      data: {id: edge.id(), source: source, target: target},
-      css: css
-    });
+    //remove the older edge and add the new one
+    edge.remove();
+    cy.add(newEdge);
   }
   root._private.data.edgesOfCallopsedChildren = _edgesOfCallopsedChildren;
 }
 
 var repairEdgesOfCallopsedChildren = function (node) {
 
+}
+
+/*node is an outer node of root 
+ if root is not it's anchestor 
+ and it is not the root itself*/
+var isOuterNode = function (node, root) {
+  var temp = node;
+  while (temp != null) {
+    if (temp == root) {
+      return false;
+    }
+    temp = temp.parent()[0];
+  }
+  return true;
 }
 
 var sbgnStyleSheet = cytoscape.stylesheet()
@@ -414,7 +434,7 @@ var SBGNContainer = Backbone.View.extend({
 
         cy.on('tap', 'node', function (event) {
           var node = this;
-          
+
           var cyPosX = event.cyPosition.x;
           var cyPosY = event.cyPosition.y;
 
@@ -434,7 +454,7 @@ var SBGNContainer = Backbone.View.extend({
 //            this.children().remove();
             console.log(this.selected());
           }
-          
+
           $(".qtip").remove();
 
           if (event.originalEvent.shiftKey)
