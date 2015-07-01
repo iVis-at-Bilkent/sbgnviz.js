@@ -121,7 +121,7 @@ var barrowEdgesOfCallopsedChildren = function (root, childNode) {
     var sourceNode = edge.source();
     var targetNode = edge.target();
 
-    var newEdge = edge.jsons()[0];
+    var newEdge = jQuery.extend(true, {}, edge.jsons()[0]);
     var removedEdge = edge.remove();
     //store the data of the original edge
     //to restore when the node is expanded
