@@ -132,14 +132,14 @@ var jsonToSbgnml = {
         //Temporary hack to resolve "undefined" arc source and targets
         var arcTarget = edge._private.data.porttarget;
         var arcSource = edge._private.data.portsource;
-        var arcId = arcSource + "-" + arcTarget;
 
         if (arcSource.length === 0) 
             arcSource = edge._private.data.source;
 
         if (arcTarget.length === 0) 
             arcTarget = edge._private.data.target;
-
+          
+        var arcId = arcSource + "-" + arcTarget;
 
         sbgnmlText = sbgnmlText + "<arc id='" + arcId + 
             "' target='" + arcTarget +
