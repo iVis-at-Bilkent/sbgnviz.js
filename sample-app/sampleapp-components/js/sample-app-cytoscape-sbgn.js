@@ -2,7 +2,7 @@ var SBGNStyleProperties = {
   'compound-padding': 20,
   'dynamic-label-size': 'regular',
   'fit-labels-to-nodes': 'true',
-  'expanded-callopsed': 'expanded'
+  'expanded-collapsed': 'expanded'
 };
 
 var refreshPaddings = function () {
@@ -30,60 +30,60 @@ var refreshPaddings = function () {
   }
 
   var complexesAndCompartments = cy.$("node[sbgnclass='complex'], node[sbgnclass='compartment']");
-  complexesAndCompartments.css('padding-left', calc_padding);
+  complexesAndCompartments.css('padding-left', calc_padding + 8);
   complexesAndCompartments.css('padding-right', calc_padding);
-  complexesAndCompartments.css('padding-top', calc_padding);
+  complexesAndCompartments.css('padding-top', calc_padding + 8);
   complexesAndCompartments.css('padding-bottom', calc_padding);
 
   //To refresh the nodes on the screen apply the preset layout
   cy.layout({name: 'preset'});
 }
 
-//Some nodes are initilized as callopsed this method handles them
-var initCallopsedNodes = function () {
+//Some nodes are initilized as collapsed this method handles them
+var initCollapsedNodes = function () {
   var orphans = cy.nodes().orphans();
   for (var i = 0; i < orphans.length; i++) {
     var root = orphans[i];
-    callopseBottomUp(root);
+    collapseBottomUp(root);
   }
 }
 
-//callopse the nodes in bottom up order 
-var callopseBottomUp = function (root) {
+//collapse the nodes in bottom up order 
+var collapseBottomUp = function (root) {
   var children = root.children();
   for (var i = 0; i < children.length; i++) {
     var node = children[i];
     if (node.is("[sbgnclass!='complex']") && node.is("[sbgnclass!='compartment']")) {
       continue;
     }
-    if (node.css('expanded-callopsed') == 'callopsed') {
-      callopseBottomUp(node);
+    if (node.css('expanded-collapsed') == 'collapsed') {
+      collapseBottomUp(node);
     }
   }
   if ((root.is("[sbgnclass='complex']") || root.is("[sbgnclass='compartment']"))
-          && root.css('expanded-callopsed') == 'callopsed') {
-    callopseNode(root);
+          && root.css('expanded-collapsed') == 'collapsed') {
+    collapseNode(root);
   }
 }
 
 var expandNode = function (node) {
-  if(node._private.data.callopsedChildren != null){
-    node._private.data.callopsedChildren.restore();
-    repairEdgesOfCallopsedChildren(node);
-    node._private.data.callopsedChildren = null;
+  if(node._private.data.collapsedChildren != null){
+    node.css('expanded-collapsed', 'expanded');
+    node._private.data.collapsedChildren.restore();
+    repairEdgesOfCollapsedChildren(node);
+    node._private.data.collapsedChildren = null;
   }
 }
 
-var callopseNode = function (node) {
+var collapseNode = function (node) {
+  node.css('expanded-collapsed', 'collapsed');
   var children = node.children();
   for (var i = 0; i < children.length; i++) {
     var child = children[i];
-    barrowEdgesOfCallopsedChildren(node, child);
+    barrowEdgesOfcollapsedChildren(node, child);
   }
 
-  var callopsedChildren = null;
   removeChildren(node, node);
-  node.css('expanded-callopsed', 'callopsed');
 //  node.css('width', 100);
 //  node.css('height', 100);
 }
@@ -95,20 +95,20 @@ var removeChildren = function(node, root){
     var child = children[i];
     removeChildren(child, root);
     var removedChild = child.remove();
-    if(root._private.data.callopsedChildren == null){
-      root._private.data.callopsedChildren = removedChild;
+    if(root._private.data.collapsedChildren == null){
+      root._private.data.collapsedChildren = removedChild;
     }
     else{
-      root._private.data.callopsedChildren = root._private.data.callopsedChildren.union(removedChild);
+      root._private.data.collapsedChildren = root._private.data.collapsedChildren.union(removedChild);
     }
   }
 }
 
-var barrowEdgesOfCallopsedChildren = function (root, childNode) {
+var barrowEdgesOfcollapsedChildren = function (root, childNode) {
   var children = childNode.children();
   for (var i = 0; i < children.length; i++) {
     var child = children[i];
-    barrowEdgesOfCallopsedChildren(root, child);
+    barrowEdgesOfcollapsedChildren(root, child);
   }
 
   var edges = childNode.connectedEdges();
@@ -125,12 +125,12 @@ var barrowEdgesOfCallopsedChildren = function (root, childNode) {
     var removedEdge = edge.remove();
     //store the data of the original edge
     //to restore when the node is expanded
-    if (root._private.data.edgesOfCallopsedChildren == null) {
-      root._private.data.edgesOfCallopsedChildren = removedEdge;
+    if (root._private.data.edgesOfcollapsedChildren == null) {
+      root._private.data.edgesOfcollapsedChildren = removedEdge;
     }
     else {
-      root._private.data.edgesOfCallopsedChildren =
-              root._private.data.edgesOfCallopsedChildren.union(removedEdge);
+      root._private.data.edgesOfcollapsedChildren =
+              root._private.data.edgesOfcollapsedChildren.union(removedEdge);
     }
 
     //Do not handle the inner edges
@@ -139,7 +139,7 @@ var barrowEdgesOfCallopsedChildren = function (root, childNode) {
     }
 
     //If the change source and/or target of the edge in the 
-    //case of they are equal to the id of the callopsed child
+    //case of they are equal to the id of the collapsed child
     if (source == childNode.id()) {
       source = root.id();
     }
@@ -158,18 +158,18 @@ var barrowEdgesOfCallopsedChildren = function (root, childNode) {
   }
 }
 
-var repairEdgesOfCallopsedChildren = function (node) {
-  var edgesOfCallopsedChildren = node._private.data.edgesOfCallopsedChildren;
-  if(edgesOfCallopsedChildren == null){
+var repairEdgesOfCollapsedChildren = function (node) {
+  var edgesOfcollapsedChildren = node._private.data.edgesOfcollapsedChildren;
+  if(edgesOfcollapsedChildren == null){
     return;
   }
-  for (var i = 0; i < edgesOfCallopsedChildren.length; i++) {
-    var oldEdge = cy.getElementById(edgesOfCallopsedChildren[i]._private.data.id);
+  for (var i = 0; i < edgesOfcollapsedChildren.length; i++) {
+    var oldEdge = cy.getElementById(edgesOfcollapsedChildren[i]._private.data.id);
     if(oldEdge != null)
       oldEdge.remove();
   }
-  edgesOfCallopsedChildren.restore();
-  node._private.data.edgesOfCallopsedChildren = null;
+  edgesOfcollapsedChildren.restore();
+  node._private.data.edgesOfcollapsedChildren = null;
 }
 
 /*node is an outer node of root 
@@ -184,6 +184,21 @@ var isOuterNode = function (node, root) {
     temp = temp.parent()[0];
   }
   return true;
+}
+
+var printNodeInfo = function(){
+  console.log("print node info");
+  var nodes = cy.nodes();
+  for(var i = 0; i < nodes.length; i++){
+    var node = nodes[i];
+    console.log(node.data("id") + "\t" + node.data("parent"));
+  }
+  console.log("print edge info");
+  var edges = cy.edges();
+  for(var i = 0; i < edges.length; i++){
+    var edge = edges[i];
+    console.log(edge.data("id") + "\t" + edge.data("source") + "\t" + edge.data("target"));
+  }
 }
 
 var sbgnStyleSheet = cytoscape.stylesheet()
@@ -202,7 +217,7 @@ var sbgnStyleSheet = cytoscape.stylesheet()
         .selector("node[sbgnclass='complex']")
         .css({
           'background-color': '#F4F3EE',
-          'expanded-callopsed': SBGNStyleProperties['expanded-callopsed']
+          'expanded-collapsed': SBGNStyleProperties['expanded-collapsed']
         })
         .selector("node[sbgnclass='compartment']")
         .css({
@@ -212,7 +227,7 @@ var sbgnStyleSheet = cytoscape.stylesheet()
           'text-valign': 'bottom',
           'text-halign': 'center',
           'font-size': '16',
-          'expanded-callopsed': SBGNStyleProperties['expanded-callopsed']
+          'expanded-collapsed': SBGNStyleProperties['expanded-collapsed']
         })
         .selector("node[sbgnclass!='complex'][sbgnclass!='compartment'][sbgnclass!='submap']")
         .css({
@@ -347,9 +362,8 @@ var SBGNContainer = Backbone.View.extend({
       {
         window.cy = this;
 
-        initCallopsedNodes();
-
         refreshPaddings();
+        initCollapsedNodes();
 
         var panProps = ({
           fitPadding: 10,
@@ -470,17 +484,17 @@ var SBGNContainer = Backbone.View.extend({
           var cyPosX = event.cyPosition.x;
           var cyPosY = event.cyPosition.y;
 
-          if (cyPosX >= node._private.data.expandCallopseStartX
-                  && cyPosX <= node._private.data.expandCallopseEndX
-                  && cyPosY >= node._private.data.expandCallopseStartY
-                  && cyPosY <= node._private.data.expandCallopseEndY) {
-            var expandedOrCallopsed = this.css('expanded-callopsed');
-            if (expandedOrCallopsed == 'expanded') {
-              this.css('expanded-callopsed', 'callopsed');
-              callopseNode(this);
+          if (cyPosX >= node._private.data.expandcollapseStartX
+                  && cyPosX <= node._private.data.expandcollapseEndX
+                  && cyPosY >= node._private.data.expandcollapseStartY
+                  && cyPosY <= node._private.data.expandcollapseEndY) {
+            var expandedOrcollapsed = this.css('expanded-collapsed');
+            if (expandedOrcollapsed == 'expanded') {
+//              this.css('expanded-collapsed', 'collapsed');
+              collapseNode(this);
             }
             else {
-              this.css('expanded-callopsed', 'expanded');
+//              this.css('expanded-collapsed', 'expanded');
               expandNode(this);
             }
 //            this.children().remove();

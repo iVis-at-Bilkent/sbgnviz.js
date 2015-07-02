@@ -64,10 +64,10 @@
   $$.style.properties.push({name: 'fit-labels-to-nodes', type: $$.style.types.trueOrFalse});
   $$.style.properties['fit-labels-to-nodes'] = {name: 'fit-labels-to-nodes', type: $$.style.types.trueOrFalse};
 
-  //add expanded-callopsed property to css features
-  $$.style.types.expandedOrCallopsed = {enums: ['expanded', 'callopsed']};
-  $$.style.properties.push({name: 'expanded-callopsed', type: $$.style.types.expandedOrCallopsed});
-  $$.style.properties['expanded-callopsed'] = {name: 'expanded-callopsed', type: $$.style.types.expandedOrCallopsed};
+  //add expanded-collapsed property to css features
+  $$.style.types.expandedOrcollapsed = {enums: ['expanded', 'collapsed']};
+  $$.style.properties.push({name: 'expanded-collapsed', type: $$.style.types.expandedOrcollapsed});
+  $$.style.properties['expanded-collapsed'] = {name: 'expanded-collapsed', type: $$.style.types.expandedOrcollapsed};
 
   function drawSelection(render, context, node) {
     //TODO: do it for all classes in sbgn, create a sbgn class array to check
@@ -89,26 +89,29 @@
       return;
     }
     
-    //Draw expand-callopse rectangles
-    var expandedOrCallopsed = node.css('expanded-callopsed');
-    
-    node._private.data.expandCallopseStartX = node._private.position.x - render.getNodeWidth(node) / 2 + 5;
-    node._private.data.expandCallopseStartY = node._private.position.y - render.getNodeHeight(node) / 2 + 5;
-    node._private.data.expandCallopseEndX = node._private.data.expandCallopseStartX + 12;
-    node._private.data.expandCallopseEndY = node._private.data.expandCallopseStartY + 12;
+    //Draw expand-collapse rectangles
+    var expandedOrcollapsed = node.css('expanded-collapsed');
+    var rectSize = 12;
+    var lineSize = 8;
+    var startOffset =  5;
+    var diff = (rectSize - lineSize) / 2;
+    node._private.data.expandcollapseStartX = node._private.position.x - render.getNodeWidth(node) / 2 + startOffset;
+    node._private.data.expandcollapseStartY = node._private.position.y - render.getNodeHeight(node) / 2 + startOffset;
+    node._private.data.expandcollapseEndX = node._private.data.expandcollapseStartX + rectSize;
+    node._private.data.expandcollapseEndY = node._private.data.expandcollapseStartY + rectSize;
 
     context.rect(
-            node._private.data.expandCallopseStartX,
-            node._private.data.expandCallopseStartY,
-            12,
-            12);
+            node._private.data.expandcollapseStartX,
+            node._private.data.expandcollapseStartY,
+            rectSize,
+            rectSize);
 
-    context.moveTo(node._private.data.expandCallopseStartX, node._private.data.expandCallopseStartY + 5);
-    context.lineTo(node._private.data.expandCallopseStartX + 10, node._private.data.expandCallopseStartY + 5);
+    context.moveTo(node._private.data.expandcollapseStartX + diff, node._private.data.expandcollapseStartY + rectSize / 2);
+    context.lineTo(node._private.data.expandcollapseStartX + lineSize + diff, node._private.data.expandcollapseStartY + + rectSize / 2);
 
-    if (expandedOrCallopsed == 'callopsed') {
-      context.moveTo(node._private.data.expandCallopseStartX + 5, node._private.data.expandCallopseStartY);
-      context.lineTo(node._private.data.expandCallopseStartX + 5, node._private.data.expandCallopseStartY + 10);
+    if (expandedOrcollapsed == 'collapsed') {
+      context.moveTo(node._private.data.expandcollapseStartX + rectSize / 2, node._private.data.expandcollapseStartY + diff);
+      context.lineTo(node._private.data.expandcollapseStartX + rectSize / 2, node._private.data.expandcollapseStartY + lineSize + diff);
     }
 
     context.stroke();
