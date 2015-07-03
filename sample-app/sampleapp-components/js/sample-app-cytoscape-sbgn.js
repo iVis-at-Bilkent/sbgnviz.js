@@ -39,9 +39,9 @@ var refreshPaddings = function () {
 
   var complexesAndCompartments = cy.$("node[sbgnclass='complex'], node[sbgnclass='compartment']");
   complexesAndCompartments.css('padding-left', calc_padding + 8);
-  complexesAndCompartments.css('padding-right', calc_padding);
+  complexesAndCompartments.css('padding-right', calc_padding + 8);
   complexesAndCompartments.css('padding-top', calc_padding + 8);
-  complexesAndCompartments.css('padding-bottom', calc_padding);
+  complexesAndCompartments.css('padding-bottom', calc_padding + 8);
 
   //To refresh the nodes on the screen apply the preset layout
   cy.layout({name: 'preset'});
@@ -71,6 +71,11 @@ var getCollapsedChildrenData = function (collapsedChildren, numOfSimples, total)
 
 //Some nodes are initilized as collapsed this method handles them
 var initCollapsedNodes = function () {
+  var jsons = cy.nodes();
+  for (var i = 0; i < jsons.length; i++) {
+    var ele = jsons[i];
+    console.log(ele.id() + ele._private.data.sbgnlabel);
+  }
   var orphans = cy.nodes().orphans();
   for (var i = 0; i < orphans.length; i++) {
     var root = orphans[i];
@@ -105,6 +110,14 @@ var expandNode = function (node) {
     node.css("width", node._private.data.oldWidth);
     node.css("height", node._private.data.oldHeight);
     cy.nodes().updateCompoundBounds();
+
+    $( "#perform-incremental-layout").trigger( "click" );
+
+    var jsons = cy.nodes();
+    for (var i = 0; i < jsons.length; i++) {
+      var ele = jsons[i];
+      console.log(ele.id() + ele._private.data.sbgnlabel);
+    }
   }
 }
 
@@ -118,9 +131,9 @@ var collapseNode = function (node) {
   node._private.data.oldWidth = node.css('width');
   node._private.data.oldHeight = node.css('height');
   removeChildren(node, node);
-  
-  node.css('width', 100);
-  node.css('height', 100);
+
+  node.css('width', 75);
+  node.css('height', 75);
 }
 
 var removeChildren = function (node, root) {
@@ -515,7 +528,6 @@ var SBGNContainer = Backbone.View.extend({
 
         cy.on('tap', 'node', function (event) {
           var node = this;
-
           var cyPosX = event.cyPosition.x;
           var cyPosY = event.cyPosition.y;
 
@@ -601,6 +613,12 @@ var SBGNLayout = Backbone.View.extend({
   },
   applyLayout: function () {
     var options = this.currentLayoutProperties;
+    cy.elements().filter(':visible').layout(options);
+  },
+  applyIncrementalLayout: function () {
+    var options = _.clone(this.currentLayoutProperties);
+    options.randomize = false;
+    options.animate = false;
     cy.elements().filter(':visible').layout(options);
   },
   render: function () {

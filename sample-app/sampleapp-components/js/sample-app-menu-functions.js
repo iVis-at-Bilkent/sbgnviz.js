@@ -261,6 +261,18 @@ $(document).ready(function () {
 
     sbgnLayoutProp.applyLayout();
   });
+  
+  $("#perform-incremental-layout").click(function (e) {
+    cy.nodes().removeData("ports");
+    cy.edges().removeData("portsource");
+    cy.edges().removeData("porttarget");
+
+    cy.nodes().data("ports", []);
+    cy.edges().data("portsource", []);
+    cy.edges().data("porttarget", []);
+
+    sbgnLayoutProp.applyIncrementalLayout();
+  });
 
   $("#save-as-png").click(function (evt) {
     var pngContent = cy.png({scale: 3, full: true});
