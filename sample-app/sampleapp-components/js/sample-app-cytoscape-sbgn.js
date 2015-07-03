@@ -2,7 +2,7 @@ var SBGNStyleProperties = {
   'compound-padding': 20,
   'dynamic-label-size': 'regular',
   'fit-labels-to-nodes': 'true',
-  'expanded-collapsed': 'collapsed'
+  'expanded-collapsed': 'expanded'
 };
 
 var refreshPaddings = function () {
