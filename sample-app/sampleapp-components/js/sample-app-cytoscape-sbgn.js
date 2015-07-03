@@ -102,6 +102,9 @@ var expandNode = function (node) {
     node._private.data.collapsedChildren.restore();
     repairEdgesOfCollapsedChildren(node);
     node._private.data.collapsedChildren = null;
+    node.css("width", node._private.data.oldWidth);
+    node.css("height", node._private.data.oldHeight);
+    cy.nodes().updateCompoundBounds();
   }
 }
 
@@ -112,10 +115,12 @@ var collapseNode = function (node) {
     var child = children[i];
     barrowEdgesOfcollapsedChildren(node, child);
   }
-
+  node._private.data.oldWidth = node.css('width');
+  node._private.data.oldHeight = node.css('height');
   removeChildren(node, node);
-//  node.css('width', 100);
-//  node.css('height', 100);
+  
+  node.css('width', 100);
+  node.css('height', 100);
 }
 
 var removeChildren = function (node, root) {
