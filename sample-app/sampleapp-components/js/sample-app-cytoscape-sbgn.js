@@ -2,7 +2,7 @@ var SBGNStyleProperties = {
   'compound-padding': 20,
   'dynamic-label-size': 'regular',
   'fit-labels-to-nodes': 'true',
-  'expanded-collapsed': 'expanded'
+  'expanded-collapsed': 'collapsed'
 };
 
 var refreshPaddings = function () {
@@ -17,9 +17,17 @@ var refreshPaddings = function () {
   for (var i = 0; i < nodes.length; i++) {
     var theNode = nodes[i];
     if (theNode.children() == null || theNode.children().length == 0) {
-      total += Number(theNode._private.data.sbgnbbox.w);
-      total += Number(theNode._private.data.sbgnbbox.h);
-      numOfSimples++;
+      var collapsedChildren = theNode._private.data.collapsedChildren;
+      if (collapsedChildren == null || collapsedChildren.length == 0) {
+        total += Number(theNode._private.data.sbgnbbox.w);
+        total += Number(theNode._private.data.sbgnbbox.h);
+        numOfSimples++;
+      }
+      else {
+        var result = getCollapsedChildrenData(collapsedChildren, numOfSimples, total);
+        numOfSimples = result.numOfSimples;
+        total = result.total;
+      }
     }
   }
 
@@ -37,6 +45,28 @@ var refreshPaddings = function () {
 
   //To refresh the nodes on the screen apply the preset layout
   cy.layout({name: 'preset'});
+}
+
+var getCollapsedChildrenData = function (collapsedChildren, numOfSimples, total) {
+  for (var i = 0; i < collapsedChildren; i++) {
+    var collapsedChild = collapsedChildren[i];
+    if (collapsedChild._private.data.collapsedChildren == null
+            || collapsedChild._private.data.collapsedChildren.length == 0) {
+      total += Number(collapsedChild._private.data.sbgnbbox.w);
+      total += Number(collapsedChild._private.data.sbgnbbox.h);
+      numOfSimples++;
+    }
+    else {
+      var result =
+              getCollapsedChildrenData(collapsedChild._private.data.collapsedChildren, numOfSimples, total);
+      numOfSimples = result.numOfSimples;
+      total = result.total;
+    }
+  }
+  return {
+    numOfSimples: numOfSimples,
+    total: total
+  };
 }
 
 //Some nodes are initilized as collapsed this method handles them
@@ -67,7 +97,7 @@ var collapseBottomUp = function (root) {
 }
 
 var expandNode = function (node) {
-  if(node._private.data.collapsedChildren != null){
+  if (node._private.data.collapsedChildren != null) {
     node.css('expanded-collapsed', 'expanded');
     node._private.data.collapsedChildren.restore();
     repairEdgesOfCollapsedChildren(node);
@@ -88,17 +118,17 @@ var collapseNode = function (node) {
 //  node.css('height', 100);
 }
 
-var removeChildren = function(node, root){
+var removeChildren = function (node, root) {
   var children = node.children();
-  
-  for(var i = 0; i < children.length; i++){
+
+  for (var i = 0; i < children.length; i++) {
     var child = children[i];
     removeChildren(child, root);
     var removedChild = child.remove();
-    if(root._private.data.collapsedChildren == null){
+    if (root._private.data.collapsedChildren == null) {
       root._private.data.collapsedChildren = removedChild;
     }
-    else{
+    else {
       root._private.data.collapsedChildren = root._private.data.collapsedChildren.union(removedChild);
     }
   }
@@ -160,12 +190,12 @@ var barrowEdgesOfcollapsedChildren = function (root, childNode) {
 
 var repairEdgesOfCollapsedChildren = function (node) {
   var edgesOfcollapsedChildren = node._private.data.edgesOfcollapsedChildren;
-  if(edgesOfcollapsedChildren == null){
+  if (edgesOfcollapsedChildren == null) {
     return;
   }
   for (var i = 0; i < edgesOfcollapsedChildren.length; i++) {
     var oldEdge = cy.getElementById(edgesOfcollapsedChildren[i]._private.data.id);
-    if(oldEdge != null)
+    if (oldEdge != null)
       oldEdge.remove();
   }
   edgesOfcollapsedChildren.restore();
@@ -186,16 +216,16 @@ var isOuterNode = function (node, root) {
   return true;
 }
 
-var printNodeInfo = function(){
+var printNodeInfo = function () {
   console.log("print node info");
   var nodes = cy.nodes();
-  for(var i = 0; i < nodes.length; i++){
+  for (var i = 0; i < nodes.length; i++) {
     var node = nodes[i];
     console.log(node.data("id") + "\t" + node.data("parent"));
   }
   console.log("print edge info");
   var edges = cy.edges();
-  for(var i = 0; i < edges.length; i++){
+  for (var i = 0; i < edges.length; i++) {
     var edge = edges[i];
     console.log(edge.data("id") + "\t" + edge.data("source") + "\t" + edge.data("target"));
   }
