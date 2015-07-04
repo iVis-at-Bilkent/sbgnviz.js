@@ -71,11 +71,6 @@ var getCollapsedChildrenData = function (collapsedChildren, numOfSimples, total)
 
 //Some nodes are initilized as collapsed this method handles them
 var initCollapsedNodes = function () {
-  var jsons = cy.nodes();
-  for (var i = 0; i < jsons.length; i++) {
-    var ele = jsons[i];
-    console.log(ele.id() + ele._private.data.sbgnlabel);
-  }
   var orphans = cy.nodes().orphans();
   for (var i = 0; i < orphans.length; i++) {
     var root = orphans[i];
@@ -112,12 +107,6 @@ var expandNode = function (node) {
     cy.nodes().updateCompoundBounds();
 
     $( "#perform-incremental-layout").trigger( "click" );
-
-    var jsons = cy.nodes();
-    for (var i = 0; i < jsons.length; i++) {
-      var ele = jsons[i];
-      console.log(ele.id() + ele._private.data.sbgnlabel);
-    }
   }
 }
 
