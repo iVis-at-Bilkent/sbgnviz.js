@@ -42,16 +42,15 @@ var RemoveNodeCommand = function (nodeTobeDeleted)
  *  Description: A simple action manager that acts also as a undo-redo manager regarding Command Design Pattern
  *	Author: Istemi Bahceci<istemi.bahceci@gmail.com>
  */
-var EditorActionsManager = function () 
-{
-    var undoStack = [];
-    var redoStack =[];
+var editorActionsManager = {
+    undoStack: [],
+    redoStack: [],
  
 	 /*
 	 *  Executes given command by calling do method of given command
 	 *  pushes the action to the undoStack after execution.
 	 */
-    do: function (command) 
+    _do: function (command) 
     {
         command._do(command.params);
      	undoStack.push(command);
@@ -94,7 +93,7 @@ var EditorActionsManager = function ()
  */
 function sampleRun() 
 {
-    var editorActionsManager = new EditorActionsManager();
+//    var editorActionsManager = new EditorActionsManager();
  
     // issue commands
     editorActionsManager._do(new AddNodeCommand(newNode));
