@@ -518,3 +518,53 @@ var SBGNProperties = Backbone.View.extend({
     return this;
   }
 });
+
+var AddNodeProperties = Backbone.View.extend({
+  defaultProperties: {
+    content: "new node",
+    x: 150,
+    y: 150,
+    width: 100,
+    height: 100
+  },
+  currentProperties: null,
+  initialize: function () {
+    var self = this;
+    self.copyProperties();
+    self.template = _.template($("#add-node-template").html(), self.currentProperties);
+  },
+  copyProperties: function () {
+    this.currentProperties = _.clone(this.defaultProperties);
+  },
+  render: function () {
+    var self = this;
+    self.template = _.template($("#add-node-template").html(), self.currentProperties);
+    $(self.el).html(self.template);
+
+    $(self.el).dialog();
+
+    $("#confirm-add-node").die("click").live("click", function (evt) {
+      self.currentProperties.content = document.getElementById("add-node-content").value;
+      self.currentProperties.x = Number(document.getElementById("add-node-x").value);
+      self.currentProperties.y = Number(document.getElementById("add-node-y").value);
+      self.currentProperties.width = Number(document.getElementById("add-node-width").value);
+      self.currentProperties.height = Number(document.getElementById("add-node-height").value);
+
+      addRemoveUtilities.addNode(self.currentProperties.content,
+              self.currentProperties.x,
+              self.currentProperties.y,
+              self.currentProperties.width,
+              self.currentProperties.height);
+
+      $(self.el).dialog('close');
+    });
+
+    $("#default-add-node").die("click").live("click", function (evt) {
+      self.copyProperties();
+      self.template = _.template($("#add-node-template").html(), self.currentLayoutProperties);
+      $(self.el).html(self.template);
+    });
+
+    return this;
+  }
+});

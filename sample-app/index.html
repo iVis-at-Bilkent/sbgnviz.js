@@ -92,6 +92,12 @@
                                 <li><a href="#" id="show-all">Show All</a></li>
                                 <li class="divider"></li>
                                 <li><a href="#" id="delete-selected">Delete Selected</a></li>
+                                <li class="divider"></li>
+                                <li><a href="#" id="add-node">Add Node</a></li>
+                                <li><a href="#" id="delete-selected-nodes">Delete Selected Nodes</a></li>
+                                <li class="divider"></li>
+                                <li><a href="#" id="add-edge">Add Edge</a></li>
+                                <li><a href="#" id="delete-selected-edges">Delete Selected Edges</a></li>
                             </ul>
                         </li>
 
@@ -158,6 +164,10 @@
     
         <div id="sbgn-properties-table" title="Properties" style="display: inline">
             <!-- sbgn properties table will be shown here -->
+        </div>
+    
+        <div id="sbgn-add-node-table" title="Add Node">
+            <!-- sbgn add node table will be shown here -->
         </div>
 
         <div id="biogene-container" style="display: none">
@@ -406,6 +416,70 @@
             </tr>
             </table>
         </script>
+        
+        <script type="text/template" id="add-node-template">
+            <table class="table-condensed layout-table">
+            <tr>
+            <td>
+            <span class="add-on layout-text"> Content </span>
+            </td>
+            
+            <td>
+            <input id="add-node-content" type="text" class="input-small layout-text" value= <%= content %> >
+            </td>
+            </tr>
+            
+            <tr>
+            <td>
+            <span class="add-on layout-text"> X </span>
+            </td>
+            
+            <td>
+            <input id="add-node-x" type="text" class="input-small layout-text" value= <%= x %> >
+            </td>
+            </tr>
+    
+            <tr>
+            <td>
+            <span class="add-on layout-text"> Y </span>
+            </td>
+            
+            <td>
+            <input id="add-node-y" type="text" class="input-small layout-text" value= <%= y %> >
+            </td>
+            </tr>
+    
+            <tr>
+            <td>
+            <span class="add-on layout-text"> Width </span>
+            </td>
+            
+            <td>
+            <input id="add-node-width" type="text" class="input-small layout-text" value= <%= width %> >
+            </td>
+    
+            <tr>
+            <td>
+            <span class="add-on layout-text"> Height </span>
+            </td>
+            
+            <td>
+            <input id="add-node-height" type="text" class="input-small layout-text" value= <%= height %> >
+            </td>
+            </tr>
+            </tr>
+    
+            <tr id="layout-buttons">
+            <td>
+            <button id="confirm-add-node" class="btn btn-default" >Add</button>
+            </td>
+            <td>
+            <button id="default-add-node" class="btn btn-default">Default</button>
+            </td>
+            </tr>
+            
+            </table>
+        </script>
 
         <!-- BioGeneView template for backbone.js -->
         <script type="text/template" id="biogene-template">
@@ -490,6 +564,7 @@
         <script src="../src/utilities/sbgnml-to-json-converter.js"></script>
         <script src="../src/utilities/sbgn-filtering.js"></script>
         <script src="../src/utilities/expand-collapse-utilities.js"></script>
+        <script src="../src/utilities/add-remove-utilities.js"></script>
 
         <!-- Sample application components -->
         <script src="sampleapp-components/js/sample-app-cytoscape-sbgn.js"></script>

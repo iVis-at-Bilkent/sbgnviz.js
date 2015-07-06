@@ -23,6 +23,10 @@ $(document).ready(function () {
   var sbgnProperties = new SBGNProperties({
     el: '#sbgn-properties-table'
   });
+  
+  var sbgnAddNodeProp = new AddNodeProperties({
+    el: '#sbgn-add-node-table'
+  });
 
   $("body").on("change", "#file-input", function (e) {
     if ($("#file-input").val() == "") {
@@ -244,6 +248,10 @@ $(document).ready(function () {
 
   $("#layout-properties").click(function (e) {
     sbgnLayoutProp.render();
+  });
+  
+  $("#add-node").click(function (e) {
+    sbgnAddNodeProp.render();
   });
 
   $("#sbgn-properties").click(function (e) {
