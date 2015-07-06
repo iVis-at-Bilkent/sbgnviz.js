@@ -5,7 +5,13 @@ var addRemoveUtilities = {
       data: {
         width: width,
         height: height,
-        sbgnclass: "source and sink"
+        sbgnclass: "source and sink",//this will also be a parameter
+        sbgnbbox: {
+          h: height,
+          w: width,
+          x: x,
+          y: y
+        }
       },
       position: {
         x: x,
