@@ -8,12 +8,12 @@
 //Actual  methods
 function addNode(newNode) 
 {
-	//cy.addNode 
+	return addRemoveUtilities.addNode(newNode.content, newNode.x, newNode.y, newNode.width, newNode.height); 
 }
 
-function removeNode(nodeToBeDeleted) 
+function removeNodes(nodesToBeDeleted) 
 { 
-	//cy.deleteNode
+	return addRemoveUtilities.removeNodes(nodesToBeDeleted);
 }
  
  /*
@@ -30,12 +30,12 @@ var Command = function (_do, undo, params) {
  
 var AddNodeCommand = function (newNode) 
 {
-	return new Command(addNode, removeNode, newNode);
+	return new Command(addNode, removeNodes, newNode);
 };
 
-var RemoveNodeCommand = function (nodeTobeDeleted) 
+var RemoveNodesCommand = function (nodesTobeDeleted) 
 {
-	return new Command(removeNode, addNode, nodeTobeDeleted);
+	return new Command(removeNodes, addNode, nodeTobeDeleted);
 };
 
  /**
@@ -53,7 +53,7 @@ function EditorActionsManager()
 	 */
 	this._do = function (command) 
 	{
-		command._do(command.params);
+		command.undoparams = command._do(command.params);
 		this.undoStack.push(command);
 	};
 
@@ -63,8 +63,11 @@ function EditorActionsManager()
 	 */
 	this.undo = function () 
 	{
-		var lastCommand = undoStack.pop();
-		lastCommand.undo(lastCommand.params);
+        if(this.undoStack.length == 0){
+          return;
+        }
+		var lastCommand = this.undoStack.pop();
+		lastCommand.undo(lastCommand.undoparams);
 		this.redoStack.push(lastCommand);
 	};
 
@@ -74,9 +77,28 @@ function EditorActionsManager()
 	 */
 	this.redo = function()
 	{
-		var lastCommand = redoStack.pop();
+        if(this.redoStack.length == 0){
+          return;
+        }
+		var lastCommand = this.redoStack.pop();
 		this._do(lastCommand);
 	};
+
+    /*
+     * 
+     * This method indicates whether the undo stack is empty
+     */
+    this.isUndoStackEmpty = function(){
+      return this.undoStack.length == 0;
+    }
+    
+    /*
+     * 
+     * This method indicates whether the redo stack is empty
+     */
+    this.isRedoStackEmpty = function(){
+      return this.redoStack.length == 0;
+    }
 
 	 /*
 	 *  Empties undo and redo stacks !
@@ -87,7 +109,7 @@ function EditorActionsManager()
 		this.redoStack =[];
 	};
 }
- 
+window.editorActionsManager = new EditorActionsManager();
  
 /*
  *  A sample run that gives insight about the usage of EditorActionsManager and commands

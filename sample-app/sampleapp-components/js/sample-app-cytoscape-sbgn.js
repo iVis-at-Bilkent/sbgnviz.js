@@ -550,11 +550,13 @@ var AddNodeProperties = Backbone.View.extend({
       self.currentProperties.width = Number(document.getElementById("add-node-width").value);
       self.currentProperties.height = Number(document.getElementById("add-node-height").value);
 
-      addRemoveUtilities.addNode(self.currentProperties.content,
-              self.currentProperties.x,
-              self.currentProperties.y,
-              self.currentProperties.width,
-              self.currentProperties.height);
+      var newNode = _.clone(self.currentProperties);
+      editorActionsManager._do(new AddNodeCommand(newNode));
+//      addRemoveUtilities.addNode(self.currentProperties.content,
+//              self.currentProperties.x,
+//              self.currentProperties.y,
+//              self.currentProperties.width,
+//              self.currentProperties.height);
 
       $(self.el).dialog('close');
     });

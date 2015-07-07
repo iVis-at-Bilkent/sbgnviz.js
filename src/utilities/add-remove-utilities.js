@@ -1,6 +1,6 @@
 var addRemoveUtilities = {
   addNode: function (content, x, y, width, height) {
-    cy.add({
+    var eles = cy.add({
       group: "nodes",
       data: {
         width: width,
@@ -24,15 +24,19 @@ var addRemoveUtilities = {
     cy.layout({
       name: 'preset'
     });
+    return eles[0];
   },
   removeNodes: function (nodes) {
     var removedEles = nodes.connectedEdges().remove();
-    removedEles = removedEles.union(removeNodes(nodes.children()));
+    var children = nodes.children();
+    if(children != null && children.length > 0){
+      removedEles = removedEles.union(this.removeNodes(children));
+    }
     removedEles = removedEles.union(nodes.remove());
     return removedEles;
   },
   addEdge: function (source, target) {
-    cy.add({
+    var eles = cy.add({
       group: "edges",
       data: {
         source: source,
@@ -42,12 +46,14 @@ var addRemoveUtilities = {
     cy.layout({
       name: 'preset'
     });
+    
+    return eles[0];
   },
   removeEdges: function (edges) {
     return edges.remove();
   },
-  restoreNodes: function(nodes){
-    nodes.restore();
+  restoreNodes: function(eles){
+    eles.restore();
   },
   restoreEdges: function(edges){
     edges.restore();

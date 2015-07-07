@@ -281,6 +281,14 @@ $(document).ready(function () {
 
     sbgnLayoutProp.applyIncrementalLayout();
   });
+  
+  $("#undo-last-action").click(function (e) {
+    editorActionsManager.undo();
+  });
+  
+  $("#redo-last-action").click(function (e) {
+    editorActionsManager.redo();
+  });
 
   $("#save-as-png").click(function (evt) {
     var pngContent = cy.png({scale: 3, full: true});
