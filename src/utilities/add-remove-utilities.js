@@ -40,7 +40,8 @@ var addRemoveUtilities = {
       group: "edges",
       data: {
         source: source,
-        target: target
+        target: target,
+        sbgnclass: "logic arc"//this will be read as parameter
       }
     });
     cy.layout({

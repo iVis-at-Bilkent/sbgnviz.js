@@ -6,6 +6,15 @@ var setFileContent = function (fileName) {
   span.appendChild(document.createTextNode(fileName));
 }
 
+$(document).keydown(function(e) { 
+    if (e.which === 90 && e.ctrlKey) { 
+        alert('control + z'); 
+    } 
+    if (e.which === 90 && e.ctrlKey && e.shiftKey) { 
+        alert('control + shift + z'); 
+    } 
+});
+
 $(document).ready(function () {
   var xmlObject = loadXMLDoc('samples/activated_stat1alpha_induction_of_the_irf1_gene.xml');
 
@@ -253,6 +262,32 @@ $(document).ready(function () {
   $("#add-node").click(function (e) {
     sbgnAddNodeProp.render();
   });
+  
+  $("#delete-selected-nodes").click(function (e) {
+    var selectedNodes = cy.$("node:selected");
+    editorActionsManager._do(new RemoveNodesCommand(selectedNodes));
+    refreshUndoRedoButtonsStatus();
+  });
+  
+  $("#add-edge").click(function (e) {
+    var selectedNodes = cy.$("node:selected");
+    if(selectedNodes.length != 2){
+      alert("Exactly 2 nodes should be selected!!!");
+      return;
+    }
+    var newEdge = {
+      source: selectedNodes[0].id(),
+      target: selectedNodes[1].id()
+    };
+    editorActionsManager._do(new AddEdgeCommand(newEdge));
+    refreshUndoRedoButtonsStatus();
+  });
+  
+  $("#delete-selected-edges").click(function (e) {
+    var selectedEdges = cy.$("edge:selected");
+    editorActionsManager._do(new RemoveEdgesCommand(selectedEdges));
+    refreshUndoRedoButtonsStatus();
+  });
 
   $("#sbgn-properties").click(function (e) {
     sbgnProperties.render();
@@ -284,10 +319,12 @@ $(document).ready(function () {
   
   $("#undo-last-action").click(function (e) {
     editorActionsManager.undo();
+    refreshUndoRedoButtonsStatus();
   });
   
   $("#redo-last-action").click(function (e) {
     editorActionsManager.redo();
+    refreshUndoRedoButtonsStatus();
   });
 
   $("#save-as-png").click(function (evt) {

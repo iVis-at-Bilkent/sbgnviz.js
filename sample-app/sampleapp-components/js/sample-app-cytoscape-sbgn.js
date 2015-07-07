@@ -5,6 +5,22 @@ var SBGNStyleProperties = {
   'expanded-collapsed': 'expanded'
 };
 
+var refreshUndoRedoButtonsStatus = function(){
+  if(editorActionsManager.isUndoStackEmpty()){
+    $("#undo-last-action").parent("li").addClass("disabled");
+  }
+  else{
+    $("#undo-last-action").parent("li").removeClass("disabled");
+  }
+  
+  if(editorActionsManager.isRedoStackEmpty()){
+    $("#redo-last-action").parent("li").addClass("disabled");
+  }
+  else{
+    $("#redo-last-action").parent("li").removeClass("disabled");
+  }
+}
+
 var refreshPaddings = function () {
   //If compound padding is not set yet set it by css value
   if (window.compoundPadding == null) {
@@ -552,6 +568,8 @@ var AddNodeProperties = Backbone.View.extend({
 
       var newNode = _.clone(self.currentProperties);
       editorActionsManager._do(new AddNodeCommand(newNode));
+      refreshUndoRedoButtonsStatus();
+      
 //      addRemoveUtilities.addNode(self.currentProperties.content,
 //              self.currentProperties.x,
 //              self.currentProperties.y,

@@ -15,6 +15,27 @@ function removeNodes(nodesToBeDeleted)
 { 
 	return addRemoveUtilities.removeNodes(nodesToBeDeleted);
 }
+
+function restoreNodes(eles)
+{
+    return addRemoveUtilities.restoreNodes(eles);
+}
+
+function addEdge(newEdge) 
+{
+	return addRemoveUtilities.addEdge(newEdge.source, newEdge.target); 
+}
+
+function removeEdges(edgesToBeDeleted) 
+{ 
+	return addRemoveUtilities.removeEdges(edgesToBeDeleted);
+}
+
+function restoreEdges(edges)
+{
+    return addRemoveUtilities.restoreEdges(edges);
+}
+
  
  /*
   *	Base command class
@@ -35,7 +56,17 @@ var AddNodeCommand = function (newNode)
 
 var RemoveNodesCommand = function (nodesTobeDeleted) 
 {
-	return new Command(removeNodes, addNode, nodeTobeDeleted);
+	return new Command(removeNodes, restoreNodes, nodesTobeDeleted);
+};
+
+var AddEdgeCommand = function (newEdge) 
+{
+	return new Command(addEdge, removeEdges, newEdge);
+};
+
+var RemoveEdgesCommand = function (edgesTobeDeleted) 
+{
+	return new Command(removeEdges, restoreEdges, edgesTobeDeleted);
 };
 
  /**
