@@ -242,6 +242,9 @@ var SBGNContainer = Backbone.View.extend({
         refreshPaddings();
         expandCollapseUtilities.initCollapsedNodes();
 
+        editorActionsManager.reset();
+        refreshUndoRedoButtonsStatus();
+
         var panProps = ({
           fitPadding: 10,
         });

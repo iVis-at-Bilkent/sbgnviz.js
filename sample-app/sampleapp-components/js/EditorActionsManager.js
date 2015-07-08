@@ -40,8 +40,34 @@ function expandNode(node) {
   return expandCollapseUtilities.expandNode(node);
 }
 
-function collapseNode(node){
+function collapseNode(node) {
   return expandCollapseUtilities.collapseNode(node);
+}
+
+function performLayoutFunction(nodesData) {
+  return returnToPositionsAndSizes(nodesData);
+}
+
+function returnToPositionsAndSizes(nodesData) {
+  var currentPositionsAndSizes = {};
+  cy.nodes().positions(function (i, ele) {
+    currentPositionsAndSizes[ele.id()] = {
+      width: ele.width(),
+      height: ele.height(),
+      x: ele.position("x"),
+      y: ele.position("y")
+    };
+    var data = nodesData[ele.id()];
+    ele._private.data.width = data.width;
+    ele._private.data.height = data.height;
+    return {
+      x: data.x,
+      y: data.y
+    };
+  });
+  
+  cy.fit(10);
+  return currentPositionsAndSizes;
 }
 /*
  *	Base command class
@@ -75,12 +101,16 @@ var RemoveEdgesCommand = function (edgesTobeDeleted)
   return new Command(removeEdges, restoreEdges, edgesTobeDeleted);
 };
 
-var ExpandNodeCommand = function (node){
+var ExpandNodeCommand = function (node) {
   return new Command(expandNode, collapseNode, node);
 };
 
-var CollapseNodeCommand = function (node){
+var CollapseNodeCommand = function (node) {
   return new Command(collapseNode, expandNode, node);
+};
+
+var PerformLayoutCommand = function (nodesData) {
+  return new Command(performLayoutFunction, returnToPositionsAndSizes, nodesData);
 };
 
 /**
@@ -112,7 +142,10 @@ function EditorActionsManager()
       return;
     }
     var lastCommand = this.undoStack.pop();
-    lastCommand.undo(lastCommand.undoparams);
+    var result = lastCommand.undo(lastCommand.undoparams);
+    if(result != null){
+      lastCommand.params = result;
+    }
     this.redoStack.push(lastCommand);
   };
 
