@@ -8,10 +8,12 @@ var setFileContent = function (fileName) {
 
 $(document).keydown(function(e) { 
     if (e.which === 90 && e.ctrlKey) { 
-        alert('control + z'); 
+        editorActionsManager.undo();
+        refreshUndoRedoButtonsStatus()
     } 
-    if (e.which === 90 && e.ctrlKey && e.shiftKey) { 
-        alert('control + shift + z'); 
+    if (e.which === 89 && e.ctrlKey) { 
+        editorActionsManager.redo();
+        refreshUndoRedoButtonsStatus()
     } 
 });
 
