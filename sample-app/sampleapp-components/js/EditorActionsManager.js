@@ -69,6 +69,41 @@ function returnToPositionsAndSizes(nodesData) {
   cy.fit(10);
   return currentPositionsAndSizes;
 }
+
+function moveNodeConditionally(param){
+  if(param.move){
+    moveNode(param.positionDiff, param.node);
+  }
+  return param;
+}
+
+function moveNodeReversely(param){
+  var diff = {
+    x: -1 * param.positionDiff.x,
+    y: -1 * param.positionDiff.y
+  }
+  var result = {
+    positionDiff: param.positionDiff,
+    node: param.node,
+    move: true
+  };
+  moveNode(diff, param.node);
+  return result;
+}
+
+function moveNode(positionDiff, node){
+  var oldX = node.position("x");
+  var oldY = node.position("y");
+  node.position({
+    x: oldX + positionDiff.x,
+    y: oldY + positionDiff.y
+  });
+  var children = node.children();
+  for(var i = 0; i < children.length; i++){
+    var child = children[i];
+    moveNode(positionDiff ,child);
+  }
+}
 /*
  *	Base command class
  * do: reference to the function that performs actual action for this command.
@@ -113,6 +148,10 @@ var PerformLayoutCommand = function (nodesData) {
   return new Command(performLayoutFunction, returnToPositionsAndSizes, nodesData);
 };
 
+var MoveNodeCommand = function (param) {
+  return new Command(moveNodeConditionally, moveNodeReversely, param);
+};
+
 /**
  *  Description: A simple action manager that acts also as a undo-redo manager regarding Command Design Pattern
  *	Author: Istemi Bahceci<istemi.bahceci@gmail.com>
@@ -128,6 +167,7 @@ function EditorActionsManager()
    */
   this._do = function (command)
   {
+    //_do function returns the parameters for undo function
     command.undoparams = command._do(command.params);
     this.undoStack.push(command);
   };
@@ -143,6 +183,7 @@ function EditorActionsManager()
     }
     var lastCommand = this.undoStack.pop();
     var result = lastCommand.undo(lastCommand.undoparams);
+    //If undo function returns something then do function params should be refreshed
     if(result != null){
       lastCommand.params = result;
     }

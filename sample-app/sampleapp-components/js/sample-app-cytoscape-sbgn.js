@@ -5,18 +5,18 @@ var SBGNStyleProperties = {
   'expanded-collapsed': 'expanded'
 };
 
-var refreshUndoRedoButtonsStatus = function(){
-  if(editorActionsManager.isUndoStackEmpty()){
+var refreshUndoRedoButtonsStatus = function () {
+  if (editorActionsManager.isUndoStackEmpty()) {
     $("#undo-last-action").parent("li").addClass("disabled");
   }
-  else{
+  else {
     $("#undo-last-action").parent("li").removeClass("disabled");
   }
-  
-  if(editorActionsManager.isRedoStackEmpty()){
+
+  if (editorActionsManager.isRedoStackEmpty()) {
     $("#redo-last-action").parent("li").addClass("disabled");
   }
-  else{
+  else {
     $("#redo-last-action").parent("li").removeClass("disabled");
   }
 }
@@ -249,6 +249,32 @@ var SBGNContainer = Backbone.View.extend({
           fitPadding: 10,
         });
         container.cytoscapePanzoom(panProps);
+
+        cy.on("mousedown", "node", function () {
+          this.lastMouseDownPosition = {
+            x: this.position("x"),
+            y: this.position("y")
+          }
+        });
+
+        cy.on("mouseup", "node", function () {
+          var mouseUpPosition = {
+            x: this.position("x"),
+            y: this.position("y")
+          };
+          if(mouseUpPosition != this.lastMouseDownPosition){
+            var positionDiff = {
+              x: mouseUpPosition.x - this.lastMouseDownPosition.x,
+              y: mouseUpPosition.y - this.lastMouseDownPosition.y
+            };
+            var param = {
+              positionDiff: positionDiff,
+              node: this,
+              move: false
+            };
+            editorActionsManager._do(new MoveNodeCommand(param));
+          }
+        });
 
         cy.on('mouseover', 'node', function (event) {
           var node = this;
@@ -574,7 +600,7 @@ var AddNodeProperties = Backbone.View.extend({
       var newNode = _.clone(self.currentProperties);
       editorActionsManager._do(new AddNodeCommand(newNode));
       refreshUndoRedoButtonsStatus();
-      
+
 //      addRemoveUtilities.addNode(self.currentProperties.content,
 //              self.currentProperties.x,
 //              self.currentProperties.y,
