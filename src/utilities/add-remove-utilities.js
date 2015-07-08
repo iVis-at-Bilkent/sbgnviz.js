@@ -32,7 +32,9 @@ var addRemoveUtilities = {
     if(children != null && children.length > 0){
       removedEles = removedEles.union(this.removeNodes(children));
     }
+    var parents = nodes.parents();
     removedEles = removedEles.union(nodes.remove());
+    cy.nodes().updateCompoundBounds();
     return removedEles;
   },
   addEdge: function (source, target) {
