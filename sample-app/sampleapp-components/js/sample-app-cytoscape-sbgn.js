@@ -367,10 +367,12 @@ var SBGNContainer = Backbone.View.extend({
                   && cyPosY <= node._private.data.expandcollapseEndY) {
             var expandedOrcollapsed = this.css('expanded-collapsed');
             if (expandedOrcollapsed == 'expanded') {
-              expandCollapseUtilities.collapseNode(this);
+//              expandCollapseUtilities.collapseNode(this);
+              editorActionsManager._do(new CollapseNodeCommand(this));
             }
             else {
-              expandCollapseUtilities.expandNode(this);
+              editorActionsManager._do(new ExpandNodeCommand(this));
+//              expandCollapseUtilities.expandNode(this);
             }
           }
 

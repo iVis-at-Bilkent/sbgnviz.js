@@ -34,6 +34,8 @@ var expandCollapseUtilities = {
       node.css("height", node._private.data.oldHeight);
       cy.nodes().updateCompoundBounds();
       $("#perform-incremental-layout").trigger("click");
+      //return the node to undo the operation
+      return node;
     }
   },
   collapseNode: function (node) {
@@ -48,6 +50,8 @@ var expandCollapseUtilities = {
     this.removeChildren(node, node);
     node.css('width', 75);
     node.css('height', 75);
+    //return the node to undo the operation
+    return node;
   },
   removeChildren: function (node, root) {
     var children = node.children();

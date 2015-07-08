@@ -6,12 +6,13 @@ var setFileContent = function (fileName) {
   span.appendChild(document.createTextNode(fileName));
 }
 
+//Handle keyboard events
 $(document).keydown(function(e) { 
     if (e.which === 90 && e.ctrlKey) { 
         editorActionsManager.undo();
         refreshUndoRedoButtonsStatus()
     } 
-    if (e.which === 89 && e.ctrlKey) { 
+    else if (e.which === 89 && e.ctrlKey) { 
         editorActionsManager.redo();
         refreshUndoRedoButtonsStatus()
     } 
