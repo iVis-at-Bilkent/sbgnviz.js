@@ -273,6 +273,7 @@ var SBGNContainer = Backbone.View.extend({
               move: false
             };
             editorActionsManager._do(new MoveNodeCommand(param));
+            refreshUndoRedoButtonsStatus();
           }
         });
 
