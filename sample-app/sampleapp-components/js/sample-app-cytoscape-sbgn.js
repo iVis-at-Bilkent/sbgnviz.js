@@ -262,7 +262,8 @@ var SBGNContainer = Backbone.View.extend({
             x: this.position("x"),
             y: this.position("y")
           };
-          if(mouseUpPosition != this.lastMouseDownPosition){
+          if(mouseUpPosition.x != this.lastMouseDownPosition.x ||
+                  mouseUpPosition.y != this.lastMouseDownPosition.y){
             var positionDiff = {
               x: mouseUpPosition.x - this.lastMouseDownPosition.x,
               y: mouseUpPosition.y - this.lastMouseDownPosition.y
