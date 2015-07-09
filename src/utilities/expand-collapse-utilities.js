@@ -21,7 +21,7 @@ var expandCollapseUtilities = {
     }
     if ((root.is("[sbgnclass='complex']") || root.is("[sbgnclass='compartment']"))
             && root.css('expanded-collapsed') == 'collapsed') {
-      this.simpleCollapseNode(root);
+      this.collapseNode(root);
     }
   },
   expandNode: function (node) {
