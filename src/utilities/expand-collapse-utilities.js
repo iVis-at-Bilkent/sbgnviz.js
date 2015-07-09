@@ -32,13 +32,34 @@ var expandCollapseUtilities = {
       node._private.data.collapsedChildren = null;
       node.css("width", node._private.data.oldWidth);
       node.css("height", node._private.data.oldHeight);
+
+      var nodesData = {};
+      var nodes = cy.nodes();
+      for (var i = 0; i < nodes.length; i++) {
+        var thenode = nodes[i];
+        nodesData[thenode.id()] = {
+          width: thenode.width(),
+          height: thenode.height(),
+          x: thenode.position("x"),
+          y: thenode.position("y")
+        };
+      }
+
       cy.nodes().updateCompoundBounds();
       $("#perform-incremental-layout").trigger("click");
       //return the node to undo the operation
-      return node;
+      var param = {
+        node: node,
+        nodesData: nodesData
+      };
+      return param;
     }
   },
   collapseNode: function (node) {
+    //If the method is called with an object parameter consider the node in the object 
+    if(node.node != null){
+      node = node.node;
+    }
     node.css('expanded-collapsed', 'collapsed');
     var children = node.children();
     for (var i = 0; i < children.length; i++) {

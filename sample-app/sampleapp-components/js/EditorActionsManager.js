@@ -44,6 +44,11 @@ function collapseNode(node) {
   return expandCollapseUtilities.collapseNode(node);
 }
 
+function undoExpandNode(param){
+  returnToPositionsAndSizes(param.nodesData);
+  return expandCollapseUtilities.collapseNode(param.node);
+}
+
 function performLayoutFunction(nodesData) {
   return returnToPositionsAndSizes(nodesData);
 }
@@ -137,7 +142,7 @@ var RemoveEdgesCommand = function (edgesTobeDeleted)
 };
 
 var ExpandNodeCommand = function (node) {
-  return new Command(expandNode, collapseNode, node);
+  return new Command(expandNode, undoExpandNode, node);
 };
 
 var CollapseNodeCommand = function (node) {
