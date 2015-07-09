@@ -21,17 +21,12 @@ var expandCollapseUtilities = {
     }
     if ((root.is("[sbgnclass='complex']") || root.is("[sbgnclass='compartment']"))
             && root.css('expanded-collapsed') == 'collapsed') {
-      this.collapseNode(root);
+      this.simpleCollapseNode(root);
     }
   },
   expandNode: function (node) {
     if (node._private.data.collapsedChildren != null) {
-      node.css('expanded-collapsed', 'expanded');
-      node._private.data.collapsedChildren.restore();
-      this.repairEdgesOfCollapsedChildren(node);
-      node._private.data.collapsedChildren = null;
-      node.css("width", node._private.data.oldWidth);
-      node.css("height", node._private.data.oldHeight);
+      this.simpleExpandNode(node);
 
       var nodesData = {};
       var nodes = cy.nodes();
@@ -45,21 +40,43 @@ var expandCollapseUtilities = {
         };
       }
 
-      cy.nodes().updateCompoundBounds();
       $("#perform-incremental-layout").trigger("click");
-      //return the node to undo the operation
+
       var param = {
         node: node,
         nodesData: nodesData
       };
+
+      /*
+       * return the param to undo the operation,
+       * param.node is needed to collapse the node back,
+       * param.nodesData is needed to back the incremental 
+       * layout before collapsing the node 
+       */
       return param;
     }
   },
-  collapseNode: function (node) {
-    //If the method is called with an object parameter consider the node in the object 
-    if(node.node != null){
-      node = node.node;
+  /*
+   * This method expands the given node
+   * without making incremental layout
+   * after expand operation it will be simply
+   * used to undo the collapse operation
+   */
+  simpleExpandNode: function (node) {
+    if (node._private.data.collapsedChildren != null) {
+      node.css('expanded-collapsed', 'expanded');
+      node._private.data.collapsedChildren.restore();
+      this.repairEdgesOfCollapsedChildren(node);
+      node._private.data.collapsedChildren = null;
+      node.css("width", node._private.data.oldWidth);
+      node.css("height", node._private.data.oldHeight);
+
+      cy.nodes().updateCompoundBounds();
+      //return the node to undo the operation
+      return node;
     }
+  },
+  collapseNode: function (node) {
     node.css('expanded-collapsed', 'collapsed');
     var children = node.children();
     for (var i = 0; i < children.length; i++) {

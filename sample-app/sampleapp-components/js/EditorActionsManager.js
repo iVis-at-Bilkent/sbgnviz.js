@@ -44,9 +44,13 @@ function collapseNode(node) {
   return expandCollapseUtilities.collapseNode(node);
 }
 
-function undoExpandNode(param){
+function undoExpandNode(param) {
   returnToPositionsAndSizes(param.nodesData);
   return expandCollapseUtilities.collapseNode(param.node);
+}
+
+function undoCollapseNode(node) {
+  return expandCollapseUtilities.simpleExpandNode(node);
 }
 
 function performLayoutFunction(nodesData) {
@@ -70,19 +74,19 @@ function returnToPositionsAndSizes(nodesData) {
       y: data.y
     };
   });
-  
+
   cy.fit(10);
   return currentPositionsAndSizes;
 }
 
-function moveNodeConditionally(param){
-  if(param.move){
+function moveNodeConditionally(param) {
+  if (param.move) {
     moveNode(param.positionDiff, param.node);
   }
   return param;
 }
 
-function moveNodeReversely(param){
+function moveNodeReversely(param) {
   var diff = {
     x: -1 * param.positionDiff.x,
     y: -1 * param.positionDiff.y
@@ -96,7 +100,7 @@ function moveNodeReversely(param){
   return result;
 }
 
-function moveNode(positionDiff, node){
+function moveNode(positionDiff, node) {
   var oldX = node.position("x");
   var oldY = node.position("y");
   node.position({
@@ -104,9 +108,9 @@ function moveNode(positionDiff, node){
     y: oldY + positionDiff.y
   });
   var children = node.children();
-  for(var i = 0; i < children.length; i++){
+  for (var i = 0; i < children.length; i++) {
     var child = children[i];
-    moveNode(positionDiff ,child);
+    moveNode(positionDiff, child);
   }
 }
 /*
@@ -146,7 +150,7 @@ var ExpandNodeCommand = function (node) {
 };
 
 var CollapseNodeCommand = function (node) {
-  return new Command(collapseNode, expandNode, node);
+  return new Command(collapseNode, undoCollapseNode, node);
 };
 
 var PerformLayoutCommand = function (nodesData) {
@@ -189,7 +193,7 @@ function EditorActionsManager()
     var lastCommand = this.undoStack.pop();
     var result = lastCommand.undo(lastCommand.undoparams);
     //If undo function returns something then do function params should be refreshed
-    if(result != null){
+    if (result != null) {
       lastCommand.params = result;
     }
     this.redoStack.push(lastCommand);
