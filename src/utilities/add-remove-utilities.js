@@ -55,10 +55,11 @@ var addRemoveUtilities = {
   removeEdges: function (edges) {
     return edges.remove();
   },
-  restoreNodes: function(eles){
+  restoreEles: function(eles){
     eles.restore();
+    return eles;
   },
-  restoreEdges: function(edges){
-    edges.restore();
+  removeEles: function(eles){
+    return eles.remove();
   }
 };

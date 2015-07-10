@@ -9,7 +9,11 @@ var sbgnFiltering = {
         var allNodes = cy.nodes();
         var selectedNodes = cy.nodes(":selected");
         var nodesToShow = this.expandRemainingNodes(selectedNodes, allNodes);
-        allNodes.not(nodesToShow).remove();
+        var nodesNotToShow = allNodes.not(nodesToShow);
+        var connectedEdges = nodesNotToShow.connectedEdges();
+        var removedEles = connectedEdges.remove();
+        removedEles = removedEles.union(nodesNotToShow.remove());
+        return removedEles;
     },
 
     hideSelected: function(){

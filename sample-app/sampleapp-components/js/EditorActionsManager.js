@@ -16,9 +16,9 @@ function removeNodes(nodesToBeDeleted)
   return addRemoveUtilities.removeNodes(nodesToBeDeleted);
 }
 
-function restoreNodes(eles)
+function restoreEles(eles)
 {
-  return addRemoveUtilities.restoreNodes(eles);
+  return addRemoveUtilities.restoreEles(eles);
 }
 
 function addEdge(newEdge)
@@ -29,11 +29,6 @@ function addEdge(newEdge)
 function removeEdges(edgesToBeDeleted)
 {
   return addRemoveUtilities.removeEdges(edgesToBeDeleted);
-}
-
-function restoreEdges(edges)
-{
-  return addRemoveUtilities.restoreEdges(edges);
 }
 
 function expandNode(node) {
@@ -113,6 +108,21 @@ function moveNode(positionDiff, node) {
     moveNode(positionDiff, child);
   }
 }
+
+function deleteSelected(param){
+  if(param.firstTime){
+    return sbgnFiltering.deleteSelected();
+  }
+  return addRemoveUtilities.removeEles(param.eles);
+}
+
+function restoreSelected(eles){
+  var param = {};
+  param.eles = restoreEles(eles);
+  param.firstTime = false;
+  return param;
+}
+
 /*
  *	Base command class
  * do: reference to the function that performs actual action for this command.
@@ -132,7 +142,7 @@ var AddNodeCommand = function (newNode)
 
 var RemoveNodesCommand = function (nodesTobeDeleted)
 {
-  return new Command(removeNodes, restoreNodes, nodesTobeDeleted);
+  return new Command(removeNodes, restoreEles, nodesTobeDeleted);
 };
 
 var AddEdgeCommand = function (newEdge)
@@ -142,7 +152,7 @@ var AddEdgeCommand = function (newEdge)
 
 var RemoveEdgesCommand = function (edgesTobeDeleted)
 {
-  return new Command(removeEdges, restoreEdges, edgesTobeDeleted);
+  return new Command(removeEdges, restoreEles, edgesTobeDeleted);
 };
 
 var ExpandNodeCommand = function (node) {
@@ -159,6 +169,10 @@ var PerformLayoutCommand = function (nodesData) {
 
 var MoveNodeCommand = function (param) {
   return new Command(moveNodeConditionally, moveNodeReversely, param);
+};
+
+var DeleteSelectedCommand = function (param) {
+  return new Command(deleteSelected, restoreSelected, param);
 };
 
 /**

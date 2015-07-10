@@ -243,7 +243,12 @@ $(document).ready(function () {
   });
 
   $("#delete-selected").click(function (e) {
-    sbgnFiltering.deleteSelected();
+    //sbgnFiltering.deleteSelected();
+    var param = {
+      firstTime: true
+    };
+    editorActionsManager._do(new DeleteSelectedCommand(param));
+    refreshUndoRedoButtonsStatus();
   });
 
   $("#neighbors-of-selected").click(function (e) {
