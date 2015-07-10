@@ -1,7 +1,9 @@
 var sbgnFiltering = {
 
-	notHighlightNode : {'border-opacity': 0.3, 'text-opacity' : 0.3, 'background-opacity': 0.3},
-    notHighlightEdge : {'opacity':0.3, 'text-opacity' : 0.3, 'background-opacity': 0.3},
+	notHighlightNodeProp : {'border-opacity': 0.3, 'text-opacity' : 0.3, 'background-opacity': 0.3},
+    notHighlightEdgeProp : {'opacity':0.3, 'text-opacity' : 0.3, 'background-opacity': 0.3},
+    highlightNodeProp : {'border-opacity': 1, 'text-opacity' : 1, 'background-opacity': 1},
+    highlightEdgeProp : {'opacity':1, 'text-opacity' : 1, 'background-opacity': 1},
     processTypes : ['process', 'omitted process', 'uncertain process', 
         'association', 'dissociation', 'phenotype'],
 
@@ -57,19 +59,43 @@ var sbgnFiltering = {
     },
 
     removeHighlights: function(){
-        cy.nodes(":visible").nodes("[highlighted!='true']").removeCss();
-        cy.edges(":visible").edges("[highlighted!='true']").removeCss();
+        this.highlightNodes(cy.nodes(":visible").nodes("[highlighted!='true']"));
+        this.highlightEdges(cy.edges(":visible").edges("[highlighted!='true']"));
         cy.nodes(":visible").nodes().removeData("highlighted");
         cy.edges(":visible").edges().removeData("highlighted");
     },
 
     highlightGraph: function(nodes, edges){
-        cy.nodes(":visible").nodes("[highlighted!='true']").css(this.notHighlightNode);
-        cy.edges(":visible").edges("[highlighted!='true']").css(this.notHighlightEdge);
-        cy.nodes(":visible").nodes("[highlighted='true']").removeCss();
-        cy.edges(":visible").edges("[highlighted='true']").removeCss();
+        this.notHighlightNodes(cy.nodes(":visible").nodes("[highlighted!='true']"));
+        this.notHighlightEdges(cy.edges(":visible").edges("[highlighted!='true']"));
+        this.highlightNodes(cy.nodes(":visible").nodes("[highlighted='true']"));
+        this.highlightEdges(cy.edges(":visible").edges("[highlighted='true']"));
         // cy.nodes("[highlighted=true]").not(nodes).css(this.notHighlightNode);
         // cy.edges().not(edges).css(this.notHighlightEdge);
+    },
+    
+    highlightNodes: function(nodes){
+        for(var prop in this.highlightNodeProp){
+          nodes.css(prop, this.highlightNodeProp[prop]);
+        }
+    },
+    
+    notHighlightNodes: function(nodes){
+        for(var prop in this.notHighlightNodeProp){
+          nodes.css(prop, this.notHighlightNodeProp[prop]);
+        }
+    },
+    
+    highlightEdges: function(edges){
+        for(var prop in this.highlightEdgeProp){
+          edges.css(prop, this.highlightEdgeProp[prop]);
+        }
+    },
+    
+    notHighlightEdges: function(edges){
+        for(var prop in this.notHighlightEdgeProp){
+          edges.css(prop, this.notHighlightEdgeProp[prop]);
+        }
     },
 
     expandNodes: function(nodesToShow){
