@@ -123,6 +123,25 @@ function restoreSelected(eles){
   return param;
 }
 
+function hideSelected(param){
+  var currentNodes = cy.nodes(":visible");
+  if(param.firstTime){
+    sbgnFiltering.hideSelected();
+  }
+  else{
+    sbgnFiltering.showJustGivenNodes(param.nodesToShow);
+  }
+  return currentNodes;
+}
+
+function showJustGivenNodes(nodesToShow){
+  var param = {};
+  param.nodesToShow = cy.nodes(":visible");
+  param.firstTime = false;
+  sbgnFiltering.showJustGivenNodes(nodesToShow);
+  return param;
+}
+
 /*
  *	Base command class
  * do: reference to the function that performs actual action for this command.
@@ -173,6 +192,10 @@ var MoveNodeCommand = function (param) {
 
 var DeleteSelectedCommand = function (param) {
   return new Command(deleteSelected, restoreSelected, param);
+};
+
+var HideSelectedCommand = function (param) {
+  return new Command(hideSelected, showJustGivenNodes, param);
 };
 
 /**

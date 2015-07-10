@@ -231,7 +231,11 @@ $(document).ready(function () {
   });
 
   $("#hide-selected").click(function (e) {
-    sbgnFiltering.hideSelected();
+//    sbgnFiltering.hideSelected();
+    var param = {};
+    param.firstTime = true;
+    editorActionsManager._do(new HideSelectedCommand(param));
+    refreshUndoRedoButtonsStatus();
   });
 
   $("#show-selected").click(function (e) {

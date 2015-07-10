@@ -123,5 +123,15 @@ var sbgnFiltering = {
 
     removeFilter: function(){
         cy.elements().css('visibility', 'visible');
+    },
+    
+    removeFilterOfGivenNodes: function(nodes){
+        nodes.css('visibility', 'visible');
+    },
+    
+    showJustGivenNodes:  function(nodes){
+        var visibleNodes = cy.nodes(":visible");
+        this.applyFilter(visibleNodes);
+        this.removeFilterOfGivenNodes(nodes);
     }
 };
