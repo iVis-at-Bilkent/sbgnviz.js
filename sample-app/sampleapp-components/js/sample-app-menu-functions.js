@@ -239,11 +239,17 @@ $(document).ready(function () {
   });
 
   $("#show-selected").click(function (e) {
-    sbgnFiltering.showSelected();
+//    sbgnFiltering.showSelected();
+    var param = {};
+    param.firstTime = true;
+    editorActionsManager._do(new ShowSelectedCommand(param));
+    refreshUndoRedoButtonsStatus();
   });
 
   $("#show-all").click(function (e) {
-    sbgnFiltering.showAll();
+//    sbgnFiltering.showAll();
+    editorActionsManager._do(new ShowAllCommand());
+    refreshUndoRedoButtonsStatus();
   });
 
   $("#delete-selected").click(function (e) {

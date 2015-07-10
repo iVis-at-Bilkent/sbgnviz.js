@@ -134,6 +134,23 @@ function hideSelected(param){
   return currentNodes;
 }
 
+function showSelected(param){
+  var currentNodes = cy.nodes(":visible");
+  if(param.firstTime){
+    sbgnFiltering.showSelected();
+  }
+  else{
+    sbgnFiltering.showJustGivenNodes(param.nodesToShow);
+  }
+  return currentNodes;
+}
+
+function showAll(){
+  var currentNodes = cy.nodes(":visible");
+  sbgnFiltering.showAll();
+  return currentNodes;
+}
+
 function showJustGivenNodes(nodesToShow){
   var param = {};
   param.nodesToShow = cy.nodes(":visible");
@@ -196,6 +213,14 @@ var DeleteSelectedCommand = function (param) {
 
 var HideSelectedCommand = function (param) {
   return new Command(hideSelected, showJustGivenNodes, param);
+};
+
+var ShowSelectedCommand = function (param) {
+  return new Command(showSelected, showJustGivenNodes, param);
+};
+
+var ShowAllCommand = function () {
+  return new Command(showAll, showJustGivenNodes);
 };
 
 /**
