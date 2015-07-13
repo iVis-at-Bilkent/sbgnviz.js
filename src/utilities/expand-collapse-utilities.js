@@ -7,6 +7,7 @@ var expandCollapseUtilities = {
       this.collapseBottomUp(root);
     }
   },
+  
   //collapse the nodes in bottom up order 
   collapseBottomUp: function (root) {
     var children = root.children();
@@ -24,6 +25,8 @@ var expandCollapseUtilities = {
       this.collapseNode(root);
     }
   },
+  
+  //Expand the given node perform incremental layout after expandation
   expandNode: function (node) {
     if (node._private.data.collapsedChildren != null) {
       this.simpleExpandNode(node);
@@ -57,6 +60,7 @@ var expandCollapseUtilities = {
     }
   },
   /*
+   * 
    * This method expands the given node
    * without making incremental layout
    * after expand operation it will be simply
@@ -76,6 +80,8 @@ var expandCollapseUtilities = {
       return node;
     }
   },
+  
+  //collapse the given node
   collapseNode: function (node) {
     node.css('expanded-collapsed', 'collapsed');
     var children = node.children();
@@ -91,6 +97,15 @@ var expandCollapseUtilities = {
     //return the node to undo the operation
     return node;
   },
+  
+  /*
+   * for all children of the node parameter call this method
+   * with the same root parameter,
+   * remove the child and add the removed child to the collapsedchildren data
+   * of the root to restore them in the case of expandation
+   * root._private.data.collapsedChildren keeps the nodes to restore when the
+   * root is expanded
+   */
   removeChildren: function (node, root) {
     var children = node.children();
     for (var i = 0; i < children.length; i++) {
@@ -105,6 +120,12 @@ var expandCollapseUtilities = {
       }
     }
   },
+  
+  /*
+   * This method let the root parameter to barrow the edges connected to the
+   * child node or any node inside child node if the any one the source and target
+   * is an outer node of the root node in other word it create meta edges
+   */
   barrowEdgesOfcollapsedChildren: function (root, childNode) {
     var children = childNode.children();
     for (var i = 0; i < children.length; i++) {
@@ -154,6 +175,12 @@ var expandCollapseUtilities = {
       cy.add(newEdge);
     }
   },
+  
+  /*
+   * This method repairs the edges of the collapsed children of the given node
+   * when the node is being expanded, the meta edges created while the node is 
+   * being collapsed are also handled in this method
+   */
   repairEdgesOfCollapsedChildren: function (node) {
     var edgesOfcollapsedChildren = node._private.data.edgesOfcollapsedChildren;
     if (edgesOfcollapsedChildren == null) {
@@ -167,6 +194,7 @@ var expandCollapseUtilities = {
     edgesOfcollapsedChildren.restore();
     node._private.data.edgesOfcollapsedChildren = null;
   },
+  
   /*node is an outer node of root 
    if root is not it's anchestor 
    and it is not the root itself*/
@@ -180,6 +208,11 @@ var expandCollapseUtilities = {
     }
     return true;
   },
+  
+  /*
+   * This method is to handle the collapsed elements while the 
+   * dynamic paddings are being calculated
+   */
   getCollapsedChildrenData: function (collapsedChildren, numOfSimples, total) {
     for (var i = 0; i < collapsedChildren; i++) {
       var collapsedChild = collapsedChildren[i];
