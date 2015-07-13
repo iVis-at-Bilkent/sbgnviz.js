@@ -159,7 +159,7 @@ function showJustGivenNodes(nodesToShow) {
   return param;
 }
 
-function highlightNeighborsofSelected(param) {
+function highlightSelected(param) {
   var elementsToHighlight;
   var result = {};
   //If this is the first call of the function then call the original method
@@ -168,10 +168,17 @@ function highlightNeighborsofSelected(param) {
       //mark that there was no highlighted element
       result.allElementsWasNotHighlighted = true;
     }
-    elementsToHighlight = sbgnFiltering.highlightNeighborsofSelected();
+    var alreadyHighlighted = cy.elements("[highlighted='true']");
+    if(param.highlightNeighboursofSelected){
+      elementsToHighlight = sbgnFiltering.highlightNeighborsofSelected();
+    }
+    else if(param.highlightProcessesOfSelected){
+      elementsToHighlight = sbgnFiltering.highlightProcessesOfSelected();
+    }
+    elementsToHighlight = elementsToHighlight.not(alreadyHighlighted);
   }
   else {
-    elementsToHighlight = param.elesToHighlight;
+    elementsToHighlight = param.elesToHighlight.not(cy.elements("[highlighted='true']"));
     elementsToHighlight.data("highlighted", 'true');
     sbgnFiltering.highlightNodes(elementsToHighlight.nodes());
     sbgnFiltering.highlightEdges(elementsToHighlight.edges());
@@ -279,8 +286,15 @@ var ShowAllCommand = function () {
 };
 
 var HighlightNeighborsofSelectedCommand = function (param) {
-  return new Command(highlightNeighborsofSelected, notHighlightEles, param);
+  param.highlightNeighboursofSelected = true;
+  return new Command(highlightSelected, notHighlightEles, param);
 };
+
+var HighlightProcessesOfSelectedCommand = function (param) {
+  param.highlightProcessesOfSelected = true;
+  return new Command(highlightSelected, notHighlightEles, param);
+};
+
 /**
  *  Description: A simple action manager that acts also as a undo-redo manager regarding Command Design Pattern
  *	Author: Istemi Bahceci<istemi.bahceci@gmail.com>

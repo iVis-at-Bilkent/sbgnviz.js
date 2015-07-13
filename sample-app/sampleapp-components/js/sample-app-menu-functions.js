@@ -7,15 +7,15 @@ var setFileContent = function (fileName) {
 }
 
 //Handle keyboard events
-$(document).keydown(function(e) { 
-    if (e.which === 90 && e.ctrlKey) { 
-        editorActionsManager.undo();
-        refreshUndoRedoButtonsStatus()
-    } 
-    else if (e.which === 89 && e.ctrlKey) { 
-        editorActionsManager.redo();
-        refreshUndoRedoButtonsStatus()
-    } 
+$(document).keydown(function (e) {
+  if (e.which === 90 && e.ctrlKey) {
+    editorActionsManager.undo();
+    refreshUndoRedoButtonsStatus()
+  }
+  else if (e.which === 89 && e.ctrlKey) {
+    editorActionsManager.redo();
+    refreshUndoRedoButtonsStatus()
+  }
 });
 
 $(document).ready(function () {
@@ -35,7 +35,7 @@ $(document).ready(function () {
   var sbgnProperties = new SBGNProperties({
     el: '#sbgn-properties-table'
   });
-  
+
   var sbgnAddNodeProp = new AddNodeProperties({
     el: '#sbgn-add-node-table'
   });
@@ -156,37 +156,37 @@ $(document).ready(function () {
 
   $("#load-sample4").click(function (e) {
     var xmlObject = loadXMLDoc('samples/polyq_proteins_interference.xml');
-    
-	$("#quick-help").click(function(e){
-		e.preventDefault();
-		$.fancybox(
-			_.template($("#quick-help-template").html(), {}),
-			{
-				'autoDimensions' : false,
-				'width' : 420,
-				'height' : "auto",
-				'transitionIn' : 'none',
-				'transitionOut' : 'none'
-			});
-	});
 
-	$("#how-to-use").click(function(e) {
-		var url = "http://www.cs.bilkent.edu.tr/~ivis/sbgnviz-js/SBGNViz.js-1.x.UG.pdf";
-		var win = window.open(url, '_blank');
-		win.focus();
-	});
+    $("#quick-help").click(function (e) {
+      e.preventDefault();
+      $.fancybox(
+              _.template($("#quick-help-template").html(), {}),
+              {
+                'autoDimensions': false,
+                'width': 420,
+                'height': "auto",
+                'transitionIn': 'none',
+                'transitionOut': 'none'
+              });
+    });
 
-    $("#about").click(function(e){
-        e.preventDefault();
-        $.fancybox(
-        _.template($("#about-template").html(), {}),
-        {
-            'autoDimensions' : false,
-            'width' : 300,
-            'height' : 320,
-            'transitionIn' : 'none',
-            'transitionOut' : 'none',
-        });
+    $("#how-to-use").click(function (e) {
+      var url = "http://www.cs.bilkent.edu.tr/~ivis/sbgnviz-js/SBGNViz.js-1.x.UG.pdf";
+      var win = window.open(url, '_blank');
+      win.focus();
+    });
+
+    $("#about").click(function (e) {
+      e.preventDefault();
+      $.fancybox(
+              _.template($("#about-template").html(), {}),
+              {
+                'autoDimensions': false,
+                'width': 300,
+                'height': 320,
+                'transitionIn': 'none',
+                'transitionOut': 'none',
+              });
     });
 
     setFileContent("polyq_proteins_interference.sbgnml");
@@ -271,7 +271,12 @@ $(document).ready(function () {
   });
 
   $("#processes-of-selected").click(function (e) {
-    sbgnFiltering.highlightProcessesOfSelected();
+//    sbgnFiltering.highlightProcessesOfSelected();
+    var param = {
+      firstTime: true
+    };
+    editorActionsManager._do(new HighlightProcessesOfSelectedCommand(param));
+    refreshUndoRedoButtonsStatus();
   });
 
   $("#remove-highlights").click(function (e) {
@@ -281,20 +286,20 @@ $(document).ready(function () {
   $("#layout-properties").click(function (e) {
     sbgnLayoutProp.render();
   });
-  
+
   $("#add-node").click(function (e) {
     sbgnAddNodeProp.render();
   });
-  
+
   $("#delete-selected-nodes").click(function (e) {
     var selectedNodes = cy.$("node:selected");
     editorActionsManager._do(new RemoveNodesCommand(selectedNodes));
     refreshUndoRedoButtonsStatus();
   });
-  
+
   $("#add-edge").click(function (e) {
     var selectedNodes = cy.$("node:selected");
-    if(selectedNodes.length != 2){
+    if (selectedNodes.length != 2) {
       alert("Exactly 2 nodes should be selected!!!");
       return;
     }
@@ -305,7 +310,7 @@ $(document).ready(function () {
     editorActionsManager._do(new AddEdgeCommand(newEdge));
     refreshUndoRedoButtonsStatus();
   });
-  
+
   $("#delete-selected-edges").click(function (e) {
     var selectedEdges = cy.$("edge:selected");
     editorActionsManager._do(new RemoveEdgesCommand(selectedEdges));
@@ -319,7 +324,7 @@ $(document).ready(function () {
   $("#perform-layout").click(function (e) {
     var nodesData = {};
     var nodes = cy.nodes();
-    for(var i = 0; i < nodes.length; i++){
+    for (var i = 0; i < nodes.length; i++) {
       var node = nodes[i];
       nodesData[node.id()] = {
         width: node.width(),
@@ -328,7 +333,7 @@ $(document).ready(function () {
         y: node.position("y")
       };
     }
-    
+
     cy.nodes().removeData("ports");
     cy.edges().removeData("portsource");
     cy.edges().removeData("porttarget");
@@ -339,10 +344,10 @@ $(document).ready(function () {
 
     sbgnLayoutProp.applyLayout();
     editorActionsManager._do(new PerformLayoutCommand(nodesData));
-    
+
     refreshUndoRedoButtonsStatus();
   });
-  
+
   $("#perform-incremental-layout").click(function (e) {
     cy.nodes().removeData("ports");
     cy.edges().removeData("portsource");
@@ -354,12 +359,12 @@ $(document).ready(function () {
 
     sbgnLayoutProp.applyIncrementalLayout();
   });
-  
+
   $("#undo-last-action").click(function (e) {
     editorActionsManager.undo();
     refreshUndoRedoButtonsStatus();
   });
-  
+
   $("#redo-last-action").click(function (e) {
     editorActionsManager.redo();
     refreshUndoRedoButtonsStatus();
