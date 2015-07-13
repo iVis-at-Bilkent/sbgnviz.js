@@ -49,6 +49,7 @@ var sbgnFiltering = {
         nodesToHighlight = nodesToHighlight.add(nodesToHighlight.descendants());
         nodesToHighlight.data("highlighted", 'true');
         this.highlightGraph(nodesToHighlight.nodes(), nodesToHighlight.edges());
+        return nodesToHighlight;
     },
 
     highlightProcessesOfSelected: function(){
@@ -56,6 +57,7 @@ var sbgnFiltering = {
         selectedEles = this.expandNodes(selectedEles);
         selectedEles.data("highlighted", 'true');
         this.highlightGraph(selectedEles.nodes(), selectedEles.edges());
+        return selectedEles;
     },
 
     removeHighlights: function(){
@@ -96,6 +98,12 @@ var sbgnFiltering = {
         for(var prop in this.notHighlightEdgeProp){
           edges.css(prop, this.notHighlightEdgeProp[prop]);
         }
+    },
+    
+    isAllElementsAreNotHighlighted: function(){
+        var highlightedNodes = cy.nodes(":visible").nodes("[highlighted='true']");
+        var highlightedEdges = cy.edges(":visible").edges("[highlighted='true']");
+        return highlightedNodes.length + highlightedEdges.length == 0;
     },
 
     expandNodes: function(nodesToShow){

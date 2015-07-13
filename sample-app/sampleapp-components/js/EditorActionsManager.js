@@ -109,54 +109,109 @@ function moveNode(positionDiff, node) {
   }
 }
 
-function deleteSelected(param){
-  if(param.firstTime){
+function deleteSelected(param) {
+  if (param.firstTime) {
     return sbgnFiltering.deleteSelected();
   }
   return addRemoveUtilities.removeEles(param.eles);
 }
 
-function restoreSelected(eles){
+function restoreSelected(eles) {
   var param = {};
   param.eles = restoreEles(eles);
   param.firstTime = false;
   return param;
 }
 
-function hideSelected(param){
+function hideSelected(param) {
   var currentNodes = cy.nodes(":visible");
-  if(param.firstTime){
+  if (param.firstTime) {
     sbgnFiltering.hideSelected();
   }
-  else{
+  else {
     sbgnFiltering.showJustGivenNodes(param.nodesToShow);
   }
   return currentNodes;
 }
 
-function showSelected(param){
+function showSelected(param) {
   var currentNodes = cy.nodes(":visible");
-  if(param.firstTime){
+  if (param.firstTime) {
     sbgnFiltering.showSelected();
   }
-  else{
+  else {
     sbgnFiltering.showJustGivenNodes(param.nodesToShow);
   }
   return currentNodes;
 }
 
-function showAll(){
+function showAll() {
   var currentNodes = cy.nodes(":visible");
   sbgnFiltering.showAll();
   return currentNodes;
 }
 
-function showJustGivenNodes(nodesToShow){
+function showJustGivenNodes(nodesToShow) {
   var param = {};
   param.nodesToShow = cy.nodes(":visible");
   param.firstTime = false;
   sbgnFiltering.showJustGivenNodes(nodesToShow);
   return param;
+}
+
+function highlightNeighborsofSelected(param) {
+  var elementsToHighlight;
+  var result = {};
+  //If this is the first call of the function then call the original method
+  if (param.firstTime) {
+    if (sbgnFiltering.isAllElementsAreNotHighlighted()) {
+      //mark that there was no highlighted element
+      result.allElementsWasNotHighlighted = true;
+    }
+    elementsToHighlight = sbgnFiltering.highlightNeighborsofSelected();
+  }
+  else {
+    elementsToHighlight = param.elesToHighlight;
+    elementsToHighlight.data("highlighted", 'true');
+    sbgnFiltering.highlightNodes(elementsToHighlight.nodes());
+    sbgnFiltering.highlightEdges(elementsToHighlight.edges());
+
+    //If there are some elements to not highlight handle them
+    if (param.elesToNotHighlight != null) {
+      var elesToNotHighlight = param.elesToNotHighlight;
+      elesToNotHighlight.removeData("highlighted");
+      sbgnFiltering.notHighlightNodes(elesToNotHighlight.nodes());
+      sbgnFiltering.notHighlightEdges(elesToNotHighlight.edges());
+      
+      //If there are some elements to not highlight then allElementsWasNotHighlighted should be true
+      result.allElementsWasNotHighlighted = true;
+    }
+  }
+  result.elesToNotHighlight = elementsToHighlight;
+  return result;
+}
+
+function notHighlightEles(param) {
+  var elesToNotHighlight = param.elesToNotHighlight;
+  var allElementsWasNotHighlighted = param.allElementsWasNotHighlighted;
+
+  var result = {};
+
+  if (param.allElementsWasNotHighlighted) {
+    sbgnFiltering.removeHighlights();
+    result.elesToHighlight = elesToNotHighlight;
+    result.elesToNotHighlight = cy.elements(":visible").not(elesToNotHighlight);
+  }
+  else {
+    sbgnFiltering.notHighlightNodes(elesToNotHighlight.nodes());
+    sbgnFiltering.notHighlightEdges(elesToNotHighlight.edges());
+    elesToNotHighlight.removeData("highlighted");
+
+    result.elesToHighlight = elesToNotHighlight;
+  }
+
+  result.firstTime = false;
+  return result;
 }
 
 /*
@@ -223,6 +278,9 @@ var ShowAllCommand = function () {
   return new Command(showAll, showJustGivenNodes);
 };
 
+var HighlightNeighborsofSelectedCommand = function (param) {
+  return new Command(highlightNeighborsofSelected, notHighlightEles, param);
+};
 /**
  *  Description: A simple action manager that acts also as a undo-redo manager regarding Command Design Pattern
  *	Author: Istemi Bahceci<istemi.bahceci@gmail.com>

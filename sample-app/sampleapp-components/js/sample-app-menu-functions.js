@@ -262,7 +262,12 @@ $(document).ready(function () {
   });
 
   $("#neighbors-of-selected").click(function (e) {
-    sbgnFiltering.highlightNeighborsofSelected();
+//    sbgnFiltering.highlightNeighborsofSelected();
+    var param = {
+      firstTime: true
+    };
+    editorActionsManager._do(new HighlightNeighborsofSelectedCommand(param));
+    refreshUndoRedoButtonsStatus();
   });
 
   $("#processes-of-selected").click(function (e) {
