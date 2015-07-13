@@ -168,7 +168,7 @@ function highlightSelected(param) {
       //mark that there was no highlighted element
       result.allElementsWasNotHighlighted = true;
     }
-    var alreadyHighlighted = cy.elements("[highlighted='true']");
+    var alreadyHighlighted = cy.elements("[highlighted='true']").filter(":visible");
     if(param.highlightNeighboursofSelected){
       elementsToHighlight = sbgnFiltering.highlightNeighborsofSelected();
     }
@@ -178,7 +178,7 @@ function highlightSelected(param) {
     elementsToHighlight = elementsToHighlight.not(alreadyHighlighted);
   }
   else {
-    elementsToHighlight = param.elesToHighlight.not(cy.elements("[highlighted='true']"));
+    elementsToHighlight = param.elesToHighlight.not(cy.elements("[highlighted='true']").filter(":visible"));
     elementsToHighlight.data("highlighted", 'true');
     sbgnFiltering.highlightNodes(elementsToHighlight.nodes());
     sbgnFiltering.highlightEdges(elementsToHighlight.edges());
@@ -217,6 +217,22 @@ function notHighlightEles(param) {
     result.elesToHighlight = elesToNotHighlight;
   }
 
+  result.firstTime = false;
+  return result;
+}
+
+function removeHighlights(){
+  var result = {};
+  if(sbgnFiltering.isAllElementsAreNotHighlighted()){
+    result.elesToHighlight = cy.elements(":visible");
+  }
+  else{
+    result.elesToHighlight = cy.elements("[highlighted='true']").filter(":visible");
+  }
+  
+  sbgnFiltering.removeHighlights();
+  
+  result.elesToNotHighlight = cy.elements(":visible").not(result.elesToHighlight);
   result.firstTime = false;
   return result;
 }
@@ -293,6 +309,10 @@ var HighlightNeighborsofSelectedCommand = function (param) {
 var HighlightProcessesOfSelectedCommand = function (param) {
   param.highlightProcessesOfSelected = true;
   return new Command(highlightSelected, notHighlightEles, param);
+};
+
+var RemoveHighlightsCommand = function () {
+  return new Command(removeHighlights, highlightSelected);
 };
 
 /**

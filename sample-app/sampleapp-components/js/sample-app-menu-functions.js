@@ -280,7 +280,9 @@ $(document).ready(function () {
   });
 
   $("#remove-highlights").click(function (e) {
-    sbgnFiltering.removeHighlights();
+//    sbgnFiltering.removeHighlights();
+    editorActionsManager._do(new RemoveHighlightsCommand());
+    refreshUndoRedoButtonsStatus();
   });
 
   $("#layout-properties").click(function (e) {
