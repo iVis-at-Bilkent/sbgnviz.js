@@ -544,32 +544,6 @@ var SBGNProperties = Backbone.View.extend({
   copyProperties: function () {
     this.currentSBGNProperties = _.clone(this.defaultSBGNProperties);
   },
-  copyGivenProperties: function (properties) {
-    for (var prop in properties) {
-      this.currentSBGNProperties[prop] = properties[prop];
-    }
-  },
-  saveSBGN: function () {
-    var self = this;
-    //Refresh paddings if needed
-    if (compoundPadding != self.currentSBGNProperties.compoundPadding) {
-      compoundPadding = self.currentSBGNProperties.compoundPadding;
-      refreshPaddings();
-    }
-    //Refresh label size if needed
-    if (dynamicLabelSize != self.currentSBGNProperties.dynamicLabelSize) {
-      dynamicLabelSize = self.currentSBGNProperties.dynamicLabelSize;
-      cy.forceRender();
-    }
-    //Refresh truncations if needed
-    if (fitLabelsToNodes != self.currentSBGNProperties.fitLabelsToNodes) {
-      fitLabelsToNodes = self.currentSBGNProperties.fitLabelsToNodes;
-      cy.forceRender();
-    }
-    
-    window.incrementalLayoutAfterExpandCollapse =
-                  self.currentSBGNProperties.incrementalLayoutAfterExpandCollapse;
-  },
   render: function () {
     var self = this;
     self.template = _.template($("#sbgn-properties-template").html(), self.currentSBGNProperties);
@@ -589,22 +563,24 @@ var SBGNProperties = Backbone.View.extend({
       self.currentSBGNProperties.incrementalLayoutAfterExpandCollapse =
               document.getElementById("incremental-layout-after-expand-collapse").checked;
 
-
-      //check if there is a change in the properties if not do not push this command to the stack
-      var same = true;
-      for (var prop in param.previousSBGNProperties) {
-        if (param.previousSBGNProperties[prop] != self.currentSBGNProperties[prop]) {
-          same = false;
-          break;
-        }
+      //Refresh paddings if needed
+      if (compoundPadding != self.currentSBGNProperties.compoundPadding) {
+        compoundPadding = self.currentSBGNProperties.compoundPadding;
+        refreshPaddings();
+      }
+      //Refresh label size if needed
+      if (dynamicLabelSize != self.currentSBGNProperties.dynamicLabelSize) {
+        dynamicLabelSize = self.currentSBGNProperties.dynamicLabelSize;
+        cy.forceRender();
+      }
+      //Refresh truncations if needed
+      if (fitLabelsToNodes != self.currentSBGNProperties.fitLabelsToNodes) {
+        fitLabelsToNodes = self.currentSBGNProperties.fitLabelsToNodes;
+        cy.forceRender();
       }
 
-      if (!same) {
-        self.saveSBGN();
-        param.sbgnPropertiesObj = self;
-        editorActionsManager._do(new ChangeSBGNPropertiesCommand(param));
-        refreshUndoRedoButtonsStatus();
-      }
+      window.incrementalLayoutAfterExpandCollapse =
+              self.currentSBGNProperties.incrementalLayoutAfterExpandCollapse;
 
       $(self.el).dialog('close');
     });

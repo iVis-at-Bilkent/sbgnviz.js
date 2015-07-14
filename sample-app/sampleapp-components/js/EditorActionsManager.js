@@ -254,26 +254,6 @@ function removeHighlights() {
   return result;
 }
 
-function changeSBGNProperties(param) {
-  var result = {};
-  if (!param.firstTime) {
-    result.previousSBGNProperties = _.clone(param.sbgnPropertiesObj.currentSBGNProperties);
-    setSBGNProperties(param.sbgnPropertiesObj, param.previousSBGNProperties);
-  }
-  else {
-    result.previousSBGNProperties = param.previousSBGNProperties;
-  }
-
-  result.firstTime = false;
-  result.sbgnPropertiesObj = param.sbgnPropertiesObj;
-  return result;
-}
-
-function setSBGNProperties(sbgnPropertiesObj ,SBGNPropertiesToSet) {
-  sbgnPropertiesObj.copyGivenProperties(SBGNPropertiesToSet);
-  sbgnPropertiesObj.saveSBGN();
-}
-
 /*
  *	Base command class
  * do: reference to the function that performs actual action for this command.
@@ -360,9 +340,6 @@ var RemoveHighlightsCommand = function () {
   return new Command(removeHighlights, highlightSelected);
 };
 
-var ChangeSBGNPropertiesCommand = function (param) {
-  return new Command(changeSBGNProperties, changeSBGNProperties, param);
-};
 /**
  *  Description: A simple action manager that acts also as a undo-redo manager regarding Command Design Pattern
  *	Author: Istemi Bahceci<istemi.bahceci@gmail.com>
