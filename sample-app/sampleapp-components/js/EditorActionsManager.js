@@ -169,10 +169,10 @@ function highlightSelected(param) {
       result.allElementsWasNotHighlighted = true;
     }
     var alreadyHighlighted = cy.elements("[highlighted='true']").filter(":visible");
-    if(param.highlightNeighboursofSelected){
+    if (param.highlightNeighboursofSelected) {
       elementsToHighlight = sbgnFiltering.highlightNeighborsofSelected();
     }
-    else if(param.highlightProcessesOfSelected){
+    else if (param.highlightProcessesOfSelected) {
       elementsToHighlight = sbgnFiltering.highlightProcessesOfSelected();
     }
     elementsToHighlight = elementsToHighlight.not(alreadyHighlighted);
@@ -189,7 +189,7 @@ function highlightSelected(param) {
       elesToNotHighlight.removeData("highlighted");
       sbgnFiltering.notHighlightNodes(elesToNotHighlight.nodes());
       sbgnFiltering.notHighlightEdges(elesToNotHighlight.edges());
-      
+
       //If there are some elements to not highlight then allElementsWasNotHighlighted should be true
       result.allElementsWasNotHighlighted = true;
     }
@@ -221,20 +221,39 @@ function notHighlightEles(param) {
   return result;
 }
 
-function removeHighlights(){
+function removeHighlights() {
   var result = {};
-  if(sbgnFiltering.isAllElementsAreNotHighlighted()){
+  if (sbgnFiltering.isAllElementsAreNotHighlighted()) {
     result.elesToHighlight = cy.elements(":visible");
   }
-  else{
+  else {
     result.elesToHighlight = cy.elements("[highlighted='true']").filter(":visible");
   }
-  
+
   sbgnFiltering.removeHighlights();
-  
+
   result.elesToNotHighlight = cy.elements(":visible").not(result.elesToHighlight);
   result.firstTime = false;
   return result;
+}
+
+function changeSBGNProperties(param) {
+  var result = {};  
+  if (!param.firstTime) {
+    result.previousSBGNProperties = _.clone(sbgnProperties.currentSBGNProperties);
+    setSBGNProperties(param.previousSBGNProperties);
+  }
+  else {
+    result.previousSBGNProperties = param.previousSBGNProperties;
+  }
+  
+  result.firstTime = false;
+  return result;
+}
+
+function setSBGNProperties(SBGNPropertiesToSet) {
+  sbgnProperties.copyGivenProperties(SBGNPropertiesToSet);
+  sbgnProperties.saveSBGN();
 }
 
 /*
@@ -315,6 +334,9 @@ var RemoveHighlightsCommand = function () {
   return new Command(removeHighlights, highlightSelected);
 };
 
+var ChangeSBGNPropertiesCommand = function (param) {
+  return new Command(changeSBGNProperties, changeSBGNProperties, param);
+};
 /**
  *  Description: A simple action manager that acts also as a undo-redo manager regarding Command Design Pattern
  *	Author: Istemi Bahceci<istemi.bahceci@gmail.com>

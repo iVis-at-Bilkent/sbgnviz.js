@@ -262,8 +262,8 @@ var SBGNContainer = Backbone.View.extend({
             x: this.position("x"),
             y: this.position("y")
           };
-          if(mouseUpPosition.x != this.lastMouseDownPosition.x ||
-                  mouseUpPosition.y != this.lastMouseDownPosition.y){
+          if (mouseUpPosition.x != this.lastMouseDownPosition.x ||
+                  mouseUpPosition.y != this.lastMouseDownPosition.y) {
             var positionDiff = {
               x: mouseUpPosition.x - this.lastMouseDownPosition.x,
               y: mouseUpPosition.y - this.lastMouseDownPosition.y
@@ -518,7 +518,7 @@ var SBGNProperties = Backbone.View.extend({
   defaultSBGNProperties: {
     compoundPadding: parseInt(SBGNStyleProperties['compound-padding'], 10),
     dynamicLabelSize: SBGNStyleProperties['dynamic-label-size'],
-    fitLabelsToNodes: SBGNStyleProperties['fit-labels-to-nodes']
+    fitLabelsToNodes: (SBGNStyleProperties['fit-labels-to-nodes'] == 'true') 
   },
   currentSBGNProperties: null,
   initialize: function () {
@@ -529,6 +529,29 @@ var SBGNProperties = Backbone.View.extend({
   copyProperties: function () {
     this.currentSBGNProperties = _.clone(this.defaultSBGNProperties);
   },
+  copyGivenProperties: function (properties) {
+    for (var prop in properties) {
+      this.currentSBGNProperties[prop] = properties[prop];
+    }
+  },
+  saveSBGN: function () {
+    var self = this;
+    //Refresh paddings if needed
+    if (compoundPadding != self.currentSBGNProperties.compoundPadding) {
+      compoundPadding = self.currentSBGNProperties.compoundPadding;
+      refreshPaddings();
+    }
+    //Refresh label size if needed
+    if (dynamicLabelSize != self.currentSBGNProperties.dynamicLabelSize) {
+      dynamicLabelSize = self.currentSBGNProperties.dynamicLabelSize;
+      cy.forceRender();
+    }
+    //Refresh truncations if needed
+    if (fitLabelsToNodes != self.currentSBGNProperties.fitLabelsToNodes) {
+      fitLabelsToNodes = self.currentSBGNProperties.fitLabelsToNodes;
+      cy.forceRender();
+    }
+  },
   render: function () {
     var self = this;
     self.template = _.template($("#sbgn-properties-template").html(), self.currentSBGNProperties);
@@ -537,24 +560,28 @@ var SBGNProperties = Backbone.View.extend({
     $(self.el).dialog();
 
     $("#save-sbgn").die("click").live("click", function (evt) {
+
+      var param = {};
+      param.firstTime = true;
+      param.previousSBGNProperties = _.clone(self.currentSBGNProperties);
+
       self.currentSBGNProperties.compoundPadding = Number(document.getElementById("compound-padding").value);
       self.currentSBGNProperties.dynamicLabelSize = $('select[name="dynamic-label-size"] option:selected').val();
       self.currentSBGNProperties.fitLabelsToNodes = document.getElementById("fit-labels-to-nodes").checked;
 
-      //Refresh paddings if needed
-      if (compoundPadding != self.currentSBGNProperties.compoundPadding) {
-        compoundPadding = self.currentSBGNProperties.compoundPadding;
-        refreshPaddings();
+      //check if there is a change in the properties if not do not push this command to the stack
+      var same = true;
+      for (var prop in param.previousSBGNProperties) {
+        if (param.previousSBGNProperties[prop] != self.currentSBGNProperties[prop]) {
+          same = false;
+          break;
+        }
       }
-      //Refresh label size if needed
-      if (dynamicLabelSize != self.currentSBGNProperties.dynamicLabelSize) {
-        dynamicLabelSize = self.currentSBGNProperties.dynamicLabelSize;
-        cy.forceRender();
-      }
-      //Refresh truncations if needed
-      if (fitLabelsToNodes != self.currentSBGNProperties.fitLabelsToNodes) {
-        fitLabelsToNodes = self.currentSBGNProperties.fitLabelsToNodes;
-        cy.forceRender();
+
+      if (!same) {
+        self.saveSBGN();
+        editorActionsManager._do(new ChangeSBGNPropertiesCommand(param));
+        refreshUndoRedoButtonsStatus();
       }
 
       $(self.el).dialog('close');

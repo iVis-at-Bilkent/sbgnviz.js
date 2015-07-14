@@ -179,7 +179,7 @@ var expandCollapseUtilities = {
   /*
    * This method repairs the edges of the collapsed children of the given node
    * when the node is being expanded, the meta edges created while the node is 
-   * being collapsed are also handled in this method
+   * being collapsed are handled in this method
    */
   repairEdgesOfCollapsedChildren: function (node) {
     var edgesOfcollapsedChildren = node._private.data.edgesOfcollapsedChildren;
