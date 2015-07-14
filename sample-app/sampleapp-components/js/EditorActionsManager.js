@@ -32,20 +32,37 @@ function removeEdges(edgesToBeDeleted)
 }
 
 function expandNode(node) {
-  return expandCollapseUtilities.expandNode(node);
+  var result = expandCollapseUtilities.expandNode(node);
+  cy.fit(10);
+  return result;
 }
 
 function collapseNode(node) {
-  return expandCollapseUtilities.collapseNode(node);
+  var result = expandCollapseUtilities.collapseNode(node);
+  cy.fit(10);
+  return result;
 }
 
 function undoExpandNode(param) {
   returnToPositionsAndSizes(param.nodesData);
-  return expandCollapseUtilities.collapseNode(param.node);
+  var result = expandCollapseUtilities.simpleCollapseNode(param.node);
+  cy.fit(10);
+  return result;
 }
 
-function undoCollapseNode(node) {
+function undoCollapseNode(param) {
+  returnToPositionsAndSizes(param.nodesData);
+  var result = expandCollapseUtilities.simpleExpandNode(param.node);
+  cy.fit(10);
+  return result;
+}
+
+function simpleExpandNode(node) {
   return expandCollapseUtilities.simpleExpandNode(node);
+}
+
+function simpleCollapseNode(node) {
+  return expandCollapseUtilities.simpleCollapseNode(node);
 }
 
 function performLayoutFunction(nodesData) {
@@ -85,7 +102,7 @@ function moveNodeReversely(param) {
   var diff = {
     x: -1 * param.positionDiff.x,
     y: -1 * param.positionDiff.y
-  }
+  };
   var result = {
     positionDiff: param.positionDiff,
     node: param.node,
@@ -238,7 +255,7 @@ function removeHighlights() {
 }
 
 function changeSBGNProperties(param) {
-  var result = {};  
+  var result = {};
   if (!param.firstTime) {
     result.previousSBGNProperties = _.clone(sbgnProperties.currentSBGNProperties);
     setSBGNProperties(param.previousSBGNProperties);
@@ -246,7 +263,7 @@ function changeSBGNProperties(param) {
   else {
     result.previousSBGNProperties = param.previousSBGNProperties;
   }
-  
+
   result.firstTime = false;
   return result;
 }
@@ -294,6 +311,14 @@ var ExpandNodeCommand = function (node) {
 
 var CollapseNodeCommand = function (node) {
   return new Command(collapseNode, undoCollapseNode, node);
+};
+
+var SimpleExpandNodeCommand = function (node) {
+  return new Command(simpleExpandNode, simpleCollapseNode, node);
+};
+
+var SimpleCollapseNodeCommand = function (node) {
+  return new Command(simpleCollapseNode, simpleExpandNode, node);
 };
 
 var PerformLayoutCommand = function (nodesData) {

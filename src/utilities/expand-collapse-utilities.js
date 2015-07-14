@@ -22,7 +22,7 @@ var expandCollapseUtilities = {
     }
     if ((root.is("[sbgnclass='complex']") || root.is("[sbgnclass='compartment']"))
             && root.css('expanded-collapsed') == 'collapsed') {
-      this.collapseNode(root);
+      this.simpleCollapseNode(root);
     }
   },
   
@@ -59,6 +59,7 @@ var expandCollapseUtilities = {
       return param;
     }
   },
+  
   /*
    * 
    * This method expands the given node
@@ -81,8 +82,8 @@ var expandCollapseUtilities = {
     }
   },
   
-  //collapse the given node
-  collapseNode: function (node) {
+  //collapse the given node without making incremental layout
+  simpleCollapseNode: function (node) {
     node.css('expanded-collapsed', 'collapsed');
     var children = node.children();
     for (var i = 0; i < children.length; i++) {
@@ -96,6 +97,38 @@ var expandCollapseUtilities = {
     node.css('height', 75);
     //return the node to undo the operation
     return node;
+  },
+  
+  //collapse the given node then make incremental layout
+  collapseNode: function (node) {
+    this.simpleCollapseNode(node);
+    
+    var nodesData = {};
+    var nodes = cy.nodes();
+    for (var i = 0; i < nodes.length; i++) {
+      var thenode = nodes[i];
+      nodesData[thenode.id()] = {
+        width: thenode.width(),
+        height: thenode.height(),
+        x: thenode.position("x"),
+        y: thenode.position("y")
+      };
+    }
+
+    $("#perform-incremental-layout").trigger("click");
+
+    var param = {
+      node: node,
+      nodesData: nodesData
+    };
+
+    /*
+     * return the param to undo the operation,
+     * param.node is needed to expand the node back,
+     * param.nodesData is needed to back the incremental 
+     * layout before expanding the node 
+     */
+    return param;
   },
   
   /*
@@ -194,7 +227,6 @@ var expandCollapseUtilities = {
     edgesOfcollapsedChildren.restore();
     node._private.data.edgesOfcollapsedChildren = null;
   },
-  
   /*node is an outer node of root 
    if root is not it's anchestor 
    and it is not the root itself*/
