@@ -105,11 +105,20 @@
     node._private.data.expandcollapseEndX = node._private.data.expandcollapseStartX + rectSize;
     node._private.data.expandcollapseEndY = node._private.data.expandcollapseStartY + rectSize;
 
-    context.rect(
+    var oldStyle = context.fillStyle;
+
+    context.fillStyle = "black";
+    
+    context.fillRect(
             node._private.data.expandcollapseStartX,
             node._private.data.expandcollapseStartY,
             rectSize,
             rectSize);
+
+    context.fillStyle = oldStyle;
+
+    oldStyle = context.strokeStyle;
+    context.strokeStyle = "white";
 
     context.moveTo(node._private.data.expandcollapseStartX + diff, node._private.data.expandcollapseStartY + rectSize / 2);
     context.lineTo(node._private.data.expandcollapseStartX + lineSize + diff, node._private.data.expandcollapseStartY + + rectSize / 2);
@@ -119,6 +128,7 @@
       context.lineTo(node._private.data.expandcollapseStartX + rectSize / 2, node._private.data.expandcollapseStartY + lineSize + diff);
     }
 
+    context.strokeStyle = oldStyle;
     context.stroke();
   }
   ;
