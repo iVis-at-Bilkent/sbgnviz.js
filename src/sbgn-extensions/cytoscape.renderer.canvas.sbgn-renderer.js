@@ -128,8 +128,8 @@
       context.lineTo(node._private.data.expandcollapseStartX + rectSize / 2, node._private.data.expandcollapseStartY + lineSize + diff);
     }
 
-    context.strokeStyle = oldStyle;
     context.stroke();
+    context.strokeStyle = oldStyle;
   }
   ;
 
