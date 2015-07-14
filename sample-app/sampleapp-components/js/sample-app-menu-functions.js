@@ -32,7 +32,7 @@ $(document).ready(function () {
     el: '#sbgn-layout-table'
   });
 
-  window.sbgnProperties = new SBGNProperties({
+  var sbgnProperties = new SBGNProperties({
     el: '#sbgn-properties-table'
   });
 

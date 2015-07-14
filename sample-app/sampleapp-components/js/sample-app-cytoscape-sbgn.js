@@ -601,6 +601,7 @@ var SBGNProperties = Backbone.View.extend({
 
       if (!same) {
         self.saveSBGN();
+        param.sbgnPropertiesObj = self;
         editorActionsManager._do(new ChangeSBGNPropertiesCommand(param));
         refreshUndoRedoButtonsStatus();
       }

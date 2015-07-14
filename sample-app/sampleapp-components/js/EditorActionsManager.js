@@ -257,21 +257,21 @@ function removeHighlights() {
 function changeSBGNProperties(param) {
   var result = {};
   if (!param.firstTime) {
-    //TODO handle sbgnProperties without making the object global
-    result.previousSBGNProperties = _.clone(sbgnProperties.currentSBGNProperties);
-    setSBGNProperties(param.previousSBGNProperties);
+    result.previousSBGNProperties = _.clone(param.sbgnPropertiesObj.currentSBGNProperties);
+    setSBGNProperties(param.sbgnPropertiesObj, param.previousSBGNProperties);
   }
   else {
     result.previousSBGNProperties = param.previousSBGNProperties;
   }
 
   result.firstTime = false;
+  result.sbgnPropertiesObj = param.sbgnPropertiesObj;
   return result;
 }
 
-function setSBGNProperties(SBGNPropertiesToSet) {
-  sbgnProperties.copyGivenProperties(SBGNPropertiesToSet);
-  sbgnProperties.saveSBGN();
+function setSBGNProperties(sbgnPropertiesObj ,SBGNPropertiesToSet) {
+  sbgnPropertiesObj.copyGivenProperties(SBGNPropertiesToSet);
+  sbgnPropertiesObj.saveSBGN();
 }
 
 /*
@@ -439,7 +439,7 @@ function EditorActionsManager()
     this.redoStack = [];
   };
 }
-window.editorActionsManager = new EditorActionsManager();
+var editorActionsManager = new EditorActionsManager();
 
 /*
  *  A sample run that gives insight about the usage of EditorActionsManager and commands
