@@ -257,6 +257,7 @@ function removeHighlights() {
 function changeSBGNProperties(param) {
   var result = {};
   if (!param.firstTime) {
+    //TODO handle sbgnProperties without making the object global
     result.previousSBGNProperties = _.clone(sbgnProperties.currentSBGNProperties);
     setSBGNProperties(param.previousSBGNProperties);
   }

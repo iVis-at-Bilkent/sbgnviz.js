@@ -566,6 +566,9 @@ var SBGNProperties = Backbone.View.extend({
       fitLabelsToNodes = self.currentSBGNProperties.fitLabelsToNodes;
       cy.forceRender();
     }
+    
+    window.incrementalLayoutAfterExpandCollapse =
+                  self.currentSBGNProperties.incrementalLayoutAfterExpandCollapse;
   },
   render: function () {
     var self = this;
@@ -590,13 +593,6 @@ var SBGNProperties = Backbone.View.extend({
       //check if there is a change in the properties if not do not push this command to the stack
       var same = true;
       for (var prop in param.previousSBGNProperties) {
-        //incrementalLayoutAfterExpandCollapse property do not change the current graph visialisation
-        if (prop == "incrementalLayoutAfterExpandCollapse") {
-          window.incrementalLayoutAfterExpandCollapse =
-                  self.currentSBGNProperties.incrementalLayoutAfterExpandCollapse;
-          continue;
-        }
-
         if (param.previousSBGNProperties[prop] != self.currentSBGNProperties[prop]) {
           same = false;
           break;
