@@ -69,6 +69,11 @@
   $$.style.properties.push({name: 'expanded-collapsed', type: $$.style.types.expandedOrcollapsed});
   $$.style.properties['expanded-collapsed'] = {name: 'expanded-collapsed', type: $$.style.types.expandedOrcollapsed};
 
+  //add incremental-layout-after-expand-collapse property to css features
+  $$.style.types.trueOrFalse = {enums: ['true', 'false']};
+  $$.style.properties.push({name: 'incremental-layout-after-expand-collapse', type: $$.style.types.trueOrFalse});
+  $$.style.properties['incremental-layout-after-expand-collapse'] = {name: 'incremental-layout-after-expand-collapse', type: $$.style.types.trueOrFalse};
+
   function drawSelection(render, context, node) {
     //TODO: do it for all classes in sbgn, create a sbgn class array to check
     if (sbgnShapes[render.getNodeShape(node)]) {

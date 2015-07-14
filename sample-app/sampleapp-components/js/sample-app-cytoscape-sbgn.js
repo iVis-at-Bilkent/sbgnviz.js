@@ -2,7 +2,8 @@ var SBGNStyleProperties = {
   'compound-padding': 20,
   'dynamic-label-size': 'regular',
   'fit-labels-to-nodes': 'true',
-  'expanded-collapsed': 'expanded'
+  'expanded-collapsed': 'expanded',
+  'incremental-layout-after-expand-collapse': 'true'
 };
 
 var refreshUndoRedoButtonsStatus = function () {
@@ -89,7 +90,8 @@ var sbgnStyleSheet = cytoscape.stylesheet()
           'background-opacity': '0.5',
           'compound-padding': SBGNStyleProperties['compound-padding'],
           'dynamic-label-size': SBGNStyleProperties['dynamic-label-size'],
-          'fit-labels-to-nodes': SBGNStyleProperties['fit-labels-to-nodes']
+          'fit-labels-to-nodes': SBGNStyleProperties['fit-labels-to-nodes'],
+          'incremental-layout-after-expand-collapse': SBGNStyleProperties['incremental-layout-after-expand-collapse']
         })
         .selector("node[sbgnclass='complex']")
         .css({
@@ -397,13 +399,25 @@ var SBGNContainer = Backbone.View.extend({
                   && cyPosY >= node._private.data.expandcollapseStartY
                   && cyPosY <= node._private.data.expandcollapseEndY) {
             var expandedOrcollapsed = this.css('expanded-collapsed');
+
+            if (window.incrementalLayoutAfterExpandCollapse == null) {
+              window.incrementalLayoutAfterExpandCollapse =
+                      (cy.$("node").css('incremental-layout-after-expand-collapse') == 'true');
+            }
+
             if (expandedOrcollapsed == 'expanded') {
 //              expandCollapseUtilities.collapseNode(this);
-              editorActionsManager._do(new CollapseNodeCommand(this));
+              if (incrementalLayoutAfterExpandCollapse)
+                editorActionsManager._do(new CollapseNodeCommand(this));
+              else
+                editorActionsManager._do(new SimpleCollapseNodeCommand(this));
               refreshUndoRedoButtonsStatus();
             }
             else {
-              editorActionsManager._do(new ExpandNodeCommand(this));
+              if (incrementalLayoutAfterExpandCollapse)
+                editorActionsManager._do(new ExpandNodeCommand(this));
+              else
+                editorActionsManager._do(new SimpleExpandNodeCommand(this));
               refreshUndoRedoButtonsStatus();
 //              expandCollapseUtilities.expandNode(this);
             }
@@ -518,7 +532,8 @@ var SBGNProperties = Backbone.View.extend({
   defaultSBGNProperties: {
     compoundPadding: parseInt(SBGNStyleProperties['compound-padding'], 10),
     dynamicLabelSize: SBGNStyleProperties['dynamic-label-size'],
-    fitLabelsToNodes: (SBGNStyleProperties['fit-labels-to-nodes'] == 'true') 
+    fitLabelsToNodes: (SBGNStyleProperties['fit-labels-to-nodes'] == 'true'),
+    incrementalLayoutAfterExpandCollapse: (SBGNStyleProperties['incremental-layout-after-expand-collapse'] == 'true')
   },
   currentSBGNProperties: null,
   initialize: function () {
@@ -568,10 +583,20 @@ var SBGNProperties = Backbone.View.extend({
       self.currentSBGNProperties.compoundPadding = Number(document.getElementById("compound-padding").value);
       self.currentSBGNProperties.dynamicLabelSize = $('select[name="dynamic-label-size"] option:selected').val();
       self.currentSBGNProperties.fitLabelsToNodes = document.getElementById("fit-labels-to-nodes").checked;
+      self.currentSBGNProperties.incrementalLayoutAfterExpandCollapse =
+              document.getElementById("incremental-layout-after-expand-collapse").checked;
+
 
       //check if there is a change in the properties if not do not push this command to the stack
       var same = true;
       for (var prop in param.previousSBGNProperties) {
+        //incrementalLayoutAfterExpandCollapse property do not change the current graph visialisation
+        if (prop == "incrementalLayoutAfterExpandCollapse") {
+          window.incrementalLayoutAfterExpandCollapse =
+                  self.currentSBGNProperties.incrementalLayoutAfterExpandCollapse;
+          continue;
+        }
+
         if (param.previousSBGNProperties[prop] != self.currentSBGNProperties[prop]) {
           same = false;
           break;
