@@ -254,6 +254,20 @@ function removeHighlights() {
   return result;
 }
 
+function panCy(param){
+  var result = {};
+  result.firstTime = false;
+  
+  if(!param.firstTime){
+    result.oldPanPosition = _.clone(cy.pan());
+    cy.pan(param.oldPanPosition);
+  }
+  else{
+    result.oldPanPosition = param.oldPanPosition;
+  }
+  return result;
+}
+
 /*
  *	Base command class
  * do: reference to the function that performs actual action for this command.
@@ -338,6 +352,10 @@ var HighlightProcessesOfSelectedCommand = function (param) {
 
 var RemoveHighlightsCommand = function () {
   return new Command(removeHighlights, highlightSelected);
+};
+
+var PanCyCommand = function (param) {
+  return new Command(panCy, panCy, param);
 };
 
 /**

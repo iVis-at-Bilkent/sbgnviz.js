@@ -251,12 +251,37 @@ var SBGNContainer = Backbone.View.extend({
           fitPadding: 10,
         });
         container.cytoscapePanzoom(panProps);
+        
+        var panned = false;
+        var panPositionOnLastMouseDown = null;
+
+        cy.on("mousedown", function () {
+          panPositionOnLastMouseDown = {
+            x: cy.pan("x"),
+            y: cy.pan("y")
+          }
+        });
 
         cy.on("mousedown", "node", function () {
           this.lastMouseDownPosition = {
             x: this.position("x"),
             y: this.position("y")
           }
+        });
+        
+        cy.on("pan", function () {
+          panned = true;
+        });
+        
+        cy.on("mouseup", function () {
+          if(panned){
+            var param = {
+              firstTime: true,
+              oldPanPosition: panPositionOnLastMouseDown
+            };
+            editorActionsManager._do(new PanCyCommand(param));
+          }
+          panned = false;
         });
 
         cy.on("mouseup", "node", function () {
