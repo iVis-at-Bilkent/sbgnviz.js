@@ -118,6 +118,9 @@
     context.fillStyle = oldStyle;
 
     oldStyle = context.strokeStyle;
+    
+    context.stroke();
+    context.beginPath();
     context.strokeStyle = "white";
 
     context.moveTo(node._private.data.expandcollapseStartX + diff, node._private.data.expandcollapseStartY + rectSize / 2);
