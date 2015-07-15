@@ -91,38 +91,38 @@ function returnToPositionsAndSizes(nodesData) {
   return currentPositionsAndSizes;
 }
 
-function moveNodeConditionally(param) {
+function moveNodesConditionally(param) {
   if (param.move) {
-    moveNode(param.positionDiff, param.node);
+    moveNodes(param.positionDiff, param.nodes);
   }
   return param;
 }
 
-function moveNodeReversely(param) {
+function moveNodesReversely(param) {
   var diff = {
     x: -1 * param.positionDiff.x,
     y: -1 * param.positionDiff.y
   };
   var result = {
     positionDiff: param.positionDiff,
-    node: param.node,
+    nodes: param.nodes,
     move: true
   };
-  moveNode(diff, param.node);
+  moveNodes(diff, param.nodes);
   return result;
 }
 
-function moveNode(positionDiff, node) {
-  var oldX = node.position("x");
-  var oldY = node.position("y");
-  node.position({
-    x: oldX + positionDiff.x,
-    y: oldY + positionDiff.y
-  });
-  var children = node.children();
-  for (var i = 0; i < children.length; i++) {
-    var child = children[i];
-    moveNode(positionDiff, child);
+function moveNodes(positionDiff, nodes) {
+  for (var i = 0; i < nodes.length; i++) {
+    var node = nodes[i];
+    var oldX = node.position("x");
+    var oldY = node.position("y");
+    node.position({
+      x: oldX + positionDiff.x,
+      y: oldY + positionDiff.y
+    });
+    var children = node.children();
+    moveNodes(positionDiff, children);
   }
 }
 
@@ -307,7 +307,7 @@ var PerformLayoutCommand = function (nodesData) {
 };
 
 var MoveNodeCommand = function (param) {
-  return new Command(moveNodeConditionally, moveNodeReversely, param);
+  return new Command(moveNodesConditionally, moveNodesReversely, param);
 };
 
 var DeleteSelectedCommand = function (param) {

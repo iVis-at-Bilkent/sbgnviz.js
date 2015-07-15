@@ -270,9 +270,20 @@ var SBGNContainer = Backbone.View.extend({
               x: mouseUpPosition.x - this.lastMouseDownPosition.x,
               y: mouseUpPosition.y - this.lastMouseDownPosition.y
             };
+            
+            var nodes;
+            
+            if(this.selected()){
+              nodes = cy.nodes(":visible").filter(":selected");
+            }
+            else {
+              nodes = [];
+              nodes.push(this);
+            }
+            
             var param = {
               positionDiff: positionDiff,
-              node: this,
+              nodes: nodes,
               move: false
             };
             editorActionsManager._do(new MoveNodeCommand(param));
