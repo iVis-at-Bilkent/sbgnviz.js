@@ -207,7 +207,7 @@ var expandCollapseUtilities = {
       //remove the older edge and add the new one
       cy.add(newEdge);
       var newCyEdge = cy.edges()[cy.edges().length - 1];
-      var opacity = parseInt(newCyEdge.css("opacity"), 10);
+      var opacity = Number(newCyEdge.css("opacity"));
       newCyEdge.css("opacity", opacity * 0.7);
 //      newCyEdge.data("meta", true);
     }
