@@ -1,9 +1,4 @@
 var sbgnFiltering = {
-
-	notHighlightNodeProp : {'border-opacity': 0.3, 'text-opacity' : 0.3, 'background-opacity': 0.3},
-    notHighlightEdgeProp : {'opacity':0.3, 'text-opacity' : 0.3, 'background-opacity': 0.3},
-    highlightNodeProp : {'border-opacity': 1, 'text-opacity' : 1, 'background-opacity': 1},
-    highlightEdgeProp : {'opacity':1, 'text-opacity' : 1, 'background-opacity': 1},
     processTypes : ['process', 'omitted process', 'uncertain process', 
         'association', 'dissociation', 'phenotype'],
 
@@ -77,27 +72,19 @@ var sbgnFiltering = {
     },
     
     highlightNodes: function(nodes){
-        for(var prop in this.highlightNodeProp){
-          nodes.css(prop, this.highlightNodeProp[prop]);
-        }
+      nodes.removeClass("not-highlighted");
     },
     
     notHighlightNodes: function(nodes){
-        for(var prop in this.notHighlightNodeProp){
-          nodes.css(prop, this.notHighlightNodeProp[prop]);
-        }
+      nodes.addClass("not-highlighted");
     },
     
     highlightEdges: function(edges){
-        for(var prop in this.highlightEdgeProp){
-          edges.css(prop, this.highlightEdgeProp[prop]);
-        }
+      edges.removeClass("not-highlighted");
     },
     
     notHighlightEdges: function(edges){
-        for(var prop in this.notHighlightEdgeProp){
-          edges.css(prop, this.notHighlightEdgeProp[prop]);
-        }
+      edges.addClass("not-highlighted");
     },
     
     isAllElementsAreNotHighlighted: function(){

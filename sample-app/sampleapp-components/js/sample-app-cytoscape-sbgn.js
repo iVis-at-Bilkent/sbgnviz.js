@@ -186,6 +186,18 @@ var sbgnStyleSheet = cytoscape.stylesheet()
           'shape': 'rectangle',
           'width': 15,
           'height': 15
+        })
+        .selector('edge.not-highlighted')
+        .css({
+          'opacity':0.3,
+          'text-opacity' : 0.3, 
+          'background-opacity': 0.3
+        })
+        .selector('node.not-highlighted')
+        .css({
+          'border-opacity':0.3,
+          'text-opacity' : 0.3, 
+          'background-opacity': 0.3
         }); // end of sbgnStyleSheet
 
 var NotyView = Backbone.View.extend({
@@ -240,7 +252,6 @@ var SBGNContainer = Backbone.View.extend({
       ready: function ()
       {
         window.cy = this;
-
         refreshPaddings();
         expandCollapseUtilities.initCollapsedNodes();
 
@@ -251,7 +262,7 @@ var SBGNContainer = Backbone.View.extend({
           fitPadding: 10,
         });
         container.cytoscapePanzoom(panProps);
-        
+
         var panned = false;
         var panPositionOnLastMouseDown = null;
 
@@ -268,13 +279,13 @@ var SBGNContainer = Backbone.View.extend({
             y: this.position("y")
           }
         });
-        
+
         cy.on("pan", function () {
           panned = true;
         });
-        
+
         cy.on("mouseup", function () {
-          if(panned){
+          if (panned) {
             var param = {
               firstTime: true,
               oldPanPosition: panPositionOnLastMouseDown
@@ -295,17 +306,17 @@ var SBGNContainer = Backbone.View.extend({
               x: mouseUpPosition.x - this.lastMouseDownPosition.x,
               y: mouseUpPosition.y - this.lastMouseDownPosition.y
             };
-            
+
             var nodes;
-            
-            if(this.selected()){
+
+            if (this.selected()) {
               nodes = cy.nodes(":visible").filter(":selected");
             }
             else {
               nodes = [];
               nodes.push(this);
             }
-            
+
             var param = {
               positionDiff: positionDiff,
               nodes: nodes,
