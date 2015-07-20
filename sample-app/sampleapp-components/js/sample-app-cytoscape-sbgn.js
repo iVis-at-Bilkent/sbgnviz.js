@@ -338,6 +338,7 @@ var SBGNContainer = Backbone.View.extend({
           
           if(!node.mouseover){
             node.mouseover = true;
+            //make preset layout to redraw the nodes
             makePresetLayout();
           }
           
@@ -376,6 +377,7 @@ var SBGNContainer = Backbone.View.extend({
 
         cy.on('mouseout', 'node', function (event) {
           this.mouseover = false;
+          //make preset layout to redraw the nodes
           makePresetLayout();
         });  
 
