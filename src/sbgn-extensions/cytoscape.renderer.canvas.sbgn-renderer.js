@@ -90,7 +90,11 @@
               render.getNodeHeight(node)); //node._private.data.weight / 5.0
     }
     
-    if(node.is("[sbgnclass!='complex']") && node.is("[sbgnclass!='compartment']")){
+    var children = node.children();
+    var collapsedChildren = node._private.data.collapsedChildren;
+    
+    //check if the expand or collapse box is to be drawn
+    if((children == null || children.length == 0) && collapsedChildren == null){
       return;
     }
     
