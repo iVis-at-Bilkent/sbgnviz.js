@@ -6,6 +6,12 @@ var SBGNStyleProperties = {
   'incremental-layout-after-expand-collapse': 'true'
 };
 
+var makePresetLayout = function(){
+  cy.layout({
+    name: "preset"
+  });
+};
+
 var refreshUndoRedoButtonsStatus = function () {
   if (editorActionsManager.isUndoStackEmpty()) {
     $("#undo-last-action").parent("li").addClass("disabled");
@@ -61,8 +67,8 @@ var refreshPaddings = function () {
   complexesAndCompartments.css('padding-bottom', calc_padding + 8);
 
   //To refresh the nodes on the screen apply the preset layout
-  cy.layout({name: 'preset'});
-}
+  makePresetLayout();
+};
 
 var printNodeInfo = function () {
   console.log("print node info");
@@ -329,7 +335,12 @@ var SBGNContainer = Backbone.View.extend({
 
         cy.on('mouseover', 'node', function (event) {
           var node = this;
-
+          
+          if(!node.mouseover){
+            node.mouseover = true;
+            makePresetLayout();
+          }
+          
           $(".qtip").remove();
 
           if (event.originalEvent.shiftKey)
@@ -362,6 +373,11 @@ var SBGNContainer = Backbone.View.extend({
           });
 
         });
+
+        cy.on('mouseout', 'node', function (event) {
+          this.mouseover = false;
+          makePresetLayout();
+        });  
 
         cy.on('cxttap', 'node', function (event) {
           var node = this;

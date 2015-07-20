@@ -90,6 +90,11 @@
               render.getNodeHeight(node)); //node._private.data.weight / 5.0
     }
     
+    //expand or collapse boxes are to be drawn if the mouse is over the node
+    if(!node.mouseover){
+      return;
+    }
+    
     var children = node.children();
     var collapsedChildren = node._private.data.collapsedChildren;
     
