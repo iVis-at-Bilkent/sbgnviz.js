@@ -204,6 +204,18 @@ var sbgnStyleSheet = cytoscape.stylesheet()
           'border-opacity':0.3,
           'text-opacity' : 0.3, 
           'background-opacity': 0.3
+        })
+        .selector('edge.meta')
+        .css({
+          'line-color': '#898989',
+          'source-arrow-color': '#898989',
+          'target-arrow-color': '#898989'
+        })
+        .selector("edge.meta:selected")
+        .css({
+          'line-color': '#d67614',
+          'source-arrow-color': '#d67614',
+          'target-arrow-color': '#d67614'
         }); // end of sbgnStyleSheet
 
 var NotyView = Backbone.View.extend({
