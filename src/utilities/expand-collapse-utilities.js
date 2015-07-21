@@ -93,8 +93,8 @@ var expandCollapseUtilities = {
     node._private.data.oldWidth = node.css('width');
     node._private.data.oldHeight = node.css('height');
     this.removeChildren(node, node);
-    node.css('width', 75);
-    node.css('height', 75);
+    node.css('width', 60);
+    node.css('height', 60);
     //return the node to undo the operation
     return node;
   },

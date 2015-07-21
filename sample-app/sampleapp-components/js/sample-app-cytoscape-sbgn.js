@@ -295,7 +295,7 @@ var SBGNContainer = Backbone.View.extend({
         refreshUndoRedoButtonsStatus();
 
         var panProps = ({
-          fitPadding: 10,
+          fitPadding: 10
         });
         container.cytoscapePanzoom(panProps);
 
@@ -309,11 +309,14 @@ var SBGNContainer = Backbone.View.extend({
 //          }
 //        });
 
+        var lastMouseDownNodeInfo = null;
         cy.on("mousedown", "node", function () {
-          this.lastMouseDownPosition = {
+          lastMouseDownNodeInfo = {};
+          lastMouseDownNodeInfo.lastMouseDownPosition = {
             x: this.position("x"),
             y: this.position("y")
-          }
+          };
+          lastMouseDownNodeInfo.node = this;
         });
 
 //        cy.on("pan", function () {
@@ -332,25 +335,30 @@ var SBGNContainer = Backbone.View.extend({
 //        });
 
         cy.on("mouseup", "node", function () {
+          if( lastMouseDownNodeInfo == null ){
+            return;
+          } 
+          var node = lastMouseDownNodeInfo.node;
+          var lastMouseDownPosition = lastMouseDownNodeInfo.lastMouseDownPosition;
           var mouseUpPosition = {
-            x: this.position("x"),
-            y: this.position("y")
+            x: node.position("x"),
+            y: node.position("y")
           };
-          if (mouseUpPosition.x != this.lastMouseDownPosition.x ||
-                  mouseUpPosition.y != this.lastMouseDownPosition.y) {
+          if (mouseUpPosition.x != lastMouseDownPosition.x ||
+                  mouseUpPosition.y != lastMouseDownPosition.y) {
             var positionDiff = {
-              x: mouseUpPosition.x - this.lastMouseDownPosition.x,
-              y: mouseUpPosition.y - this.lastMouseDownPosition.y
+              x: mouseUpPosition.x - lastMouseDownPosition.x,
+              y: mouseUpPosition.y - lastMouseDownPosition.y
             };
 
             var nodes;
 
-            if (this.selected()) {
+            if (node.selected()) {
               nodes = cy.nodes(":visible").filter(":selected");
             }
             else {
               nodes = [];
-              nodes.push(this);
+              nodes.push(node);
             }
 
             var param = {
@@ -359,6 +367,8 @@ var SBGNContainer = Backbone.View.extend({
               move: false
             };
             editorActionsManager._do(new MoveNodeCommand(param));
+            
+            lastMouseDownNodeInfo = null;
             refreshUndoRedoButtonsStatus();
           }
         });

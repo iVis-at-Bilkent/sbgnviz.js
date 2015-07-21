@@ -90,11 +90,6 @@
               render.getNodeHeight(node)); //node._private.data.weight / 5.0
     }
     
-    //expand or collapse boxes are to be drawn if the mouse is over the node
-    if(!node.mouseover){
-      return;
-    }
-    
     var children = node.children();
     var collapsedChildren = node._private.data.collapsedChildren;
     
@@ -103,8 +98,14 @@
       return;
     }
     
-    //Draw expand-collapse rectangles
     var expandedOrcollapsed = node.css('expanded-collapsed');
+    
+    //expand or collapse boxes are to be drawn if the mouse is over the node or the node is collapsed
+    if(!node.mouseover && expandedOrcollapsed == 'expanded'){
+      return;
+    }
+    
+    //Draw expand-collapse rectangles
     var rectSize = 12;
     var lineSize = 8;
     var startOffset =  5;
