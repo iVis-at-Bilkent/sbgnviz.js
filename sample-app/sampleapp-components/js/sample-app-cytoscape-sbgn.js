@@ -299,15 +299,15 @@ var SBGNContainer = Backbone.View.extend({
         });
         container.cytoscapePanzoom(panProps);
 
-        var panned = false;
-        var panPositionOnLastMouseDown = null;
-
-        cy.on("mousedown", function () {
-          panPositionOnLastMouseDown = {
-            x: cy.pan("x"),
-            y: cy.pan("y")
-          }
-        });
+//        var panned = false;
+//        var panPositionOnLastMouseDown = null;
+//
+//        cy.on("mousedown", function () {
+//          panPositionOnLastMouseDown = {
+//            x: cy.pan("x"),
+//            y: cy.pan("y")
+//          }
+//        });
 
         cy.on("mousedown", "node", function () {
           this.lastMouseDownPosition = {
@@ -316,20 +316,20 @@ var SBGNContainer = Backbone.View.extend({
           }
         });
 
-        cy.on("pan", function () {
-          panned = true;
-        });
+//        cy.on("pan", function () {
+//          panned = true;
+//        });
 
-        cy.on("mouseup", function () {
-          if (panned) {
-            var param = {
-              firstTime: true,
-              oldPanPosition: panPositionOnLastMouseDown
-            };
-            editorActionsManager._do(new PanCyCommand(param));
-          }
-          panned = false;
-        });
+//        cy.on("mouseup", function () {
+//          if (panned) {
+//            var param = {
+//              firstTime: true,
+//              oldPanPosition: panPositionOnLastMouseDown
+//            };
+//            editorActionsManager._do(new PanCyCommand(param));
+//          }
+//          panned = false;
+//        });
 
         cy.on("mouseup", "node", function () {
           var mouseUpPosition = {
@@ -369,7 +369,7 @@ var SBGNContainer = Backbone.View.extend({
           if (!node.mouseover) {
             node.mouseover = true;
             //make preset layout to redraw the nodes
-            makePresetLayout();
+            cy.forceRender();
           }
 
           $(".qtip").remove();
@@ -408,7 +408,7 @@ var SBGNContainer = Backbone.View.extend({
         cy.on('mouseout', 'node', function (event) {
           this.mouseover = false;
           //make preset layout to redraw the nodes
-          makePresetLayout();
+          cy.forceRender();
         });
 
         cy.on('cxttap', 'node', function (event) {
