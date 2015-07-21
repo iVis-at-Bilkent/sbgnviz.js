@@ -1,12 +1,4 @@
-var SBGNStyleProperties = {
-  'compound-padding': 20,
-  'dynamic-label-size': 'regular',
-  'fit-labels-to-nodes': 'true',
-  'expanded-collapsed': 'expanded',
-  'incremental-layout-after-expand-collapse': 'true'
-};
-
-var makePresetLayout = function(){
+var makePresetLayout = function () {
   cy.layout({
     name: "preset"
   });
@@ -31,7 +23,7 @@ var refreshUndoRedoButtonsStatus = function () {
 var refreshPaddings = function () {
   //If compound padding is not set yet set it by css value
   if (window.compoundPadding == null) {
-    window.compoundPadding = parseInt(cy.$("node").css('compound-padding'), 10);
+    window.compoundPadding = parseInt(sbgnStyleRules['compound-padding'], 10);
   }
   var nodes = cy.nodes();
   var total = 0;
@@ -85,6 +77,27 @@ var printNodeInfo = function () {
   }
 }
 
+var getStyleRules = function (selector) {
+  for (var i = 0; i < sbgnStyleSheet.length; i++) {
+    var currentStyle = sbgnStyleSheet[i];
+    if (currentStyle.selector == selector) {
+      return currentStyle.properties;
+    }
+  }
+};
+
+var getSBGNStyleRules = function () {
+  if (window.sbgnStyleRules == null) {
+    var styleRulesList = getStyleRules(".sbgn");
+    window.sbgnStyleRules = {};
+    for (var i = 0; i < styleRulesList.length; i++) {
+      var rule = styleRulesList[i];
+      window.sbgnStyleRules[rule.name] = rule.value;
+    }
+  }
+  return sbgnStyleRules;
+};
+
 var sbgnStyleSheet = cytoscape.stylesheet()
         .selector("node")
         .css({
@@ -93,16 +106,12 @@ var sbgnStyleSheet = cytoscape.stylesheet()
           'background-color': '#f6f6f6',
           'font-size': 11,
           'shape': 'data(sbgnclass)',
-          'background-opacity': '0.5',
-          'compound-padding': SBGNStyleProperties['compound-padding'],
-          'dynamic-label-size': SBGNStyleProperties['dynamic-label-size'],
-          'fit-labels-to-nodes': SBGNStyleProperties['fit-labels-to-nodes'],
-          'incremental-layout-after-expand-collapse': SBGNStyleProperties['incremental-layout-after-expand-collapse']
+          'background-opacity': '0.5'
         })
         .selector("node[sbgnclass='complex']")
         .css({
           'background-color': '#F4F3EE',
-          'expanded-collapsed': SBGNStyleProperties['expanded-collapsed']
+          'expanded-collapsed': 'expanded'
         })
         .selector("node[sbgnclass='compartment']")
         .css({
@@ -112,7 +121,7 @@ var sbgnStyleSheet = cytoscape.stylesheet()
           'text-valign': 'bottom',
           'text-halign': 'center',
           'font-size': '16',
-          'expanded-collapsed': SBGNStyleProperties['expanded-collapsed']
+          'expanded-collapsed': 'expanded'
         })
         .selector("node[sbgnclass!='complex'][sbgnclass!='compartment'][sbgnclass!='submap']")
         .css({
@@ -195,14 +204,14 @@ var sbgnStyleSheet = cytoscape.stylesheet()
         })
         .selector('edge.not-highlighted')
         .css({
-          'opacity':0.3,
-          'text-opacity' : 0.3, 
+          'opacity': 0.3,
+          'text-opacity': 0.3,
           'background-opacity': 0.3
         })
         .selector('node.not-highlighted')
         .css({
-          'border-opacity':0.3,
-          'text-opacity' : 0.3, 
+          'border-opacity': 0.3,
+          'text-opacity': 0.3,
           'background-opacity': 0.3
         })
         .selector('edge.meta')
@@ -216,7 +225,16 @@ var sbgnStyleSheet = cytoscape.stylesheet()
           'line-color': '#d67614',
           'source-arrow-color': '#d67614',
           'target-arrow-color': '#d67614'
+        })
+        .selector(".sbgn")
+        .css({
+          'compound-padding': 20,
+          'dynamic-label-size': 'regular',
+          'fit-labels-to-nodes': 'true',
+          'incremental-layout-after-expand-collapse': 'true'
         }); // end of sbgnStyleSheet
+
+getSBGNStyleRules();
 
 var NotyView = Backbone.View.extend({
   render: function () {
@@ -347,13 +365,13 @@ var SBGNContainer = Backbone.View.extend({
 
         cy.on('mouseover', 'node', function (event) {
           var node = this;
-          
-          if(!node.mouseover){
+
+          if (!node.mouseover) {
             node.mouseover = true;
             //make preset layout to redraw the nodes
             makePresetLayout();
           }
-          
+
           $(".qtip").remove();
 
           if (event.originalEvent.shiftKey)
@@ -391,7 +409,7 @@ var SBGNContainer = Backbone.View.extend({
           this.mouseover = false;
           //make preset layout to redraw the nodes
           makePresetLayout();
-        });  
+        });
 
         cy.on('cxttap', 'node', function (event) {
           var node = this;
@@ -479,7 +497,7 @@ var SBGNContainer = Backbone.View.extend({
 
             if (window.incrementalLayoutAfterExpandCollapse == null) {
               window.incrementalLayoutAfterExpandCollapse =
-                      (cy.$("node").css('incremental-layout-after-expand-collapse') == 'true');
+                      (sbgnStyleRules['incremental-layout-after-expand-collapse'] == 'true');
             }
 
             if (expandedOrcollapsed == 'expanded') {
@@ -607,10 +625,10 @@ var SBGNLayout = Backbone.View.extend({
 
 var SBGNProperties = Backbone.View.extend({
   defaultSBGNProperties: {
-    compoundPadding: parseInt(SBGNStyleProperties['compound-padding'], 10),
-    dynamicLabelSize: SBGNStyleProperties['dynamic-label-size'],
-    fitLabelsToNodes: (SBGNStyleProperties['fit-labels-to-nodes'] == 'true'),
-    incrementalLayoutAfterExpandCollapse: (SBGNStyleProperties['incremental-layout-after-expand-collapse'] == 'true')
+    compoundPadding: parseInt(sbgnStyleRules['compound-padding'], 10),
+    dynamicLabelSize: sbgnStyleRules['dynamic-label-size'],
+    fitLabelsToNodes: (sbgnStyleRules['fit-labels-to-nodes'] == 'true'),
+    incrementalLayoutAfterExpandCollapse: (sbgnStyleRules['incremental-layout-after-expand-collapse'] == 'true')
   },
   currentSBGNProperties: null,
   initialize: function () {

@@ -1842,7 +1842,7 @@
   function truncateText(textProp, context) {
     //If fit labels to nodes is not set yet set it by css value
     if (window.fitLabelsToNodes == null) {
-      window.fitLabelsToNodes = (cy.$("node").css('fit-labels-to-nodes') == 'true');
+      window.fitLabelsToNodes = (sbgnStyleRules['fit-labels-to-nodes'] == 'true');
     }
     //If fit labels to nodes is false do not truncate
     if (window.fitLabelsToNodes == false) {
@@ -1903,7 +1903,7 @@
   $$.sbgn.drawDynamicLabelText = function (context, textProp) {
     //If dynamic label size is not set yet set it by css value
     if (window.dynamicLabelSize == null) {
-      window.dynamicLabelSize = cy.$("node").css('dynamic-label-size');
+      window.dynamicLabelSize = sbgnStyleRules['dynamic-label-size'];
     }
 
     var dynamicLabelSizeCoefficient;

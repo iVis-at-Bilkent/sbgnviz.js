@@ -6,6 +6,10 @@
  */
 
 //Actual  methods
+function fit(){
+  cy.fit(10);
+}
+
 function addNode(newNode)
 {
   return addRemoveUtilities.addNode(newNode.content, newNode.x, newNode.y, newNode.width, newNode.height);
@@ -33,27 +37,27 @@ function removeEdges(edgesToBeDeleted)
 
 function expandNode(node) {
   var result = expandCollapseUtilities.expandNode(node);
-  cy.fit(10);
+  fit();
   return result;
 }
 
 function collapseNode(node) {
   var result = expandCollapseUtilities.collapseNode(node);
-  cy.fit(10);
+  fit();
   return result;
 }
 
 function undoExpandNode(param) {
   returnToPositionsAndSizes(param.nodesData);
   var result = expandCollapseUtilities.simpleCollapseNode(param.node);
-  cy.fit(10);
+  fit();
   return result;
 }
 
 function undoCollapseNode(param) {
   returnToPositionsAndSizes(param.nodesData);
   var result = expandCollapseUtilities.simpleExpandNode(param.node);
-  cy.fit(10);
+  fit();
   return result;
 }
 
@@ -87,7 +91,7 @@ function returnToPositionsAndSizes(nodesData) {
     };
   });
 
-  cy.fit(10);
+  fit();
   return currentPositionsAndSizes;
 }
 
