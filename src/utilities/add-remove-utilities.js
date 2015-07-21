@@ -5,13 +5,15 @@ var addRemoveUtilities = {
       data: {
         width: width,
         height: height,
-        sbgnclass: "source and sink",//this will also be a parameter
+        sbgnclass: "terminal",//this will also be a parameter
         sbgnbbox: {
           h: height,
           w: width,
           x: x,
           y: y
-        }
+        },
+        sbgnstatesandinfos: [],
+        ports: []
       },
       position: {
         x: x,
