@@ -272,6 +272,22 @@ var SBGNContainer = Backbone.View.extend({
       positionMap[cytoscapeJsGraph.nodes[i].data.id] = {'x': xPos, 'y': yPos};
     }
 
+    var windowWidth = $(window).width();
+    var windowHeight = $(window).height();
+
+    var canvasWidth = $(this.el).width();
+    var canvasHeight = $(this.el).height();
+
+    if(windowWidth > canvasWidth)
+    {
+        $(this.el).width(windowWidth* 0.99) ;
+    }
+
+    if(windowHeight > canvasHeight)
+    {
+        $(this.el).height(windowHeight* 0.92);
+    }
+
     var cyOptions = {
       elements: cytoscapeJsGraph,
       style: sbgnStyleSheet,
