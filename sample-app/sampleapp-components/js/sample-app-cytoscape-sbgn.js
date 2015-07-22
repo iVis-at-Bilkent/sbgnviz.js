@@ -216,9 +216,9 @@ var sbgnStyleSheet = cytoscape.stylesheet()
         })
         .selector('edge.meta')
         .css({
-          'line-color': '#898989',
-          'source-arrow-color': '#898989',
-          'target-arrow-color': '#898989'
+          'line-color': '#C4C4C4',
+          'source-arrow-color': '#C4C4C4',
+          'target-arrow-color': '#C4C4C4'
         })
         .selector("edge.meta:selected")
         .css({
