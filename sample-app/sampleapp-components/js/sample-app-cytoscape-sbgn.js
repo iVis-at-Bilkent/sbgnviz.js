@@ -111,7 +111,10 @@ var sbgnStyleSheet = cytoscape.stylesheet()
         .selector("node[sbgnclass='complex']")
         .css({
           'background-color': '#F4F3EE',
-          'expanded-collapsed': 'expanded'
+          'expanded-collapsed': 'expanded',
+          'text-valign': 'bottom',
+          'text-halign': 'center',
+          'font-size': '16'
         })
         .selector("node[sbgnclass='compartment']")
         .css({

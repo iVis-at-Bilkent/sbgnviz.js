@@ -7,7 +7,6 @@ var expandCollapseUtilities = {
       this.collapseBottomUp(root);
     }
   },
-  
   //collapse the nodes in bottom up order 
   collapseBottomUp: function (root) {
     var children = root.children();
@@ -25,7 +24,6 @@ var expandCollapseUtilities = {
       this.simpleCollapseNode(root);
     }
   },
-  
   //Expand the given node perform incremental layout after expandation
   expandNode: function (node) {
     if (node._private.data.collapsedChildren != null) {
@@ -59,7 +57,6 @@ var expandCollapseUtilities = {
       return param;
     }
   },
-  
   /*
    * 
    * This method expands the given node
@@ -77,15 +74,43 @@ var expandCollapseUtilities = {
       node.css("height", node._private.data.oldHeight);
 
       cy.nodes().updateCompoundBounds();
+
+      //Don't show children info when the complex node is expanded
+      if (node._private.data.sbgnclass == "complex") {
+        node.removeStyle('content');
+      }
+
       //return the node to undo the operation
       return node;
     }
   },
-  
   //collapse the given node without making incremental layout
   simpleCollapseNode: function (node) {
     node.css('expanded-collapsed', 'collapsed');
+
     var children = node.children();
+
+    //The children info of complex nodes should be shown when they are collapsed
+    if (node._private.data.sbgnclass == "complex") {
+      var new_content;
+      new_content = node._private.data.sbgnlabel;
+
+      if (new_content == null) {
+        new_content = "";
+        for (var i = 0; i < children.length; i++) {
+          var child_content = children[i]._private.data.sbgnlabel;
+          if (child_content == null) {
+            continue;
+          }
+          if (new_content != "") {
+            new_content += ":";
+          }
+          new_content += child_content;
+        }
+      }
+      node.css('content', new_content);
+    }
+
     for (var i = 0; i < children.length; i++) {
       var child = children[i];
       this.barrowEdgesOfcollapsedChildren(node, child);
@@ -95,14 +120,14 @@ var expandCollapseUtilities = {
     this.removeChildren(node, node);
     node.css('width', 60);
     node.css('height', 60);
+
     //return the node to undo the operation
     return node;
   },
-  
   //collapse the given node then make incremental layout
   collapseNode: function (node) {
     this.simpleCollapseNode(node);
-    
+
     var nodesData = {};
     var nodes = cy.nodes();
     for (var i = 0; i < nodes.length; i++) {
@@ -130,7 +155,6 @@ var expandCollapseUtilities = {
      */
     return param;
   },
-  
   /*
    * for all children of the node parameter call this method
    * with the same root parameter,
@@ -153,7 +177,6 @@ var expandCollapseUtilities = {
       }
     }
   },
-  
   /*
    * This method let the root parameter to barrow the edges connected to the
    * child node or any node inside child node if the any one the source and target
@@ -210,7 +233,6 @@ var expandCollapseUtilities = {
       newCyEdge.addClass("meta");
     }
   },
-  
   /*
    * This method repairs the edges of the collapsed children of the given node
    * when the node is being expanded, the meta edges created while the node is 
@@ -243,7 +265,6 @@ var expandCollapseUtilities = {
     }
     return true;
   },
-  
   /*
    * This method is to handle the collapsed elements while the 
    * dynamic paddings are being calculated
