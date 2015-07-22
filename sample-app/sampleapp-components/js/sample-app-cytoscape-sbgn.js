@@ -126,10 +126,15 @@ var sbgnStyleSheet = cytoscape.stylesheet()
           'font-size': '16',
           'expanded-collapsed': 'expanded'
         })
+        .selector("node[sbgnclass='submap']")
+        .css({
+          'expanded-collapsed': 'expanded'
+        })
         .selector("node[sbgnclass!='complex'][sbgnclass!='compartment'][sbgnclass!='submap']")
         .css({
           'width': 'data(sbgnbbox.w)',
-          'height': 'data(sbgnbbox.h)'
+          'height': 'data(sbgnbbox.h)',
+          'expanded-collapsed': 'expanded'
         })
         .selector("node:selected")
         .css({
