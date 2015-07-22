@@ -315,16 +315,6 @@ var SBGNContainer = Backbone.View.extend({
         });
         container.cytoscapePanzoom(panProps);
 
-//        var panned = false;
-//        var panPositionOnLastMouseDown = null;
-//
-//        cy.on("mousedown", function () {
-//          panPositionOnLastMouseDown = {
-//            x: cy.pan("x"),
-//            y: cy.pan("y")
-//          }
-//        });
-
         var lastMouseDownNodeInfo = null;
         cy.on("mousedown", "node", function () {
           lastMouseDownNodeInfo = {};
@@ -334,21 +324,6 @@ var SBGNContainer = Backbone.View.extend({
           };
           lastMouseDownNodeInfo.node = this;
         });
-
-//        cy.on("pan", function () {
-//          panned = true;
-//        });
-
-//        cy.on("mouseup", function () {
-//          if (panned) {
-//            var param = {
-//              firstTime: true,
-//              oldPanPosition: panPositionOnLastMouseDown
-//            };
-//            editorActionsManager._do(new PanCyCommand(param));
-//          }
-//          panned = false;
-//        });
 
         cy.on("mouseup", "node", function () {
           if( lastMouseDownNodeInfo == null ){
