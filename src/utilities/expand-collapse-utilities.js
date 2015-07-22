@@ -29,32 +29,12 @@ var expandCollapseUtilities = {
     if (node._private.data.collapsedChildren != null) {
       this.simpleExpandNode(node);
 
-      var nodesData = {};
-      var nodes = cy.nodes();
-      for (var i = 0; i < nodes.length; i++) {
-        var thenode = nodes[i];
-        nodesData[thenode.id()] = {
-          width: thenode.width(),
-          height: thenode.height(),
-          x: thenode.position("x"),
-          y: thenode.position("y")
-        };
-      }
-
       $("#perform-incremental-layout").trigger("click");
 
-      var param = {
-        node: node,
-        nodesData: nodesData
-      };
-
       /*
-       * return the param to undo the operation,
-       * param.node is needed to collapse the node back,
-       * param.nodesData is needed to back the incremental 
-       * layout before collapsing the node 
+       * return the node to undo the operation
        */
-      return param;
+      return node;
     }
   },
   /*
@@ -128,32 +108,12 @@ var expandCollapseUtilities = {
   collapseNode: function (node) {
     this.simpleCollapseNode(node);
 
-    var nodesData = {};
-    var nodes = cy.nodes();
-    for (var i = 0; i < nodes.length; i++) {
-      var thenode = nodes[i];
-      nodesData[thenode.id()] = {
-        width: thenode.width(),
-        height: thenode.height(),
-        x: thenode.position("x"),
-        y: thenode.position("y")
-      };
-    }
-
     $("#perform-incremental-layout").trigger("click");
 
-    var param = {
-      node: node,
-      nodesData: nodesData
-    };
-
     /*
-     * return the param to undo the operation,
-     * param.node is needed to expand the node back,
-     * param.nodesData is needed to back the incremental 
-     * layout before expanding the node 
+     * return the node to undo the operation
      */
-    return param;
+    return node;
   },
   /*
    * for all children of the node parameter call this method

@@ -6,7 +6,7 @@
  */
 
 //Actual  methods
-function fit(){
+function fit() {
   cy.fit(10);
 }
 
@@ -36,27 +36,50 @@ function removeEdges(edgesToBeDeleted)
 }
 
 function expandNode(node) {
-  var result = expandCollapseUtilities.expandNode(node);
+  var param = {};
+  param.node = node;
+  param.nodesData = getNodePositionsAndSizes();
+  expandCollapseUtilities.expandNode(node);
   fit();
-  return result;
+  return param;
 }
 
 function collapseNode(node) {
-  var result = expandCollapseUtilities.collapseNode(node);
+  var param = {};
+  param.node = node;
+  param.nodesData = getNodePositionsAndSizes();
+  expandCollapseUtilities.collapseNode(node);
   fit();
-  return result;
+  return param;
+}
+
+function getNodePositionsAndSizes() {
+  var positionsAndSizes = {};
+  var nodes = cy.nodes();
+
+  for (var i = 0; i < nodes.length; i++) {
+    var ele = nodes[i];
+    positionsAndSizes[ele.id()] = {
+      width: ele.width(),
+      height: ele.height(),
+      x: ele.position("x"),
+      y: ele.position("y")
+    };
+  }
+  
+  return positionsAndSizes;
 }
 
 function undoExpandNode(param) {
-  returnToPositionsAndSizes(param.nodesData);
   var result = expandCollapseUtilities.simpleCollapseNode(param.node);
+  returnToPositionsAndSizes(param.nodesData);
   fit();
   return result;
 }
 
 function undoCollapseNode(param) {
-  returnToPositionsAndSizes(param.nodesData);
   var result = expandCollapseUtilities.simpleExpandNode(param.node);
+  returnToPositionsAndSizes(param.nodesData);
   fit();
   return result;
 }
