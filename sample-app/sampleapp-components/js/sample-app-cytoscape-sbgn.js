@@ -4,6 +4,30 @@ var makePresetLayout = function () {
   });
 };
 
+var nodeQtipFunction = function (node, label) {
+  node.qtip({
+    content: label,
+    show: {
+      ready: true
+    },
+    position: {
+      my: 'top center',
+      at: 'bottom center',
+      adjust: {
+        cyViewport: true
+      }
+    },
+    style: {
+      classes: 'qtip-bootstrap',
+      tip: {
+        width: 16,
+        height: 8
+      }
+    }
+  });
+
+};
+
 var refreshUndoRedoButtonsStatus = function () {
   if (editorActionsManager.isUndoStackEmpty()) {
     $("#undo-last-action").parent("li").addClass("disabled");
@@ -391,26 +415,7 @@ var SBGNContainer = Backbone.View.extend({
             return;
 
           node.qtipTimeOutFcn = setTimeout(function () {
-            cy.getElementById(node.id()).qtip({
-              content: label,
-              show: {
-                ready: true
-              },
-              position: {
-                my: 'top center',
-                at: 'bottom center',
-                adjust: {
-                  cyViewport: true
-                }
-              },
-              style: {
-                classes: 'qtip-bootstrap',
-                tip: {
-                  width: 16,
-                  height: 8
-                }
-              }
-            });
+            nodeQtipFunction(node, label);
           }, 1000);
 
         });
@@ -542,26 +547,7 @@ var SBGNContainer = Backbone.View.extend({
           if (typeof label === 'undefined' || label == "")
             return;
 
-          cy.getElementById(node.id()).qtip({
-            content: label,
-            show: {
-              ready: true,
-            },
-            position: {
-              my: 'top center',
-              at: 'bottom center',
-              adjust: {
-                cyViewport: true
-              }
-            },
-            style: {
-              classes: 'qtip-bootstrap',
-              tip: {
-                width: 16,
-                height: 8
-              }
-            }
-          });
+          nodeQtipFunction(node, label);
 
         });
       }
