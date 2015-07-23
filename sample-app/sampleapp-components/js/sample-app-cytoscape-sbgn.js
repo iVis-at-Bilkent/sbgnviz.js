@@ -547,6 +547,11 @@ var SBGNContainer = Backbone.View.extend({
           if (typeof label === 'undefined' || label == "")
             return;
 
+          if (node.qtipTimeOutFcn != null) {
+            clearTimeout(node.qtipTimeOutFcn);
+            node.qtipTimeOutFcn = null;
+          }
+
           nodeQtipFunction(node, label);
 
         });
