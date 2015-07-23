@@ -285,14 +285,14 @@ var SBGNContainer = Backbone.View.extend({
     var canvasWidth = $(this.el).width();
     var canvasHeight = $(this.el).height();
 
-    if(windowWidth > canvasWidth)
+    if (windowWidth > canvasWidth)
     {
-        $(this.el).width(windowWidth* 0.99) ;
+      $(this.el).width(windowWidth * 0.99);
     }
 
-    if(windowHeight > canvasHeight)
+    if (windowHeight > canvasHeight)
     {
-        $(this.el).height(windowHeight* 0.92);
+      $(this.el).height(windowHeight * 0.92);
     }
 
     var cyOptions = {
@@ -333,9 +333,9 @@ var SBGNContainer = Backbone.View.extend({
         });
 
         cy.on("mouseup", "node", function () {
-          if( lastMouseDownNodeInfo == null ){
+          if (lastMouseDownNodeInfo == null) {
             return;
-          } 
+          }
           var node = lastMouseDownNodeInfo.node;
           var lastMouseDownPosition = lastMouseDownNodeInfo.lastMouseDownPosition;
           var mouseUpPosition = {
@@ -365,7 +365,7 @@ var SBGNContainer = Backbone.View.extend({
               move: false
             };
             editorActionsManager._do(new MoveNodeCommand(param));
-            
+
             lastMouseDownNodeInfo = null;
             refreshUndoRedoButtonsStatus();
           }
@@ -390,30 +390,36 @@ var SBGNContainer = Backbone.View.extend({
           if (typeof label === 'undefined' || label == "")
             return;
 
-          cy.getElementById(node.id()).qtip({
-            content: label,
-            show: {
-              ready: true,
-            },
-            position: {
-              my: 'top center',
-              at: 'bottom center',
-              adjust: {
-                cyViewport: true
+          node.qtipTimeOutFcn = setTimeout(function () {
+            cy.getElementById(node.id()).qtip({
+              content: label,
+              show: {
+                ready: true
+              },
+              position: {
+                my: 'top center',
+                at: 'bottom center',
+                adjust: {
+                  cyViewport: true
+                }
+              },
+              style: {
+                classes: 'qtip-bootstrap',
+                tip: {
+                  width: 16,
+                  height: 8
+                }
               }
-            },
-            style: {
-              classes: 'qtip-bootstrap',
-              tip: {
-                width: 16,
-                height: 8
-              }
-            }
-          });
+            });
+          }, 1000);
 
         });
 
         cy.on('mouseout', 'node', function (event) {
+          if (this.qtipTimeOutFcn != null) {
+            clearTimeout(this.qtipTimeOutFcn);
+            this.qtipTimeOutFcn = null;
+          }
           this.mouseover = false;
           //make preset layout to redraw the nodes
           cy.forceRender();
