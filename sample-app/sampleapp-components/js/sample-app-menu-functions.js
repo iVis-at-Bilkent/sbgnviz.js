@@ -305,11 +305,13 @@ $(document).ready(function () {
       alert("Exactly 2 nodes should be selected!!!");
       return;
     }
-    var newEdge = {
+    var param = {};
+    param.newEdge = {
       source: selectedNodes[0].id(),
       target: selectedNodes[1].id()
     };
-    editorActionsManager._do(new AddEdgeCommand(newEdge));
+    param.firstTime = true;
+    editorActionsManager._do(new AddEdgeCommand(param));
     refreshUndoRedoButtonsStatus();
   });
 

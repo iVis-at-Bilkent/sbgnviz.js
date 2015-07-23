@@ -10,9 +10,17 @@ function fit() {
   cy.fit(10);
 }
 
-function addNode(newNode)
+function addNode(param)
 {
-  return addRemoveUtilities.addNode(newNode.content, newNode.x, newNode.y, newNode.width, newNode.height);
+  var result;
+  if(param.firstTime){
+    var newNode = param.newNode;
+    result = addRemoveUtilities.addNode(newNode.content, newNode.x, newNode.y, newNode.width, newNode.height);
+  }
+  else {
+    result = addRemoveUtilities.restoreEles(param);
+  }
+  return result;
 }
 
 function removeNodes(nodesToBeDeleted)
@@ -25,9 +33,17 @@ function restoreEles(eles)
   return addRemoveUtilities.restoreEles(eles);
 }
 
-function addEdge(newEdge)
+function addEdge(param)
 {
-  return addRemoveUtilities.addEdge(newEdge.source, newEdge.target);
+  var result;
+  if(param.firstTime){
+    var newEdge = param.newEdge;
+    result = addRemoveUtilities.addEdge(newEdge.source, newEdge.target);
+  }
+  else {
+    result = addRemoveUtilities.restoreEles(param);
+  }
+  return result;
 }
 
 function removeEdges(edgesToBeDeleted)

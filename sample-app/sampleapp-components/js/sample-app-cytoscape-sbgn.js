@@ -726,8 +726,11 @@ var AddNodeProperties = Backbone.View.extend({
       self.currentProperties.width = Number(document.getElementById("add-node-width").value);
       self.currentProperties.height = Number(document.getElementById("add-node-height").value);
 
-      var newNode = _.clone(self.currentProperties);
-      editorActionsManager._do(new AddNodeCommand(newNode));
+      var param = {};
+      param.newNode = _.clone(self.currentProperties);
+      param.firstTime = true;
+     
+      editorActionsManager._do(new AddNodeCommand(param));
       refreshUndoRedoButtonsStatus();
 
 //      addRemoveUtilities.addNode(self.currentProperties.content,
