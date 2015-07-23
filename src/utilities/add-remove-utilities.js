@@ -26,7 +26,7 @@ var addRemoveUtilities = {
     cy.layout({
       name: 'preset'
     });
-    return eles[0];
+    return eles[eles.length - 1];
   },
   removeNodes: function (nodes) {
     var removedEles = nodes.connectedEdges().remove();
@@ -52,7 +52,7 @@ var addRemoveUtilities = {
       name: 'preset'
     });
     
-    return eles[0];
+    return eles[eles.length - 1];
   },
   removeEdges: function (edges) {
     return edges.remove();

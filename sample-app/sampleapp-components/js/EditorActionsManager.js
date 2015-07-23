@@ -296,6 +296,15 @@ function removeHighlights() {
   result.firstTime = false;
   return result;
 }
+/*
+ * This method assumes that nodesToMakeCompound contains at least one node
+ * and all of the nodes including in it have the same parent
+ */
+function createCompoundForSelectedNodes(nodesToMakeCompound){
+  var oldParentId = nodesToMakeCompound[0].id();
+  var childrenOfCompound = jQuery.extend(true, {}, nodesToMakeCompound.jsons());
+//  var newCompoundNode = 
+}
 
 /*
  *	Base command class
@@ -381,6 +390,10 @@ var HighlightProcessesOfSelectedCommand = function (param) {
 
 var RemoveHighlightsCommand = function () {
   return new Command(removeHighlights, highlightSelected);
+};
+
+var CreateCompundForSelectedNodesCommand = function(param){
+  return new Command(createCompoundForSelectedNodes, removeCompound, param);
 };
 
 /**
