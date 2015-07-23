@@ -98,6 +98,11 @@
       return;
     }
     
+    //If the compound node has no expanded-collapsed style property make it expanded
+    if( node.css()['expanded-collapsed'] == null ){
+      node.css('expanded-collapsed', 'expanded');
+    }
+    
     var expandedOrcollapsed = node.css('expanded-collapsed');
     
     //expand or collapse boxes are to be drawn if the mouse is over the node or the node is collapsed
