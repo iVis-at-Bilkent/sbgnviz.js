@@ -74,10 +74,11 @@ var expandCollapseUtilities = {
     //The children info of complex nodes should be shown when they are collapsed
     if (node._private.data.sbgnclass == "complex") {
       var new_content;
+      var infoLabel = getInfoLabel(node);
       new_content = node._private.data.sbgnlabel;
 
       if (new_content == null || new_content == "") {
-        new_content = getInfoLabel(node);
+        new_content = infoLabel;
       }
       node.css('content', new_content);
     }

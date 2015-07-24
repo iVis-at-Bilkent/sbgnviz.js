@@ -5,18 +5,6 @@ var makePresetLayout = function () {
 };
 
 /*
- * This function call the recursive getInfoLabel function for all orphan
- * nodes so infoLabel of all nodes are set by calling this function.
- */
-var getInfoLabels = function () {
-  var orphans = cy.nodes().orphans();
-  for (var i = 0; i < orphans.length; i++) {
-    var root = orphans[i];
-    getInfoLabel(root);
-  }
-};
-
-/*
  * This function obtains the info label of the given node by
  * it's children info recursively
  */
@@ -435,7 +423,6 @@ var SBGNContainer = Backbone.View.extend({
       {
         window.cy = this;
         refreshPaddings();
-        getInfoLabels();
 
         expandCollapseUtilities.initCollapsedNodes();
 
