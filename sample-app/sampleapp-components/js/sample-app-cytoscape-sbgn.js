@@ -529,6 +529,11 @@ var SBGNContainer = Backbone.View.extend({
         cy.on('cxttap', 'node', function (event) {
           var node = this;
           $(".qtip").remove();
+          
+          if (node.qtipTimeOutFcn != null) {
+            clearTimeout(node.qtipTimeOutFcn);
+            node.qtipTimeOutFcn = null;
+          }
 
           var geneClass = node._private.data.sbgnclass;
           if (geneClass != 'macromolecule' && geneClass != 'nucleic acid feature' &&
