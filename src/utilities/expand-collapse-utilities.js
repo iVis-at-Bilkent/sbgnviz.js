@@ -15,6 +15,7 @@ var expandCollapseUtilities = {
       if (node.is("[sbgnclass!='complex']") && node.is("[sbgnclass!='compartment']")) {
         continue;
       }
+      //TODO probably this if statement should be removed check it
       if (node.css('expanded-collapsed') == 'collapsed') {
         this.collapseBottomUp(node);
       }
@@ -75,18 +76,8 @@ var expandCollapseUtilities = {
       var new_content;
       new_content = node._private.data.sbgnlabel;
 
-      if (new_content == null) {
-        new_content = "";
-        for (var i = 0; i < children.length; i++) {
-          var child_content = children[i]._private.data.sbgnlabel;
-          if (child_content == null) {
-            continue;
-          }
-          if (new_content != "") {
-            new_content += ":";
-          }
-          new_content += child_content;
-        }
+      if (new_content == null || new_content == "") {
+        new_content = getInfoLabel(node);
       }
       node.css('content', new_content);
     }
