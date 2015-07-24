@@ -61,6 +61,9 @@ var getInfoLabel = function (node) {
   return infoLabel;
 };
 
+/*
+ * This function create qtip for the given node
+ */
 var nodeQtipFunction = function (node) {
   /*
    * Check the sbgnlabel of the node if it is not valid 
@@ -97,6 +100,10 @@ var nodeQtipFunction = function (node) {
 
 };
 
+/*
+ * This function refreshs the enabled-disabled status of undo-redo buttons.
+ * The status of buttons are determined by whether the undo-redo stacks are empty.
+ */
 var refreshUndoRedoButtonsStatus = function () {
   if (editorActionsManager.isUndoStackEmpty()) {
     $("#undo-last-action").parent("li").addClass("disabled");
