@@ -12,15 +12,11 @@ var expandCollapseUtilities = {
     var children = root.children();
     for (var i = 0; i < children.length; i++) {
       var node = children[i];
-      if (node.is("[sbgnclass!='complex']") && node.is("[sbgnclass!='compartment']")) {
-        continue;
-      }
-      //TODO probably this if statement should be removed check it
-      if (node.css('expanded-collapsed') == 'collapsed') {
-        this.collapseBottomUp(node);
-      }
+      this.collapseBottomUp(node);
     }
-    if ((root.is("[sbgnclass='complex']") || root.is("[sbgnclass='compartment']"))
+    //If the root is a compound node to be collapsed then collapse it
+    if ((root.children().length > 0 || root._private.data.collapsedChildren != null)
+            && root.css()['expanded-collapsed'] != null
             && root.css('expanded-collapsed') == 'collapsed') {
       this.simpleCollapseNode(root);
     }
@@ -30,7 +26,7 @@ var expandCollapseUtilities = {
     if (node._private.data.collapsedChildren != null) {
       this.simpleExpandNode(node);
       node.removeData("infoLabel");
-      
+
       $("#perform-incremental-layout").trigger("click");
 
       /*
@@ -78,7 +74,7 @@ var expandCollapseUtilities = {
       //The node is being collapsed store infolabel to use it later
       var infoLabel = getInfoLabel(node);
       node._private.data.infoLabel = infoLabel;
-      
+
       new_content = node._private.data.sbgnlabel;
 
       if (new_content == null || new_content == "") {
