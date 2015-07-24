@@ -8,9 +8,9 @@ var makePresetLayout = function () {
  * This function call the recursive getInfoLabel function for all orphan
  * nodes so infoLabel of all nodes are set by calling this function.
  */
-var getInfoLabels = function() {
+var getInfoLabels = function () {
   var orphans = cy.nodes().orphans();
-  for(var i = 0; i < orphans.length; i++){
+  for (var i = 0; i < orphans.length; i++) {
     var root = orphans[i];
     getInfoLabel(root);
   }
@@ -20,42 +20,60 @@ var getInfoLabels = function() {
  * This function obtains the info label of the given node by
  * it's children info recursively
  */
-var getInfoLabel = function(node) {
+var getInfoLabel = function (node) {
   /*
    * Info label of a collapsed node cannot be changed if
    * the node is collapsed return the already existing info label of it
    */
-  if(node._private.data.collapsedChildren != null){
+  if (node._private.data.collapsedChildren != null) {
     return node._private.data.infoLabel;
   }
-  
+
   /*
    * If the node is simple then it's infolabel is equal to it's sbgnlabel
    */
-  if(node.children() == null || node.children().length == 0){
+  if (node.children() == null || node.children().length == 0) {
     node._private.data.infoLabel = node._private.data.sbgnlabel;
     return node._private.data.sbgnlabel;
   }
-  
+
   var children = node.children();
   var infoLabel = "";
   /*
    * Get the info label of the given node by it's children info recursively
    */
-  for(var i = 0; i < children.length; i++){
+  for (var i = 0; i < children.length; i++) {
     var child = children[i];
-    if(infoLabel != ""){
+    var childInfo = getInfoLabel(child);
+    
+    if(childInfo == null || childInfo == ""){
+      continue;
+    }
+    
+    if (infoLabel != "") {
       infoLabel += ":";
     }
-    infoLabel += getInfoLabel(child);
+    infoLabel += childInfo;
   }
-  
+
   //set the info label of the node and return that info label
   node._private.data.infoLabel = infoLabel;
   return infoLabel;
 };
 
-var nodeQtipFunction = function (node, label) {
+var nodeQtipFunction = function (node) {
+  /*
+   * Check the sbgnlabel of the node if it is not valid 
+   * then check the infolabel if it is also not valid do not show qtip
+   */
+  var label = node._private.data.sbgnlabel;
+
+  if (label == null || label == "")
+    label = node._private.data.infoLabel;
+  
+  if (label == null || label == "")
+    return;
+  
   node.qtip({
     content: label,
     show: {
@@ -396,7 +414,7 @@ var SBGNContainer = Backbone.View.extend({
         window.cy = this;
         refreshPaddings();
         getInfoLabels();
-        
+
         expandCollapseUtilities.initCollapsedNodes();
 
         editorActionsManager.reset();
@@ -470,13 +488,8 @@ var SBGNContainer = Backbone.View.extend({
           if (event.originalEvent.shiftKey)
             return;
 
-          var label = node._private.data.sbgnlabel;
-
-          if (typeof label === 'undefined' || label == "")
-            return;
-
           node.qtipTimeOutFcn = setTimeout(function () {
-            nodeQtipFunction(node, label);
+            nodeQtipFunction(node);
           }, 1000);
 
         });
@@ -603,17 +616,12 @@ var SBGNContainer = Backbone.View.extend({
           if (event.originalEvent.shiftKey)
             return;
 
-          var label = node._private.data.sbgnlabel;
-
-          if (typeof label === 'undefined' || label == "")
-            return;
-
           if (node.qtipTimeOutFcn != null) {
             clearTimeout(node.qtipTimeOutFcn);
             node.qtipTimeOutFcn = null;
           }
 
-          nodeQtipFunction(node, label);
+          nodeQtipFunction(node);
 
         });
       }
@@ -790,7 +798,7 @@ var AddNodeProperties = Backbone.View.extend({
       var param = {};
       param.newNode = _.clone(self.currentProperties);
       param.firstTime = true;
-     
+
       editorActionsManager._do(new AddNodeCommand(param));
       refreshUndoRedoButtonsStatus();
 
