@@ -21,7 +21,6 @@ var getInfoLabel = function (node) {
    * If the node is simple then it's infolabel is equal to it's sbgnlabel
    */
   if (node.children() == null || node.children().length == 0) {
-    node._private.data.infoLabel = node._private.data.sbgnlabel;
     return node._private.data.sbgnlabel;
   }
 
@@ -44,8 +43,7 @@ var getInfoLabel = function (node) {
     infoLabel += childInfo;
   }
 
-  //set the info label of the node and return that info label
-  node._private.data.infoLabel = infoLabel;
+  //return info label
   return infoLabel;
 };
 

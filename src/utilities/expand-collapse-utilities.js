@@ -29,7 +29,8 @@ var expandCollapseUtilities = {
   expandNode: function (node) {
     if (node._private.data.collapsedChildren != null) {
       this.simpleExpandNode(node);
-
+      node.removeData("infoLabel");
+      
       $("#perform-incremental-layout").trigger("click");
 
       /*
@@ -74,7 +75,10 @@ var expandCollapseUtilities = {
     //The children info of complex nodes should be shown when they are collapsed
     if (node._private.data.sbgnclass == "complex") {
       var new_content;
+      //The node is being collapsed store infolabel to use it later
       var infoLabel = getInfoLabel(node);
+      node._private.data.infoLabel = infoLabel;
+      
       new_content = node._private.data.sbgnlabel;
 
       if (new_content == null || new_content == "") {
