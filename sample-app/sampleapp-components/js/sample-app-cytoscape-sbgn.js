@@ -4,6 +4,57 @@ var makePresetLayout = function () {
   });
 };
 
+/*
+ * This function call the recursive getInfoLabel function for all orphan
+ * nodes so infoLabel of all nodes are set by calling this function.
+ */
+var getInfoLabels = function() {
+  var orphans = cy.nodes().orphans();
+  for(var i = 0; i < orphans.length; i++){
+    var root = orphans[i];
+    getInfoLabel(root);
+  }
+};
+
+/*
+ * This function obtains the info label of the given node by
+ * it's children info recursively
+ */
+var getInfoLabel = function(node) {
+  /*
+   * Info label of a collapsed node cannot be changed if
+   * the node is collapsed return the already existing info label of it
+   */
+  if(node._private.data.collapsedChildren != null){
+    return node._private.data.infoLabel;
+  }
+  
+  /*
+   * If the node is simple then it's infolabel is equal to it's sbgnlabel
+   */
+  if(node.children() == null || node.children().length == 0){
+    node._private.data.infoLabel = node._private.data.sbgnlabel;
+    return node._private.data.sbgnlabel;
+  }
+  
+  var children = node.children();
+  var infoLabel = "";
+  /*
+   * Get the info label of the given node by it's children info recursively
+   */
+  for(var i = 0; i < children.length; i++){
+    var child = children[i];
+    if(infoLabel != ""){
+      infoLabel += ":";
+    }
+    infoLabel += getInfoLabel(child);
+  }
+  
+  //set the info label of the node and return that info label
+  node._private.data.infoLabel = infoLabel;
+  return infoLabel;
+};
+
 var nodeQtipFunction = function (node, label) {
   node.qtip({
     content: label,
@@ -86,6 +137,9 @@ var refreshPaddings = function () {
   makePresetLayout();
 };
 
+/*
+ * This is a debugging function
+ */
 var printNodeInfo = function () {
   console.log("print node info");
   var nodes = cy.nodes();
@@ -99,8 +153,9 @@ var printNodeInfo = function () {
     var edge = edges[i];
     console.log(edge.data("id") + "\t" + edge.data("source") + "\t" + edge.data("target"));
   }
-}
+};
 
+//get the style properties for the given selector
 var getStyleRules = function (selector) {
   for (var i = 0; i < sbgnStyleSheet.length; i++) {
     var currentStyle = sbgnStyleSheet[i];
@@ -110,6 +165,9 @@ var getStyleRules = function (selector) {
   }
 };
 
+/*
+ * get the style rules for .sbgn selector and fill them into sbgnStyleRules map
+ */
 var getSBGNStyleRules = function () {
   if (window.sbgnStyleRules == null) {
     var styleRulesList = getStyleRules(".sbgn");
@@ -265,6 +323,7 @@ var sbgnStyleSheet = cytoscape.stylesheet()
           'incremental-layout-after-expand-collapse': 'true'
         }); // end of sbgnStyleSheet
 
+//get the sbgn style rules
 getSBGNStyleRules();
 
 var NotyView = Backbone.View.extend({
@@ -336,6 +395,8 @@ var SBGNContainer = Backbone.View.extend({
       {
         window.cy = this;
         refreshPaddings();
+        getInfoLabels();
+        
         expandCollapseUtilities.initCollapsedNodes();
 
         editorActionsManager.reset();
