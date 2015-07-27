@@ -58,7 +58,7 @@ var nodeQtipFunction = function (node) {
   var label = node._private.data.sbgnlabel;
 
   if (label == null || label == "")
-    label = node._private.data.infoLabel;
+    label = getInfoLabel(node);
   
   if (label == null || label == "")
     return;
