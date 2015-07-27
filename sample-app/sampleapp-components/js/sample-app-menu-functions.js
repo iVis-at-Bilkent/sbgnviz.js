@@ -284,6 +284,15 @@ $(document).ready(function () {
     editorActionsManager._do(new RemoveHighlightsCommand());
     refreshUndoRedoButtonsStatus();
   });
+  
+  $("#make-compound").click(function (e) {
+    var param = {
+      firstTime: true,
+      nodesToMakeCompound: cy.nodes(":selected")
+    };
+    editorActionsManager._do(new CreateCompundForSelectedNodesCommand(param));
+    refreshUndoRedoButtonsStatus();
+  });
 
   $("#layout-properties").click(function (e) {
     sbgnLayoutProp.render();

@@ -13,7 +13,7 @@ function fit() {
 function addNode(param)
 {
   var result;
-  if(param.firstTime){
+  if (param.firstTime) {
     var newNode = param.newNode;
     result = addRemoveUtilities.addNode(newNode.content, newNode.x, newNode.y, newNode.width, newNode.height);
   }
@@ -36,7 +36,7 @@ function restoreEles(eles)
 function addEdge(param)
 {
   var result;
-  if(param.firstTime){
+  if (param.firstTime) {
     var newEdge = param.newEdge;
     result = addRemoveUtilities.addEdge(newEdge.source, newEdge.target);
   }
@@ -82,7 +82,7 @@ function getNodePositionsAndSizes() {
       y: ele.position("y")
     };
   }
-  
+
   return positionsAndSizes;
 }
 
@@ -297,13 +297,58 @@ function removeHighlights() {
   return result;
 }
 /*
- * This method assumes that nodesToMakeCompound contains at least one node
+ * This method assumes that param.nodesToMakeCompound contains at least one node
  * and all of the nodes including in it have the same parent
  */
-function createCompoundForSelectedNodes(nodesToMakeCompound){
-  var oldParentId = nodesToMakeCompound[0].id();
-  var childrenOfCompound = jQuery.extend(true, {}, nodesToMakeCompound.jsons());
-//  var newCompoundNode = 
+function createCompoundForSelectedNodes(param) {
+  var nodesToMakeCompound = param.nodesToMakeCompound;
+  var oldParentId = nodesToMakeCompound[0].data("parent");
+  var newCompound;
+
+  if (param.firstTime) {
+    var eles = cy.add({
+      group: "nodes",
+      data: {
+        sbgnclass: "complex", //this will also be a parameter
+        parent: oldParentId,
+        sbgnbbox: {
+        },
+        sbgnstatesandinfos: [],
+        ports: []
+      }
+    });
+
+    newCompound = eles[eles.length - 1];
+    newCompound._private.data.sbgnbbox.h = newCompound.height();
+    newCompound._private.data.sbgnbbox.w = newCompound.width();
+  }
+  else {
+    newCompound = param.removedCompund.restore();
+  }
+
+  var newCompoundId = newCompound.id();
+
+  addRemoveUtilities.changeParent(nodesToMakeCompound, oldParentId, newCompoundId);
+  refreshPaddings();
+  return newCompound;
+}
+
+function removeCompound(compoundToRemove) {
+  var compoundId = compoundToRemove.id();
+  var newParentId = compoundToRemove.data("parent");
+  var childrenOfCompound = compoundToRemove.children();
+
+  addRemoveUtilities.changeParent(childrenOfCompound, compoundId, newParentId);
+  var removedCompund = compoundToRemove.remove();
+
+  refreshPaddings();
+
+  var param = {
+    nodesToMakeCompound: childrenOfCompound,
+    removedCompund: removedCompund
+  };
+
+  return param;
 }
 
 /*
@@ -392,7 +437,7 @@ var RemoveHighlightsCommand = function () {
   return new Command(removeHighlights, highlightSelected);
 };
 
-var CreateCompundForSelectedNodesCommand = function(param){
+var CreateCompundForSelectedNodesCommand = function (param) {
   return new Command(createCompoundForSelectedNodes, removeCompound, param);
 };
 

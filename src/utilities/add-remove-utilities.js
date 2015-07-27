@@ -5,7 +5,7 @@ var addRemoveUtilities = {
       data: {
         width: width,
         height: height,
-        sbgnclass: "terminal",//this will also be a parameter
+        sbgnclass: "terminal", //this will also be a parameter
         sbgnbbox: {
           h: height,
           w: width,
@@ -31,7 +31,7 @@ var addRemoveUtilities = {
   removeNodes: function (nodes) {
     var removedEles = nodes.connectedEdges().remove();
     var children = nodes.children();
-    if(children != null && children.length > 0){
+    if (children != null && children.length > 0) {
       removedEles = removedEles.union(this.removeNodes(children));
     }
     var parents = nodes.parents();
@@ -51,17 +51,34 @@ var addRemoveUtilities = {
     cy.layout({
       name: 'preset'
     });
-    
+
     return eles[eles.length - 1];
   },
   removeEdges: function (edges) {
     return edges.remove();
   },
-  restoreEles: function(eles){
+  restoreEles: function (eles) {
     eles.restore();
     return eles;
   },
-  removeEles: function(eles){
+  removeEles: function (eles) {
     return eles.remove();
+  },
+  changeParent: function (nodes, oldParentId, newParentId) {
+    var removedNodes = this.removeNodes(nodes);
+
+    for (var i = 0; i < removedNodes.length; i++) {
+      var removedNode = removedNodes[i];
+      var parentId = removedNode._private.data.parent;
+
+      //Just alter the parent id of the nodesToMakeCompound
+      if (parentId != oldParentId) {
+        continue;
+      }
+
+      removedNode._private.data.parent = newParentId;
+    }
+
+    cy.add(removedNodes);
   }
 };
