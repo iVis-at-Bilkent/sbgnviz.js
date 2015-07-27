@@ -309,7 +309,7 @@ function createCompoundForSelectedNodes(param) {
     var eles = cy.add({
       group: "nodes",
       data: {
-        sbgnclass: "complex", //this will also be a parameter
+        sbgnclass: param.compundType,
         parent: oldParentId,
         sbgnbbox: {
         },

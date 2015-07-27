@@ -285,9 +285,20 @@ $(document).ready(function () {
     refreshUndoRedoButtonsStatus();
   });
   
-  $("#make-compound").click(function (e) {
+  $("#make-compound-complex").click(function (e) {
     var param = {
       firstTime: true,
+      compundType: "complex",
+      nodesToMakeCompound: cy.nodes(":selected")
+    };
+    editorActionsManager._do(new CreateCompundForSelectedNodesCommand(param));
+    refreshUndoRedoButtonsStatus();
+  });
+  
+  $("#make-compound-compartment").click(function (e) {
+    var param = {
+      firstTime: true,
+      compundType: "compartment",
       nodesToMakeCompound: cy.nodes(":selected")
     };
     editorActionsManager._do(new CreateCompundForSelectedNodesCommand(param));
