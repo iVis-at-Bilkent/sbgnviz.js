@@ -5,11 +5,6 @@
  *	Author: Istemi Bahceci<istemi.bahceci@gmail.com>
  */
 
-//Actual  methods
-function fit() {
-  cy.fit(10);
-}
-
 function addNode(param)
 {
   var result;
@@ -56,7 +51,6 @@ function expandNode(node) {
   param.node = node;
   param.nodesData = getNodePositionsAndSizes();
   expandCollapseUtilities.expandNode(node);
-  fit();
   return param;
 }
 
@@ -65,7 +59,6 @@ function collapseNode(node) {
   param.node = node;
   param.nodesData = getNodePositionsAndSizes();
   expandCollapseUtilities.collapseNode(node);
-  fit();
   return param;
 }
 
@@ -89,14 +82,12 @@ function getNodePositionsAndSizes() {
 function undoExpandNode(param) {
   var result = expandCollapseUtilities.simpleCollapseNode(param.node);
   returnToPositionsAndSizes(param.nodesData);
-  fit();
   return result;
 }
 
 function undoCollapseNode(param) {
   var result = expandCollapseUtilities.simpleExpandNode(param.node);
   returnToPositionsAndSizes(param.nodesData);
-  fit();
   return result;
 }
 
@@ -130,7 +121,6 @@ function returnToPositionsAndSizes(nodesData) {
     };
   });
 
-  fit();
   return currentPositionsAndSizes;
 }
 

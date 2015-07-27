@@ -682,12 +682,14 @@ var SBGNLayout = Backbone.View.extend({
   },
   applyLayout: function () {
     var options = this.currentLayoutProperties;
+    options.fit = options.randomize;
     cy.elements().filter(':visible').layout(options);
   },
   applyIncrementalLayout: function () {
     var options = _.clone(this.currentLayoutProperties);
     options.randomize = false;
     options.animate = false;
+    options.fit = false;
     cy.elements().filter(':visible').layout(options);
   },
   render: function () {
