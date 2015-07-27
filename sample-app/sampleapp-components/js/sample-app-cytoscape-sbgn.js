@@ -588,6 +588,17 @@ var SBGNContainer = Backbone.View.extend({
           });
         });
 
+        var cancelSelection;
+        var selectAgain;
+        cy.on('select', 'node', function (event) {
+          if(cancelSelection){
+            this.unselect();
+            cancelSelection = null;
+            selectAgain.select();
+            selectAgain = null;
+          }
+        });
+
         cy.on('tap', 'node', function (event) {
           var node = this;
           //Handle expand-collapse box
@@ -598,6 +609,8 @@ var SBGNContainer = Backbone.View.extend({
                   && cyPosX <= node._private.data.expandcollapseEndX
                   && cyPosY >= node._private.data.expandcollapseStartY
                   && cyPosY <= node._private.data.expandcollapseEndY) {
+            selectAgain = cy.filter(":selected");
+            cancelSelection = true;
             var expandedOrcollapsed = this.css('expanded-collapsed');
 
             if (window.incrementalLayoutAfterExpandCollapse == null) {
