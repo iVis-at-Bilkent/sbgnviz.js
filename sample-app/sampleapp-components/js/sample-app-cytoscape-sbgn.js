@@ -65,17 +65,17 @@ var nodeQtipFunction = function (node) {
   
   node.qtip({
     content: function(){
-      var contentHtml = "<b style='allign:center;font-size:16px;'>" + label + "</b>";
+      var contentHtml = "<b style='text-align:center;font-size:16px;'>" + label + "</b>";
       var sbgnstatesandinfos = node._private.data.sbgnstatesandinfos;
       for(var i = 0; i < sbgnstatesandinfos.length; i++){
         var sbgnstateandinfo = sbgnstatesandinfos[i];
         if(sbgnstateandinfo.clazz == "state variable"){
           var value = sbgnstateandinfo.state.value;
           var variable = sbgnstateandinfo.state.variable;
-          contentHtml += "<div style='allign:center;font-size:14px;'>" + value + "@" + variable + "</div>";
+          contentHtml += "<div style='text-align:center;font-size:14px;'>" + value + "@" + variable + "</div>";
         }
         else if(sbgnstateandinfo.clazz == "unit of information"){
-          contentHtml += "<div style='allign:center;font-size:14px;'>" + sbgnstateandinfo.label.text + "</div>";
+          contentHtml += "<div style='text-align:center;font-size:14px;'>" + sbgnstateandinfo.label.text + "</div>";
         }
       }
       return contentHtml;
