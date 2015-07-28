@@ -312,10 +312,10 @@ $(document).ready(function () {
   $("#add-node").click(function (e) {
     sbgnAddNodeProp.render();
   });
-
-  $("#delete-selected-nodes").click(function (e) {
-    var selectedNodes = cy.$("node:selected");
-    editorActionsManager._do(new RemoveNodesCommand(selectedNodes));
+  
+  $("#delete-selected-eles").click(function (e) {
+    var selectedEles = cy.$(":selected");
+    editorActionsManager._do(new RemoveElesCommand(selectedEles));
     refreshUndoRedoButtonsStatus();
   });
 
@@ -332,12 +332,6 @@ $(document).ready(function () {
     };
     param.firstTime = true;
     editorActionsManager._do(new AddEdgeCommand(param));
-    refreshUndoRedoButtonsStatus();
-  });
-
-  $("#delete-selected-edges").click(function (e) {
-    var selectedEdges = cy.$("edge:selected");
-    editorActionsManager._do(new RemoveEdgesCommand(selectedEdges));
     refreshUndoRedoButtonsStatus();
   });
 

@@ -61,8 +61,15 @@ var addRemoveUtilities = {
     eles.restore();
     return eles;
   },
-  removeEles: function (eles) {
+  removeElesSimply: function (eles) {
     return eles.remove();
+  },
+  removeEles: function (eles) {
+    var edges = eles.edges();
+    var nodes = eles.nodes();
+    var removedEles = this.removeEdges(edges);
+    removedEles = removedEles.union(this.removeNodes(nodes));
+    return removedEles;
   },
   changeParent: function (nodes, oldParentId, newParentId) {
     var removedNodes = this.removeNodes(nodes);

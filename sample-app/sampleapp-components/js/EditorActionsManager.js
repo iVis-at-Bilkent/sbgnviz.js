@@ -23,6 +23,10 @@ function removeNodes(nodesToBeDeleted)
   return addRemoveUtilities.removeNodes(nodesToBeDeleted);
 }
 
+function removeEles(elesToBeRemoved){
+  return addRemoveUtilities.removeEles(elesToBeRemoved);
+}
+
 function restoreEles(eles)
 {
   return addRemoveUtilities.restoreEles(eles);
@@ -163,7 +167,7 @@ function deleteSelected(param) {
   if (param.firstTime) {
     return sbgnFiltering.deleteSelected();
   }
-  return addRemoveUtilities.removeEles(param.eles);
+  return addRemoveUtilities.removeElesSimply(param.eles);
 }
 
 function restoreSelected(eles) {
@@ -361,6 +365,11 @@ var AddNodeCommand = function (newNode)
 var RemoveNodesCommand = function (nodesTobeDeleted)
 {
   return new Command(removeNodes, restoreEles, nodesTobeDeleted);
+};
+
+var RemoveElesCommand = function (elesTobeDeleted)
+{
+  return new Command(removeEles, restoreEles, elesTobeDeleted);
 };
 
 var AddEdgeCommand = function (newEdge)
