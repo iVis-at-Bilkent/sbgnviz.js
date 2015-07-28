@@ -1,3 +1,40 @@
+
+
+function dynamicResize()
+{
+
+    var win = $(this); //this = window
+
+    var windowWidth = win.width();
+    var windowHeight = win.height();
+
+    var canvasWidth = 1000;
+    var canvasHeight = 680;
+
+    if (windowWidth > canvasWidth)
+    {
+      $("#sbgn-network-container").width(windowWidth * 0.85);
+      $(".nav-menu").width(windowWidth * 0.85);
+      $(".navbar").width(windowWidth * 0.85);
+      $("#sbgn-info-content").width(windowWidth * 0.85);
+
+    }
+
+    if (windowHeight > canvasHeight)
+    {
+      $("#sbgn-network-container").height(windowHeight * 0.85);
+    }
+}
+
+$(window).on('resize', dynamicResize);
+
+$( document ).ready(function() 
+{
+  dynamicResize();
+});
+
+
+
 var makePresetLayout = function () {
   cy.layout({
     name: "preset"
@@ -386,22 +423,6 @@ var SBGNContainer = Backbone.View.extend({
       var xPos = cytoscapeJsGraph.nodes[i].data.sbgnbbox.x;
       var yPos = cytoscapeJsGraph.nodes[i].data.sbgnbbox.y;
       positionMap[cytoscapeJsGraph.nodes[i].data.id] = {'x': xPos, 'y': yPos};
-    }
-
-    var windowWidth = $(window).width();
-    var windowHeight = $(window).height();
-
-    var canvasWidth = $(this.el).width();
-    var canvasHeight = $(this.el).height();
-
-    if (windowWidth > canvasWidth)
-    {
-      $(this.el).width(windowWidth * 0.99);
-    }
-
-    if (windowHeight > canvasHeight)
-    {
-      $(this.el).height(windowHeight * 0.92);
     }
 
     var cyOptions = {
