@@ -1,13 +1,93 @@
 var expandCollapseUtilities = {
   //Some nodes are initilized as collapsed this method handles them
   initCollapsedNodes: function () {
-    var orphans = cy.nodes().orphans();
+    var nodesToCollapse = cy.nodes().filter(function(i, ele){
+      if(ele.css()['expanded-collapsed'] != null && ele.css('expanded-collapsed') == 'collapsed'){
+        return true;
+      }
+    });
+    this.simpleCollapseGivenNodes(nodesToCollapse);
+  },
+  simpleCollapseGivenNodes: function (nodes) {
+    nodes.data("collapse", true);
+    var orphans = nodes.orphans();
     for (var i = 0; i < orphans.length; i++) {
       var root = orphans[i];
       this.collapseBottomUp(root);
     }
+    return nodes;
   },
-  //collapse the nodes in bottom up order 
+  simpleExpandGivenNodes: function (nodes) {
+    nodes.data("expand", true);
+    var orphans = nodes.orphans();
+    for (var i = 0; i < orphans.length; i++) {
+      var root = orphans[i];
+      this.expandTopDown(root);
+    }
+    return nodes;
+  },
+  simpleExpandAllNodes: function () {
+    var nodes = cy.nodes();
+    var orphans = nodes.orphans();
+    var expandStack = [];
+    for (var i = 0; i < orphans.length; i++) {
+      var root = orphans[i];
+      this.expandAllTopDown(root, expandStack);
+    }
+    return expandStack;
+  },
+  expandAllNodes: function () {
+    var expandedStack = this.simpleExpandAllNodes();
+
+    $("#perform-incremental-layout").trigger("click");
+
+    /*
+     * return the nodes to undo the operation
+     */
+    return expandedStack;
+  },
+  collapseExpandedStack: function (expandedStack) {
+    while(expandedStack.length > 0){
+      var node = expandedStack.pop();
+      this.simpleCollapseNode(node);
+    }
+  },
+  expandAllTopDown: function(root, expandStack){
+    if(root._private.data.collapsedChildren != null)
+    {
+      expandStack.push(root);
+      this.simpleExpandNode(root);
+    }
+    var children = root.children();
+    for (var i = 0; i < children.length; i++) {
+      var node = children[i];
+      this.expandAllTopDown(node, expandStack);
+    }
+  },
+  //Expand the given nodes perform incremental layout after expandation
+  expandGivenNodes: function (nodes) {
+    this.simpleExpandGivenNodes(nodes);
+    nodes.removeData("infoLabel");
+
+    $("#perform-incremental-layout").trigger("click");
+
+    /*
+     * return the nodes to undo the operation
+     */
+    return nodes;
+  },
+  //collapse the given nodes then make incremental layout
+  collapseGivenNodes: function (nodes) {
+    this.simpleCollapseGivenNodes(nodes);
+
+    $("#perform-incremental-layout").trigger("click");
+
+    /*
+     * return the nodes to undo the operation
+     */
+    return nodes;
+  },
+  //collapse the nodes in bottom up order starting from the root
   collapseBottomUp: function (root) {
     var children = root.children();
     for (var i = 0; i < children.length; i++) {
@@ -15,10 +95,26 @@ var expandCollapseUtilities = {
       this.collapseBottomUp(node);
     }
     //If the root is a compound node to be collapsed then collapse it
-    if ((root.children().length > 0 || root._private.data.collapsedChildren != null)
-            && root.css()['expanded-collapsed'] != null
-            && root.css('expanded-collapsed') == 'collapsed') {
+//    if ((root.children().length > 0 || root._private.data.collapsedChildren != null)
+//            && root.css()['expanded-collapsed'] != null
+//            && root.css('expanded-collapsed') == 'collapsed') 
+    if(root.data("collapse") && root.children().length > 0)
+    {
       this.simpleCollapseNode(root);
+      root.removeData("collapse");
+    }
+  },
+  //expand the nodes in top down order starting from the root 
+  expandTopDown: function (root) {
+    if(root.data("expand") && root._private.data.collapsedChildren != null)
+    {
+      this.simpleExpandNode(root);
+      root.removeData("expand");
+    }
+    var children = root.children();
+    for (var i = 0; i < children.length; i++) {
+      var node = children[i];
+      this.expandTopDown(node);
     }
   },
   //Expand the given node perform incremental layout after expandation
@@ -48,8 +144,7 @@ var expandCollapseUtilities = {
       node._private.data.collapsedChildren.restore();
       this.repairEdgesOfCollapsedChildren(node);
       node._private.data.collapsedChildren = null;
-      node.css("width", node._private.data.oldWidth);
-      node.css("height", node._private.data.oldHeight);
+      node.removeClass('collapsed');
 
       cy.nodes().updateCompoundBounds();
 
@@ -64,48 +159,49 @@ var expandCollapseUtilities = {
   },
   //collapse the given node without making incremental layout
   simpleCollapseNode: function (node) {
-    node.css('expanded-collapsed', 'collapsed');
+    if (node._private.data.collapsedChildren == null) {
+      node.css('expanded-collapsed', 'collapsed');
 
-    var children = node.children();
+      var children = node.children();
 
-    //The children info of complex nodes should be shown when they are collapsed
-    if (node._private.data.sbgnclass == "complex") {
-      var new_content;
-      //The node is being collapsed store infolabel to use it later
-      var infoLabel = getInfoLabel(node);
-      node._private.data.infoLabel = infoLabel;
+      //The children info of complex nodes should be shown when they are collapsed
+      if (node._private.data.sbgnclass == "complex") {
+        var new_content;
+        //The node is being collapsed store infolabel to use it later
+        var infoLabel = getInfoLabel(node);
+        node._private.data.infoLabel = infoLabel;
 
-      new_content = node._private.data.sbgnlabel;
+        new_content = node._private.data.sbgnlabel;
 
-      if (new_content == null || new_content == "") {
-        new_content = infoLabel;
+        if (new_content == null || new_content == "") {
+          new_content = infoLabel;
+        }
+        node.css('content', new_content);
       }
-      node.css('content', new_content);
-    }
 
-    for (var i = 0; i < children.length; i++) {
-      var child = children[i];
-      this.barrowEdgesOfcollapsedChildren(node, child);
-    }
-    node._private.data.oldWidth = node.css('width');
-    node._private.data.oldHeight = node.css('height');
-    this.removeChildren(node, node);
-    node.css('width', 60);
-    node.css('height', 60);
+      for (var i = 0; i < children.length; i++) {
+        var child = children[i];
+        this.barrowEdgesOfcollapsedChildren(node, child);
+      }
+      this.removeChildren(node, node);
+      node.addClass('collapsed');
 
-    //return the node to undo the operation
-    return node;
+      //return the node to undo the operation
+      return node;
+    }
   },
   //collapse the given node then make incremental layout
   collapseNode: function (node) {
-    this.simpleCollapseNode(node);
+    if (node._private.data.collapsedChildren == null) {
+      this.simpleCollapseNode(node);
 
-    $("#perform-incremental-layout").trigger("click");
+      $("#perform-incremental-layout").trigger("click");
 
-    /*
-     * return the node to undo the operation
-     */
-    return node;
+      /*
+       * return the node to undo the operation
+       */
+      return node;
+    }
   },
   /*
    * for all children of the node parameter call this method

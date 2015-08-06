@@ -3,32 +3,32 @@
 function dynamicResize()
 {
 
-    var win = $(this); //this = window
+  var win = $(this); //this = window
 
-    var windowWidth = win.width();
-    var windowHeight = win.height();
+  var windowWidth = win.width();
+  var windowHeight = win.height();
 
-    var canvasWidth = 1000;
-    var canvasHeight = 680;
+  var canvasWidth = 1000;
+  var canvasHeight = 680;
 
-    if (windowWidth > canvasWidth)
-    {
-      $("#sbgn-network-container").width(windowWidth * 0.85);
-      $(".nav-menu").width(windowWidth * 0.85);
-      $(".navbar").width(windowWidth * 0.85);
-      $("#sbgn-info-content").width(windowWidth * 0.85);
+  if (windowWidth > canvasWidth)
+  {
+    $("#sbgn-network-container").width(windowWidth * 0.85);
+    $(".nav-menu").width(windowWidth * 0.85);
+    $(".navbar").width(windowWidth * 0.85);
+    $("#sbgn-info-content").width(windowWidth * 0.85);
+    $("#sbgn-select-mode").width(windowWidth * 0.85);
+  }
 
-    }
-
-    if (windowHeight > canvasHeight)
-    {
-      $("#sbgn-network-container").height(windowHeight * 0.85);
-    }
+  if (windowHeight > canvasHeight)
+  {
+    $("#sbgn-network-container").height(windowHeight * 0.85);
+  }
 }
 
 $(window).on('resize', dynamicResize);
 
-$( document ).ready(function() 
+$(document).ready(function ()
 {
   dynamicResize();
 });
@@ -69,11 +69,11 @@ var getInfoLabel = function (node) {
   for (var i = 0; i < children.length; i++) {
     var child = children[i];
     var childInfo = getInfoLabel(child);
-    
-    if(childInfo == null || childInfo == ""){
+
+    if (childInfo == null || childInfo == "") {
       continue;
     }
-    
+
     if (infoLabel != "") {
       infoLabel += ":";
     }
@@ -96,22 +96,22 @@ var nodeQtipFunction = function (node) {
 
   if (label == null || label == "")
     label = getInfoLabel(node);
-  
+
   if (label == null || label == "")
     return;
-  
+
   node.qtip({
-    content: function(){
+    content: function () {
       var contentHtml = "<b style='text-align:center;font-size:16px;'>" + label + "</b>";
       var sbgnstatesandinfos = node._private.data.sbgnstatesandinfos;
-      for(var i = 0; i < sbgnstatesandinfos.length; i++){
+      for (var i = 0; i < sbgnstatesandinfos.length; i++) {
         var sbgnstateandinfo = sbgnstatesandinfos[i];
-        if(sbgnstateandinfo.clazz == "state variable"){
+        if (sbgnstateandinfo.clazz == "state variable") {
           var value = sbgnstateandinfo.state.value;
           var variable = sbgnstateandinfo.state.variable;
           contentHtml += "<div style='text-align:center;font-size:14px;'>" + value + "@" + variable + "</div>";
         }
-        else if(sbgnstateandinfo.clazz == "unit of information"){
+        else if (sbgnstateandinfo.clazz == "unit of information") {
           contentHtml += "<div style='text-align:center;font-size:14px;'>" + sbgnstateandinfo.label.text + "</div>";
         }
       }
@@ -378,6 +378,11 @@ var sbgnStyleSheet = cytoscape.stylesheet()
           'source-arrow-color': '#d67614',
           'target-arrow-color': '#d67614'
         })
+        .selector("node.collapsed")
+        .css({
+          'width': 60,
+          'height': 60
+        })
         .selector(".sbgn")
         .css({
           'compound-padding': 20,
@@ -504,7 +509,7 @@ var SBGNContainer = Backbone.View.extend({
 
         cy.on('mouseover', 'node', function (event) {
           var node = this;
-
+          
           if (!node.mouseover) {
             node.mouseover = true;
             //make preset layout to redraw the nodes
@@ -535,7 +540,7 @@ var SBGNContainer = Backbone.View.extend({
         cy.on('cxttap', 'node', function (event) {
           var node = this;
           $(".qtip").remove();
-          
+
           if (node.qtipTimeOutFcn != null) {
             clearTimeout(node.qtipTimeOutFcn);
             node.qtipTimeOutFcn = null;
@@ -612,7 +617,7 @@ var SBGNContainer = Backbone.View.extend({
         var cancelSelection;
         var selectAgain;
         cy.on('select', 'node', function (event) {
-          if(cancelSelection){
+          if (cancelSelection) {
             this.unselect();
             cancelSelection = null;
             selectAgain.select();
@@ -626,10 +631,12 @@ var SBGNContainer = Backbone.View.extend({
           var cyPosX = event.cyPosition.x;
           var cyPosY = event.cyPosition.y;
 
-          if (cyPosX >= node._private.data.expandcollapseStartX
+          if (  cyPosX >= node._private.data.expandcollapseStartX
                   && cyPosX <= node._private.data.expandcollapseEndX
                   && cyPosY >= node._private.data.expandcollapseStartY
                   && cyPosY <= node._private.data.expandcollapseEndY) {
+            node.children().unselect();
+            node.children().connectedEdges().unselect();
             selectAgain = cy.filter(":selected");
             cancelSelection = true;
             var expandedOrcollapsed = this.css('expanded-collapsed');
@@ -805,63 +812,6 @@ var SBGNProperties = Backbone.View.extend({
     $("#default-sbgn").die("click").live("click", function (evt) {
       self.copyProperties();
       self.template = _.template($("#sbgn-properties-template").html(), self.currentSBGNProperties);
-      $(self.el).html(self.template);
-    });
-
-    return this;
-  }
-});
-
-var AddNodeProperties = Backbone.View.extend({
-  defaultProperties: {
-    content: "new node",
-    x: 150,
-    y: 150,
-    width: 100,
-    height: 100
-  },
-  currentProperties: null,
-  initialize: function () {
-    var self = this;
-    self.copyProperties();
-    self.template = _.template($("#add-node-template").html(), self.currentProperties);
-  },
-  copyProperties: function () {
-    this.currentProperties = _.clone(this.defaultProperties);
-  },
-  render: function () {
-    var self = this;
-    self.template = _.template($("#add-node-template").html(), self.currentProperties);
-    $(self.el).html(self.template);
-
-    $(self.el).dialog();
-
-    $("#confirm-add-node").die("click").live("click", function (evt) {
-      self.currentProperties.content = document.getElementById("add-node-content").value;
-      self.currentProperties.x = Number(document.getElementById("add-node-x").value);
-      self.currentProperties.y = Number(document.getElementById("add-node-y").value);
-      self.currentProperties.width = Number(document.getElementById("add-node-width").value);
-      self.currentProperties.height = Number(document.getElementById("add-node-height").value);
-
-      var param = {};
-      param.newNode = _.clone(self.currentProperties);
-      param.firstTime = true;
-
-      editorActionsManager._do(new AddNodeCommand(param));
-      refreshUndoRedoButtonsStatus();
-
-//      addRemoveUtilities.addNode(self.currentProperties.content,
-//              self.currentProperties.x,
-//              self.currentProperties.y,
-//              self.currentProperties.width,
-//              self.currentProperties.height);
-
-      $(self.el).dialog('close');
-    });
-
-    $("#default-add-node").die("click").live("click", function (evt) {
-      self.copyProperties();
-      self.template = _.template($("#add-node-template").html(), self.currentLayoutProperties);
       $(self.el).html(self.template);
     });
 

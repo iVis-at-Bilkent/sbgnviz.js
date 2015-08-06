@@ -5,49 +5,9 @@
  *	Author: Istemi Bahceci<istemi.bahceci@gmail.com>
  */
 
-function addNode(param)
-{
-  var result;
-  if (param.firstTime) {
-    var newNode = param.newNode;
-    result = addRemoveUtilities.addNode(newNode.content, newNode.x, newNode.y, newNode.width, newNode.height);
-  }
-  else {
-    result = addRemoveUtilities.restoreEles(param);
-  }
-  return result;
-}
-
-function removeNodes(nodesToBeDeleted)
-{
-  return addRemoveUtilities.removeNodes(nodesToBeDeleted);
-}
-
-function removeEles(elesToBeRemoved){
-  return addRemoveUtilities.removeEles(elesToBeRemoved);
-}
-
 function restoreEles(eles)
 {
   return addRemoveUtilities.restoreEles(eles);
-}
-
-function addEdge(param)
-{
-  var result;
-  if (param.firstTime) {
-    var newEdge = param.newEdge;
-    result = addRemoveUtilities.addEdge(newEdge.source, newEdge.target);
-  }
-  else {
-    result = addRemoveUtilities.restoreEles(param);
-  }
-  return result;
-}
-
-function removeEdges(edgesToBeDeleted)
-{
-  return addRemoveUtilities.removeEdges(edgesToBeDeleted);
 }
 
 function expandNode(node) {
@@ -64,6 +24,42 @@ function collapseNode(node) {
   param.nodesData = getNodePositionsAndSizes();
   expandCollapseUtilities.collapseNode(node);
   return param;
+}
+
+function expandGivenNodes(nodes) {
+  var param = {};
+  param.nodes = nodes;
+  param.nodesData = getNodePositionsAndSizes();
+  expandCollapseUtilities.expandGivenNodes(nodes);
+  return param;
+}
+
+function collapseGivenNodes(nodes) {
+  var param = {};
+  param.nodes = nodes;
+  param.nodesData = getNodePositionsAndSizes();
+  expandCollapseUtilities.collapseGivenNodes(nodes);
+  return param;
+}
+
+function expandAllNodes() {
+  var param = {};
+  param.nodesData = getNodePositionsAndSizes();
+  param.expandStack = expandCollapseUtilities.expandAllNodes();
+  return param;
+}
+
+function simpleExpandAllNodes(){
+  return expandCollapseUtilities.simpleExpandAllNodes();
+}
+
+function collapseExpandedStack(expandedStack) {
+  return expandCollapseUtilities.collapseExpandedStack(expandedStack);
+}
+
+function undoExpandAllNodes(param){
+  expandCollapseUtilities.collapseExpandedStack(param.expandStack);
+  returnToPositionsAndSizes(param.nodesData);
 }
 
 function getNodePositionsAndSizes() {
@@ -95,12 +91,32 @@ function undoCollapseNode(param) {
   return result;
 }
 
+function undoExpandGivenNodes(param) {
+  var result = expandCollapseUtilities.simpleCollapseGivenNodes(param.nodes);
+  returnToPositionsAndSizes(param.nodesData);
+  return result;
+}
+
+function undoCollapseGivenNodes(param) {
+  var result = expandCollapseUtilities.simpleExpandGivenNodes(param.nodes);
+  returnToPositionsAndSizes(param.nodesData);
+  return result;
+}
+
 function simpleExpandNode(node) {
   return expandCollapseUtilities.simpleExpandNode(node);
 }
 
 function simpleCollapseNode(node) {
   return expandCollapseUtilities.simpleCollapseNode(node);
+}
+
+function simpleExpandGivenNodes(nodes) {
+  return expandCollapseUtilities.simpleExpandGivenNodes(nodes);
+}
+
+function simpleCollapseGivenNodes(nodes) {
+  return expandCollapseUtilities.simpleCollapseGivenNodes(nodes);
 }
 
 function performLayoutFunction(nodesData) {
@@ -290,60 +306,6 @@ function removeHighlights() {
   result.firstTime = false;
   return result;
 }
-/*
- * This method assumes that param.nodesToMakeCompound contains at least one node
- * and all of the nodes including in it have the same parent
- */
-function createCompoundForSelectedNodes(param) {
-  var nodesToMakeCompound = param.nodesToMakeCompound;
-  var oldParentId = nodesToMakeCompound[0].data("parent");
-  var newCompound;
-
-  if (param.firstTime) {
-    var eles = cy.add({
-      group: "nodes",
-      data: {
-        sbgnclass: param.compundType,
-        parent: oldParentId,
-        sbgnbbox: {
-        },
-        sbgnstatesandinfos: [],
-        ports: []
-      }
-    });
-
-    newCompound = eles[eles.length - 1];
-    newCompound._private.data.sbgnbbox.h = newCompound.height();
-    newCompound._private.data.sbgnbbox.w = newCompound.width();
-  }
-  else {
-    newCompound = param.removedCompund.restore();
-  }
-
-  var newCompoundId = newCompound.id();
-
-  addRemoveUtilities.changeParent(nodesToMakeCompound, oldParentId, newCompoundId);
-  refreshPaddings();
-  return newCompound;
-}
-
-function removeCompound(compoundToRemove) {
-  var compoundId = compoundToRemove.id();
-  var newParentId = compoundToRemove.data("parent");
-  var childrenOfCompound = compoundToRemove.children();
-
-  addRemoveUtilities.changeParent(childrenOfCompound, compoundId, newParentId);
-  var removedCompund = compoundToRemove.remove();
-
-  refreshPaddings();
-
-  var param = {
-    nodesToMakeCompound: childrenOfCompound,
-    removedCompund: removedCompund
-  };
-
-  return param;
-}
 
 /*
  *	Base command class
@@ -355,31 +317,6 @@ var Command = function (_do, undo, params) {
   this._do = _do;
   this.undo = undo;
   this.params = params;
-};
-
-var AddNodeCommand = function (newNode)
-{
-  return new Command(addNode, removeNodes, newNode);
-};
-
-var RemoveNodesCommand = function (nodesTobeDeleted)
-{
-  return new Command(removeNodes, restoreEles, nodesTobeDeleted);
-};
-
-var RemoveElesCommand = function (elesTobeDeleted)
-{
-  return new Command(removeEles, restoreEles, elesTobeDeleted);
-};
-
-var AddEdgeCommand = function (newEdge)
-{
-  return new Command(addEdge, removeEdges, newEdge);
-};
-
-var RemoveEdgesCommand = function (edgesTobeDeleted)
-{
-  return new Command(removeEdges, restoreEles, edgesTobeDeleted);
 };
 
 var ExpandNodeCommand = function (node) {
@@ -396,6 +333,30 @@ var SimpleExpandNodeCommand = function (node) {
 
 var SimpleCollapseNodeCommand = function (node) {
   return new Command(simpleCollapseNode, simpleExpandNode, node);
+};
+
+var ExpandGivenNodesCommand = function (nodes) {
+  return new Command(expandGivenNodes, undoExpandGivenNodes, nodes);
+};
+
+var CollapseGivenNodesCommand = function (nodes) {
+  return new Command(collapseGivenNodes, undoCollapseGivenNodes, nodes);
+};
+
+var SimpleExpandGivenNodesCommand = function (nodes) {
+  return new Command(simpleExpandGivenNodes, simpleCollapseGivenNodes, nodes);
+};
+
+var SimpleCollapseGivenNodesCommand = function (nodes) {
+  return new Command(simpleCollapseGivenNodes, simpleExpandGivenNodes, nodes);
+};
+
+var SimpleExpandAllNodesCommand = function () {
+  return new Command(simpleExpandAllNodes, collapseExpandedStack);
+};
+
+var ExpandAllNodesCommand = function () {
+  return new Command(expandAllNodes, undoExpandAllNodes);
 };
 
 var PerformLayoutCommand = function (nodesData) {
@@ -434,10 +395,6 @@ var HighlightProcessesOfSelectedCommand = function (param) {
 
 var RemoveHighlightsCommand = function () {
   return new Command(removeHighlights, highlightSelected);
-};
-
-var CreateCompundForSelectedNodesCommand = function (param) {
-  return new Command(createCompoundForSelectedNodes, removeCompound, param);
 };
 
 /**

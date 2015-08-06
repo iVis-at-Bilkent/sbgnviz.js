@@ -36,10 +36,6 @@ $(document).ready(function () {
     el: '#sbgn-properties-table'
   });
 
-  var sbgnAddNodeProp = new AddNodeProperties({
-    el: '#sbgn-add-node-table'
-  });
-
   $("body").on("change", "#file-input", function (e) {
     if ($("#file-input").val() == "") {
       return;
@@ -252,7 +248,7 @@ $(document).ready(function () {
     refreshUndoRedoButtonsStatus();
   });
 
-  $("#delete-selected").click(function (e) {
+  $("#delete-selected-smart").click(function (e) {
     //sbgnFiltering.deleteSelected();
     var param = {
       firstTime: true
@@ -284,59 +280,61 @@ $(document).ready(function () {
     editorActionsManager._do(new RemoveHighlightsCommand());
     refreshUndoRedoButtonsStatus();
   });
-  
-  $("#make-compound-complex").click(function (e) {
-    var param = {
-      firstTime: true,
-      compundType: "complex",
-      nodesToMakeCompound: cy.nodes(":selected")
-    };
-    editorActionsManager._do(new CreateCompundForSelectedNodesCommand(param));
-    refreshUndoRedoButtonsStatus();
-  });
-  
-  $("#make-compound-compartment").click(function (e) {
-    var param = {
-      firstTime: true,
-      compundType: "compartment",
-      nodesToMakeCompound: cy.nodes(":selected")
-    };
-    editorActionsManager._do(new CreateCompundForSelectedNodesCommand(param));
-    refreshUndoRedoButtonsStatus();
-  });
 
   $("#layout-properties").click(function (e) {
     sbgnLayoutProp.render();
   });
 
-  $("#add-node").click(function (e) {
-    sbgnAddNodeProp.render();
-  });
-  
-  $("#delete-selected-eles").click(function (e) {
-    var selectedEles = cy.$(":selected");
-    editorActionsManager._do(new RemoveElesCommand(selectedEles));
-    refreshUndoRedoButtonsStatus();
-  });
-
-  $("#add-edge").click(function (e) {
-    var selectedNodes = cy.$("node:selected");
-    if (selectedNodes.length != 2) {
-      alert("Exactly 2 nodes should be selected!!!");
-      return;
-    }
-    var param = {};
-    param.newEdge = {
-      source: selectedNodes[0].id(),
-      target: selectedNodes[1].id()
-    };
-    param.firstTime = true;
-    editorActionsManager._do(new AddEdgeCommand(param));
-    refreshUndoRedoButtonsStatus();
-  });
-
   $("#sbgn-properties").click(function (e) {
     sbgnProperties.render();
+  });
+
+  $("#collapse-selected").click(function (e) {
+    if (window.incrementalLayoutAfterExpandCollapse == null) {
+      window.incrementalLayoutAfterExpandCollapse =
+              (sbgnStyleRules['incremental-layout-after-expand-collapse'] == 'true');
+    }
+    if (incrementalLayoutAfterExpandCollapse)
+      editorActionsManager._do(new CollapseGivenNodesCommand(cy.nodes(":selected")));
+    else
+      editorActionsManager._do(new SimpleCollapseGivenNodesCommand(cy.nodes(":selected")));
+    refreshUndoRedoButtonsStatus();
+  });
+  
+  $("#expand-selected").click(function (e) {
+    if (window.incrementalLayoutAfterExpandCollapse == null) {
+      window.incrementalLayoutAfterExpandCollapse =
+              (sbgnStyleRules['incremental-layout-after-expand-collapse'] == 'true');
+    }
+    if (incrementalLayoutAfterExpandCollapse)
+      editorActionsManager._do(new ExpandGivenNodesCommand(cy.nodes(":selected")));
+    else
+      editorActionsManager._do(new SimpleExpandGivenNodesCommand(cy.nodes(":selected")));
+    refreshUndoRedoButtonsStatus();
+  });
+  
+  $("#collapse-all").click(function (e) {
+    if (window.incrementalLayoutAfterExpandCollapse == null) {
+      window.incrementalLayoutAfterExpandCollapse =
+              (sbgnStyleRules['incremental-layout-after-expand-collapse'] == 'true');
+    }
+    if (incrementalLayoutAfterExpandCollapse)
+      editorActionsManager._do(new CollapseGivenNodesCommand(cy.nodes()));
+    else
+      editorActionsManager._do(new SimpleCollapseGivenNodesCommand(cy.nodes()));
+    refreshUndoRedoButtonsStatus();
+  });
+  
+  $("#expand-all").click(function (e) {
+    if (window.incrementalLayoutAfterExpandCollapse == null) {
+      window.incrementalLayoutAfterExpandCollapse =
+              (sbgnStyleRules['incremental-layout-after-expand-collapse'] == 'true');
+    }
+    if (incrementalLayoutAfterExpandCollapse)
+      editorActionsManager._do(new ExpandAllNodesCommand());
+    else
+      editorActionsManager._do(new SimpleExpandAllNodesCommand());
+    refreshUndoRedoButtonsStatus();
   });
 
   $("#perform-layout").click(function (e) {
