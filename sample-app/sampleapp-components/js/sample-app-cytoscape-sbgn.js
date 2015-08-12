@@ -635,8 +635,6 @@ var SBGNContainer = Backbone.View.extend({
                   && cyPosX <= node._private.data.expandcollapseEndX
                   && cyPosY >= node._private.data.expandcollapseStartY
                   && cyPosY <= node._private.data.expandcollapseEndY) {
-            node.children().unselect();
-            node.children().connectedEdges().unselect();
             selectAgain = cy.filter(":selected");
             cancelSelection = true;
             var expandedOrcollapsed = this.css('expanded-collapsed');
