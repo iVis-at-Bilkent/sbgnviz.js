@@ -10,12 +10,12 @@ var expandCollapseUtilities = {
     });
     this.simpleCollapseGivenNodes(nodesToCollapse);
   },
-  alterSourceOrTargetOfCollapsedEdge: function(createdWhileBeingCollapsed, edgeId, sourceOrTarget){
+  alterSourceOrTargetOfCollapsedEdge: function (createdWhileBeingCollapsed, edgeId, sourceOrTarget) {
     var node = cy.getElementById(createdWhileBeingCollapsed)[0];
     var edgesOfcollapsedChildren = node._private.data.edgesOfcollapsedChildren;
-    for(var i = 0; i < edgesOfcollapsedChildren.length; i++){
+    for (var i = 0; i < edgesOfcollapsedChildren.length; i++) {
       var collapsedEdge = edgesOfcollapsedChildren[i];
-      if(collapsedEdge._private.data.id == edgeId)
+      if (collapsedEdge._private.data.id == edgeId)
         collapsedEdge._private.data[sourceOrTarget] = collapsedEdge._private.data.collapsedNodeBeforeBecamingMeta;
     }
   },
@@ -355,10 +355,8 @@ var expandCollapseUtilities = {
       cy.add(newEdge);
       var newCyEdge = cy.edges()[cy.edges().length - 1];
       newCyEdge.addClass("meta");
-      if(!newCyEdge.data("meta")){
-        newCyEdge.data("meta", true);
-        newCyEdge.data("collapsedNodeBeforeBecamingMeta", childNode.id());
-      }
+      newCyEdge.data("meta", true);
+      newCyEdge.data("collapsedNodeBeforeBecamingMeta", childNode.id());
     }
   },
   /*
@@ -377,15 +375,15 @@ var expandCollapseUtilities = {
               this.collapsedMetaEdgesInfo[edgesOfcollapsedChildren[i]._private.data.id] != null) {
         var info = this.collapsedMetaEdgesInfo[edgesOfcollapsedChildren[i]._private.data.id];
         if (info.createdWhileBeingCollapsed != node.id()) {
-          if( edgesOfcollapsedChildren[i]._private.data.source == info.oldOwner){
+          if (edgesOfcollapsedChildren[i]._private.data.source == info.oldOwner) {
             edgesOfcollapsedChildren[i]._private.data.source = info.createdWhileBeingCollapsed;
             this.alterSourceOrTargetOfCollapsedEdge(info.createdWhileBeingCollapsed
-            , edgesOfcollapsedChildren[i]._private.data.id ,"target");
+                    , edgesOfcollapsedChildren[i]._private.data.id, "target");
           }
-          else if( edgesOfcollapsedChildren[i]._private.data.target == info.oldOwner){
+          else if (edgesOfcollapsedChildren[i]._private.data.target == info.oldOwner) {
             edgesOfcollapsedChildren[i]._private.data.target = info.createdWhileBeingCollapsed;
             this.alterSourceOrTargetOfCollapsedEdge(info.createdWhileBeingCollapsed
-            , edgesOfcollapsedChildren[i]._private.data.id ,"source");
+                    , edgesOfcollapsedChildren[i]._private.data.id, "source");
           }
           edgesOfcollapsedChildren[i]._private.data.makeMeta = true;
         }
@@ -400,17 +398,17 @@ var expandCollapseUtilities = {
     edgesOfcollapsedChildren.restore();
     edgesOfcollapsedChildren.removeData("meta");
     edgesOfcollapsedChildren.removeClass("meta");
-    
+
     var newMetaEdges = edgesOfcollapsedChildren.filter(function (i, ele) {
       if (ele.data("makeMeta")) {
         return true;
       }
     });
-    
+
     newMetaEdges.addClass("meta");
     newMetaEdges.data("meta", true);
     newMetaEdges.removeData("makeMeta");
-    
+
     node._private.data.edgesOfcollapsedChildren = null;
   },
   /*node is an outer node of root 
