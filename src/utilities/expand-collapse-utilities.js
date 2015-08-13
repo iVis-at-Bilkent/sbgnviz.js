@@ -1,4 +1,6 @@
 var expandCollapseUtilities = {
+  //This is a map which keeps the information of collapsed meta edges to handle them correctly
+  collapsedMetaEdgesInfo: {},
   //Some nodes are initilized as collapsed this method handles them
   initCollapsedNodes: function () {
     var nodesToCollapse = cy.nodes().filter(function (i, ele) {
@@ -282,6 +284,34 @@ var expandCollapseUtilities = {
       var sourceNode = edge.source();
       var targetNode = edge.target();
       var newEdge = jQuery.extend(true, {}, edge.jsons()[0]);
+
+      if (edge.data("meta") && source != target) {
+        var otherEnd = null;
+        var oldOwner = null;
+        if (source == childNode.id()) {
+          otherEnd = target;
+          oldOwner = source;
+        }
+        else if (target == childNode.id()) {
+          otherEnd = source;
+          oldOwner = target;
+        }
+        var info = {
+          createdWhileBeingCollapsed: root.id(),
+          otherEnd: otherEnd,
+          oldOwner: oldOwner
+        };
+        if (this.collapsedMetaEdgesInfo[otherEnd] == null) {
+          this.collapsedMetaEdgesInfo[otherEnd] = {};
+        }
+        if (this.collapsedMetaEdgesInfo[root.id()] == null) {
+          this.collapsedMetaEdgesInfo[root.id()] = {};
+        }
+        this.collapsedMetaEdgesInfo[root.id()][otherEnd] = info;
+        this.collapsedMetaEdgesInfo[otherEnd][root.id()] = info;
+        this.collapsedMetaEdgesInfo[edge.id()] = info;
+      }
+
       var removedEdge = edge.remove();
       //store the data of the original edge
       //to restore when the node is expanded
@@ -316,6 +346,7 @@ var expandCollapseUtilities = {
       cy.add(newEdge);
       var newCyEdge = cy.edges()[cy.edges().length - 1];
       newCyEdge.addClass("meta");
+      newCyEdge.data("meta", true);
     }
   },
   /*
@@ -328,13 +359,42 @@ var expandCollapseUtilities = {
     if (edgesOfcollapsedChildren == null) {
       return;
     }
+    var collapsedMetaEdgeInfoOfNode = this.collapsedMetaEdgesInfo[node.id()];
     for (var i = 0; i < edgesOfcollapsedChildren.length; i++) {
+      if (collapsedMetaEdgeInfoOfNode != null &&
+              this.collapsedMetaEdgesInfo[edgesOfcollapsedChildren[i]._private.data.id] != null) {
+        var info = this.collapsedMetaEdgesInfo[edgesOfcollapsedChildren[i]._private.data.id];
+        if (info.createdWhileBeingCollapsed != node.id()) {
+          if( edgesOfcollapsedChildren[i]._private.data.source == info.oldOwner){
+            edgesOfcollapsedChildren[i]._private.data.source = info.createdWhileBeingCollapsed;
+          }
+          else if( edgesOfcollapsedChildren[i]._private.data.target == info.oldOwner){
+            edgesOfcollapsedChildren[i]._private.data.target = info.createdWhileBeingCollapsed;
+          }
+          edgesOfcollapsedChildren[i]._private.data.makeMeta = true;
+        }
+        delete this.collapsedMetaEdgesInfo[info.createdWhileBeingCollapsed][info.otherEnd];
+        delete this.collapsedMetaEdgesInfo[info.otherEnd][info.createdWhileBeingCollapsed];
+        delete this.collapsedMetaEdgesInfo[edgesOfcollapsedChildren[i]._private.data.id];
+      }
       var oldEdge = cy.getElementById(edgesOfcollapsedChildren[i]._private.data.id);
-      if (oldEdge != null)
+      if (oldEdge != null && oldEdge.length > 0)
         oldEdge.remove();
     }
     edgesOfcollapsedChildren.restore();
     edgesOfcollapsedChildren.removeData("meta");
+    edgesOfcollapsedChildren.removeClass("meta");
+    
+    var newMetaEdges = edgesOfcollapsedChildren.filter(function (i, ele) {
+      if (ele.data("makeMeta")) {
+        return true;
+      }
+    });
+    
+    newMetaEdges.addClass("meta");
+    newMetaEdges.data("meta", true);
+    newMetaEdges.removeData("makeMeta");
+    
     node._private.data.edgesOfcollapsedChildren = null;
   },
   /*node is an outer node of root 
