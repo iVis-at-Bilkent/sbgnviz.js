@@ -397,7 +397,7 @@ var expandCollapseUtilities = {
     }
     edgesOfcollapsedChildren.restore();
     edgesOfcollapsedChildren.removeData("meta");
-    edgesOfcollapsedChildren.removeClass("meta");
+//    edgesOfcollapsedChildren.removeClass("meta");
 
     var newMetaEdges = edgesOfcollapsedChildren.filter(function (i, ele) {
       if (ele.data("makeMeta")) {
