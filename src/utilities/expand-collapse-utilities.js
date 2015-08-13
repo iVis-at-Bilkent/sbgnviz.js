@@ -10,6 +10,15 @@ var expandCollapseUtilities = {
     });
     this.simpleCollapseGivenNodes(nodesToCollapse);
   },
+  alterSourceOrTargetOfCollapsedEdge: function(createdWhileBeingCollapsed, edgeId, sourceOrTarget){
+    var node = cy.getElementById(createdWhileBeingCollapsed)[0];
+    var edgesOfcollapsedChildren = node._private.data.edgesOfcollapsedChildren;
+    for(var i = 0; i < edgesOfcollapsedChildren.length; i++){
+      var collapsedEdge = edgesOfcollapsedChildren[i];
+      if(collapsedEdge._private.data.id == edgeId)
+        collapsedEdge._private.data[sourceOrTarget] = collapsedEdge._private.data.collapsedNodeBeforeBecamingMeta;
+    }
+  },
   //Check if there is node to expand or collapse in given nodes according to the given mode parameter
   thereIsNodeToExpandOrCollapse: function (nodes, mode) {
     var thereIs = false;
@@ -346,7 +355,10 @@ var expandCollapseUtilities = {
       cy.add(newEdge);
       var newCyEdge = cy.edges()[cy.edges().length - 1];
       newCyEdge.addClass("meta");
-      newCyEdge.data("meta", true);
+      if(!newCyEdge.data("meta")){
+        newCyEdge.data("meta", true);
+        newCyEdge.data("collapsedNodeBeforeBecamingMeta", childNode.id());
+      }
     }
   },
   /*
@@ -367,9 +379,13 @@ var expandCollapseUtilities = {
         if (info.createdWhileBeingCollapsed != node.id()) {
           if( edgesOfcollapsedChildren[i]._private.data.source == info.oldOwner){
             edgesOfcollapsedChildren[i]._private.data.source = info.createdWhileBeingCollapsed;
+            this.alterSourceOrTargetOfCollapsedEdge(info.createdWhileBeingCollapsed
+            , edgesOfcollapsedChildren[i]._private.data.id ,"target");
           }
           else if( edgesOfcollapsedChildren[i]._private.data.target == info.oldOwner){
             edgesOfcollapsedChildren[i]._private.data.target = info.createdWhileBeingCollapsed;
+            this.alterSourceOrTargetOfCollapsedEdge(info.createdWhileBeingCollapsed
+            , edgesOfcollapsedChildren[i]._private.data.id ,"source");
           }
           edgesOfcollapsedChildren[i]._private.data.makeMeta = true;
         }
