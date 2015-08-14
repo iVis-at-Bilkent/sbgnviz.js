@@ -647,14 +647,20 @@ var SBGNContainer = Backbone.View.extend({
             if (expandedOrcollapsed == 'expanded') {
 //              expandCollapseUtilities.collapseNode(this);
               if (incrementalLayoutAfterExpandCollapse)
-                editorActionsManager._do(new CollapseNodeCommand(this));
+                editorActionsManager._do(new CollapseNodeCommand({
+                  node: this,
+                  firstTime: true
+                }));
               else
                 editorActionsManager._do(new SimpleCollapseNodeCommand(this));
               refreshUndoRedoButtonsStatus();
             }
             else {
               if (incrementalLayoutAfterExpandCollapse)
-                editorActionsManager._do(new ExpandNodeCommand(this));
+                editorActionsManager._do(new ExpandNodeCommand({
+                  node: this,
+                  firstTime: true
+                }));
               else
                 editorActionsManager._do(new SimpleExpandNodeCommand(this));
               refreshUndoRedoButtonsStatus();

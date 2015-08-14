@@ -302,7 +302,10 @@ $(document).ready(function () {
     }
     var selected = cy.nodes(":selected");
     if (incrementalLayoutAfterExpandCollapse)
-      editorActionsManager._do(new CollapseGivenNodesCommand(selected));
+      editorActionsManager._do(new CollapseGivenNodesCommand({
+        nodes: selected,
+        firstTime: true
+      }));
     else
       editorActionsManager._do(new SimpleCollapseGivenNodesCommand(selected));
     refreshUndoRedoButtonsStatus();
@@ -320,7 +323,10 @@ $(document).ready(function () {
               (sbgnStyleRules['incremental-layout-after-expand-collapse'] == 'true');
     }
     if (incrementalLayoutAfterExpandCollapse)
-      editorActionsManager._do(new ExpandGivenNodesCommand(cy.nodes(":selected")));
+      editorActionsManager._do(new ExpandGivenNodesCommand({
+        nodes: cy.nodes(":selected"),
+        firstTime: true
+      }));
     else
       editorActionsManager._do(new SimpleExpandGivenNodesCommand(cy.nodes(":selected")));
     refreshUndoRedoButtonsStatus();
@@ -338,7 +344,10 @@ $(document).ready(function () {
               (sbgnStyleRules['incremental-layout-after-expand-collapse'] == 'true');
     }
     if (incrementalLayoutAfterExpandCollapse)
-      editorActionsManager._do(new CollapseGivenNodesCommand(cy.nodes()));
+      editorActionsManager._do(new CollapseGivenNodesCommand({
+        nodes: cy.nodes(),
+        firstTime: true
+      }));
     else
       editorActionsManager._do(new SimpleCollapseGivenNodesCommand(cy.nodes()));
     refreshUndoRedoButtonsStatus();
@@ -356,7 +365,9 @@ $(document).ready(function () {
               (sbgnStyleRules['incremental-layout-after-expand-collapse'] == 'true');
     }
     if (incrementalLayoutAfterExpandCollapse)
-      editorActionsManager._do(new ExpandAllNodesCommand());
+      editorActionsManager._do(new ExpandAllNodesCommand({
+        firstTime: true
+      }));
     else
       editorActionsManager._do(new SimpleExpandAllNodesCommand());
     refreshUndoRedoButtonsStatus();
