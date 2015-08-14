@@ -1,6 +1,8 @@
 var expandCollapseUtilities = {
   //This is a map which keeps the information of collapsed meta edges to handle them correctly
   collapsedMetaEdgesInfo: {},
+  //This map keeps track of the meta levels of edges by their id's
+  edgesMetaLevels: {},
   //Some nodes are initilized as collapsed this method handles them
   initCollapsedNodes: function () {
     var nodesToCollapse = cy.nodes().filter(function (i, ele) {
@@ -10,13 +12,17 @@ var expandCollapseUtilities = {
     });
     this.simpleCollapseGivenNodes(nodesToCollapse);
   },
+  //This method changes source or target id of the collapsed edge data kept in the data of the node
+  //with id of createdWhileBeingCollapsed
   alterSourceOrTargetOfCollapsedEdge: function (createdWhileBeingCollapsed, edgeId, sourceOrTarget) {
     var node = cy.getElementById(createdWhileBeingCollapsed)[0];
     var edgesOfcollapsedChildren = node._private.data.edgesOfcollapsedChildren;
     for (var i = 0; i < edgesOfcollapsedChildren.length; i++) {
       var collapsedEdge = edgesOfcollapsedChildren[i];
-      if (collapsedEdge._private.data.id == edgeId)
+      if (collapsedEdge._private.data.id == edgeId) {
         collapsedEdge._private.data[sourceOrTarget] = collapsedEdge._private.data.collapsedNodeBeforeBecamingMeta;
+        break;
+      }
     }
   },
   //Check if there is node to expand or collapse in given nodes according to the given mode parameter
@@ -294,7 +300,21 @@ var expandCollapseUtilities = {
       var targetNode = edge.target();
       var newEdge = jQuery.extend(true, {}, edge.jsons()[0]);
 
-      if (edge.data("meta") && source != target) {
+      //Initilize the meta level of this edge if it is not initilized yet
+      if (this.edgesMetaLevels[edge.id()] == null){
+        this.edgesMetaLevels[edge.id()] = 0;
+      }
+      
+      /*If the edge is meta and has different source and targets then handle this case because if
+       * the other end of this edge is removed because of the reason that it's parent is
+       * being collapsed and this node is expanded before other end is still collapsed this causes
+       * that this edge cannot be restored as one end node of it does not exists. 
+       * Create a collapsed meta edge info for this edge and add this info to collapsedMetaEdgesInfo
+       * map. This info includes createdWhileBeingCollapsed(the node which is being collapsed),
+       * otherEnd(the other end of this edge) and oldOwner(the owner of this edge which will become 
+       * an old owner after collapse operation)
+       */
+      if (this.edgesMetaLevels[edge.id()] != 0 && source != target) {
         var otherEnd = null;
         var oldOwner = null;
         if (source == childNode.id()) {
@@ -316,6 +336,7 @@ var expandCollapseUtilities = {
         if (this.collapsedMetaEdgesInfo[root.id()] == null) {
           this.collapsedMetaEdgesInfo[root.id()] = {};
         }
+        //the information should be reachable by edge id and node id's
         this.collapsedMetaEdgesInfo[root.id()][otherEnd] = info;
         this.collapsedMetaEdgesInfo[otherEnd][root.id()] = info;
         this.collapsedMetaEdgesInfo[edge.id()] = info;
@@ -354,8 +375,12 @@ var expandCollapseUtilities = {
       //remove the older edge and add the new one
       cy.add(newEdge);
       var newCyEdge = cy.edges()[cy.edges().length - 1];
-      newCyEdge.addClass("meta");
-      newCyEdge.data("meta", true);
+      //If this edge has not meta class properties make it meta
+      if(this.edgesMetaLevels[newCyEdge.id()] == 0){
+        newCyEdge.addClass("meta");
+      }
+      //Increase the meta level of this edge by 1
+      this.edgesMetaLevels[newCyEdge.id()]++;
       newCyEdge.data("collapsedNodeBeforeBecamingMeta", childNode.id());
     }
   },
@@ -371,9 +396,12 @@ var expandCollapseUtilities = {
     }
     var collapsedMetaEdgeInfoOfNode = this.collapsedMetaEdgesInfo[node.id()];
     for (var i = 0; i < edgesOfcollapsedChildren.length; i++) {
+      //Handle collapsed meta edge info if it is required
       if (collapsedMetaEdgeInfoOfNode != null &&
               this.collapsedMetaEdgesInfo[edgesOfcollapsedChildren[i]._private.data.id] != null) {
         var info = this.collapsedMetaEdgesInfo[edgesOfcollapsedChildren[i]._private.data.id];
+        //If the meta edge is not created because of the reason that this node is collapsed
+        //handle it by changing source or target of related edge datas 
         if (info.createdWhileBeingCollapsed != node.id()) {
           if (edgesOfcollapsedChildren[i]._private.data.source == info.oldOwner) {
             edgesOfcollapsedChildren[i]._private.data.source = info.createdWhileBeingCollapsed;
@@ -385,29 +413,31 @@ var expandCollapseUtilities = {
             this.alterSourceOrTargetOfCollapsedEdge(info.createdWhileBeingCollapsed
                     , edgesOfcollapsedChildren[i]._private.data.id, "source");
           }
-          edgesOfcollapsedChildren[i]._private.data.makeMeta = true;
         }
+        //Delete the related collapsedMetaEdgesInfo's as they are handled 
         delete this.collapsedMetaEdgesInfo[info.createdWhileBeingCollapsed][info.otherEnd];
         delete this.collapsedMetaEdgesInfo[info.otherEnd][info.createdWhileBeingCollapsed];
         delete this.collapsedMetaEdgesInfo[edgesOfcollapsedChildren[i]._private.data.id];
       }
       var oldEdge = cy.getElementById(edgesOfcollapsedChildren[i]._private.data.id);
-      if (oldEdge != null && oldEdge.length > 0)
+      //If the edge is already in the graph remove it and decrease it's meta level
+      if (oldEdge != null && oldEdge.length > 0){
+        this.edgesMetaLevels[edgesOfcollapsedChildren[i]._private.data.id]--;
         oldEdge.remove();
+      }
     }
     edgesOfcollapsedChildren.restore();
-    edgesOfcollapsedChildren.removeData("meta");
-//    edgesOfcollapsedChildren.removeClass("meta");
-
-    var newMetaEdges = edgesOfcollapsedChildren.filter(function (i, ele) {
-      if (ele.data("makeMeta")) {
-        return true;
+    
+    //Check for meta levels of edges and handle the changes
+    for(var i = 0; i < edgesOfcollapsedChildren.length; i++){
+      var edge = edgesOfcollapsedChildren[i];
+      if(this.edgesMetaLevels[edge.id()] == null || this.edgesMetaLevels[edge.id()] == 0){
+        edge.removeClass("meta");
       }
-    });
-
-    newMetaEdges.addClass("meta");
-    newMetaEdges.data("meta", true);
-    newMetaEdges.removeData("makeMeta");
+      else {
+        edge.addClass("meta");
+      }
+    }
 
     node._private.data.edgesOfcollapsedChildren = null;
   },
