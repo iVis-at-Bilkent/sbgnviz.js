@@ -1850,12 +1850,12 @@
     if (window.fitLabelsToNodes == null) {
       window.fitLabelsToNodes = (sbgnStyleRules['fit-labels-to-nodes'] == 'true');
     }
+    var text = (typeof textProp.label === 'undefined') ? "" : textProp.label;
     //If fit labels to nodes is false do not truncate
     if (window.fitLabelsToNodes == false) {
-      return textProp.label;
+      return text;
     }
     var width;
-    var text = (typeof textProp.label === 'undefined') ? "" : textProp.label;
     var len = text.length;
     var ellipsis = "..";
 
