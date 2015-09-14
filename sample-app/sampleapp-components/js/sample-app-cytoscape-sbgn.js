@@ -109,10 +109,19 @@ var nodeQtipFunction = function (node) {
         if (sbgnstateandinfo.clazz == "state variable") {
           var value = sbgnstateandinfo.state.value;
           var variable = sbgnstateandinfo.state.variable;
-          contentHtml += "<div style='text-align:center;font-size:14px;'>" + value + "@" + variable + "</div>";
+          var stateLabel = (variable == null /*|| typeof stateVariable === undefined */) ? value :
+            value + "@" + variable;
+          if(stateLabel == null){
+            stateLabel = "";
+          }
+          contentHtml += "<div style='text-align:center;font-size:14px;'>" + stateLabel + "</div>";
         }
         else if (sbgnstateandinfo.clazz == "unit of information") {
-          contentHtml += "<div style='text-align:center;font-size:14px;'>" + sbgnstateandinfo.label.text + "</div>";
+          var stateLabel = sbgnstateandinfo.label.text;
+          if(stateLabel == null){
+            stateLabel = "";
+          }
+          contentHtml += "<div style='text-align:center;font-size:14px;'>" + stateLabel + "</div>";
         }
       }
       return contentHtml;
