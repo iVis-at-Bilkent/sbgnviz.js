@@ -4304,10 +4304,9 @@
     var edges = this.options.eles.edges();
 
     this.root = gm.addRoot();
-    this.orphans = nodes.orphans();
 
     if (!this.options.tile) {
-      this.processChildrenList(this.root, this.orphans);
+      this.processChildrenList(this.root, nodes.orphans());
     }
     else {
       // Find zero degree nodes and create a complex for each level
@@ -4657,7 +4656,7 @@
 
     // Find all zero degree nodes which aren't covered by a complex
     var zeroDegree = this.options.eles.nodes().filter(function (i, ele) {
-      if (this.degree(false) == 0 && ele.parent().length > 0 && !getToBeTiled(ele.parent()[0]))
+      if (this.degree(false) == 0 && (ele.parent().length == 0 || (ele.parent().length > 0 && !getToBeTiled(ele.parent()[0])) ) )
         return true;
       else
         return false;
@@ -4685,11 +4684,12 @@
         if (this.options.cy.getElementById(dummyComplexId).empty()) {
           this.options.cy.add({
             group: "nodes",
-            data: {id: dummyComplexId, parent: p_id,
+            data: {id: dummyComplexId, parent: p_id
             },
             position: {x: Math.random() * this.options.cy.container().clientWidth,
               y: Math.random() * this.options.cy.container().clientHeight}
           });
+          this.options.eles = this.options.eles.union(this.options.cy.nodes()[this.options.cy.nodes().length - 1]);
         }
       }
     }
@@ -4722,8 +4722,7 @@
     // Get complex ordering by finding the inner one first
     var complexOrder = this.performDFSOnComplexes(options);
     _CoSELayout.complexOrder = complexOrder;
-
-    this.processChildrenList(this.root, this.orphans);
+    this.processChildrenList(this.root, this.options.eles.nodes().orphans());
 
     for (var i = 0; i < complexOrder.length; i++) {
       // find the corresponding layout node

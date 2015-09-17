@@ -110,15 +110,15 @@ var nodeQtipFunction = function (node) {
           var value = sbgnstateandinfo.state.value;
           var variable = sbgnstateandinfo.state.variable;
           var stateLabel = (variable == null /*|| typeof stateVariable === undefined */) ? value :
-            value + "@" + variable;
-          if(stateLabel == null){
+                  value + "@" + variable;
+          if (stateLabel == null) {
             stateLabel = "";
           }
           contentHtml += "<div style='text-align:center;font-size:14px;'>" + stateLabel + "</div>";
         }
         else if (sbgnstateandinfo.clazz == "unit of information") {
           var stateLabel = sbgnstateandinfo.label.text;
-          if(stateLabel == null){
+          if (stateLabel == null) {
             stateLabel = "";
           }
           contentHtml += "<div style='text-align:center;font-size:14px;'>" + stateLabel + "</div>";
@@ -259,8 +259,12 @@ var sbgnStyleSheet = cytoscape.stylesheet()
           'border-color': '#555',
           'background-color': '#f6f6f6',
           'font-size': 11,
-          'shape': 'data(sbgnclass)',
+//          'shape': 'data(sbgnclass)',
           'background-opacity': '0.5'
+        })
+        .selector("node[sbgnclass]")
+        .css({
+          'shape': 'data(sbgnclass)'
         })
         .selector("node[sbgnclass='complex']")
         .css({
@@ -284,7 +288,7 @@ var sbgnStyleSheet = cytoscape.stylesheet()
         .css({
           'expanded-collapsed': 'expanded'
         })
-        .selector("node[sbgnclass!='complex'][sbgnclass!='compartment'][sbgnclass!='submap']")
+        .selector("node[sbgnclass][sbgnclass!='complex'][sbgnclass!='compartment'][sbgnclass!='submap']")
         .css({
           'width': 'data(sbgnbbox.w)',
           'height': 'data(sbgnbbox.h)'
@@ -518,7 +522,7 @@ var SBGNContainer = Backbone.View.extend({
 
         cy.on('mouseover', 'node', function (event) {
           var node = this;
-          
+
           if (!node.mouseover) {
             node.mouseover = true;
             //make preset layout to redraw the nodes
@@ -640,7 +644,7 @@ var SBGNContainer = Backbone.View.extend({
           var cyPosX = event.cyPosition.x;
           var cyPosY = event.cyPosition.y;
 
-          if (  cyPosX >= node._private.data.expandcollapseStartX
+          if (cyPosX >= node._private.data.expandcollapseStartX
                   && cyPosX <= node._private.data.expandcollapseEndX
                   && cyPosY >= node._private.data.expandcollapseStartY
                   && cyPosY <= node._private.data.expandcollapseEndY) {

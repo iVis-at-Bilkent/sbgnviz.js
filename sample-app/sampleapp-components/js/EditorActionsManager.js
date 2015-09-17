@@ -17,7 +17,7 @@ function expandNode(param) {
   var node = param.node;
   result.node = node;
   result.nodesData = getNodePositionsAndSizes();
-  if(param.firstTime){
+  if (param.firstTime) {
     expandCollapseUtilities.expandNode(node);
   }
   else {
@@ -34,7 +34,7 @@ function collapseNode(param) {
   var node = param.node;
   result.node = node;
   result.nodesData = getNodePositionsAndSizes();
-  if(param.firstTime){
+  if (param.firstTime) {
     expandCollapseUtilities.collapseNode(node);
   }
   else {
@@ -51,7 +51,7 @@ function expandGivenNodes(param) {
   };
   result.nodes = nodes;
   result.nodesData = getNodePositionsAndSizes();
-  if(param.firstTime){
+  if (param.firstTime) {
     expandCollapseUtilities.expandGivenNodes(nodes);
   }
   else {
@@ -66,7 +66,7 @@ function collapseGivenNodes(param) {
   var result = {};
   result.nodes = nodes;
   result.nodesData = getNodePositionsAndSizes();
-  if(param.firstTime){
+  if (param.firstTime) {
     expandCollapseUtilities.collapseGivenNodes(nodes);
   }
   else {
@@ -81,17 +81,17 @@ function expandAllNodes(param) {
     firstTime: false
   };
   result.nodesData = getNodePositionsAndSizes();
-  if(param.firstTime){
+  if (param.firstTime) {
     result.expandStack = expandCollapseUtilities.expandAllNodes();
   }
-  else{
+  else {
     result.expandStack = expandCollapseUtilities.simpleExpandAllNodes();
     returnToPositionsAndSizes(param.nodesData);
   }
   return result;
 }
 
-function simpleExpandAllNodes(){
+function simpleExpandAllNodes() {
   return expandCollapseUtilities.simpleExpandAllNodes();
 }
 
@@ -99,7 +99,7 @@ function collapseExpandedStack(expandedStack) {
   return expandCollapseUtilities.collapseExpandedStack(expandedStack);
 }
 
-function undoExpandAllNodes(param){
+function undoExpandAllNodes(param) {
   var result = {
     firstTime: false
   };
@@ -183,6 +183,10 @@ function simpleCollapseGivenNodes(nodes) {
 }
 
 function performLayoutFunction(nodesData) {
+  if (nodesData.firstTime) {
+    delete nodesData.firstTime;
+    return nodesData;
+  }
   return returnToPositionsAndSizes(nodesData);
 }
 
