@@ -46,23 +46,9 @@ var expandCollapseUtilities = {
 
     return thereIs;
   },
-  //this method returns the nodes whose parent is not in given nodes
-  getRootsOfGivenNodes: function (nodes) {
-    var parentMap = {};
-    for (var i = 0; i < nodes.length; i++) {
-      parentMap[nodes[i].id()] = nodes[i].data("parent");
-    }
-    var roots = cy.nodes().filter(function (i, ele) {
-      if (parentMap[parentMap[ele.id()]] == null) {
-        return true;
-      }
-    });
-
-    return roots;
-  },
   simpleCollapseGivenNodes: function (nodes) {
     nodes.data("collapse", true);
-    var roots = this.getRootsOfGivenNodes(nodes);
+    var roots = sbgnElementUtilities.getRootsOfGivenNodes(nodes);
     for (var i = 0; i < roots.length; i++) {
       var root = roots[i];
       this.collapseBottomUp(root);
@@ -71,7 +57,7 @@ var expandCollapseUtilities = {
   },
   simpleExpandGivenNodes: function (nodes) {
     nodes.data("expand", true);
-    var roots = this.getRootsOfGivenNodes(nodes);
+    var roots = sbgnElementUtilities.getRootsOfGivenNodes(nodes);
     for (var i = 0; i < roots.length; i++) {
       var root = roots[i];
       this.expandTopDown(root);
