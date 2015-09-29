@@ -4559,7 +4559,7 @@
       });
 
       if (after.options.fit)
-        after.options.cy.fit(after.options.padding);
+        after.options.cy.fit(after.options.eles.nodes(), after.options.padding);
 
       //trigger layoutready when each node has had its position set at least once
       if (!ready) {
@@ -4597,7 +4597,7 @@
         });
 
         if (after.options.fit)
-          after.options.cy.fit(after.options.padding);
+          after.options.cy.fit(after.options.eles.nodes(), after.options.padding);
 
         if (!ready) {
           ready = true;
@@ -4611,7 +4611,7 @@
     return this; // chaining
   };
 
-  var getToBeTiled = function (node) {
+  _CoSELayout.prototype.getToBeTiled = function (node) {
     var id = node.data("id");
     //firstly check the previous results
     if (_CoSELayout.toBeTiled[id] != null) {
@@ -4629,7 +4629,7 @@
     for (var i = 0; i < children.length; i++) {
       var theChild = children[i];
 
-      if (theChild.degree(false) > 0) {
+      if (this.getNodeDegree(theChild) > 0) {
         _CoSELayout.toBeTiled[id] = false;
         return false;
       }
@@ -4640,23 +4640,36 @@
         continue;
       }
 
-      if (!getToBeTiled(theChild)) {
+      if (!this.getToBeTiled(theChild)) {
         _CoSELayout.toBeTiled[id] = false;
         return false;
       }
     }
     _CoSELayout.toBeTiled[id] = true;
     return true;
-  }
+  };
+  
+  _CoSELayout.prototype.getNodeDegree = function(node) {
+    var id = node.id();
+    var edges = this.options.eles.edges().filter(function(i, ele){
+      var source = ele.data('source');
+      var target = ele.data('target');
+      if(source != target && (source == id || target == id) ){
+        return true;
+      }
+    });
+    return edges.length;
+  };
 
   _CoSELayout.prototype.groupZeroDegreeMembers = function () {
     // array of [parent_id x oneDegreeNode_id] 
     var tempMemberGroups = [];
     var memberGroups = [];
-
+    var self = this;
     // Find all zero degree nodes which aren't covered by a compound
     var zeroDegree = this.options.eles.nodes().filter(function (i, ele) {
-      if (this.degree(false) == 0 && (ele.parent().length == 0 || (ele.parent().length > 0 && !getToBeTiled(ele.parent()[0])) ) )
+//      console.log(self.getNodeDegree(ele));
+      if (self.getNodeDegree(ele) == 0 && (ele.parent().length == 0 || (ele.parent().length > 0 && !self.getToBeTiled(ele.parent()[0])) ) )
         return true;
       else
         return false;
@@ -4710,7 +4723,7 @@
     for (var i = 0; i < children.length; i++) {
       var child = children[i];
       this.fillCompexOrderByDFS(compoundOrder, child.children());
-      if (getToBeTiled(child)) {
+      if (this.getToBeTiled(child)) {
         compoundOrder.push(child);
       }
     }
