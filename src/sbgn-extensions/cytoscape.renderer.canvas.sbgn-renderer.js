@@ -2122,8 +2122,8 @@
       context.stroke();
 
       //update new state and info position(relative to node center)
-      state.bbox.x = stateCenterX - centerX;
-      state.bbox.y = stateCenterY - centerY;
+      state.bbox.x = (stateCenterX - centerX) * 100 / node.width();
+      state.bbox.y = (stateCenterY - centerY) * 100 / node.height();
     }
   };
 
@@ -2590,8 +2590,8 @@
       var state = stateAndInfos[i];
       var stateWidth = state.bbox.w + threshold;
       var stateHeight = state.bbox.h + threshold;
-      var stateCenterX = state.bbox.x + centerX;
-      var stateCenterY = state.bbox.y + centerY;
+      var stateCenterX = state.bbox.x * node.width() / 100 + centerX;
+      var stateCenterY = state.bbox.y * node.height() / 100 + centerY;
 
       if (state.clazz == "state variable" && stateCount < 2) {//draw ellipse
         var stateCheckPoint = nodeShapes["ellipse"].checkPoint(
@@ -2631,8 +2631,8 @@
       var state = stateAndInfos[i];
       var stateWidth = state.bbox.w;
       var stateHeight = state.bbox.h;
-      var stateCenterX = state.bbox.x + centerX;
-      var stateCenterY = state.bbox.y + centerY;
+      var stateCenterX = state.bbox.x * node.width() / 100 + centerX;
+      var stateCenterY = state.bbox.y * node.height() / 100 + centerY;
 
       if (state.clazz == "state variable" && stateCount < 2) {//draw ellipse
         var stateIntersectLines = $$.sbgn.intersectLineEllipse(x, y, centerX, centerY,
@@ -2675,8 +2675,8 @@
       var state = stateAndInfos[i];
       var stateWidth = state.bbox.w;
       var stateHeight = state.bbox.h;
-      var stateCenterX = state.bbox.x + centerX;
-      var stateCenterY = state.bbox.y + centerY;
+      var stateCenterX = state.bbox.x * node.width() / 100 + centerX;
+      var stateCenterY = state.bbox.y * node.height() / 100 + centerY;
 
       if (state.clazz == "state variable" && stateCount < 2) {//draw ellipse
         var stateIntersectBox = nodeShapes["ellipse"].intersectBox(x1, y1, x2, y2,

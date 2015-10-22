@@ -8,3 +8,12 @@
 .idea/modules.xml
 
 .idea/misc.xml
+/HTML5Application/nbproject/private/
+src/sbgn-extensions/.npmignore
+src/sbgn-extensions/.npmignore
+src/sbgn-extensions/.spmignore
+src/sbgn-extensions/.versions
+src/sbgn-extensions/.spmignore
+src/sbgn-extensions/bower.json
+src/sbgn-extensions/gulpfile.js
+src/sbgn-extensions/node_modules/*/

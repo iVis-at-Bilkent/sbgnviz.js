@@ -704,7 +704,7 @@ var SBGNContainer = Backbone.View.extend({
 
 var SBGNLayout = Backbone.View.extend({
   defaultLayoutProperties: {
-    name: 'cose2',
+    name: 'cose-bilkent',
     nodeRepulsion: 4500,
     nodeOverlap: 10,
     idealEdgeLength: 50,
