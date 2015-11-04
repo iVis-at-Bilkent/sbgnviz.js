@@ -1,16 +1,19 @@
 var sbgnElementUtilities = {
-  //this method returns the nodes whose parent is not in given nodes
+   //this method returns the nodes non of whose ancestors is not in given nodes
   getRootsOfGivenNodes: function (nodes) {
-    var parentMap = {};
     var nodesMap = {};
     for (var i = 0; i < nodes.length; i++) {
-      parentMap[nodes[i].id()] = nodes[i].data("parent");
       nodesMap[nodes[i].id()] = true;
     }
     var roots = nodes.filter(function (i, ele) {
-      if (nodesMap[parentMap[ele.id()]] == null) {
-        return true;
+      var parent = ele.parent()[0];
+      while (parent != null) {
+        if (nodesMap[parent.id()]) {
+          return false;
+        }
+        parent = parent.parent()[0];
       }
+      return true;
     });
 
     return roots;
