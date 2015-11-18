@@ -126,5 +126,8 @@ M. Sari, I. Bahceci, U. Dogrusoz, S.O. Sumer, B.A. Aksoy, O. Babur, E. Demir, "[
 
 ## Team
 
-  * Mecit Sari, Ugur Dogrusoz, Istemi Bahceci, Ayhun Tekat, Metin Can Siper, M.Furkan Sahin, [i-Vis at Bilkent University](http://www.cs.bilkent.edu.tr/~ivis)
-  * Selcuk Onur Sumer, Bulent Arman Aksoy, Ozgun Babur, Emek Demir, [cBio at MSKCC](http://cbio.mskcc.org)
+  * Istemi Bahceci, Metin Can Siper, Utku Demir, Ugur Dogrusoz [i-Vis at Bilkent University](http://www.cs.bilkent.edu.tr/~ivis)
+  * Selcuk Onur Sumer, Ozgun Babur, Emek Demir, [cBio at MSKCC](http://cbio.mskcc.org)
+
+#### Alumni
+  * Mecit Sari, Ayhun Tekat, M.Furkan Sahin, Bulent Arman Aksoy
