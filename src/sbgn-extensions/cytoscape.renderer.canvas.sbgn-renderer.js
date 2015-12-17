@@ -2003,8 +2003,8 @@
       var state = stateAndInfos[i];
       var stateWidth = state.bbox.w;
       var stateHeight = state.bbox.h;
-      var stateCenterX = state.bbox.x + centerX;
-      var stateCenterY = state.bbox.y + centerY;
+      var stateCenterX = state.bbox.x * node.width() / 100 + centerX;
+      var stateCenterY = state.bbox.y * node.height() / 100 + centerY;
 
       var textProp = {'centerX': stateCenterX, 'centerY': stateCenterY,
         'opacity': node._private.style['text-opacity'].value,

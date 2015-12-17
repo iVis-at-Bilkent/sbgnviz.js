@@ -82,8 +82,11 @@ var sbgnmlToJson = {
         sbgnbbox.h = $(ele).find('bbox').attr('h');
 
         //set positions as center
-        sbgnbbox.x = parseFloat(sbgnbbox.x) + parseFloat(sbgnbbox.w)/2 - xPos;
-        sbgnbbox.y = parseFloat(sbgnbbox.y) + parseFloat(sbgnbbox.h)/2 - yPos;
+        sbgnbbox.x = parseFloat(sbgnbbox.x) + parseFloat(sbgnbbox.w) / 2 - xPos;
+        sbgnbbox.y = parseFloat(sbgnbbox.y) + parseFloat(sbgnbbox.h) / 2 - yPos;
+        
+        sbgnbbox.x = sbgnbbox.x / parseFloat(parentBbox.w) * 100;
+        sbgnbbox.y = sbgnbbox.y / parseFloat(parentBbox.h) * 100;
 
         return sbgnbbox;
     },
