@@ -2584,12 +2584,11 @@
     var stateAndInfos = node._private.data.sbgnstatesandinfos;
 
     var stateCount = 0, infoCount = 0;
-
-
+    
     for (var i = 0; i < stateAndInfos.length; i++) {
       var state = stateAndInfos[i];
-      var stateWidth = state.bbox.w + threshold;
-      var stateHeight = state.bbox.h + threshold;
+      var stateWidth = parseFloat(state.bbox.w) + parseFloat(threshold);
+      var stateHeight = parseFloat(state.bbox.h) + parseFloat(threshold);
       var stateCenterX = state.bbox.x * node.width() / 100 + centerX;
       var stateCenterY = state.bbox.y * node.height() / 100 + centerY;
 
