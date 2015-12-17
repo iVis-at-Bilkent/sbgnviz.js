@@ -2587,8 +2587,8 @@
     
     for (var i = 0; i < stateAndInfos.length; i++) {
       var state = stateAndInfos[i];
-      var stateWidth = parseFloat(state.bbox.w) + parseFloat(threshold);
-      var stateHeight = parseFloat(state.bbox.h) + parseFloat(threshold);
+      var stateWidth = parseFloat(state.bbox.w) + threshold;
+      var stateHeight = parseFloat(state.bbox.h) + threshold;
       var stateCenterX = state.bbox.x * node.width() / 100 + centerX;
       var stateCenterY = state.bbox.y * node.height() / 100 + centerY;
 
