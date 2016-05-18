@@ -124,6 +124,8 @@ Please cite the following when you use SBGNViz.js:
 
 M. Sari, I. Bahceci, U. Dogrusoz, S.O. Sumer, B.A. Aksoy, O. Babur, E. Demir, "[SBGNViz: a tool for visualization and complexity management of SBGN process description maps](http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0128985)", PLoS ONE, 10(6), e0128985, 2015.
 
+Thanks to JetBrains for an [Open Source License](https://www.jetbrains.com/buy/opensource/)
+
 ## Team
 
   * Istemi Bahceci, Metin Can Siper, Utku Demir, Ugur Dogrusoz [i-Vis at Bilkent University](http://www.cs.bilkent.edu.tr/~ivis)
