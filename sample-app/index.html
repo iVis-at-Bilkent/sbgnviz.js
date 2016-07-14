@@ -17,21 +17,19 @@
         <link href="../lib/css/cytoscape.js-panzoom.css" rel="stylesheet" type="text/css" />
         <link href="../lib/css/font-awesome-4.0.3/css/font-awesome.css" rel="stylesheet" type="text/css" />
         <link href="../lib/css/jquery.qtip.min.css" rel="stylesheet" type="text/css" />
+        <link href="../node_modules/cytoscape-edge-bend-editing/cytoscape.js-edge-bend-editing.css" rel="stylesheet" type="text/css" />
 
-        <link href="../lib/css/ddSlick.css" rel="stylesheet" type="text/css" />
-        
         <!-- Loading sample app css -->
         <link href="sampleapp-components/css/sbgn-viz.css" rel="stylesheet">
 
     </head>
 
     <body>
-
         <div class="nav-menu">
             <nav class="navbar navbar-default sbgn-nav-bar" role="navigation">
                 <div>
+                    <span class="sbgn-label">SBGN<i>Viz</i>.js</span>
                     <ul class="nav navbar-nav navbar-left">
-
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                                 File 
@@ -39,6 +37,7 @@
                             </a>
                             <ul class="dropdown-menu">
                                 <input id="file-input" type="file" style="display:none" />
+                                <li><a href="#" type="file" id="new-file">New</a></li>
                                 <li><a href="#" type="file" id="load-file">Load...</a></li>
                                 <li class="dropdown-submenu">
                                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">
@@ -46,13 +45,15 @@
                                         <!--<b class="right-caret"></b>-->
                                     </a>
                                     <ul class="dropdown-menu">
-                                        <li><a href="#" id="load-sample1">Activated STAT1alpha induction of the IRF1 gene</a></li>
-                                        <li><a href="#" id="load-sample2">Glycolysis</a></li>
-                                        <li><a href="#" id="load-sample3">MAPK cascade</a></li>
-                                        <li><a href="#" id="load-sample4">PolyQ proteins interference</a></li>
-                                        <li><a href="#" id="load-sample5">Insulin-like Growth Factor (IGF) signalling</a></li>
-                                        <li><a href="#" id="load-sample6">ATM mediated phosphorylation of repair proteins</a></li>
-                                        <li><a href="#" id="load-sample7">Vitamins B6 activation to pyridoxal phosphate</a></li>
+                                        <li><a href="#" id="load-sample1">Neuronal muscle signaling</a></li>
+                                        <li><a href="#" id="load-sample2">CaM-CaMK dependent signaling to the nucleus</a></li>
+                                        <li><a href="#" id="load-sample3">Activated STAT1alpha induction of the IRF1 gene</a></li>
+                                        <li><a href="#" id="load-sample4">Glycolysis</a></li>
+                                        <li><a href="#" id="load-sample5">MAPK cascade</a></li>
+                                        <li><a href="#" id="load-sample6">PolyQ proteins interference</a></li>
+                                        <li><a href="#" id="load-sample7">Insulin-like Growth Factor (IGF) signalling</a></li>
+                                        <li><a href="#" id="load-sample8">ATM mediated phosphorylation of repair proteins</a></li>
+                                        <li><a href="#" id="load-sample9">Vitamins B6 activation to pyridoxal phosphate</a></li>
                                     </ul>
                                 </li>
                                 <li><a href="#" id="save-as-sbgnml">Save...</a></li>
@@ -70,29 +71,100 @@
                             </ul>
                         </li>
 
-
-                        <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                                Layout 
-                                <b class="caret"></b>
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li><a href="#" id="perform-layout">Perform Layout</a></li>
-                                <li><a href="#" id="perform-incremental-layout" style="display: none"></a></li>
-                                <li><a href="#" id="layout-properties">Layout Properties...</a></li>
-                            </ul>
-                        </li>
-
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                                 Edit 
                                 <b class="caret"></b>
                             </a>
                             <ul class="dropdown-menu">
-                                <li><a href="#" id="delete-selected-smart">Delete Selected</a></li>
-                                
+                                <li><a href="#" id="select-edit">Select/Edit</a></li>
+                                <li class="dropdown-submenu">
+                                    <a href="#" id="add-node-menu-option" class="dropdown-toggle" data-toggle="dropdown">
+                                        Add Node
+                                        <!--<b class="right-caret"></b>-->
+                                    </a>
+                                    <ul class="dropdown-menu" id="add-node-submenu">
+                                        <li><a href="#" class="add-node-menu-item" name="macromolecule">Macromolecule</a></li>
+                                        <li><a href="#" class="add-node-menu-item" name="simple-chemical">Simple Chemical</a></li>
+                                        <li><a href="#" class="add-node-menu-item" name="complex">Complex</a></li>
+                                        <li class="dropdown-submenu">
+                                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" id="process-menu-option">
+                                                Process
+                                                <!--<b class="right-caret"></b>-->
+                                            </a>
+                                            <ul class="dropdown-menu">
+                                                <li><a href="#" class="add-node-menu-item process-type" name="process" >Process</a></li>
+                                                <li><a href="#" class="add-node-menu-item process-type" name="omitted-process">Omitted Process</a></li>
+                                                <li><a href="#" class="add-node-menu-item process-type" name="uncertain-process">Uncertain Process</a></li>
+                                                <li><a href="#" class="add-node-menu-item process-type" name="association">Association</a></li>
+                                                <li><a href="#" class="add-node-menu-item process-type" name="dissociation">Dissociation</a></li>
+                                            </ul>
+                                        </li>
+                                        <li><a href="#" class="add-node-menu-item" name="phenotype">Phenotype</a></li>
+                                        <li><a href="#" class="add-node-menu-item" name="compartment">Compartment</a></li>
+                                        <li><a href="#" class="add-node-menu-item" name="unspecified-entity">Unspecified Entry</a></li>
+                                        <li><a href="#" class="add-node-menu-item" name="nucleic-acid-feature">Nucleic Acid Feature</a></li>
+                                        <li><a href="#" class="add-node-menu-item" name="source-and-sink">Source or Sink</a></li>
+                                        <li><a href="#" class="add-node-menu-item" name="perturbing-agent">Perturbing Agend</a></li>
+                                        <li><a href="#" class="add-node-menu-item" name="tag">Tag</a></li>
+                                        <li class="dropdown-submenu">
+                                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" id="logical-operator-menu-option">
+                                                Logical Operators
+                                                <!--<b class="right-caret"></b>-->
+                                            </a>
+                                            <ul class="dropdown-menu">
+                                                <li><a href="#" class="logical-operator-type add-node-menu-item" name="and">AND</a></li>
+                                                <li><a href="#" class="logical-operator-type add-node-menu-item" name="or">OR</a></li>
+                                                <li><a href="#" class="logical-operator-type add-node-menu-item" name="not">NOT</a></li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </li>
+
+                                <li class="dropdown-submenu">
+                                    <a href="#" id="add-edge-menu-option" class="dropdown-toggle" data-toggle="dropdown">
+                                        Add Interaction 
+                                    </a>
+                                    <ul class="dropdown-menu" id="add-edge-submenu">
+                                        <li><a href="#" class="add-edge-menu-item" name="consumption">Consumption</a></li>
+                                        <li><a href="#" class="add-edge-menu-item" name="production">Production</a></li>
+                                        <li class="divider"></li>
+                                        <li><a href="#" class="add-edge-menu-item" name="modulation">Modulation</a></li>
+                                        <li><a href="#" class="add-edge-menu-item" name="stimulation">Simulation</a></li>
+                                        <li><a href="#" class="add-edge-menu-item" name="catalysis">Catalysis</a></li>
+                                        <li><a href="#" class="add-edge-menu-item" name="inhibition">Inhibition</a></li>
+                                        <li><a href="#" class="add-edge-menu-item" name="necessary-stimulation">Necessary Stimulation</a></li>
+                                        <li class="divider"></li>
+                                        <li><a href="#" class="add-edge-menu-item" name="logic-arc">Logic Arc</a></li>
+                                        <li class="divider"></li>
+                                        <li><a href="#" class="add-edge-menu-item" name="equivalence-arc">Equivalence Arc</a></li>
+                                    </ul>
+                                </li>
+
                                 <li class="divider"></li>
-                                
+                                <li><a href="#" id="make-compound-complex" >Add Complex for Selected</a></li>
+                                <li><a href="#" id="make-compound-compartment" >Add Compartment for Selected</a></li>
+                                <li><a href="#" id="create-reaction-template" >Add From Template...</a></li>
+                                <li><a href="#" id="clone-selected" >Clone Selected</a></li>
+
+                                <li class="divider"></li>
+
+                                <li><a href="#" id="delete-selected-simple">Delete Selected Simple</a></li>
+                                <li><a href="#" id="delete-selected-smart">Delete Selected Smart</a></li>
+
+                                <li class="divider"></li>
+                                <li class="disabled"><a href="#" id="undo-last-action" >Undo</a></li>
+                                <li class="disabled"><a href="#" id="redo-last-action" >Redo</a></li>
+
+                            </ul>
+                        </li>
+
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                View 
+                                <b class="caret"></b>
+                            </a>
+                            <ul class="dropdown-menu">
                                 <li class="dropdown-submenu">
                                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                                         Hide/Show
@@ -104,9 +176,7 @@
                                         <li><a href="#" id="show-all">Show All</a></li>
                                     </ul>
                                 </li>
-                                
-                                <li class="divider"></li>
-                                
+
                                 <li class="dropdown-submenu">
                                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                                         Collapse/Expand
@@ -115,26 +185,86 @@
                                     <ul class="dropdown-menu">
                                         <li><a href="#" id="collapse-selected">Collapse Selected</a></li>
                                         <li><a href="#" id="expand-selected">Expand Selected</a></li>
+                                        <li><a href="#" id="collapse-complexes">Collapse Complexes</a></li>
+                                        <li><a href="#" id="expand-complexes">Expand Complexes</a></li>
                                         <li><a href="#" id="collapse-all">Collapse All</a></li>
                                         <li><a href="#" id="expand-all">Expand All</a></li>
                                     </ul>
                                 </li>
                                 
-                                <li class="divider"></li>
-                                <li class="disabled"><a href="#" id="undo-last-action" >Undo</a></li>
-                                <li class="disabled"><a href="#" id="redo-last-action" >Redo</a></li>
+                                <li class="dropdown-submenu">
+                                    <a href="#" id="add-node-menu-option" class="dropdown-toggle" data-toggle="dropdown">
+                                        Align
+                                        <!--<b class="right-caret"></b>-->
+                                    </a>
+                                    <ul class="dropdown-menu" id="add-node-submenu">
+                                        <li class="dropdown-submenu">
+                                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                                Horizontal
+                                                <!--<b class="right-caret"></b>-->
+                                            </a>
+                                            <ul class="dropdown-menu">
+                                                <li><a href="#" id="align-horizontal-top">Top</a></li>
+                                                <li><a href="#" id="align-horizontal-middle">Middle</a></li>
+                                                <li><a href="#" id="align-horizontal-bottom">Bottom</a></li>
+                                            </ul>
+                                        </li>
+                                        <li class="dropdown-submenu">
+                                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                                Vertical
+                                                <!--<b class="right-caret"></b>-->
+                                            </a>
+                                            <ul class="dropdown-menu">
+                                                <li><a href="#" id="align-vertical-left">Left</a></li>
+                                                <li><a href="#" id="align-vertical-center">Center</a></li>
+                                                <li><a href="#" id="align-vertical-right">Right</a></li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </li>
                             </ul>
                         </li>
-
+                        
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                                 Highlight 
                                 <b class="caret"></b>
                             </a>
                             <ul class="dropdown-menu">
+                                <li><a href="#" id="highlight-search-menu-item">Search ...</a></li>
                                 <li><a href="#" id="neighbors-of-selected">Neighbors of Selected</a></li>
                                 <li><a href="#" id="processes-of-selected">Processes of Selected</a></li>
                                 <li><a href="#" id="remove-highlights">Remove Highlights</a></li>
+
+                            </ul>
+                        </li>
+
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                Layout 
+                                <b class="caret"></b>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a href="#" id="perform-layout">Perform Layout</a></li>
+                                <li><a href="#" id="layout-properties">Layout Properties...</a></li>
+                            </ul>
+                        </li>
+                        
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                Query 
+                                <b class="caret"></b>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li class="dropdown-submenu">
+                                    <a href="#" id="query-pathwaycommons" class="dropdown-toggle" data-toggle="dropdown">
+                                        Pathway Commons
+                                        <!--<b class="right-caret"></b>-->
+                                    </a>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="#" id="query-pathsbetween">Paths Between</a></li>
+                                    </ul>
+                                </li>
                             </ul>
                         </li>
 
@@ -162,39 +292,184 @@
                             </ul>
                         </li>
                     </ul>
+                    <span class="input-file" id="file-name"></span>
                 </div>
             </nav>
         </div>
 
-        <div id="sbgn-info-content">
+        <div id="sbgn-toolbar" style="margin-top: 5px;">
             <table width="100%" height="100%" align="center" valign="center">
                 <tr>
-                    <td>
-                        <span class="input-file" id="file-name"></span>
-                    </td>
-                    <td>
-                        <span class="sbgn-label">SBGN<i>Viz</i>.js</span>
-                    </td>
+                <div class="inside-menu">
+                <img id="new-file-icon" class="sbgn-toolbar-element" src="sampleapp-images/toolbar-icons/new.png" title="New: Create a blank SBGN-PD map">
+                <img id="load-file-icon" class="sbgn-toolbar-element" src="sampleapp-images/toolbar-icons/load.png" title="Load: Load an SBGN-PD map from SBGN-ML file">
+                <img id="save-icon" class="sbgn-toolbar-element" src="sampleapp-images/toolbar-icons/save.png" title="Save: Save current SBGN-PD map to an SBGN-ML file">
+                <img id="properties-icon" class="sbgn-toolbar-element" src="sampleapp-images/toolbar-icons/properties.png" title="Properties: Modify general properties of current SBGN-PD map" >
+                </div>
+                
+                <div class="menu-break-large sbgn-toolbar-element">&nbsp</div>
+                <div class="inside-menu">
+                <img id="select-icon" class="sbgn-toolbar-element" src="sampleapp-images/toolbar-icons/select.png" title="Select / Edit" >
+                <div class="btn-group sbgn-toolbar-element" role="group" id="node-list">
+                    <button id="node-list-set-mode-btn" title="Create a new Macromolecule" type="button" class="btn" aria-haspopup="true" aria-expanded="false">
+                        <div style="height: 16px;">
+                            <img style="float: left; height: 16px; width: auto;" id="sbgn-selected-node-img" src="sampleapp-images/nodes/macromolecule.png"/>
+                            <!--<span style="float: right;" class="caret"></span>-->
+                        </div>
+                    </button>
+                    <button id="node-list-dd-button" type="button" class="btn dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <div style="height: 16px;">
+                            <span class="caret"></span>
+                            <span class="sr-only"></span>
+                        </div>
+                    </button>
+                    <ul id="node-list-menu" class="dropdown-menu" >
+                        <li class="sbgn-select-node-item" id="first-sbgn-select-node-item"><a class="dd-list-href" href="#"><img src="sampleapp-images/nodes/macromolecule.png" class="sbgn-select-img" value="macromolecule"/>Macromolecule</a></li>
+                        <li class="sbgn-select-node-item"><a class="dd-list-href" href="#"><img src="sampleapp-images/nodes/simplechemical.png" class="sbgn-select-img" value="simple-chemical"/>Simple Chemical</a></li>
+                        <li class="sbgn-select-node-item"><a class="dd-list-href" href="#"><img src="sampleapp-images/nodes/complex.png" class="sbgn-select-img" value="complex"/>Complex</a></li>
+                        <li class="sbgn-select-node-item"><a class="dd-list-href" href="#"><img src="sampleapp-images/nodes/process.png" class="sbgn-select-img" value="process"/>Process</a></li>
+                        <li class="sbgn-select-node-item"><a class="dd-list-href" href="#"><img src="sampleapp-images/nodes/omittedprocess.png" class="sbgn-select-img" value="omitted-process"/>Omitted Process</a></li>
+                        <li class="sbgn-select-node-item"><a class="dd-list-href" href="#"><img src="sampleapp-images/nodes/uncertainprocess.png" class="sbgn-select-img" value="uncertain-process"/>Uncertain Process</a></li>
+                        <li class="sbgn-select-node-item"><a class="dd-list-href" href="#"><img src="sampleapp-images/nodes/association.png" class="sbgn-select-img" value="association"/>Association</a></li>
+                        <li class="sbgn-select-node-item"><a class="dd-list-href" href="#"><img src="sampleapp-images/nodes/dissociation.png" class="sbgn-select-img" value="dissociation"/>Dissociation</a></li>
+                        <li class="sbgn-select-node-item"><a class="dd-list-href" href="#"><img src="sampleapp-images/nodes/phenotype.png" class="sbgn-select-img" value="phenotype"/>Phenotype</a></li>
+                        <li class="sbgn-select-node-item"><a class="dd-list-href" href="#"><img src="sampleapp-images/nodes/compartment.png" class="sbgn-select-img" value="compartment"/>Compartment</a></li>
+                        <li class="sbgn-select-node-item"><a class="dd-list-href" href="#"><img src="sampleapp-images/nodes/unspecifiedentity.png" class="sbgn-select-img" value="unspecified-entity"/>Unspecified Entity</a></li>
+                        <li class="sbgn-select-node-item"><a class="dd-list-href" href="#"><img src="sampleapp-images/nodes/nucleicacidfeature.png" class="sbgn-select-img" value="nucleic-acid-feature"/>Nucleic Acid Feature</a></li>
+
+                        <li class="sbgn-select-node-item"><a class="dd-list-href" href="#"><img src="sampleapp-images/nodes/sourceandsink.png" class="sbgn-select-img" value="source-and-sink"/>Source and Sink</a></li>
+                        <li class="sbgn-select-node-item"><a class="dd-list-href" href="#"><img src="sampleapp-images/nodes/perturbingagent.png" class="sbgn-select-img" value="perturbing-agent"/>Perturbing Agent</a></li>
+                        <li class="sbgn-select-node-item"><a class="dd-list-href" href="#"><img src="sampleapp-images/nodes/tag.png" class="sbgn-select-img" value="tag"/>Tag</a></li>
+
+                        <li class="sbgn-select-node-item"><a class="dd-list-href" href="#"><img src="sampleapp-images/nodes/and.png" class="sbgn-select-img" value="and"/>AND</a></li>
+                        <li class="sbgn-select-node-item"><a class="dd-list-href" href="#"><img src="sampleapp-images/nodes/or.png" class="sbgn-select-img" value="or"/>OR</a></li>
+                        <li class="sbgn-select-node-item"><a class="dd-list-href" href="#"><img src="sampleapp-images/nodes/not.png" class="sbgn-select-img" value="not"/>NOT</a></li>
+                    </ul>
+                </div>
+                <div class="btn-group sbgn-toolbar-element" role="group" id="edge-list">
+                    <button id="edge-list-set-mode-btn" type="button" class="btn" title="Create a new Consumption" aria-haspopup="true" aria-expanded="false">
+                        <div style="height: 16px;">
+                            <img style="float: left; height: 16px; width: auto;" id="sbgn-selected-edge-img" src="sampleapp-images/edges/consumption.png"/>
+                            <!--<span style="float: right;" class="caret"></span>-->
+                        </div>
+                    </button>
+                    <button id="edge-list-dd-button" type="button" class="btn dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <div style="height: 16px;">
+                            <span class="caret"></span>
+                            <span class="sr-only"></span>
+                        </div>
+                    </button>
+                    <ul id="edge-list-menu" class="dropdown-menu" >
+                        <li id="first-sbgn-select-edge-item" class="sbgn-select-edge-item"><a class="dd-list-href" href="#"><img src="sampleapp-images/edges/consumption.png" class="sbgn-select-img" value="consumption"/>Consumption</a></li>
+                        <li class="sbgn-select-edge-item"><a class="dd-list-href" href="#"><img src="sampleapp-images/edges/production.png" class="sbgn-select-img" value="production"/>Production</a></li>
+                        <li class="sbgn-select-edge-item"><a class="dd-list-href" href="#"><img src="sampleapp-images/edges/modulation.png" class="sbgn-select-img" value="modulation"/>Modulation</a></li>
+                        <li class="sbgn-select-edge-item"><a class="dd-list-href" href="#"><img src="sampleapp-images/edges/stimulation.png" class="sbgn-select-img" value="stimulation"/>Stimulation</a></li>
+                        <li class="sbgn-select-edge-item"><a class="dd-list-href" href="#"><img src="sampleapp-images/edges/catalysis.png" class="sbgn-select-img" value="catalysis"/>Catalysis</a></li>
+                        <li class="sbgn-select-edge-item"><a class="dd-list-href" href="#"><img src="sampleapp-images/edges/inhibition.png" class="sbgn-select-img" value="inhibition"/>Inhibition</a></li>
+                        <li class="sbgn-select-edge-item"><a class="dd-list-href" href="#"><img src="sampleapp-images/edges/necessarystimulation.png" class="sbgn-select-img" value="necessary-stimulation"/>Necessary Stimulation</a></li>
+                        <li class="sbgn-select-edge-item"><a class="dd-list-href" href="#"><img src="sampleapp-images/edges/logicarc.png" class="sbgn-select-img" value="logic-arc"/>Logic Arc</a></li>
+                        <li class="sbgn-select-edge-item"><a class="dd-list-href" href="#"><img src="sampleapp-images/edges/logicarc.png" class="sbgn-select-img" value="equivalence-arc"/>Equivalence Arc</a></li>
+                    </ul>
+                </div>
+                
+                <div class="menu-break-small sbgn-toolbar-element">&nbsp</div>
+                <img id="delete-selected-simple-icon" class="sbgn-toolbar-element" src="sampleapp-images/toolbar-icons/deletesimple.png" title="Delete Selected Simple: Delete selected nodes and interactions" >
+                <img id="delete-selected-smart-icon" class="sbgn-toolbar-element" src="sampleapp-images/toolbar-icons/deletesmart.png" title="Delete Selected Smart: Delete selected nodes and any processes they are involved in" >
+
+                <div class="menu-break-small sbgn-toolbar-element">&nbsp</div>
+                <img id="undo-icon" class="sbgn-toolbar-element" src="sampleapp-images/toolbar-icons/undo.png" title="Undo: Undo the last operation" >
+                <img id="redo-icon" class="sbgn-toolbar-element" src="sampleapp-images/toolbar-icons/redo.png" title="Redo: Redo the last undone operation" >
+
+                </div>
+                
+                <div class="menu-break-large sbgn-toolbar-element">&nbsp</div>
+                <div class="inside-menu">
+                <img id="hide-selected-icon" class="sbgn-toolbar-element" src="sampleapp-images/toolbar-icons/hideselected.png" title="Hide Selected: Hide selected nodes and any processes they are involved in" >
+                <img id="show-selected-icon" class="sbgn-toolbar-element" src="sampleapp-images/toolbar-icons/showselected.png" title="Show Selected: Show selected nodes and any processes they are involved in, hiding the remaining nodes and their interactions" >
+
+                <div class="menu-break-small sbgn-toolbar-element">&nbsp</div>
+                <img id="collapse-selected-icon" class="sbgn-toolbar-element" src="sampleapp-images/toolbar-icons/collapseselected.png" title="Collapse Selected: Collapse selected compound node to hide its members" >
+                <img id="expand-selected-icon" class="sbgn-toolbar-element" src="sampleapp-images/toolbar-icons/expandselected.png" title="Expand Selected: Expand selected collapsed node to show its members" >
+
+                <div class="menu-break-small sbgn-toolbar-element">&nbsp</div>
+                <div class="btn-group sbgn-toolbar-element" role="group" id="align-list">
+                    <button id="align-button" title="Align to First Selected: Align positions of selected nodes based on the first (if any) selected node" type="button" class="btn" aria-haspopup="true" aria-expanded="false">
+                        <div style="height: 16px;">
+                            <img style="float: left; height: 16px; width: auto;" id="sbgn-align-img" src="sampleapp-images/align/align.png"/>
+                            <!--<span style="float: right;" class="caret"></span>-->
+                        </div>
+                    </button>
+                    <button id="align-dd-button" type="button" class="btn dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <div style="height: 16px;">
+                            <span class="caret"></span>
+                            <span class="sr-only"></span>
+                        </div>
+                    </button>
+                    <ul id="align-menu" class="dropdown-menu" >
+                        <li><a class="dd-list-href" href="#" id="align-horizontal-top-icon"><img src="sampleapp-images/align/align-horizontal-top.png" class="sbgn-select-img"/>Align Horizontal Top</a></li>
+                        <li><a class="dd-list-href" href="#" id="align-horizontal-middle-icon"><img src="sampleapp-images/align/align-horizontal-middle.png" class="sbgn-select-img"/>Align Horizontal Middle</a></li>
+                        <li><a class="dd-list-href" href="#" id="align-horizontal-bottom-icon"><img src="sampleapp-images/align/align-horizontal-bottom.png" class="sbgn-select-img"/>Align Horizontal Bottom</a></li>
+                        <li><a class="dd-list-href" href="#" id="align-vertical-left-icon"><img src="sampleapp-images/align/align-vertical-left.png" class="sbgn-select-img"/>Align Vertical Left</a></li>
+                        <li><a class="dd-list-href" href="#" id="align-vertical-center-icon"><img src="sampleapp-images/align/align-vertical-center.png" class="sbgn-select-img"/>Align Vertical Center</a></li>
+                        <li><a class="dd-list-href" href="#" id="align-vertical-right-icon"><img src="sampleapp-images/align/align-vertical-right.png" class="sbgn-select-img"/>Align Vertical Right</a></li>
+                    </ul>
+                </div>
+                </div>
+                
+                <div class="menu-break-large sbgn-toolbar-element">&nbsp</div>
+                <div class="inside-menu">
+                <img id="search-by-label-icon" class="sbgn-toolbar-element" src="sampleapp-images/search.png" title="Search: Search and find (case insensitive) all nodes with specified label text, selecting them and highlighting them along with their processes" >
+                <input id="search-by-label-text-box" class="sbgn-toolbar-element" type="label">
+                <img id="highlight-neighbors-of-selected-icon" class="sbgn-toolbar-element" src="sampleapp-images/toolbar-icons/highlightneighborsofselected.png" title="Highlight Neighbors of Selected: Highlight selected nodes and their neighbors by ghosting remaining nodes" >
+                <img id="remove-highlights-icon" class="sbgn-toolbar-element" src="sampleapp-images/toolbar-icons/removehighlights.png" title="Remove Highlights: Remove any highlights" >
+                </div>
+                
+                <div class="menu-break-large sbgn-toolbar-element">&nbsp</div>
+                <div class="inside-menu">
+                <img id="perform-layout-icon" class="sbgn-toolbar-element" src="sampleapp-images/toolbar-icons/layout-cose.png" title="Perform Layout: Perform a force-directed layout of current map, maintaining compound structures" >
+                <img id="layout-properties-icon" class="sbgn-toolbar-element" src="sampleapp-images/toolbar-icons/layoutproperties.png" title="Layout Properties: Modify parameters used during layout" >
+                </div>
                 </tr>
+                
             </table>
         </div>
-    
-        <div id="sbgn-network-container">
-        </div>
 
+        <table id="sbgn-inspector-and-canvas">
+            <tr>
+                <td>
+                    <div id="sbgn-network-container">
+                    </div>
+                </td>
+                <td>
+                    <div id="sbgn-inspector">
+                    </div>
+                </td>
+            </tr>
+        </table>
         <div id="sbgn-layout-table" title="Layout Properties">
             <!-- sbgn layout table will be shown here -->
         </div>
-    
+
         <div id="sbgn-properties-table" title="Properties" style="display: inline">
             <!-- sbgn properties table will be shown here -->
         </div>
 
         <div id="biogene-container" style="display: none">
         </div>
+        
+        <div id="query-pathsbetween-table" title="Paths Between Query Parameters">
+            <!-- paths between query table will be shown here -->
+        </div>
+        
+        <div id="reaction-template-table" title="Template">
+            <!-- paths between query table will be shown here -->
+        </div>
 
         <div id="box">
         </div>
+
+        <input id="node-label-textbox" type="text"></input>
+      
 
         <!-- templates -->
         <script type="text/template" id="node-legend-template">
@@ -217,25 +492,18 @@
 
             <table width="100%" height="100%" align="center" valign="center">
             <tr><td>
+            <p class="sbgn-text">SBGN<i>Viz</i> Editor version 1.0</p>
+            </td></tr>
+            
+            <tr><td>
             <img src="sampleapp-images/i-vis.png" alt="" class="centered">
             </td></tr>
-
+            
+            <tr height="10px"></tr>
+            
             <tr><td>
-            <img src="sampleapp-images/cbio.png" alt="" class="centered">
-            </td></tr>
-
-            <tr><td>
-            <p class="sbgn-text">SBGN<i>Viz</i>.js version 1.2</p>
-            </td></tr>
-
-            <tr><td>
-            <p class="address-text marg">i-Vis information Visualization Group</p>
+            <p class="address-text marg">i-Vis Information Visualization Group</p>
             <p class="address-text">Bilkent University, Ankara, Turkey</p>
-            </td></tr>
-
-            <tr><td>
-            <p class="address-text marg">Memorial Sloan-Kettering Cancer Center</p>
-            <p class="address-text">New York, USA</p>
             </td></tr>
 
             <tr><td>
@@ -243,7 +511,7 @@
             <a href="mailto:ivis@cs.bilkent.edu.tr" target="_top">ivis@cs.bilkent.edu.tr</a>
             </p>
             <p class="address-text">
-            <a href="https://github.com/PathwayCommons/sbgnviz-js" target="_blank">https://github.com/PathwayCommons/sbgnviz-js</a>
+            <a href="https://github.com/iVis-at-Bilkent/sbgnviz-js" target="_blank">https://github.com/iVis-at-Bilkent/sbgnviz-js</a>
             </p>
             </td></tr>
             </table>
@@ -270,6 +538,10 @@
             <tr>
             <td><b>Right-click</b>:
             Detailed properties of a macro-molecule from BioGene</td>
+            </tr>
+            <tr>
+            <td><b>Ctrl + drag</b>:
+            Transfer a node in and out of a compound node</td>
             </tr>
             </table>
             </div>
@@ -345,6 +617,24 @@
             <input id="num-iter" type="text" class="input-small layout-text" value= <%= numIter %> >
             </td>
             </tr>
+    
+            <tr>
+            <td>
+            <span class="add-on layout-text"> Tiling Vertical Padding </span>
+            </td>
+            <td>
+            <input id="tiling-padding-vertical" type="text" class="input-small layout-text" value= <%= tilingPaddingVertical %> >
+            </td>
+            </tr>
+    
+            <tr>
+            <td>
+            <span class="add-on layout-text"> Tiling Vertical Horizontal </span>
+            </td>
+            <td>
+            <input id="tiling-padding-horizontal" type="text" class="input-small layout-text" value= <%= tilingPaddingHorizontal %> >
+            </td>
+            </tr>
 
             <tr>
             <td>
@@ -355,14 +645,14 @@
             <input id="tile" type="checkbox" class="input-small layout-text" <% if (tile){ %> checked<%}%>>
             </td>
             </tr>
-    
+
             <tr>
             <td>
             <span class="add-on layout-text"> Animate </span>
             </td>
 
             <td>
-            <input id="animate" type="checkbox" class="input-small layout-text" <% if (animate){ %> checked<%}%>>
+            <input id="animate" type="checkbox" class="input-small layout-text" <% if (animate === 'during'){ %> checked<%}%>>
             </td>
             </tr>
             <tr>
@@ -378,10 +668,10 @@
             <td><br>
             </td>
             </tr>
-            
+
             <tr id="layout-buttons">
             <td>
-            <button id="save-layout" class="btn btn-default" >Save</button>
+            <button style="float: right;" id="save-layout" class="btn btn-default" >Save</button>
             </td>
             <td>
             <button id="default-layout" class="btn btn-default">Default</button>
@@ -389,33 +679,34 @@
             </tr>
             </table>
         </script>
-        
+
         <script type="text/template" id="sbgn-properties-template">
             <table class="table-condensed layout-table">
             <tr>
             <td>
             <span class="add-on layout-text"> Compound Padding </span>
             </td>
-            
+
             <td>
-            <input id="compound-padding" type="text" class="input-small layout-text" value= <%= compoundPadding %> > %
+            <input id="compound-padding" type="text" class="input-small layout-text" value= <%= compoundPadding %> > 
             </td>
+            <td>%</td>
             </tr>
-    
+
             <tr>
             <td>
             <span class="add-on layout-text"> Label Size </span>
             </td>
-            
+
             <td>
-            <select name="dynamic-label-size">
+            <select id="dynamic-label-size-select" name="dynamic-label-size">
             <option id="dynamic-label-size_small" value="small" <% if (dynamicLabelSize == 'small'){ %> selected<%}%> > Small </option>
             <option id="dynamic-label-size_regular" value="regular" <% if (dynamicLabelSize == 'regular'){ %> selected<%}%> > Regular </option>
             <option id="dynamic-label-size_large" value="large" <% if (dynamicLabelSize == 'large'){ %> selected<%}%> > Large </option>
             </select>
             </td>
             </tr>
-    
+
             <tr>
             <td>
             <span class="add-on layout-text"> Fit Labels To Nodes </span>
@@ -425,25 +716,197 @@
             <input id="fit-labels-to-nodes" type="checkbox" class="input-small layout-text" <% if (fitLabelsToNodes){ %> checked<%}%>>
             </td>
             </tr>
-    
+
             <tr>
             <td>
-            <span class="add-on layout-text"> Layout After Expand / Collapse </span>
+            <span class="add-on layout-text"> Rearrange After Expand-Collapse </span>
             </td>
 
             <td>
-            <input id="incremental-layout-after-expand-collapse" type="checkbox" class="input-small layout-text" <% if (incrementalLayoutAfterExpandCollapse){ %> checked<%}%>>
+            <input id="rearrange-after-expand-collapse" type="checkbox" class="input-small layout-text" <% if (rearrangeAfterExpandCollapse){ %> checked<%}%>>
+            </td>
+            </tr>
+
+                <tr>
+                    <td>
+                        <span class="add-on layout-text"> Animate on Drawing Changes </span>
+                    </td>
+
+                    <td>
+                        <input id="animate-on-drawing-changes" type="checkbox" class="input-small layout-text" <% if (animateOnDrawingChanges){ %> checked<%}%>>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <span class="add-on layout-text"> Show Grid </span>
+                    </td>
+
+                    <td>
+                        <input id="show-grid" type="checkbox" class="input-small layout-text" <% if (showGrid){ %> checked<%}%>>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <span class="add-on layout-text"> Snap to Grid </span>
+                    </td>
+
+                    <td>
+                        <input id="snap-to-grid" type="checkbox" class="input-small layout-text" <% if (snapToGrid){ %> checked<%}%>>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <span class="add-on layout-text"> Grid Size </span>
+                    </td>
+
+                    <td>
+                        <input id="grid-size" type="number" min=5 class="input-small layout-text" value= <%= gridSize %> >
+                    </td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>
+                        <span class="add-on layout-text"> Discrete Drag </span>
+                    </td>
+
+                    <td>
+                        <input id="discrete-drag" type="checkbox" class="input-small layout-text" <% if (discreteDrag){ %> checked<%}%>>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <span class="add-on layout-text"> Auto  Resize Nodes </span>
+                    </td>
+
+                    <td>
+                        <input id="auto-resize-nodes" type="checkbox" class="input-small layout-text" <% if (autoResizeNodes){ %> checked<%}%>>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <span class="add-on layout-text"> Show Alignment Guidelines </span>
+                    </td>
+
+                    <td>
+                        <input id="show-alignment-guidelines" type="checkbox" class="input-small layout-text" <% if (showAlignmentGuidelines){ %> checked<%}%>>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <span class="add-on layout-text"> Guideline Tolerance </span>
+                    </td>
+
+                    <td>
+                        <input id="guideline-tolerance" type="number" min=0 step=0.1 class="input-small layout-text" value= <%= guidelineTolerance %> >
+                    </td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>
+                        <span class="add-on layout-text"> Guideline Color </span>
+                    </td>
+
+                    <td>
+                        <input id="guideline-color" type="color" class="input-small layout-text" value= <%= guidelineColor %> >
+                    </td>
+                    <td></td>
+                </tr>
+            <tr id="sbgn-buttons">
+            <td colspan="2"">
+            <div style="margin-left: 30%;">
+            <button id="save-sbgn" class="btn btn-default" >Save</button>
+            <button id="default-sbgn" class="btn btn-default">Default</button>
+            </td>
+            </div>
+            </tr>
+            </table>
+        </script>
+        
+        <script type="text/template" id="query-pathsbetween-template">
+            <table class="table-condensed layout-table">
+            <tr>
+            <th colspan=2 style="padding-left: 0px;" align="left">
+            <span class="add-on layout-text"> Find all paths of specified length limit between any two entities of the specified set </span>
+            </th>
+            </tr>
+
+            <tr>
+            <td>
+            <span class="add-on layout-text"> Gene Symbols: </span><br>
+            <textarea id="query-pathsbetween-gene-symbols" rows="4" cols="86"><%= geneSymbols %></textarea>
+            </td>
+
+            <td>
+            <table>
+            <tr><td colspan="2">
+            <table frame="box" style="border-color: rgb(204, 204, 204)">
+            <caption style="text-align: left;">Stop Distance</caption>
+            <tr>
+            <td colspan=2>Length limit</td>
+            <td><input id="query-pathsbetween-length-limit" type="number" class="input-small layout-text" value= <%= lengthLimit %> > </td>
+            </tr>
+            </table>
+            </td></tr>
+            </table>
             </td>
             </tr>
     
-            <tr id="sbgn-buttons">
-            <td>
-            <button id="save-sbgn" class="btn btn-default" >Save</button>
-            </td>
-            <td>
-            <button id="default-sbgn" class="btn btn-default">Default</button>
+            <tr>
+            <td colspan=2>
+            <button id="save-query-pathsbetween" style="margin-left: 30%;" class="btn btn-default" >OK</button>
+            <button id="cancel-query-pathsbetween" style="margin-left: 10%;" class="btn btn-default">Cancel</button>
             </td>
             </tr>
+
+            </table>
+        </script>
+        
+        <script type="text/template" id="reaction-template">
+            <table class="table-condensed layout-table">
+          
+            <tr>
+            <td style="padding-bottom: 10px;" align="right" valign="middle">
+            <span class="add-on layout-text"> <b> Type </b> </span>
+            </td>
+            
+            <td>
+            <select id="reaction-template-type-select" class='input-medium layout-text' name="reaction-template-type">
+            <option id="reaction-template-type-association" value="association" <% if (templateType == 'association'){ %> selected<%}%> > Association </option>
+            <option id="reaction-template-type-dissociation" value="dissociation" <% if (templateType == 'dissociation'){ %> selected<%}%> > Dissociation </option>
+            </select>
+            </td>
+            </tr>
+    
+            <tr>
+            <td align="center" valign="middle" style="margin-left: 5px;">
+            <span class="add-on layout-text"> <b> Input </b> </span>
+            </td>
+            
+            <td align="center" valign="middle" style="margin-right: 5px;">
+            <span class="add-on layout-text"> <b> Output </b> </span>
+            </td>
+            </tr>
+            
+            
+            <tr>
+            <td>
+            <%= getInputHtml() %>
+            </td>
+            
+            <td>
+            <%= getOutputHtml() %>
+            </td>
+    
+            </tr>
+            
+            <tr>
+            <td colspan=2 align="center">
+            <button id="create-template" class="btn btn-default" >Create</button>
+            <button id="cancel-template" class="btn btn-default">Cancel</button>
+            </td>
+            </tr>
+            
             </table>
         </script>
 
@@ -508,35 +971,54 @@
             Right click to a node to see its detailed information
         </script>
 
+        <!--global variables-->
+        <script src="sampleapp-components/js/sample-app-global-variables.js"></script>
+        
         <!-- External Libraries -->
-        <script src="../lib/js/jquery-1.8.2.min.js"></script>
+        <script src="../node_modules/jQuery/tmp/jquery.js"></script>
         <script src="../lib/js/jquery.fancybox-1.3.4.pack.js"></script>
         <script src="../lib/js/jquery.expander-min.js"></script>
-        <script src="../lib/js/jquery.qtip.min.js"></script>
+        <script src="../node_modules/qtip2/dist/jquery.qtip.js"></script>
         <script src="../lib/js/bootstrap.min.js"></script>
         <script src="../lib/js/jquery-ui-1.10.3.custom.min.js"></script>
         <script src="../lib/js/underscore.js"></script>
-        <script src="../lib/js/backbone-min.js"></script>
-        <script src="../lib/js/cytoscape.min.js"></script>
-        <script src="../lib/js/cytoscape.js-panzoom.js"></script>
-        <script src="../lib/js/cytoscape.js-qtip.js"></script>
+        <script src="../node_modules/backbone/backbone.js"></script>
+        <script src="../lib/js/cytoscape.js"></script>
+        <script src="../node_modules/cytoscape-panzoom/cytoscape-panzoom.js"></script>
+        <script src="../node_modules/cytoscape-qtip/cytoscape-qtip.js"></script>
         <script src="../lib/js/cytoscape-edgehandles.js"></script>
-        <script src="../lib/js/FileSaver.js"></script>
+        <script src="../node_modules/filesaverjs/FileSaver.js"></script>
         <script src="../lib/js/jquery.noty.packaged.min.js"></script>
-        <script src="../lib/js/jquery.dropdown.js"></script>
+        <script src="../lib/js/cytoscape-noderesize.js"></script>
+        <script src="../lib/js/cytoscape-snap-to-grid.js"></script>
+        <script src="../node_modules/cytoscape-cose-bilkent/cytoscape-cose-bilkent.js"></script>
+        <script src="../node_modules/cytoscape-undo-redo/cytoscape-undo-redo.js"></script>
+        <script src="../node_modules/cytoscape-clipboard/cytoscape-clipboard.js"></script>
+        <script src="../node_modules/cytoscape-expand-collapse/cytoscape-expand-collapse.js"></script>
+        <script src="../node_modules/cytoscape-edge-bend-editing/cytoscape-edge-bend-editing.js"></script>
+        <script src="../node_modules/cytoscape-view-utilities/cytoscape-view-utilities.js"></script>
 
         <!-- Core SBGNViz components -->
-        <script src="../src/sbgn-extensions/cytoscape-cose-bilkent.js"></script>
         <script src="../src/sbgn-extensions/cytoscape.renderer.canvas.sbgn-renderer.js"></script>
+        <script src="../src/utilities/sbgn-style-rules.js"></script>
         <script src="../src/utilities/json-to-sbgnml-converter.js"></script>
         <script src="../src/utilities/sbgnml-to-json-converter.js"></script>
         <script src="../src/utilities/sbgn-filtering.js"></script>
         <script src="../src/utilities/sbgn-element-utilities.js"></script>
-        <script src="../src/utilities/expand-collapse-utilities.js"></script>
         <script src="../src/utilities/add-remove-utilities.js"></script>
-
+        <script src="../src/utilities/inspector-utilities.js"></script>
+        
+        
         <!-- Sample application components -->
-        <script src="sampleapp-components/js/EditorActionsManager.js"></script>
+        <script src="sampleapp-components/js/sbgn-action-functions.js"></script>
+        <script src="sampleapp-components/js/add-remove-action-functions.js"></script>
+        <script src="sampleapp-components/js/easy-creation-action-functions.js"></script>
+        <script src="sampleapp-components/js/general-action-functions.js"></script>
+        <script src="sampleapp-components/js/register-undo-redo-actions.js"></script>
+        
+        <script src="sampleapp-components/js/general-sample-app-functions.js"></script>
+        <script src="sampleapp-components/js/sample-app-stylesheet-helpers.js"></script>
+        <script src="sampleapp-components/js/common-element-properties.js"></script>
         <script src="sampleapp-components/js/sample-app-cytoscape-sbgn.js"></script>
         <script src="sampleapp-components/js/sample-app-menu-functions.js"></script>
         <script src="sampleapp-components/js/sample-app-mode-handler.js"></script>

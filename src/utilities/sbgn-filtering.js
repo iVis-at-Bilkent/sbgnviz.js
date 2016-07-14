@@ -5,6 +5,7 @@ var sbgnFiltering = {
     deleteSelected: function(){
         var allNodes = cy.nodes();
         var selectedNodes = cy.nodes(":selected");
+        cy.elements().unselect();
         var nodesToShow = this.expandRemainingNodes(selectedNodes, allNodes);
         var nodesNotToShow = allNodes.not(nodesToShow);
         var connectedEdges = nodesNotToShow.connectedEdges();
@@ -13,84 +14,20 @@ var sbgnFiltering = {
         return removedEles;
     },
 
-    hideSelected: function(){
-        var allNodes = cy.nodes(":visible");
-        var selectedNodes = cy.nodes(":selected");
-        var nodesToShow = this.expandRemainingNodes(selectedNodes, allNodes);
-        this.applyFilter(allNodes.not(nodesToShow));
-
-        cy.elements(":selected").unselect();
+    getProcessesOfSelected: function(){
+        var selectedEles = cy.elements(":selected");
+        selectedEles = this.expandNodes(selectedEles);
+        return selectedEles;
     },
-
-    showSelected: function(){       
-        var allNodes = cy.nodes();
-        var selectedNodes = cy.nodes(":selected");
-        var nodesToShow = this.expandNodes(selectedNodes);
-        this.applyFilter(allNodes.not(nodesToShow));
-
-        cy.elements(":selected").unselect();
-    },
-
-    showAll: function(){
-        this.removeFilter();     
-    },
-
-    highlightNeighborsofSelected: function(){
+    
+    getNeighboursOfSelected: function(){
         var selectedEles = cy.elements(":selected");
         selectedEles = selectedEles.add(selectedEles.parents("node[sbgnclass='complex']"));
         selectedEles = selectedEles.add(selectedEles.descendants());
         var neighborhoodEles = selectedEles.neighborhood();
-        var nodesToHighlight = selectedEles.add(neighborhoodEles);
-        nodesToHighlight = nodesToHighlight.add(nodesToHighlight.descendants());
-        nodesToHighlight.data("highlighted", 'true');
-        this.highlightGraph(nodesToHighlight.nodes(), nodesToHighlight.edges());
-        return nodesToHighlight;
-    },
-
-    highlightProcessesOfSelected: function(){
-        var selectedEles = cy.elements(":selected");
-        selectedEles = this.expandNodes(selectedEles);
-        selectedEles.data("highlighted", 'true');
-        this.highlightGraph(selectedEles.nodes(), selectedEles.edges());
-        return selectedEles;
-    },
-
-    removeHighlights: function(){
-        this.highlightNodes(cy.nodes(":visible").nodes("[highlighted!='true']"));
-        this.highlightEdges(cy.edges(":visible").edges("[highlighted!='true']"));
-        cy.nodes(":visible").nodes().removeData("highlighted");
-        cy.edges(":visible").edges().removeData("highlighted");
-    },
-
-    highlightGraph: function(nodes, edges){
-        this.notHighlightNodes(cy.nodes(":visible").nodes("[highlighted!='true']"));
-        this.notHighlightEdges(cy.edges(":visible").edges("[highlighted!='true']"));
-        this.highlightNodes(cy.nodes(":visible").nodes("[highlighted='true']"));
-        this.highlightEdges(cy.edges(":visible").edges("[highlighted='true']"));
-        // cy.nodes("[highlighted=true]").not(nodes).css(this.notHighlightNode);
-        // cy.edges().not(edges).css(this.notHighlightEdge);
-    },
-    
-    highlightNodes: function(nodes){
-      nodes.removeClass("not-highlighted");
-    },
-    
-    notHighlightNodes: function(nodes){
-      nodes.addClass("not-highlighted");
-    },
-    
-    highlightEdges: function(edges){
-      edges.removeClass("not-highlighted");
-    },
-    
-    notHighlightEdges: function(edges){
-      edges.addClass("not-highlighted");
-    },
-    
-    isAllElementsAreNotHighlighted: function(){
-        var highlightedNodes = cy.nodes(":visible").nodes("[highlighted='true']");
-        var highlightedEdges = cy.edges(":visible").edges("[highlighted='true']");
-        return highlightedNodes.length + highlightedEdges.length == 0;
+        var elesToHighlight = selectedEles.add(neighborhoodEles);
+        elesToHighlight = elesToHighlight.add(elesToHighlight.descendants());
+        return elesToHighlight;
     },
 
     expandNodes: function(nodesToShow){
@@ -134,25 +71,11 @@ var sbgnFiltering = {
         nodesToShow = this.expandNodes(nodesToShow);
         return nodesToShow;
     },
-
-    applyFilter: function(nodesToFilterOut){
-        //nodesToFilterOut = nodesToFilterOut.add(nodesToFilterOut.descendants());
-//        nodesToFilterOut.hide();
-        nodesToFilterOut.css('visibility', 'hidden');
-        //nodesToFilterOut.data(filterType, true);
-    },
-
-    removeFilter: function(){
-        cy.elements().css('visibility', 'visible');
-    },
     
-    removeFilterOfGivenNodes: function(nodes){
-        nodes.css('visibility', 'visible');
-    },
-    
-    showJustGivenNodes:  function(nodes){
-        var visibleNodes = cy.nodes(":visible");
-        this.applyFilter(visibleNodes);
-        this.removeFilterOfGivenNodes(nodes);
+    noneIsNotHighlighted: function(){
+        var notHighlightedNodes = cy.nodes(":visible").nodes(".nothighlighted");
+        var notHighlightedEdges = cy.edges(":visible").edges(".nothighlighted");
+        
+        return notHighlightedNodes.length + notHighlightedEdges.length === 0;
     }
 };

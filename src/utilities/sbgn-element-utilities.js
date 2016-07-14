@@ -11,7 +11,7 @@ var sbgnElementUtilities = {
         'nucleic acid feature multimer': true, 'macromolecule multimer': true,
         'simple chemical multimer': true, 'complex multimer': true, 'compartment': true},
     //this method returns the nodes non of whose ancestors is not in given nodes
-    getRootsOfGivenNodes: function (nodes) {
+    getTopMostNodes: function (nodes) {
         var nodesMap = {};
         for (var i = 0; i < nodes.length; i++) {
             nodesMap[nodes[i].id()] = true;
@@ -56,5 +56,31 @@ var sbgnElementUtilities = {
             
             this.propogateReplacementToChildren(child, dx, dy);
         }
+    },
+    moveNodes: function(positionDiff, nodes, notCalcTopMostNodes) {
+      var topMostNodes = notCalcTopMostNodes ? nodes : sbgnElementUtilities.getTopMostNodes(nodes);
+      for (var i = 0; i < topMostNodes.length; i++) {
+        var node = topMostNodes[i];
+        var oldX = node.position("x");
+        var oldY = node.position("y");
+        node.position({
+          x: oldX + positionDiff.x,
+          y: oldY + positionDiff.y
+        });
+        var children = node.children();
+        this.moveNodes(positionDiff, children, true);
+      }
+    },
+    convertToModelPosition: function (renderedPosition) {
+      var pan = cy.pan();
+      var zoom = cy.zoom();
+
+      var x = (renderedPosition.x - pan.x) / zoom;
+      var y = (renderedPosition.y - pan.y) / zoom;
+
+      return {
+        x: x,
+        y: y
+      };
     }
 };
