@@ -16,7 +16,6 @@ var loadSample = function(filename){
     model: {cytoscapeJsGraph: sbgnmlToJson.convert(xmlObject)}
   })).render();
   
-  inspectorUtilities.handleSBGNInspector();
 };
 
 var loadSBGNMLText = function(text){
@@ -74,7 +73,6 @@ var getExpandCollapseOptions = function() {
 //Handle keyboard events
 $(document).keydown(function (e) {
   if (e.ctrlKey && e.target.nodeName === 'BODY') {
-    window.ctrlKeyDown = true;
     if (e.which === 90) { // ctrl + z
       cy.undoRedo().undo();
     }
@@ -85,277 +83,10 @@ $(document).keydown(function (e) {
 });
 
 $(document).keyup(function (e) {
-  window.ctrlKeyDown = null;
-//  $("#sbgn-network-container").removeClass("target-cursor");
-  disableDragAndDropMode();
-});
-
-$("#node-label-textbox").keydown(function (e) {
-  if (e.which === 13) {
-    $("#node-label-textbox").blur();
-  }
 });
 
 $(document).ready(function () {
   loadSample('neuronal_muscle_signalling.xml');
-
-  $('#new-file-icon').click(function (e) {
-    $('#new-file').trigger("click");
-  });
-
-  $('#new-file').click(function (e) {
-    setFileContent("new_file.sbgnml");
-
-    (new SBGNContainer({
-      el: '#sbgn-network-container',
-      model: {
-        cytoscapeJsGraph: {
-          nodes: [],
-          edges: []
-        }
-      }
-    })).render();
-
-    editorActionsManager.reset();
-    inspectorUtilities.handleSBGNInspector();
-  });
-
-  $('.add-node-menu-item').click(function (e) {
-    if (!modeHandler.mode != "add-node-mode") {
-      modeHandler.setAddNodeMode();
-    }
-    var value = $(this).attr('name');
-    modeHandler.selectedNodeType = value;
-    modeHandler.setSelectedIndexOfSelector("add-node-mode", value);
-    modeHandler.setSelectedMenuItem("add-node-mode", value);
-  });
-
-  $('.add-edge-menu-item').click(function (e) {
-    if (!modeHandler.mode != "add-edge-mode") {
-      modeHandler.setAddEdgeMode();
-    }
-    var value = $(this).attr('name');
-    modeHandler.selectedEdgeType = value;
-    modeHandler.setSelectedIndexOfSelector("add-edge-mode", value);
-    modeHandler.setSelectedMenuItem("add-edge-mode", value);
-  });
-
-  modeHandler.initilize();
-
-  $('.sbgn-select-node-item').click(function (e) {
-    if (!modeHandler.mode != "add-node-mode") {
-      modeHandler.setAddNodeMode();
-    }
-    var value = $('img', this).attr('value');
-    modeHandler.selectedNodeType = value;
-    modeHandler.setSelectedIndexOfSelector("add-node-mode", value);
-    modeHandler.setSelectedMenuItem("add-node-mode", value);
-  });
-
-  $('.sbgn-select-edge-item').click(function (e) {
-    if (!modeHandler.mode != "add-edge-mode") {
-      modeHandler.setAddEdgeMode();
-    }
-    var value = $('img', this).attr('value');
-    modeHandler.selectedEdgeType = value;
-    modeHandler.setSelectedIndexOfSelector("add-edge-mode", value);
-    modeHandler.setSelectedMenuItem("add-edge-mode", value);
-  });
-
-  $('#node-list-set-mode-btn').click(function (e) {
-    if (modeHandler.mode != "add-node-mode") {
-      modeHandler.setAddNodeMode();
-    }
-  });
-
-  $('#edge-list-set-mode-btn').click(function (e) {
-    if (modeHandler.mode != "add-edge-mode") {
-      modeHandler.setAddEdgeMode();
-    }
-  });
-
-  $('#select-icon').click(function (e) {
-    modeHandler.setSelectionMode();
-  });
-
-  $('#select-edit').click(function (e) {
-    modeHandler.setSelectionMode();
-  });
-  
-  $('#clone-selected').click(function (e) {
-    var selectedNodes = cy.nodes(':selected');
-    var cb = cy.clipboard();
-    var _id = cb.copy(selectedNodes, "cloneOperation");
-    cy.undoRedo().do("paste", { id: _id });
-  });
-
-  $('#align-horizontal-top').click(function (e) {
-    var selectedNodes = sbgnElementUtilities.getTopMostNodes(cy.nodes(":selected").filter(":visible"));
-    if (selectedNodes.length <= 1) {
-      return;
-    }
-    var nodesData = getNodesData();
-
-    var modelNode = window.firstSelectedNode ? firstSelectedNode : selectedNodes[0];
-    var commonTopY = modelNode.position("y") - modelNode.height() / 2;
-
-    for (var i = 0; i < selectedNodes.length; i++) {
-      var node = selectedNodes[i];
-      var oldPosY = node.position('y');
-      var newPosY = commonTopY + node.height() / 2;
-      node.position({
-        y: newPosY
-      });
-      sbgnElementUtilities.propogateReplacementToChildren(node, 0, newPosY - oldPosY);
-    }
-
-    nodesData.firstTime = true;
-    //editorActionsManager._do(new ReturnToPositionsAndSizesCommand(nodesData));
-  });
-
-  $("#align-horizontal-top-icon").click(function (e) {
-    $("#align-horizontal-top").trigger('click');
-  });
-
-  $('#align-horizontal-middle').click(function (e) {
-    var selectedNodes = sbgnElementUtilities.getTopMostNodes(cy.nodes(":selected").filter(":visible"));
-    if (selectedNodes.length <= 1) {
-      return;
-    }
-    var nodesData = getNodesData();
-
-    var modelNode = window.firstSelectedNode ? firstSelectedNode : selectedNodes[0];
-    var commonMiddleY = modelNode.position("y");
-
-    for (var i = 0; i < selectedNodes.length; i++) {
-      var node = selectedNodes[i];
-      var oldPosY = node.position('y');
-      var newPosY = commonMiddleY;
-      node.position({
-        y: newPosY
-      });
-      sbgnElementUtilities.propogateReplacementToChildren(node, 0, newPosY - oldPosY);
-    }
-
-    nodesData.firstTime = true;
-    //editorActionsManager._do(new ReturnToPositionsAndSizesCommand(nodesData));
-  });
-
-  $("#align-horizontal-middle-icon").click(function (e) {
-    $("#align-horizontal-middle").trigger('click');
-  });
-
-  $('#align-horizontal-bottom').click(function (e) {
-    var selectedNodes = sbgnElementUtilities.getTopMostNodes(cy.nodes(":selected").filter(":visible"));
-    if (selectedNodes.length <= 1) {
-      return;
-    }
-    var nodesData = getNodesData();
-
-    var modelNode = window.firstSelectedNode ? firstSelectedNode : selectedNodes[0];
-    var commonBottomY = modelNode.position("y") + modelNode.height() / 2;
-
-    for (var i = 0; i < selectedNodes.length; i++) {
-      var node = selectedNodes[i];
-      var oldPosY = node.position('y');
-      var newPosY = commonBottomY - node.height() / 2;
-      node.position({
-        y: newPosY
-      });
-      sbgnElementUtilities.propogateReplacementToChildren(node, 0, newPosY - oldPosY);
-    }
-
-    nodesData.firstTime = true;
-    //editorActionsManager._do(new ReturnToPositionsAndSizesCommand(nodesData));
-  });
-
-  $("#align-horizontal-bottom-icon").click(function (e) {
-    $("#align-horizontal-bottom").trigger('click');
-  });
-
-  $('#align-vertical-left').click(function (e) {
-    var selectedNodes = sbgnElementUtilities.getTopMostNodes(cy.nodes(":selected").filter(":visible"));
-    if (selectedNodes.length <= 1) {
-      return;
-    }
-    var nodesData = getNodesData();
-
-    var modelNode = window.firstSelectedNode ? firstSelectedNode : selectedNodes[0];
-    var commonLeftX = modelNode.position("x") - modelNode.width() / 2;
-
-    for (var i = 0; i < selectedNodes.length; i++) {
-      var node = selectedNodes[i];
-      var oldPosX = node.position('x');
-      var newPosX = commonLeftX + node.width() / 2;
-      node.position({
-        x: newPosX
-      });
-      sbgnElementUtilities.propogateReplacementToChildren(node, newPosX - oldPosX, 0);
-    }
-
-    nodesData.firstTime = true;
-    //editorActionsManager._do(new ReturnToPositionsAndSizesCommand(nodesData));
-  });
-
-  $("#align-vertical-left-icon").click(function (e) {
-    $("#align-vertical-left").trigger('click');
-  });
-
-  $('#align-vertical-center').click(function (e) {
-    var selectedNodes = sbgnElementUtilities.getTopMostNodes(cy.nodes(":selected").filter(":visible"));
-    if (selectedNodes.length <= 1) {
-      return;
-    }
-    var nodesData = getNodesData();
-
-    var modelNode = window.firstSelectedNode ? firstSelectedNode : selectedNodes[0];
-    var commonCenterX = modelNode.position("x");
-
-    for (var i = 0; i < selectedNodes.length; i++) {
-      var node = selectedNodes[i];
-      var oldPosX = node.position('x');
-      var newPosX = commonCenterX
-      node.position({
-        x: newPosX
-      });
-      sbgnElementUtilities.propogateReplacementToChildren(node, newPosX - oldPosX, 0);
-    }
-
-    nodesData.firstTime = true;
-    //editorActionsManager._do(new ReturnToPositionsAndSizesCommand(nodesData));
-  });
-
-  $("#align-vertical-center-icon").click(function (e) {
-    $("#align-vertical-center").trigger('click');
-  });
-
-  $('#align-vertical-right').click(function (e) {
-    var selectedNodes = sbgnElementUtilities.getTopMostNodes(cy.nodes(":selected").filter(":visible"));
-    if (selectedNodes.length <= 1) {
-      return;
-    }
-    var nodesData = getNodesData();
-
-    var modelNode = window.firstSelectedNode ? firstSelectedNode : selectedNodes[0];
-    var commonRightX = modelNode.position("x") + modelNode.width() / 2;
-
-    for (var i = 0; i < selectedNodes.length; i++) {
-      var node = selectedNodes[i];
-      var oldPosX = node.position('x');
-      var newPosX = commonRightX - node.width() / 2;
-      node.position({
-        x: newPosX
-      });
-      sbgnElementUtilities.propogateReplacementToChildren(node, newPosX - oldPosX, 0);
-    }
-
-    nodesData.firstTime = true;
-    //editorActionsManager._do(new ReturnToPositionsAndSizesCommand(nodesData));
-  });
-
-  $("#align-vertical-right-icon").click(function (e) {
-    $("#align-vertical-right").trigger('click');
-  });
 
   var sbgnLayoutProp = new SBGNLayout({
     el: '#sbgn-layout-table'
@@ -419,22 +150,6 @@ $(document).ready(function () {
               'transitionIn': 'none',
               'transitionOut': 'none',
             });
-  });
-
-  $("#node-label-textbox").blur(function () {
-    $("#node-label-textbox").hide();
-    $("#node-label-textbox").data('node', undefined);
-  });
-
-  $("#node-label-textbox").on('change', function () {
-    var node = $(this).data('node');
-    var param = {
-      nodes: cy.collection(node),
-      sbgnlabel: $(this).attr('value'),
-      firstTime: true
-    };
-    
-    cy.undoRedo().do("changeNodeLabel", param);
   });
 
   $("#edge-legend").click(function (e) {
@@ -712,10 +427,6 @@ $(document).ready(function () {
     cy.undoRedo().do("removeEles", selectedEles);
   });
 
-  $("#delete-selected-simple-icon").click(function (e) {
-    $("#delete-selected-simple").trigger('click');
-  });
-
   $("#sbgn-properties").click(function (e) {
     sbgnProperties.render();
   });
@@ -844,7 +555,7 @@ $(document).ready(function () {
     
     beforePerformLayout();
     var preferences = {
-      animate: sbgnStyleRules['animate-on-drawing-changes'] == 'true'?'end':false
+      animate: sbgnStyleRules['animate-on-drawing-changes']?'end':false
     };
     
     if(sbgnLayoutProp.currentLayoutProperties.animate == 'during'){

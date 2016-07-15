@@ -292,21 +292,6 @@ var stringAfterValueCheck = function (value) {
   return value ? value : '';
 };
 
-var enableDragAndDropMode = function () {
-  window.dragAndDropModeEnabled = true;
-  $("#sbgn-network-container").addClass("target-cursor");
-  cy.autolock(true);
-  cy.autounselectify(true);
-};
-
-var disableDragAndDropMode = function () {
-  window.dragAndDropModeEnabled = null;
-  window.nodeToDragAndDrop = null;
-  $("#sbgn-network-container").removeClass("target-cursor");
-  cy.autolock(false);
-  cy.autounselectify(false);
-};
-
 var canHaveUnitOfInformation = function(sbgnclass) {
    if (sbgnclass == 'simple chemical'
           || sbgnclass == 'macromolecule' || sbgnclass == 'nucleic acid feature'

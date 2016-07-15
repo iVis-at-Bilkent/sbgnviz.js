@@ -1,0 +1,33 @@
+Copy an instance of SBGNViz.js editor
+
+Remove cytoscape-noderesize, cytoscape-edgehandles and cytoscape-snap-to-grid libraries and
+remove any usage and creation of them.
+
+Replace 'initilizeUnselectedDataOfElements()' with 'cy.nodes().addClass('changeLabelTextSize');'
+
+In modeHandler just keep 'mode: "selection-mode"' and in its usage 
+just keep 'if (modeHandler.mode == "selection-mode")' checks.
+
+Remove add-remove-action-functions.js, easy-creation-action-functions.js, sbgn-action-functions.js
+add-remove-utilities.js, inspector-utilities.js files and remove any usage of this files
+
+In register-undo-redo-actions.js just register 'changeBendPoints' action (Remove all others)
+
+Remove any usage of 'window.ctrlKeyDown', 'disableDragAndDropMode()', 'enableDragAndDropMode()'
+
+Do not trigger doubleTap if it is just triggered for changing node label do not trigger and listen it.
+
+Edit '#sbgn-toolbar' in the index.html and remove anything related to editor
+
+Remove anything other than 'undo' and 'redo' under 'Edit' menu.
+
+Edit quick help template (Remove ctrl + drag definition)
+
+Remove anything related to '#node-label-textbox'
+
+Remove '#sbgn-inspector' with its container table row, add width of inspector to '#sbgn-network-container' 
+(most probably increase from 800 to 1000)
+
+Remove alignment operations.
+
+Remove any thing related to snap-to-grid

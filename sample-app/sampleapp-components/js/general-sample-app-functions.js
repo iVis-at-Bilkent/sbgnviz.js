@@ -54,30 +54,6 @@ var getNodesData = function () {
   return nodesData;
 };
 
-var initilizeUnselectedDataOfElements = function () {
-  var nodes = cy.nodes();
-  var edges = cy.edges();
-
-  cy.startBatch();
-
-  for (var i = 0; i < nodes.length; i++) {
-    var node = nodes[i];
-    node.data("borderColor", node.css('border-color'));
-    node.data("backgroundOpacity", node.css('background-opacity'));
-  }
-
-  for (var i = 0; i < edges.length; i++) {
-    var edge = edges[i];
-    edge.data("lineColor", edge.css('line-color'));
-  }
-  
-  nodes.addClass('changeBorderColor');
-  nodes.addClass('changeBackgroundOpacity');
-  edges.addClass('changeLineColor');
-  
-  cy.endBatch();
-};
-
 /*
  * This function obtains the info label of the given node by
  * it's children info recursively

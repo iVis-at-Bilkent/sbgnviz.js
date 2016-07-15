@@ -141,7 +141,7 @@ body {
     margin: auto;
     border: 1px solid #ddd;
     height: 680px;
-    width: 800px;
+    width: 1000px;
     /*overflow: auto !important;*/
     overflow: hidden;
     border-radius: 0.25em;
@@ -155,18 +155,6 @@ body {
 #sbgn-inspector-and-canvas {
     margin: auto;
     overflow: auto !important;
-}
-
-#sbgn-inspector {
-    margin: auto;
-    border: 1px solid #ddd;
-    height: 680px;
-    width: 200px;
-    overflow: auto !important;
-    border-radius: 0.25em;
-    /*padding-left: 2px;*/
-    padding-right: 2px;
-    /*float: right;*/
 }
 
 .inside-menu {
@@ -326,15 +314,6 @@ img.sbgn-toolbar-element:hover {
 
 #align-dd-button:focus {
     outline: none;
-}
-
-#node-label-textbox {
-    position: absolute;
-    top: 150px;
-    left: 150px;
-    z-index: 100;
-    display: none;
-    width: 100px;
 }
 
 .dd-list-href {

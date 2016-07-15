@@ -137,6 +137,9 @@ var getLabelTextSize = function (ele) {
   if (sbgnclass.endsWith('process')) {
     return 18;
   }
+  else if(sbgnclass === 'complex' || sbgnclass === 'compartment') {
+    return 16;
+  }
   return getDynamicLabelTextSize(ele);
 };
 
@@ -160,7 +163,8 @@ var getDynamicLabelTextSize = function (ele) {
   //This line will be useless and is to be removed later
 //  dynamicLabelSizeCoefficient = dynamicLabelSizeCoefficient ? dynamicLabelSizeCoefficient : 1;
 
-  var h = ele.css('height') ? parseInt(ele.css('height')) : ele.data('sbgnbbox').h;
+//  var h = ele.css('height')? parseInt(ele.css('height')) : ele.data('sbgnbbox').h;
+  var h = ele.height();
   var textHeight = parseInt(h / 2.45) * dynamicLabelSizeCoefficient;
 
   return textHeight;

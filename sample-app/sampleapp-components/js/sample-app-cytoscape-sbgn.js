@@ -313,6 +313,8 @@ var SBGNContainer = Backbone.View.extend({
       ready: function ()
       {
         window.cy = this;
+        cy.nodes().addClass('changeLabelTextSize');
+        
         registerUndoRedoActions();
         
         // register the extensions
@@ -364,108 +366,6 @@ var SBGNContainer = Backbone.View.extend({
         var edges = cy.edges();
 
         refreshPaddings();
-        initilizeUnselectedDataOfElements();
-
-        cy.noderesize({
-          handleColor: '#000000', // the colour of the handle and the line drawn from it
-          hoverDelay: 1, // time spend over a target node before it is considered a target selection
-          enabled: true, // whether to start the plugin in the enabled state
-          minNodeWidth: 30,
-          minNodeHeight: 30,
-          triangleSize: 10,
-          lines: 3,
-          padding: 5,
-          start: function (sourceNode) {
-            // fired when noderesize interaction starts (drag on handle)
-            var param = {
-              nodes: cy.collection([sourceNode]),
-              performOperation: false
-            };
-            
-            cy.undoRedo().do("resizeNode", param);
-          },
-          complete: function (sourceNode, targetNodes, addedEntities) {
-            // fired when noderesize is done and entities are added
-          },
-          stop: function (sourceNode) {
-            sourceNode._private.data.sbgnbbox.w = sourceNode.width();
-            sourceNode._private.data.sbgnbbox.h = sourceNode.height();
-          }
-        });
-
-        //For adding edges interactively
-        cy.edgehandles({
-          complete: function (sourceNode, targetNodes, addedEntities) {
-            // fired when edgehandles is done and entities are added
-            var param = {};
-            var source = sourceNode.id();
-            var target = targetNodes[0].id();
-            var sourceClass = sourceNode.data('sbgnclass');
-            var targetClass = targetNodes[0].data('sbgnclass');
-            var sbgnclass = modeHandler.elementsHTMLNameToName[modeHandler.selectedEdgeType];
-
-            if (sbgnclass == 'consumption' || sbgnclass == 'modulation'
-                    || sbgnclass == 'stimulation' || sbgnclass == 'catalysis'
-                    || sbgnclass == 'inhibition' || sbgnclass == 'necessary stimulation') {
-              if (!isEPNClass(sourceClass) || !isPNClass(targetClass)) {
-                if (isPNClass(sourceClass) && isEPNClass(targetClass)) {
-                  //If just the direction is not valid reverse the direction
-                  var temp = source;
-                  source = target;
-                  target = temp;
-                }
-                else {
-                  return;
-                }
-              }
-            }
-            else if (sbgnclass == 'production') {
-              if (!isPNClass(sourceClass) || !isEPNClass(targetClass)) {
-                if (isEPNClass(sourceClass) && isPNClass(targetClass)) {
-                  //If just the direction is not valid reverse the direction
-                  var temp = source;
-                  source = target;
-                  target = temp;
-                }
-                else {
-                  return;
-                }
-              }
-            }
-            else if (sbgnclass == 'logic arc') {
-              if (!isEPNClass(sourceClass) || !isLogicalOperator(targetClass)) {
-                if (isLogicalOperator(sourceClass) && isEPNClass(targetClass)) {
-                  //If just the direction is not valid reverse the direction
-                  var temp = source;
-                  source = target;
-                  target = temp;
-                }
-                else {
-                  return;
-                }
-              }
-            }
-            else if (sbgnclass == 'equivalence arc') {
-              if (!(isEPNClass(sourceClass) && convenientToEquivalence(targetClass))
-                      && !(isEPNClass(targetClass) && convenientToEquivalence(sourceClass))) {
-                return;
-              }
-            }
-
-            param.newEdge = {
-              source: source,
-              target: target,
-              sbgnclass: sbgnclass
-            };
-            param.firstTime = true;
-            
-            cy.undoRedo().do("addEdge", param);
-            modeHandler.setSelectionMode();
-            cy.edges()[cy.edges().length - 1].select();
-          }
-        });
-
-        cy.edgehandles('drawoff');
         
         var panProps = ({
           fitPadding: 10,
@@ -479,20 +379,6 @@ var SBGNContainer = Backbone.View.extend({
         });
         
         container.cytoscapePanzoom(panProps);
-
-        cy.snapToGrid({
-          snapToGrid: false,
-          drawGrid: false,
-          gridSpacing: 40,
-          discreteDrag: false,
-          resize: false,
-          guidelines: true,
-          guidelinesTolerance: 2.0,
-          parentPadding: false,
-          guidelinesStyle: {
-            strokeStyle: "#dddddd"
-          }
-        });
 
         // listen events
 
@@ -606,14 +492,6 @@ var SBGNContainer = Backbone.View.extend({
 
         cy.on('mouseover', 'node', function (event) {
           var node = this;
-          if (modeHandler.mode != "selection-mode") {
-            node.mouseover = false;
-          }
-          else if (!node.mouseover) {
-            node.mouseover = true;
-            //make preset layout to redraw the nodes
-            cy.forceRender();
-          }
 
           $(".qtip").remove();
 
@@ -711,16 +589,8 @@ var SBGNContainer = Backbone.View.extend({
           });
         });
 
-//        var cancelSelection;
-//        var selectAgain;
         window.firstSelectedNode = null;
         cy.on('select', 'node', function (event) {
-//          if (cancelSelection) {
-//            this.unselect();
-//            cancelSelection = null;
-//            selectAgain.select();
-//            selectAgain = null;
-//          }
           if (cy.nodes(':selected').filter(':visible').length == 1) {
             window.firstSelectedNode = this;
           }
@@ -732,77 +602,12 @@ var SBGNContainer = Backbone.View.extend({
           }
         });
 
-        cy.on('select', function (event) {
-          inspectorUtilities.handleSBGNInspector();
-        });
-
-        cy.on('unselect', function (event) {
-          inspectorUtilities.handleSBGNInspector();
-        });
-
         cy.on('tap', function (event) {
           $('input').blur();
-//          $("#node-label-textbox").blur();
-          cy.nodes(":selected").length;
-
-          if (modeHandler.mode == "add-node-mode") {
-            var cyPosX = event.cyPosition.x;
-            var cyPosY = event.cyPosition.y;
-            var param = {};
-            var sbgnclass = modeHandler.elementsHTMLNameToName[modeHandler.selectedNodeType];
-            
-            param.newNode = {
-              x: cyPosX,
-              y: cyPosY,
-              sbgnclass: sbgnclass
-            };
-            param.firstTime = true;
-            
-            cy.undoRedo().do("addNode", param);
-            modeHandler.setSelectionMode();
-            cy.nodes()[cy.nodes().length - 1].select();
-          }
-        });
-
-        var tappedBefore = null;
-
-        cy.on('doubleTap', 'node', function (event) {
-          if (modeHandler.mode == 'selection-mode') {
-            var node = this;
-            var containerPos = $(cy.container()).position();
-            var left = containerPos.left + this.renderedPosition().x;
-            left -= $("#node-label-textbox").width() / 2;
-            left = left.toString() + 'px';
-            var top = containerPos.top + this.renderedPosition().y;
-            top -= $("#node-label-textbox").height() / 2;
-            top = top.toString() + 'px';
-
-            $("#node-label-textbox").css('left', left);
-            $("#node-label-textbox").css('top', top);
-            $("#node-label-textbox").show();
-            var sbgnlabel = this._private.data.sbgnlabel;
-            if (sbgnlabel == null) {
-              sbgnlabel = "";
-            }
-            $("#node-label-textbox").attr('value', sbgnlabel);
-            $("#node-label-textbox").data('node', this);
-            $("#node-label-textbox").focus();
-          }
         });
 
         cy.on('tap', 'node', function (event) {
           var node = this;
-
-          var tappedNow = event.cyTarget;
-          setTimeout(function () {
-            tappedBefore = null;
-          }, 300);
-          if (tappedBefore === tappedNow) {
-            tappedNow.trigger('doubleTap');
-            tappedBefore = null;
-          } else {
-            tappedBefore = tappedNow;
-          }
 
           $(".qtip").remove();
 
@@ -935,15 +740,7 @@ var SBGNProperties = Backbone.View.extend({
     dynamicLabelSize: sbgnStyleRules['dynamic-label-size'],
     fitLabelsToNodes: sbgnStyleRules['fit-labels-to-nodes'],
     rearrangeAfterExpandCollapse: sbgnStyleRules['rearrange-after-expand-collapse'],
-    animateOnDrawingChanges: sbgnStyleRules['animate-on-drawing-changes'],
-    showGrid: sbgnStyleRules['show-grid'],
-    snapToGrid: sbgnStyleRules['snap-to-grid'],
-    discreteDrag: sbgnStyleRules['discrete-drag'],
-    gridSize: sbgnStyleRules['grid-size'],
-    autoResizeNodes: sbgnStyleRules['auto-resize-nodes'],
-    showAlignmentGuidelines: sbgnStyleRules['show-alignment-guidelines'],
-    guidelineTolerance: sbgnStyleRules['guideline-tolerance'],
-    guidelineColor: sbgnStyleRules['guideline-color']
+    animateOnDrawingChanges: sbgnStyleRules['animate-on-drawing-changes']
   },
   currentSBGNProperties: null,
   initialize: function () {
@@ -974,15 +771,6 @@ var SBGNProperties = Backbone.View.extend({
           document.getElementById("rearrange-after-expand-collapse").checked;
       self.currentSBGNProperties.animateOnDrawingChanges =
           document.getElementById("animate-on-drawing-changes").checked;
-      self.currentSBGNProperties.showGrid = document.getElementById("show-grid").checked;
-      self.currentSBGNProperties.snapToGrid = document.getElementById("snap-to-grid").checked;
-      self.currentSBGNProperties.gridSize = Number(document.getElementById("grid-size").value);
-      self.currentSBGNProperties.discreteDrag = document.getElementById("discrete-drag").checked;
-      self.currentSBGNProperties.autoResizeNodes = document.getElementById("auto-resize-nodes").checked;
-      self.currentSBGNProperties.showAlignmentGuidelines = document.getElementById("show-alignment-guidelines").checked;
-      self.currentSBGNProperties.guidelineTolerance = Number(document.getElementById("guideline-tolerance").value);
-      self.currentSBGNProperties.guidelineColor = document.getElementById("guideline-color").value;
-      console.log(self.currentSBGNProperties);
 
       //Refresh paddings if needed
       if (sbgnStyleRules['compound-padding'] != self.currentSBGNProperties.compoundPadding) {
@@ -1001,19 +789,6 @@ var SBGNProperties = Backbone.View.extend({
         cy.nodes().removeClass('changeContent');
         cy.nodes().addClass('changeContent');
       }
-
-      cy.snapToGrid({
-        drawGrid: self.currentSBGNProperties.showGrid,
-        snapToGrid: self.currentSBGNProperties.snapToGrid,
-        gridSpacing: self.currentSBGNProperties.gridSize,
-        discreteDrag: self.currentSBGNProperties.discreteDrag,
-        resize: self.currentSBGNProperties.autoResizeNodes,
-        guidelines: self.currentSBGNProperties.showAlignmentGuidelines,
-        guidelinesTolerance: self.currentSBGNProperties.guidelineTolerance,
-        guidelinesStyle: {
-          strokeStyle: self.currentSBGNProperties.guidelineColor
-        }
-      });
 
       sbgnStyleRules['rearrange-after-expand-collapse'] = 
               self.currentSBGNProperties.rearrangeAfterExpandCollapse;
