@@ -405,9 +405,3 @@ menu[title]:before{
 menu:not([title]):before{
     content:"\2630";
 }
-
-.inspector-input-box{
-    padding-bottom: 0.5px !important;
-    padding-top: 0.5px !important;
-    margin-bottom: 2px !important;
-}

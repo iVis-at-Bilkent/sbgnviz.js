@@ -16,8 +16,8 @@ function dynamicResize()
 
   if (windowWidth > canvasWidth)
   {
-    $("#sbgn-network-container").width(windowWidth * 0.9 * 0.8);
-    $("#sbgn-inspector").width(windowWidth * 0.9 * 0.2);
+    $("#sbgn-network-container").width(windowWidth * 0.9);
+//    $("#sbgn-inspector").width(windowWidth * 0.9 * 0.2);
     var w = $("#sbgn-inspector-and-canvas").width();
     $(".nav-menu").width(w);
     $(".navbar").width(w);
