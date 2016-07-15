@@ -178,12 +178,6 @@ $(document).ready(function () {
             });
   });
 
-  $("#how-to-use").click(function (e) {
-    var url = "http://www.cs.bilkent.edu.tr/~ivis/sbgnviz-js/SBGNViz.js-1.x.UG.pdf";
-    var win = window.open(url, '_blank');
-    win.focus();
-  });
-
   $("#about").click(function (e) {
     e.preventDefault();
     $.fancybox(
@@ -191,7 +185,7 @@ $(document).ready(function () {
             {
               'autoDimensions': false,
               'width': 300,
-              'height': 250,
+              'height': 320,
               'transitionIn': 'none',
               'transitionOut': 'none',
             });
@@ -426,6 +420,10 @@ $(document).ready(function () {
     }
     cy.undoRedo().do("removeEles", selectedEles);
   });
+  
+  $("#delete-selected-simple-icon").click(function (e) {
+    $("#delete-selected-simple").trigger('click');
+  });
 
   $("#sbgn-properties").click(function (e) {
     sbgnProperties.render();
@@ -470,6 +468,72 @@ $(document).ready(function () {
 //      options: getExpandCollapseOptions()
     });
   });
+
+  $('#align-horizontal-top').click(function (e) {
+    cy.undoRedo().do("align", {
+      nodes: cy.nodes(":selected"),
+      horizontal: "top"
+    });
+  });
+
+  $("#align-horizontal-top-icon").click(function (e) {
+    $("#align-horizontal-top").trigger('click');
+  });
+
+  $('#align-horizontal-middle').click(function (e) {
+    cy.undoRedo().do("align", {
+      nodes: cy.nodes(":selected"),
+      horizontal: "center"
+    });
+  });
+
+//  $("#align-horizontal-middle-icon").click(function (e) {
+//    $("#align-horizontal-middle").trigger('click');
+//  });
+//
+//  $('#align-horizontal-bottom').click(function (e) {
+//    cy.undoRedo().do("align", {
+//      nodes: cy.nodes(":selected"),
+//      horizontal: "bottom"
+//    });
+//  });
+//
+//  $("#align-horizontal-bottom-icon").click(function (e) {
+//    $("#align-horizontal-bottom").trigger('click');
+//  });
+//
+//  $('#align-vertical-left').click(function (e) {
+//    cy.undoRedo().do("align", {
+//      nodes: cy.nodes(":selected"),
+//      vertical: "left"
+//    });
+//  });
+//
+//  $("#align-vertical-left-icon").click(function (e) {
+//    $("#align-vertical-left").trigger('click');
+//  });
+//
+//  $('#align-vertical-center').click(function (e) {
+//    cy.undoRedo().do("align", {
+//      nodes: cy.nodes(":selected"),
+//      vertical: "center"
+//    });
+//  });
+//
+//  $("#align-vertical-center-icon").click(function (e) {
+//    $("#align-vertical-center").trigger('click');
+//  });
+//
+//  $('#align-vertical-right').click(function (e) {
+//    cy.undoRedo().do("align", {
+//      nodes: cy.nodes(":selected"),
+//      vertical: "right"
+//    });
+//  });
+//
+//  $("#align-vertical-right-icon").click(function (e) {
+//    $("#align-vertical-right").trigger('click');
+//  });
 
   $("#collapse-selected-icon").click(function (e) {
     if (modeHandler.mode == "selection-mode") {
