@@ -31,3 +31,5 @@ Remove '#sbgn-inspector' with its container table row, add width of inspector to
 Remove alignment operations.
 
 Remove any thing related to snap-to-grid
+
+You can refer to the commits '880bb02abdbd35cf57d19dcae9e728236eae4c51' and 'd0f497f00343f2e73452d643bd705037f140e6ca'
