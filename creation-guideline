@@ -28,8 +28,11 @@ Remove anything related to '#node-label-textbox'
 Remove '#sbgn-inspector' with its container table row, add width of inspector to '#sbgn-network-container' 
 (most probably increase from 800 to 1000)
 
+Update dynamic resize function.
+
 Remove alignment operations.
 
 Remove any thing related to snap-to-grid
 
-You can refer to the commits '880bb02abdbd35cf57d19dcae9e728236eae4c51' and 'd0f497f00343f2e73452d643bd705037f140e6ca'
+You can refer to the commits '880bb02abdbd35cf57d19dcae9e728236eae4c51'
+, 'd0f497f00343f2e73452d643bd705037f140e6ca'and '5f690d911c2a8d5a6035fe458223df605fce59ec'
