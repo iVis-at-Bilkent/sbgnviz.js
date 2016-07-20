@@ -244,7 +244,7 @@
           if (state.clazz == "state variable") {//draw ellipse
             window.cyRenderer.drawRoundRectanglePath(context,
                     stateCenterX, stateCenterY,
-                    stateWidth, stateHeight, stateVarRadius);
+                    stateWidth, stateHeight, Math.min(stateWidth / 2, stateHeight / 2, stateVarRadius));
             context.fill();
 
             textProp.state = state.state;
@@ -253,7 +253,7 @@
             window.cyRenderer.drawRoundRectanglePath(context,
                     stateCenterX, stateCenterY,
                     stateWidth, stateHeight,
-                    unitOfInfoRadius);
+                    Math.min(stateWidth / 2, stateHeight / 2, unitOfInfoRadius));
             context.fill();
 
             textProp.label = state.label.text;
@@ -273,7 +273,7 @@
           if (state.clazz == "state variable") {//draw ellipse
             window.cyRenderer.drawRoundRectanglePath(context,
                     stateCenterX, stateCenterY,
-                    stateWidth, stateHeight, stateVarRadius);
+                    stateWidth, stateHeight, Math.min(stateWidth / 2, stateHeight / 2, stateVarRadius));
             context.fill();
 
             textProp.state = state.state;
@@ -282,7 +282,7 @@
             window.cyRenderer.drawRoundRectanglePath(context,
                     stateCenterX, stateCenterY,
                     stateWidth, stateHeight,
-                    unitOfInfoRadius);
+                    Math.min(stateWidth / 2, stateHeight / 2, unitOfInfoRadius));
             context.fill();
 
             textProp.label = state.label.text;
@@ -380,7 +380,7 @@
       if (state.clazz == "state variable") {//draw ellipse
         //var stateLabel = state.state.value;
         window.cyRenderer.drawRoundRectanglePath(context, stateCenterX, stateCenterY,
-                stateWidth, stateHeight, stateVarRadius);
+                stateWidth, stateHeight, Math.min(stateWidth / 2, stateHeight / 2, stateVarRadius));
 
         context.fill();
         textProp.state = state.state;
@@ -392,7 +392,7 @@
         window.cyRenderer.drawRoundRectanglePath(context,
                 stateCenterX, stateCenterY,
                 stateWidth, stateHeight,
-                unitOfInfoRadius);
+                Math.min(stateWidth / 2, stateHeight / 2, unitOfInfoRadius));
 
         context.fill();
 
