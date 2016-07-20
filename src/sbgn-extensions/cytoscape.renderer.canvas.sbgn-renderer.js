@@ -210,6 +210,8 @@
   }
   ;
 
+  var unitOfInfoRadius = 4;
+  var stateVarRadius = 15;
   $$.sbgn.drawComplexStateAndInfo = function (context, node, stateAndInfos,
           centerX, centerY, width, height) {
 
@@ -242,7 +244,7 @@
           if (state.clazz == "state variable") {//draw ellipse
             window.cyRenderer.drawRoundRectanglePath(context,
                     stateCenterX, stateCenterY,
-                    stateWidth, stateHeight, 15);
+                    stateWidth, stateHeight, stateVarRadius);
             context.fill();
 
             textProp.state = state.state;
@@ -251,7 +253,7 @@
             window.cyRenderer.drawRoundRectanglePath(context,
                     stateCenterX, stateCenterY,
                     stateWidth, stateHeight,
-                    10);
+                    unitOfInfoRadius);
             context.fill();
 
             textProp.label = state.label.text;
@@ -271,7 +273,7 @@
           if (state.clazz == "state variable") {//draw ellipse
             window.cyRenderer.drawRoundRectanglePath(context,
                     stateCenterX, stateCenterY,
-                    stateWidth, stateHeight, 15);
+                    stateWidth, stateHeight, stateVarRadius);
             context.fill();
 
             textProp.state = state.state;
@@ -280,7 +282,7 @@
             window.cyRenderer.drawRoundRectanglePath(context,
                     stateCenterX, stateCenterY,
                     stateWidth, stateHeight,
-                    10);
+                    unitOfInfoRadius);
             context.fill();
 
             textProp.label = state.label.text;
@@ -378,7 +380,7 @@
       if (state.clazz == "state variable") {//draw ellipse
         //var stateLabel = state.state.value;
         window.cyRenderer.drawRoundRectanglePath(context, stateCenterX, stateCenterY,
-                stateWidth, stateHeight, 15);
+                stateWidth, stateHeight, stateVarRadius);
 
         context.fill();
         textProp.state = state.state;
@@ -390,7 +392,7 @@
         window.cyRenderer.drawRoundRectanglePath(context,
                 stateCenterX, stateCenterY,
                 stateWidth, stateHeight,
-                10);
+                unitOfInfoRadius);
 
         context.fill();
 
