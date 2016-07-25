@@ -308,7 +308,7 @@
             <!-- sbgn layout table will be shown here -->
         </div>
 
-        <div id="sbgn-properties-table" title="Properties" style="display: inline">
+        <div id="sbgn-properties-table" title="Properties">
             <!-- sbgn properties table will be shown here -->
         </div>
 
@@ -413,7 +413,7 @@
         </script>
 
         <script type="text/template" id="layout-settings-template">
-            <table class="table-condensed layout-table">
+            <table class="table-condensed layout-table dialog-table">
             <tr>
             <td>
             <span class="add-on layout-text"> Node Repulsion </span>
@@ -550,24 +550,20 @@
             <input id="incremental" type="checkbox" class="input-small layout-text" <% if (!randomize){ %> checked<%}%>>
             </td>
             </tr>
-            <tr>
-            <td><br>
-            </td>
-            </tr>
 
-            <tr id="layout-buttons">
-            <td>
-            <button style="float: right;" id="save-layout" class="btn btn-default" >Save</button>
-            </td>
-            <td>
-            <button id="default-layout" class="btn btn-default">Default</button>
-            </td>
+            <tr id="layout-buttons" style="padding-bottom: 0px; margin-bottom: 0px;">
+                <td colspan="2">
+                <div style="margin-left: 30%;">
+                    <button id="save-layout" class="btn btn-default" >Save</button>
+                    <button id="default-layout" class="btn btn-default">Default</button>
+                </div>
+                </td>
             </tr>
             </table>
         </script>
 
         <script type="text/template" id="sbgn-properties-template">
-            <table class="table-condensed layout-table">
+            <table class="table-condensed layout-table dialog-table">
             <tr>
             <td>
             <span class="add-on layout-text"> Compound Padding </span>
@@ -623,7 +619,7 @@
                 </td>
             </tr>
                 
-            <tr id="sbgn-buttons">
+            <tr id="sbgn-buttons" style="padding-bottom: 0px; margin-bottom: 0px;">
             <td colspan="2"">
             <div style="margin-left: 30%;">
             <button id="save-sbgn" class="btn btn-default" >Save</button>
