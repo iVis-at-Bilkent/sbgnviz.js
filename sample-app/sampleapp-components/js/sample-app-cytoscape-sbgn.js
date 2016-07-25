@@ -655,6 +655,9 @@ var SBGNLayout = Backbone.View.extend({
     tilingPaddingHorizontal: function () {
       return calculateTilingPaddings(parseInt(sbgnStyleRules['tiling-padding-horizontal'], 10));
     },
+    gravityRangeCompound: 1.5,
+    gravityCompound: 1.0,
+    gravityRange: 3.8,
     stop: function(){
       if($('.layout-spinner').length > 0){
         $('.layout-spinner').remove();
@@ -713,6 +716,9 @@ var SBGNLayout = Backbone.View.extend({
       self.currentLayoutProperties.tile = document.getElementById("tile").checked;
       self.currentLayoutProperties.animate = document.getElementById("animate").checked?'during':'end';
       self.currentLayoutProperties.randomize = !document.getElementById("incremental").checked;
+      self.currentLayoutProperties.gravityRangeCompound = Number(document.getElementById("gravity-range-compound").value);
+      self.currentLayoutProperties.gravityCompound = Number(document.getElementById("gravity-compound").value);
+      self.currentLayoutProperties.gravityRange = Number(document.getElementById("gravity-range").value);
 
       sbgnStyleRules['tiling-padding-vertical'] = Number(document.getElementById("tiling-padding-vertical").value);
       sbgnStyleRules['tiling-padding-horizontal'] = Number(document.getElementById("tiling-padding-horizontal").value);
