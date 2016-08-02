@@ -46,6 +46,8 @@ Edit Help > About (See 'https://github.com/iVis-at-Bilkent/sbgnviz-js/issues/156
 
 Remove sampleapp-images/nodes and sampleapp-images/edges
 
+Add 'BioGene Properties' menu item. Define and use 'bioGeneQtip' function in 'biogene-info.js'
+
 You can refer to the commits '880bb02abdbd35cf57d19dcae9e728236eae4c51'
 , 'd0f497f00343f2e73452d643bd705037f140e6ca', '5f690d911c2a8d5a6035fe458223df605fce59ec',
 '8c17b6f5f5d5120fd35dad64429b510bd75b00e3'

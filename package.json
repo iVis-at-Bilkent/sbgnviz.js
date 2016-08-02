@@ -23,6 +23,7 @@
     "cytoscape-expand-collapse": "latest",
     "cytoscape-clipboard": "latest",
     "cytoscape-edge-bend-editing": "latest",
-    "cytoscape-view-utilities": "latest"
+    "cytoscape-view-utilities": "latest",
+    "cytoscape-context-menus": "latest"
   }
 }

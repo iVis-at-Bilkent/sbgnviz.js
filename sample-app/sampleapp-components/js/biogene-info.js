@@ -169,3 +169,79 @@ var BioGeneView = Backbone.View.extend({
         return text;
     }
 });
+
+var bioGeneQtip = function (node) {
+  $(".qtip").remove();
+
+  if (node.qtipTimeOutFcn != null) {
+    clearTimeout(node.qtipTimeOutFcn);
+    node.qtipTimeOutFcn = null;
+  }
+
+  var geneClass = node._private.data.sbgnclass;
+  if (geneClass != 'macromolecule' && geneClass != 'nucleic acid feature' &&
+          geneClass != 'unspecified entity')
+    return;
+
+  var queryScriptURL = "sampleapp-components/php/BioGeneQuery.php";
+  var geneName = node._private.data.sbgnlabel;
+
+  // set the query parameters
+  var queryParams =
+          {
+            query: geneName,
+            org: "human",
+            format: "json",
+          };
+
+  cy.getElementById(node.id()).qtip({
+    content: {
+      text: function (event, api) {
+        $.ajax({
+          type: "POST",
+          url: queryScriptURL,
+          async: true,
+          data: queryParams,
+        })
+                .then(function (content) {
+                  queryResult = JSON.parse(content);
+                  if (queryResult.count > 0 && queryParams.query != "" && typeof queryParams.query != 'undefined')
+                  {
+                    var info = (new BioGeneView(
+                            {
+                              el: '#biogene-container',
+                              model: queryResult.geneInfo[0]
+                            })).render();
+                    var html = $('#biogene-container').html();
+                    api.set('content.text', html);
+                  }
+                  else {
+                    api.set('content.text', "No additional information available &#013; for the selected node!");
+                  }
+                }, function (xhr, status, error) {
+                  api.set('content.text', "Error retrieving data: " + error);
+                });
+        api.set('content.title', node._private.data.sbgnlabel);
+        return _.template($("#loading-small-template").html());
+      }
+    },
+    show: {
+      ready: true
+    },
+    position: {
+      my: 'top center',
+      at: 'bottom center',
+      adjust: {
+        cyViewport: true
+      },
+      effect: false
+    },
+    style: {
+      classes: 'qtip-bootstrap',
+      tip: {
+        width: 16,
+        height: 8
+      }
+    }
+  });
+};
