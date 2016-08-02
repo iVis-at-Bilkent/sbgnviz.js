@@ -1,20 +1,20 @@
-# SBGNViz Editor: Cytoscape.js based visualization and editing tool for process description diagrams in SBGN-ML
+# SBGNViz version 2.0: Cytoscape.js based visualization tool for process description diagrams in SBGN-ML
 
-SBGNViz Editor is a web application based on [cytoscape.js](http://cytoscape.github.io/cytoscape.js/) to visualize and edit the pathway models represented by [SBGN Process Description Notation](http://www.sbgn.org/Image:Refcard-PD.png). SBGNViz Editor accepts the pathway models represented in [SBGN-ML](http://sourceforge.net/apps/mediawiki/libsbgn/index.php?title=Exchange_Format) format.
+SBGNViz is a web application based on [cytoscape.js](http://cytoscape.github.io/cytoscape.js/) to visualize pathway models represented by [SBGN Process Description Notation](http://www.sbgn.org/Image:Refcard-PD.png). It accepts the pathway models represented in [SBGN-ML](http://sourceforge.net/apps/mediawiki/libsbgn/index.php?title=Exchange_Format) format.
 
-SBGNViz Editor is built by extending an open-source javascript graph theory library for analysis and visualisation, [cytoscape.js](http://cytoscape.github.io/cytoscape.js/), to support the [SBGN Process Description Notation](http://www.sbgn.org/Image:Refcard-PD.png). 
+SBGNViz is built by extending an open-source javascript graph theory library for analysis and visualisation, [cytoscape.js](http://cytoscape.github.io/cytoscape.js/), to support the [SBGN Process Description Notation](http://www.sbgn.org/Image:Refcard-PD.png). 
 <br/>
 
 ## Software
 
-<font color="#B3A31D"><b>A sample application using SBGNViz Editor can be found [here](http://www.cs.bilkent.edu.tr/~ivis/SBGNViz.js_editor/sample-app/).</b></font>
+<font color="#B3A31D"><b>A sample application using SBGNViz can be found [here](http://www.cs.bilkent.edu.tr/~ivis/SBGNViz.js/sample-app/).</b></font>
 
-SBGNViz Editor is distributed under [GNU Lesser General Public License](http://www.gnu.org/licenses/lgpl.html). Instructions for obtaining a working copy of the project can be found [here](https://github.com/PathwayCommons/sbgnviz-js/wiki/Obtaining-A-Working-Copy). SBGNViz Editor works on every platform that have javascript support including mobile devices.
+SBGNViz is distributed under [GNU Lesser General Public License](http://www.gnu.org/licenses/lgpl.html). Instructions for obtaining a working copy of the project can be found [here](https://github.com/PathwayCommons/sbgnviz-js/wiki/Obtaining-A-Working-Copy). SBGNViz works on every platform that have Javascript support including mobile devices.
 <br/>
 
 ## Highlights
 
-Below are some sample screenshots from SBGNViz.js, illustrating some of its capabilities. Please click on a figure to see it in full size. A User's Guide can be found [here](http://www.cs.bilkent.edu.tr/~ivis/sbgnviz-js/SBGNViz.js-1.0.UG.pdf), documenting all features of the tool.
+Below are some sample screenshots from SBGNViz.js, illustrating some of its capabilities. Please click on a figure to see it in full size. 
 
 <table  border="1" width="800px" align="left">
 	<tr>
@@ -138,4 +138,8 @@ Thanks to JetBrains for an [Open Source License](https://www.jetbrains.com/buy/o
 
 ## Team
 
-  * Metin Can Siper, Ugur Dogrusoz, Istemi Bahceci, Alper Karacelik, Mecit Sari, Ayhun Tekat, M.Furkan Sahin, [i-Vis at Bilkent University](http://www.cs.bilkent.edu.tr/~ivis)
+  * Metin Can Siper, Selim Firat Yilmaz, Ugur Dogrusoz, Alper Karacelik of [i-Vis at Bilkent University](http://www.cs.bilkent.edu.tr/~ivis)
+
+#### Alumni
+
+  * Istemi Bahceci, Mecit Sari, Ayhun Tekat, M.Furkan Sahin
