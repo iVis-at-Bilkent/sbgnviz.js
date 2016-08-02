@@ -661,8 +661,8 @@
   $$.sbgn.registerSbgnArrowShapes = function () {
     window.cyArrowShapes['necessary stimulation'] = jQuery.extend({}, window.cyArrowShapes['triangle-tee']);
     window.cyArrowShapes['necessary stimulation'].pointsTee = [
-      -0.15, -0.37,
-      0.15, -0.37
+      -0.18, -0.43,
+      0.18, -0.43
     ];
   };
 

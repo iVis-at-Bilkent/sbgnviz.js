@@ -17,7 +17,8 @@
         <link href="../lib/css/cytoscape.js-panzoom.css" rel="stylesheet" type="text/css" />
         <link href="../lib/css/font-awesome-4.0.3/css/font-awesome.css" rel="stylesheet" type="text/css" />
         <link href="../lib/css/jquery.qtip.min.css" rel="stylesheet" type="text/css" />
-        <link href="../node_modules/cytoscape-edge-bend-editing/cytoscape.js-edge-bend-editing.css" rel="stylesheet" type="text/css" />
+        <link href="../node_modules/cytoscape-context-menus/cytoscape-context-menus.css" rel="stylesheet" type="text/css" />
+<!--        <link href="../node_modules/cytoscape-edge-bend-editing/cytoscape.js-edge-bend-editing.css" rel="stylesheet" type="text/css" />-->
 
         <!-- Loading sample app css -->
         <link href="sampleapp-components/css/sbgn-viz.css" rel="stylesheet">
@@ -188,7 +189,7 @@
                                         <!--<b class="right-caret"></b>-->
                                     </a>
                                     <ul class="dropdown-menu">
-                                        <li><a href="#" id="query-pathsbetween">Paths Between</a></li>
+                                        <li><a href="#" id="query-pathsbetween">Paths Between...</a></li>
                                     </ul>
                                 </li>
                             </ul>
@@ -308,7 +309,7 @@
             <!-- sbgn layout table will be shown here -->
         </div>
 
-        <div id="sbgn-properties-table" title="Properties" style="display: inline">
+        <div id="sbgn-properties-table" title="Properties">
             <!-- sbgn properties table will be shown here -->
         </div>
 
@@ -413,7 +414,7 @@
         </script>
 
         <script type="text/template" id="layout-settings-template">
-            <table class="table-condensed layout-table">
+            <table class="table-condensed layout-table dialog-table">
             <tr>
             <td>
             <span class="add-on layout-text"> Node Repulsion </span>
@@ -467,6 +468,33 @@
             <input id="gravity" type="text" class="input-small layout-text" value= <%= gravity %> >
             </td>
             </tr>
+    
+            <tr>
+            <td>
+            <span class="add-on layout-text"> Gravity Range   </span>
+            </td>
+            <td>
+            <input id="gravity-range" type="text" class="input-small layout-text" value= <%= gravityRange %> >
+            </td>
+            </tr>
+    
+            <tr>
+            <td>
+            <span class="add-on layout-text"> Compound Gravity  </span>
+            </td>
+            <td>
+            <input id="gravity-compound" type="text" class="input-small layout-text" value= <%= gravityCompound %> >
+            </td>
+            </tr>
+    
+            <tr>
+            <td>
+            <span class="add-on layout-text"> Compound Gravity Range </span>
+            </td>
+            <td>
+            <input id="gravity-range-compound" type="text" class="input-small layout-text" value= <%= gravityRangeCompound %> >
+            </td>
+            </tr>
 
             <tr>
             <td>
@@ -488,7 +516,7 @@
     
             <tr>
             <td>
-            <span class="add-on layout-text"> Tiling Vertical Horizontal </span>
+            <span class="add-on layout-text"> Tiling Horizontal Padding </span>
             </td>
             <td>
             <input id="tiling-padding-horizontal" type="text" class="input-small layout-text" value= <%= tilingPaddingHorizontal %> >
@@ -523,24 +551,20 @@
             <input id="incremental" type="checkbox" class="input-small layout-text" <% if (!randomize){ %> checked<%}%>>
             </td>
             </tr>
-            <tr>
-            <td><br>
-            </td>
-            </tr>
 
-            <tr id="layout-buttons">
-            <td>
-            <button style="float: right;" id="save-layout" class="btn btn-default" >Save</button>
-            </td>
-            <td>
-            <button id="default-layout" class="btn btn-default">Default</button>
-            </td>
+            <tr id="layout-buttons" style="padding-bottom: 0px; margin-bottom: 0px;">
+                <td colspan="2">
+                <div style="margin-left: 30%;">
+                    <button id="save-layout" class="btn btn-default" >Save</button>
+                    <button id="default-layout" class="btn btn-default">Default</button>
+                </div>
+                </td>
             </tr>
             </table>
         </script>
 
         <script type="text/template" id="sbgn-properties-template">
-            <table class="table-condensed layout-table">
+            <table class="table-condensed layout-table dialog-table">
             <tr>
             <td>
             <span class="add-on layout-text"> Compound Padding </span>
@@ -596,7 +620,7 @@
                 </td>
             </tr>
                 
-            <tr id="sbgn-buttons">
+            <tr id="sbgn-buttons" style="padding-bottom: 0px; margin-bottom: 0px;">
             <td colspan="2"">
             <div style="margin-left: 30%;">
             <button id="save-sbgn" class="btn btn-default" >Save</button>
@@ -775,6 +799,7 @@
         <script src="../node_modules/cytoscape-cose-bilkent/cytoscape-cose-bilkent.js"></script>
         <script src="../node_modules/cytoscape-undo-redo/cytoscape-undo-redo.js"></script>
         <script src="../node_modules/cytoscape-clipboard/cytoscape-clipboard.js"></script>
+        <script src="../node_modules/cytoscape-context-menus/cytoscape-context-menus.js"></script>
         <script src="../node_modules/cytoscape-expand-collapse/cytoscape-expand-collapse.js"></script>
         <script src="../node_modules/cytoscape-edge-bend-editing/cytoscape-edge-bend-editing.js"></script>
         <script src="../node_modules/cytoscape-view-utilities/cytoscape-view-utilities.js"></script>

@@ -325,14 +325,103 @@ var SBGNContainer = Backbone.View.extend({
         
         cy.expandCollapse(getExpandCollapseOptions());
         
+        cy.contextMenus({
+          menuItemClasses: ['customized-context-menus-menu-item']
+        });
+        
         cy.edgeBendEditing({
           // this function specifies the positions of bend points
           bendPositionsFunction: function(ele) {
             return ele.data('bendPointPositions');
           },
           // whether the bend editing operations are undoable (requires cytoscape-undo-redo.js)
-          undoable: true
+          undoable: true,
+          // title of remove bend point menu item
+          removeBendMenuItemTitle: "Delete Bend Point"
         });
+        
+        cy.appendMenuItems([
+          {
+            id: 'ctx-menu-sbgn-properties',
+            title: 'Properties...',
+            coreAsWell: true,
+            onClickFunction: function (event) { 
+              $("#sbgn-properties").trigger("click");
+            }
+          },
+          {
+            id: 'ctx-menu-delete',
+            title: 'Delete',
+            selector: 'node, edge', 
+            onClickFunction: function (event) { 
+              cy.undoRedo().do("removeEles", event.cyTarget);
+            }
+          },
+          {
+            id: 'ctx-menu-delete-selected', 
+            title: 'Delete Selected', 
+            onClickFunction: function () { 
+              $("#delete-selected-simple").trigger('click');
+            },
+            coreAsWell: true // Whether core instance have this item on cxttap
+          },
+          {
+            id: 'ctx-menu-hide-selected', 
+            title: 'Hide Selected', 
+            onClickFunction: function () { 
+              $("#hide-selected").trigger('click');
+            },
+            coreAsWell: true // Whether core instance have this item on cxttap
+          },
+          {
+            id: 'ctx-menu-show-all', 
+            title: 'Show All', 
+            onClickFunction: function () { 
+              $("#show-all").trigger('click');
+            },
+            coreAsWell: true // Whether core instance have this item on cxttap
+          },
+          {
+            id: 'ctx-menu-expand', // ID of menu item
+            title: 'Expand', // Title of menu item
+            // Filters the elements to have this menu item on cxttap
+            // If the selector is not truthy no elements will have this menu item on cxttap
+            selector: 'node[expanded-collapsed="collapsed"]', 
+            onClickFunction: function (event) { // The function to be executed on click
+              cy.undoRedo().do("expand", {
+                nodes: event.cyTarget
+              });
+            }
+          },
+          {
+            id: 'ctx-menu-collapse',
+            title: 'Collapse',
+            selector: 'node[expanded-collapsed="expanded"]', 
+            onClickFunction: function (event) {
+              cy.undoRedo().do("collapse", {
+                nodes: event.cyTarget
+              });
+            }
+          },
+          {
+            id: 'ctx-menu-perform-layout', 
+            title: 'Perform Layout', 
+            onClickFunction: function () { 
+              if (modeHandler.mode == "selection-mode") {
+                $("#perform-layout").trigger('click');
+              }
+            },
+            coreAsWell: true // Whether core instance have this item on cxttap
+          },
+          {
+            id: 'ctx-menu-biogene-properties', 
+            title: 'BioGene Properties', 
+            selector: 'node[sbgnclass="macromolecule"],[sbgnclass="nucleic acid feature"],[sbgnclass="unspecified entity"]',
+            onClickFunction: function (event) { 
+              bioGeneQtip(event.cyTarget);
+            }
+          }
+        ]);
         
         cy.clipboard({
           clipboardSize: 5, // Size of clipboard. 0 means unlimited. If size is exceeded, first added item in clipboard will be removed.
@@ -516,83 +605,6 @@ var SBGNContainer = Backbone.View.extend({
           cy.forceRender();
         });
 
-        cy.on('cxttap', 'node', function (event) {
-          var node = this;
-          $(".qtip").remove();
-
-          if (node.qtipTimeOutFcn != null) {
-            clearTimeout(node.qtipTimeOutFcn);
-            node.qtipTimeOutFcn = null;
-          }
-
-          var geneClass = node._private.data.sbgnclass;
-          if (geneClass != 'macromolecule' && geneClass != 'nucleic acid feature' &&
-                  geneClass != 'unspecified entity')
-            return;
-
-          var queryScriptURL = "sampleapp-components/php/BioGeneQuery.php";
-          var geneName = node._private.data.sbgnlabel;
-
-          // set the query parameters
-          var queryParams =
-                  {
-                    query: geneName,
-                    org: "human",
-                    format: "json",
-                  };
-
-          cy.getElementById(node.id()).qtip({
-            content: {
-              text: function (event, api) {
-                $.ajax({
-                  type: "POST",
-                  url: queryScriptURL,
-                  async: true,
-                  data: queryParams,
-                })
-                        .then(function (content) {
-                          queryResult = JSON.parse(content);
-                          if (queryResult.count > 0 && queryParams.query != "" && typeof queryParams.query != 'undefined')
-                          {
-                            var info = (new BioGeneView(
-                                    {
-                                      el: '#biogene-container',
-                                      model: queryResult.geneInfo[0]
-                                    })).render();
-                            var html = $('#biogene-container').html();
-                            api.set('content.text', html);
-                          }
-                          else {
-                            api.set('content.text', "No additional information available &#013; for the selected node!");
-                          }
-                        }, function (xhr, status, error) {
-                          api.set('content.text', "Error retrieving data: " + error);
-                        });
-                api.set('content.title', node._private.data.sbgnlabel);
-                return _.template($("#loading-small-template").html());
-              }
-            },
-            show: {
-              ready: true
-            },
-            position: {
-              my: 'top center',
-              at: 'bottom center',
-              adjust: {
-                cyViewport: true
-              },
-              effect: false
-            },
-            style: {
-              classes: 'qtip-bootstrap',
-              tip: {
-                width: 16,
-                height: 8
-              }
-            }
-          });
-        });
-
         window.firstSelectedNode = null;
         cy.on('select', 'node', function (event) {
           if (cy.nodes(':selected').filter(':visible').length == 1) {
@@ -655,6 +667,9 @@ var SBGNLayout = Backbone.View.extend({
     tilingPaddingHorizontal: function () {
       return calculateTilingPaddings(parseInt(sbgnStyleRules['tiling-padding-horizontal'], 10));
     },
+    gravityRangeCompound: 1.5,
+    gravityCompound: 1.0,
+    gravityRange: 3.8,
     stop: function(){
       if($('.layout-spinner').length > 0){
         $('.layout-spinner').remove();
@@ -713,6 +728,9 @@ var SBGNLayout = Backbone.View.extend({
       self.currentLayoutProperties.tile = document.getElementById("tile").checked;
       self.currentLayoutProperties.animate = document.getElementById("animate").checked?'during':'end';
       self.currentLayoutProperties.randomize = !document.getElementById("incremental").checked;
+      self.currentLayoutProperties.gravityRangeCompound = Number(document.getElementById("gravity-range-compound").value);
+      self.currentLayoutProperties.gravityCompound = Number(document.getElementById("gravity-compound").value);
+      self.currentLayoutProperties.gravityRange = Number(document.getElementById("gravity-range").value);
 
       sbgnStyleRules['tiling-padding-vertical'] = Number(document.getElementById("tiling-padding-vertical").value);
       sbgnStyleRules['tiling-padding-horizontal'] = Number(document.getElementById("tiling-padding-horizontal").value);
