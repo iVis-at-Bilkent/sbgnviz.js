@@ -198,7 +198,7 @@
       context.rotate(Math.PI / 2);
 
       var textProp = {'centerX': -carProp.distanceToNode + carProp.boxLength / 2, 'centerY': -carProp.boxLength / 2,
-        'opacity': edge._private.style['text-opacity'].value,
+        'opacity': edge.css('text-opacity'),
         'width': carProp.boxLength, 'label': cardinality};
       $$.sbgn.drawCardinalityText(context, textProp);
 
