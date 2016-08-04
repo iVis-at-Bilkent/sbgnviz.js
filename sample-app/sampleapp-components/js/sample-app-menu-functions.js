@@ -141,54 +141,38 @@ $(document).ready(function () {
 
   $("#node-legend").click(function (e) {
     e.preventDefault();
-    $.fancybox(
-            _.template($("#node-legend-template").html(), {}),
-            {
-              'autoDimensions': false,
-              'width': 504,
-              'height': 325,
-              'transitionIn': 'none',
-              'transitionOut': 'none',
-            });
+    fancyboxUtilities.openFancybox($("#node-legend-template"), {
+      'autoDimensions': false,
+      'width': 504,
+      'height': 325
+    });
   });
 
   $("#edge-legend").click(function (e) {
     e.preventDefault();
-    $.fancybox(
-            _.template($("#edge-legend-template").html(), {}),
-            {
-              'autoDimensions': false,
-              'width': 325,
-              'height': 285,
-              'transitionIn': 'none',
-              'transitionOut': 'none',
-            });
+    fancyboxUtilities.openFancybox($("#edge-legend-template"), {
+      'autoDimensions': false,
+      'width': 325,
+      'height': 285
+    });
   });
 
   $("#quick-help").click(function (e) {
     e.preventDefault();
-    $.fancybox(
-            _.template($("#quick-help-template").html(), {}),
-            {
-              'autoDimensions': false,
-              'width': 420,
-              'height': "auto",
-              'transitionIn': 'none',
-              'transitionOut': 'none'
-            });
+    fancyboxUtilities.openFancybox($("#quick-help-template"), {
+      'autoDimensions': false,
+      'width': 420,
+      'height': "auto"
+    });
   });
 
   $("#about").click(function (e) {
     e.preventDefault();
-    $.fancybox(
-            _.template($("#about-template").html(), {}),
-            {
-              'autoDimensions': false,
-              'width': 300,
-              'height': 320,
-              'transitionIn': 'none',
-              'transitionOut': 'none',
-            });
+    fancyboxUtilities.openFancybox($("#about-template"), {
+      'autoDimensions': false,
+      'width': 300,
+      'height': 320
+    });
   });
 
   $("#load-sample1").click(function (e) {

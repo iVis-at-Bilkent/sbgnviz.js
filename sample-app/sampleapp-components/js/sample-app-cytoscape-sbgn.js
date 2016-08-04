@@ -715,7 +715,7 @@ var SBGNLayout = Backbone.View.extend({
     self.template = _.template($("#layout-settings-template").html(), templateProperties);
     $(self.el).html(self.template);
 
-    $(self.el).dialog();
+    dialogUtilities.openDialog(self.el);
 
     $("#save-layout").die("click").live("click", function (evt) {
       self.currentLayoutProperties.nodeRepulsion = Number(document.getElementById("node-repulsion").value);
@@ -776,7 +776,7 @@ var SBGNProperties = Backbone.View.extend({
     self.template = _.template($("#sbgn-properties-template").html(), self.currentSBGNProperties);
     $(self.el).html(self.template);
 
-    $(self.el).dialog();
+    dialogUtilities.openDialog(self.el);
 
     $("#save-sbgn").die("click").live("click", function (evt) {
 
@@ -858,7 +858,7 @@ var PathsBetweenQuery = Backbone.View.extend({
       }
     });
 
-    $(self.el).dialog({width:'auto'});
+    dialogUtilities.openDialog(self.el, {width:'auto'});
 
     $("#save-query-pathsbetween").die("click").live("click", function (evt) {
 
@@ -998,7 +998,7 @@ var ReactionTemplate = Backbone.View.extend({
     self.template = _.template($("#reaction-template").html(), self.currentTemplateParameters);
     $(self.el).html(self.template);
 
-    $(self.el).dialog({width:'auto'});
+    dialogUtilities.openDialog(self.el, {width:'auto'});
 
     $('#reaction-template-type-select').die('change').live('change', function (e) {
       var optionSelected = $("option:selected", this);
