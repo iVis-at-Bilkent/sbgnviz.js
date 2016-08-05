@@ -650,7 +650,6 @@ var SBGNLayout = Backbone.View.extend({
   defaultLayoutProperties: {
     name: 'cose-bilkent',
     nodeRepulsion: 4500,
-    nodeOverlap: 10,
     idealEdgeLength: 50,
     edgeElasticity: 0.45,
     nestingFactor: 0.1,
@@ -719,7 +718,6 @@ var SBGNLayout = Backbone.View.extend({
 
     $("#save-layout").die("click").live("click", function (evt) {
       self.currentLayoutProperties.nodeRepulsion = Number(document.getElementById("node-repulsion").value);
-      self.currentLayoutProperties.nodeOverlap = Number(document.getElementById("node-overlap").value);
       self.currentLayoutProperties.idealEdgeLength = Number(document.getElementById("ideal-edge-length").value);
       self.currentLayoutProperties.edgeElasticity = Number(document.getElementById("edge-elasticity").value);
       self.currentLayoutProperties.nestingFactor = Number(document.getElementById("nesting-factor").value);
