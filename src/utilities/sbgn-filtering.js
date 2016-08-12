@@ -73,8 +73,8 @@ var sbgnFiltering = {
     },
     
     noneIsNotHighlighted: function(){
-        var notHighlightedNodes = cy.nodes(":visible").nodes(".nothighlighted");
-        var notHighlightedEdges = cy.edges(":visible").edges(".nothighlighted");
+        var notHighlightedNodes = cy.nodes(":visible").nodes(".unhighlighted");
+        var notHighlightedEdges = cy.edges(":visible").edges(".unhighlighted");
         
         return notHighlightedNodes.length + notHighlightedEdges.length === 0;
     }
