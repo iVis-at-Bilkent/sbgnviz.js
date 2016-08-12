@@ -149,7 +149,7 @@ var jsonToSbgnml = {
         sbgnmlText = sbgnmlText + "<start y='" + edge._private.rscratch.startY + "' x='" +
             edge._private.rscratch.startX + "'/>\n";
 
-        var segpts = edge.getSegmentPoints();
+        var segpts = cy.edgeBendEditing('get').getSegmentPoints(edge);
         if(segpts){
           for(var i = 0; segpts && i < segpts.length; i = i + 2){
             var bendX = segpts[i];
