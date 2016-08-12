@@ -325,7 +325,7 @@ var SBGNContainer = Backbone.View.extend({
         
         cy.expandCollapse(getExpandCollapseOptions());
         
-        cy.contextMenus({
+        var contextMenus = cy.contextMenus({
           menuItemClasses: ['customized-context-menus-menu-item']
         });
         
@@ -340,7 +340,7 @@ var SBGNContainer = Backbone.View.extend({
           removeBendMenuItemTitle: "Delete Bend Point"
         });
         
-        cy.appendMenuItems([
+        contextMenus.appendMenuItems([
           {
             id: 'ctx-menu-sbgn-properties',
             title: 'Properties...',
