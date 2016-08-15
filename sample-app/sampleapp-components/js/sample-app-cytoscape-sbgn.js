@@ -734,8 +734,6 @@ var SBGNLayout = Backbone.View.extend({
 
       sbgnStyleRules['tiling-padding-vertical'] = Number(document.getElementById("tiling-padding-vertical").value);
       sbgnStyleRules['tiling-padding-horizontal'] = Number(document.getElementById("tiling-padding-horizontal").value);
-
-      $(self.el).dialog('close');
     });
 
     $("#default-layout").die("click").live("click", function (evt) {
@@ -817,8 +815,6 @@ var SBGNProperties = Backbone.View.extend({
       
       sbgnStyleRules['animate-on-drawing-changes'] = 
               self.currentSBGNProperties.animateOnDrawingChanges;
-
-      $(self.el).dialog('close');
     });
 
     $("#default-sbgn").die("click").live("click", function (evt) {
