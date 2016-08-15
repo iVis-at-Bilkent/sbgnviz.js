@@ -17,9 +17,12 @@ var numberInputUtilities = {
   isBackspaceKey: function(e) {
     return e.keyCode === 8;
   },
+  isEnterKey: function(e) {
+    return e.keyCode === 13;
+  },
   isIntegerInput: function(value, e) {
     return this.isCtrlOrCommandPressed(e) || this.isMinusSignKey(e) || this.isNumberKey(e) 
-            || this.isBackspaceKey(e) || this.isLeftKey(e) || this.isRightKey(e);
+            || this.isBackspaceKey(e) || this.isLeftKey(e) || this.isRightKey(e) || this.isEnterKey(e);
   },
   isFloatInput: function(value, e) {
     return this.isIntegerInput(value, e) || this.isDotKey(e);
