@@ -22,7 +22,7 @@ var sbgnStyleSheet = cytoscape.stylesheet()
             if(!ele.data('sbgnclonemarker')){
               return 0;
             }
-            return ele._private.style['background-opacity'].value;
+            return ele.css('background-opacity');
           }
         })
         .selector("node[sbgnclass][sbgnclass!='complex'][sbgnclass!='process'][sbgnclass!='association'][sbgnclass!='dissociation'][sbgnclass!='compartment'][sbgnclass!='source and sink']")
@@ -186,18 +186,6 @@ var sbgnStyleSheet = cytoscape.stylesheet()
           'width': 15,
           'height': 15
         })
-        .selector('edge.not-highlighted')
-        .css({
-          'opacity': 0.3,
-          'text-opacity': 0.3,
-          'background-opacity': 0.3
-        })
-        .selector('node.not-highlighted')
-        .css({
-          'border-opacity': 0.3,
-          'text-opacity': 0.3,
-          'background-opacity': 0.3
-        })
         .selector('edge.meta')
         .css({
           'line-color': '#C4C4C4',
@@ -263,7 +251,7 @@ var sbgnStyleSheet = cytoscape.stylesheet()
             if(!ele.data('sbgnclonemarker')){
               return 0;
             }
-            return ele._private.style['background-opacity'].value;
+            return ele.css('background-opacity');
           }
         });
 // end of sbgnStyleSheet
@@ -433,27 +421,31 @@ var SBGNContainer = Backbone.View.extend({
         
         cy.viewUtilities({
           node: {
-              highlighted: {}, // styles for when nodes are highlighted.
-              unhighlighted: { // styles for when nodes are unhighlighted.
-                'border-opacity': 0.3,
-                'text-opacity': 0.3,
-                'background-opacity': 0.3
-              },
-              hidden: {
-                'display': 'none'
+            highlighted: {
+              'border-width': '10px'
+            }, // styles for when nodes are highlighted.
+            unhighlighted: {// styles for when nodes are unhighlighted.
+              'opacity': function (ele) {
+                return ele.css('opacity');
               }
             },
-            edge: {
-              highlighted: {}, // styles for when edges are highlighted.
-              unhighlighted: { // styles for when edges are unhighlighted.
-                'opacity': 0.3,
-                'text-opacity': 0.3,
-                'background-opacity': 0.3
-              },
-              hidden: {
-                'display': 'none'
-              }
+            hidden: {
+              "display": "none"
             }
+          },
+          edge: {
+            highlighted: {
+              'width': '10px'
+            }, // styles for when edges are highlighted.
+            unhighlighted: {// styles for when edges are unhighlighted.
+              'opacity': function (ele) {
+                return ele.css('opacity');
+              }
+            },
+            hidden: {
+              "display": "none"
+            }
+          }
         });
         
         var edges = cy.edges();

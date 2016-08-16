@@ -65,7 +65,7 @@
     var height = node.height();
     var centerX = node._private.position.x;
     var centerY = node._private.position.y;
-    var padding = node._private.style['border-width'].pxValue / 2;
+    var padding = parseInt(node.css('border-width')) / 2;
 
     for (var i = 0; i < node._private.data.ports.length; i++) {
       var port = node._private.data.ports[i];
@@ -141,7 +141,7 @@
     context.rotate(-Math.PI / 2);
 
     var textProp = {'centerX': 0, 'centerY': 13 / 2,
-      'opacity': edge.css('text-opacity'),
+      'opacity': edge.css('text-opacity') * edge.css('opacity'),
       'width': 13, 'label': cardinality};
     $$.sbgn.drawCardinalityText(context, textProp);
 
@@ -198,7 +198,7 @@
       context.rotate(Math.PI / 2);
 
       var textProp = {'centerX': -carProp.distanceToNode + carProp.boxLength / 2, 'centerY': -carProp.boxLength / 2,
-        'opacity': edge.css('text-opacity'),
+        'opacity': edge.css('text-opacity') * edge.css('opacity'),
         'width': carProp.boxLength, 'label': cardinality};
       $$.sbgn.drawCardinalityText(context, textProp);
 
@@ -238,7 +238,7 @@
           stateCenterY = centerY - beginPosY;
 
           var textProp = {'centerX': stateCenterX, 'centerY': stateCenterY,
-            'opacity': node._private.style['text-opacity'].value,
+            'opacity': node.css('text-opacity') * node.css('opacity'),
             'width': stateWidth, 'height': stateHeight};
 
           if (state.clazz == "state variable") {//draw ellipse
@@ -267,7 +267,7 @@
           stateCenterY = centerY + beginPosY;
 
           var textProp = {'centerX': stateCenterX, 'centerY': stateCenterY,
-            'opacity': node._private.style['text-opacity'].value,
+            'opacity': node.css('text-opacity') * node.css('opacity'),
             'width': stateWidth, 'height': stateHeight};
 
           if (state.clazz == "state variable") {//draw ellipse
@@ -335,15 +335,15 @@
     var oldOpacity = context.globalAlpha;
     context.globalAlpha = textProp.opacity;
     var text;
-
+    
     textProp.label = stringAfterValueCheck(textProp.label);
-
+    
     if (truncate == false) {
       text = textProp.label;
     } else {
       text = truncateText(textProp, context.font);
     }
-
+    
     context.fillText(text, textProp.centerX, textProp.centerY);
     context.fillStyle = oldStyle;
     context.font = oldFont;
@@ -374,7 +374,7 @@
       var stateCenterY = state.bbox.y * node.height() / 100 + centerY;
 
       var textProp = {'centerX': stateCenterX, 'centerY': stateCenterY,
-        'opacity': node._private.style['text-opacity'].value,
+        'opacity': node.css('text-opacity') * node.css('opacity'),
         'width': stateWidth, 'height': stateHeight};
 
       if (state.clazz == "state variable") {//draw ellipse
@@ -409,7 +409,7 @@
   $$.sbgn.nucleicAcidCheckPoint = function (x, y, centerX, centerY, node, threshold, points, cornerRadius) {
     var width = node.width();
     var height = node.height();
-    var padding = node._private.style["border-width"].pxValue / 2;
+    var padding = parseInt(node.css('border-width')) / 2;
 
     //check rectangle at top
     if (window.cyMath.pointInsidePolygon(x, y, points,
@@ -469,7 +469,7 @@
             + node._private.style["background-color"].value[0] + ","
             + node._private.style["background-color"].value[1] + ","
             + node._private.style["background-color"].value[2] + ","
-            + (1 * node._private.style["opacity"].value * parentOpacity) + ")";
+            + (1 * node.css('opacity') * parentOpacity) + ")";
   };
 
   $$.sbgn.drawSimpleChemicalPath = function (
@@ -620,7 +620,7 @@
     var height = node.height();
     var centerX = node._private.position.x;
     var centerY = node._private.position.y;
-    var padding = node._private.style['border-width'].value / 2;
+    var padding = parseInt(node.css('border-width')) / 2;
 
     for (var i = 0; i < node._private.data.ports.length; i++) {
       var port = node._private.data.ports[i];
@@ -677,7 +677,7 @@
         var height = node.height();
         var centerX = node._private.position.x;
         var centerY = node._private.position.y;
-        var padding = node._private.style['border-width'].pxValue / 2;
+        var padding = parseInt(node.css('border-width')) / 2;
 
         window.cyRenderer.drawPolygonPath(context,
                 centerX, centerY,
@@ -694,7 +694,7 @@
         var nodeY = node._private.position.y;
         var width = node.width();
         var height = node.height();
-        var padding = node._private.style['border-width'].pxValue / 2;
+        var padding = parseInt(node.css('border-width')) / 2;
 
         var portIntersection = $$.sbgn.intersectLinePorts(node, x, y, portId);
         if (portIntersection.length > 0) {
@@ -714,7 +714,7 @@
         var centerY = node._private.position.y;
         var width = node.width();
         var height = node.height();
-        var padding = node._private.style['border-width'].pxValue / 2;
+        var padding = parseInt(node.css('border-width')) / 2;
 
         return window.cyMath.pointInsidePolygon(x, y, window.cyNodeShapes['process'].points,
                 centerX, centerY, width, height, [0, -1], padding);
@@ -744,7 +744,7 @@
 
         $$.sbgn.cloneMarker.unspecifiedEntity(context, centerX, centerY,
                 width, height, cloneMarker,
-                node._private.style['background-opacity'].value);
+                node.css('background-opacity'));
 
         $$.sbgn.forceOpacityToOne(node, context);
         $$.sbgn.drawStateAndInfos(node, context, centerX, centerY);
@@ -755,7 +755,7 @@
 
         var width = node.width();
         var height = node.height();
-        var padding = node._private.style["border-width"].value / 2;
+        var padding = parseInt(node.css('border-width')) / 2;
 
         var portIntersection = $$.sbgn.intersectLinePorts(node, x, y, portId);
         if (portIntersection.length > 0) {
@@ -778,7 +778,7 @@
 
         var width = node.width();
         var height = node.height();
-        var padding = node._private.style["border-width"].value / 2;
+        var padding = parseInt(node.css('border-width')) / 2;
 
         var nodeCheckPoint = window.cyNodeShapes["ellipse"].checkPoint(x, y,
                 padding, width, height,
@@ -801,7 +801,7 @@
         var height = node.height();
         var multimerPadding = window.cyNodeShapes["simple chemical"].multimerPadding;
         var label = node._private.data.sbgnlabel;
-        var padding = node._private.style["border-width"].value;
+        var padding = parseInt(node.css('border-width'));
         var cloneMarker = node._private.data.sbgnclonemarker;
 
         if ($$.sbgn.isMultimer(node)) {
@@ -814,7 +814,7 @@
           $$.sbgn.cloneMarker.simpleChemical(context,
                   centerX + multimerPadding, centerY + multimerPadding,
                   width - padding, height - padding, cloneMarker, true,
-                  node._private.style['background-opacity'].value);
+                  node.css('background-opacity'));
 
           //context.stroke();
         }
@@ -827,7 +827,7 @@
 
         $$.sbgn.cloneMarker.simpleChemical(context, centerX, centerY,
                 width - padding, height - padding, cloneMarker, false,
-                node._private.style['background-opacity'].value);
+                node.css('background-opacity'));
 
 //        var nodeProp = {'label': label, 'centerX': centerX, 'centerY': centerY,
 //          'opacity': node._private.style['text-opacity'].value, 'width': node.width(), 'height': node.height()};
@@ -844,7 +844,7 @@
 
         var width = node.width();
         var height = node.height();
-        var padding = node._private.style["border-width"].value / 2;
+        var padding = parseInt(node.css('border-width'));
         var multimerPadding = window.cyNodeShapes["simple chemical"].multimerPadding;
 
         var portIntersection = $$.sbgn.intersectLinePorts(node, x, y, portId);
@@ -876,7 +876,7 @@
 
         var width = node.width();
         var height = node.height();
-        var padding = node._private.style["border-width"].value / 2;
+        var padding = parseInt(node.css('border-width')) / 2;
         var multimerPadding = window.cyNodeShapes["simple chemical"].multimerPadding;
 
         var nodeCheckPoint = window.cyNodeShapes["roundrectangle"].checkPoint(x, y,
@@ -909,7 +909,7 @@
         var label = node._private.data.sbgnlabel;
         var multimerPadding = window.cyNodeShapes["macromolecule"].multimerPadding;
         var cloneMarker = node._private.data.sbgnclonemarker;
-        var padding = node._private.style["border-width"].value;
+        var padding = parseInt(node.css('border-width'));
 
         //check whether sbgn class includes multimer substring or not
         if ($$.sbgn.isMultimer(node)) {
@@ -924,7 +924,7 @@
           $$.sbgn.cloneMarker.macromolecule(context,
                   centerX + multimerPadding, centerY + multimerPadding,
                   width, height, cloneMarker, true,
-                  node._private.style['background-opacity'].value);
+                  node.css('background-opacity'));
 
           //context.stroke();
         }
@@ -938,7 +938,7 @@
 
         $$.sbgn.cloneMarker.macromolecule(context, centerX, centerY,
                 width, height, cloneMarker, false,
-                node._private.style['background-opacity'].value);
+                node.css('background-opacity'));
 
         var oldStyle = context.fillStyle;
         $$.sbgn.forceOpacityToOne(node, context);
@@ -953,7 +953,7 @@
         var centerY = node._private.position.y;
         var width = node.width();
         var height = node.height();
-        var padding = node._private.style["border-width"].value / 2;
+        var padding = parseInt(node.css('border-width')) / 2;
         var multimerPadding = window.cyNodeShapes["macromolecule"].multimerPadding;
         var cornerRadius = window.cyMath.getRoundRectangleRadius(width, height);
 
@@ -992,7 +992,7 @@
         var centerY = node._private.position.y;
         var width = node.width() + threshold;
         var height = node.height() + threshold;
-        var padding = node._private.style["border-width"].pxValue / 2;
+        var padding = parseInt(node.css('border-width')) / 2;
         var multimerPadding = window.cyNodeShapes["macromolecule"].multimerPadding;
 
         var nodeCheckPoint = window.cyNodeShapes["roundrectangle"].checkPoint(x, y, padding,
@@ -1017,7 +1017,7 @@
         var centerY = node._private.position.y;
         var width = node.width();
         var height = node.height();
-        var padding = node._private.style["border-width"].pxValue;
+        var padding = parseInt(node.css('border-width'));
 
         window.cyNodeShapes['ellipse'].draw(context, centerX, centerY, width, height);
         context.fill();
@@ -1030,7 +1030,7 @@
         var centerY = node._private.position.y;
         var width = node.width();
         var height = node.height();
-        var padding = node._private.style["border-width"].pfValue / 2;
+        var padding = parseInt(node.css('border-width')) / 2;
 
         var portIntersection = $$.sbgn.intersectLinePorts(node, x, y, portId);
         if (portIntersection.length > 0) {
@@ -1051,7 +1051,7 @@
         var centerY = node._private.position.y;
         var width = node.width();
         var height = node.height();
-        var padding = node._private.style["border-width"].pfValue / 2;
+        var padding = parseInt(node.css('border-width')) / 2;
 
         x -= centerX;
         y -= centerY;
@@ -1100,7 +1100,7 @@
         var nodeY = node._private.position.y;
         var width = node.width();
         var height = node.height();
-        var padding = node._private.style["border-width"].pfValue / 2;
+        var padding = parseInt(node.css('border-width')) / 2;
 
         var portIntersection = $$.sbgn.intersectLinePorts(node, x, y, portId);
         if (portIntersection.length > 0) {
@@ -1119,7 +1119,7 @@
         var centerY = node._private.position.y;
         var width = node.width();
         var height = node.height();
-        var padding = node._private.style["border-width"].pfValue / 2;
+        var padding = parseInt(node.css('border-width')) / 2;
 
         x -= centerX;
         y -= centerY;
@@ -1163,7 +1163,7 @@
           $$.sbgn.cloneMarker.complex(context,
                   centerX + multimerPadding, centerY + multimerPadding,
                   width, height, cornerLength, cloneMarker, true,
-                  node._private.style['background-opacity'].value);
+                  node.css('background-opacity'));
 
           //context.stroke();
         }
@@ -1177,7 +1177,7 @@
 
         $$.sbgn.cloneMarker.complex(context, centerX, centerY,
                 width, height, cornerLength, cloneMarker, false,
-                node._private.style['background-opacity'].value);
+                node.css('background-opacity'));
 
         var oldStyle = context.fillStyle;
         $$.sbgn.forceOpacityToOne(node, context);
@@ -1192,7 +1192,7 @@
         var hasChildren = node.children().length > 0;
         var width = hasChildren ? node.outerWidth() : node.width();
         var height = hasChildren ? node.outerHeight() : node.height();
-        var padding = node._private.style["border-width"].pxValue / 2;
+        var padding = parseInt(node.css('border-width')) / 2;
         var multimerPadding = window.cyNodeShapes["complex"].multimerPadding;
         var cornerLength = window.cyNodeShapes["complex"].cornerLength;
 
@@ -1237,7 +1237,7 @@
         var hasChildren = node.children().length > 0;
         var width = (hasChildren ? node.outerWidth() : node.width()) + threshold;
         var height = (hasChildren ? node.outerHeight() : node.height()) + threshold;
-        var padding = node._private.style["border-width"].pxValue / 2;
+        var padding = parseInt(node.css('border-width')) / 2;
         var multimerPadding = window.cyNodeShapes["complex"].multimerPadding;
         var cornerLength = window.cyNodeShapes["complex"].cornerLength;
 
@@ -1290,7 +1290,7 @@
           $$.sbgn.cloneMarker.nucleicAcidFeature(context,
                   centerX + multimerPadding, centerY + multimerPadding,
                   width, height, cloneMarker, true,
-                  node._private.style['background-opacity'].value);
+                  node.css('background-opacity'));
 
           //context.stroke();
         }
@@ -1302,7 +1302,7 @@
 
         $$.sbgn.cloneMarker.nucleicAcidFeature(context, centerX, centerY,
                 width, height, cloneMarker, false,
-                node._private.style['background-opacity'].value);
+                node.css('background-opacity'));
 
 //        var nodeProp = {'label': label, 'centerX': centerX, 'centerY': centerY,
 //          'opacity': node._private.style['text-opacity'].value, 'width': node.width(), 'height': node.height()};
@@ -1404,7 +1404,7 @@
 
         $$.sbgn.cloneMarker.sourceAndSink(context, centerX, centerY,
                 width, height, cloneMarker,
-                node._private.style['background-opacity'].value);
+                node.css('background-opacity'));
 
       },
       intersectLine: window.cyNodeShapes["ellipse"].intersectLine,
@@ -1580,7 +1580,7 @@
     var nodeY = node._private.position.y;
     var width = node.width();
     var height = node.height();
-    var padding = node._private.style['border-width'].value / 2;
+    var padding = parseInt(node.css('border-width')) / 2;
 
     for (var i = 0; i < node._private.data.ports.length; i++) {
       var port = node._private.data.ports[i];
@@ -1617,7 +1617,7 @@
     var nodeY = node._private.position.y;
     var width = node.width();
     var height = node.height();
-    var padding = node._private.style["border-width"].value / 2;
+    var padding = parseInt(node.css('border-width')) / 2;
 
     var halfWidth = width / 2;
     var halfHeight = height / 2;
@@ -1902,7 +1902,7 @@
   $$.sbgn.intersectLineStateAndInfoBoxes = function (node, x, y) {
     var centerX = node._private.position.x;
     var centerY = node._private.position.y;
-    var padding = node._private.style["border-width"].value / 2;
+    var padding = parseInt(node.css('border-width')) / 2;
 
     var stateAndInfos = node._private.data.sbgnstatesandinfos;
 
@@ -1944,7 +1944,7 @@
   $$.sbgn.checkPointStateAndInfoBoxes = function (x, y, node, threshold) {
     var centerX = node._private.position.x;
     var centerY = node._private.position.y;
-    var padding = node._private.style["border-width"].value / 2;
+    var padding =parseInt(node.css('border-width')) / 2;
     var stateAndInfos = node._private.data.sbgnstatesandinfos;
 
     var stateCount = 0, infoCount = 0;
