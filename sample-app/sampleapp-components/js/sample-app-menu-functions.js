@@ -100,10 +100,6 @@ $(document).ready(function () {
     el: '#query-pathsbetween-table'
   });
   
-  var reactionTemplate = new ReactionTemplate({
-    el: '#reaction-template-table'
-  });
-  
   triggerIncrementalLayout = function(){
     if(!sbgnStyleRules['rearrange-after-expand-collapse']) {
       return;
@@ -415,10 +411,6 @@ $(document).ready(function () {
   
   $("#query-pathsbetween").click(function (e) {
     pathsBetweenQuery.render();
-  });
-  
-  $("#create-reaction-template").click(function (e) {
-    reactionTemplate.render();
   });
 
   $("#properties-icon").click(function (e) {

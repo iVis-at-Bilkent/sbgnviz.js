@@ -37,7 +37,8 @@ var BioGeneView = Backbone.View.extend({
         };
 
         // compile the template using underscore
-        var template = _.template( $("#biogene-template").html(), variables);
+        var template = _.template( $("#biogene-template").html());
+        template = template(variables);
 
         // load the compiled HTML into the Backbone "el"
         this.$el.html(template);

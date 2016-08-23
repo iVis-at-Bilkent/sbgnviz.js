@@ -1,5 +1,9 @@
 This file indicates the altered parts in used libraries and explains why they are changed.
 
+ -Library name: jquery.fancybox-1.3.4.js
+
+ Pleas see 'https://github.com/nvidoni/fancybox/issues/2
+
 -Libary name: cytoscape-edgehandles.js
 The code between line numbers 415 and 479 are commented out.
 (starting from the line "for( var i = 0; i < targets.length; i++ ) {")

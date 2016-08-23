@@ -7,7 +7,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
         <!-- jQuery UI -->
-        <link href="../lib/css/jquery-ui-1.10.3.custom.css" rel="stylesheet">
+        <link href="../lib/css/jquery-ui.css" rel="stylesheet">
         <link href="../lib/css/jquery.fancybox-1.3.4.css" rel="stylesheet">
 
         <!-- Loading Bootstrap -->
@@ -317,10 +317,6 @@
         </div>
         
         <div id="query-pathsbetween-table" title="Paths Between Query Parameters">
-            <!-- paths between query table will be shown here -->
-        </div>
-        
-        <div id="reaction-template-table" title="Template">
             <!-- paths between query table will be shown here -->
         </div>
 
@@ -660,54 +656,6 @@
 
             </table>
         </script>
-        
-        <script type="text/template" id="reaction-template">
-            <table class="table-condensed layout-table">
-          
-            <tr>
-            <td style="padding-bottom: 10px;" align="right" valign="middle">
-            <span class="add-on layout-text"> <b> Type </b> </span>
-            </td>
-            
-            <td>
-            <select id="reaction-template-type-select" class='input-medium layout-text' name="reaction-template-type">
-            <option id="reaction-template-type-association" value="association" <% if (templateType == 'association'){ %> selected<%}%> > Association </option>
-            <option id="reaction-template-type-dissociation" value="dissociation" <% if (templateType == 'dissociation'){ %> selected<%}%> > Dissociation </option>
-            </select>
-            </td>
-            </tr>
-    
-            <tr>
-            <td align="center" valign="middle" style="margin-left: 5px;">
-            <span class="add-on layout-text"> <b> Input </b> </span>
-            </td>
-            
-            <td align="center" valign="middle" style="margin-right: 5px;">
-            <span class="add-on layout-text"> <b> Output </b> </span>
-            </td>
-            </tr>
-            
-            
-            <tr>
-            <td>
-            <%= getInputHtml() %>
-            </td>
-            
-            <td>
-            <%= getOutputHtml() %>
-            </td>
-    
-            </tr>
-            
-            <tr>
-            <td colspan=2 align="center">
-            <button id="create-template" class="btn btn-default" >Create</button>
-            <button id="cancel-template" class="btn btn-default">Cancel</button>
-            </td>
-            </tr>
-            
-            </table>
-        </script>
 
         <!-- BioGeneView template for backbone.js -->
         <script type="text/template" id="biogene-template">
@@ -774,13 +722,14 @@
         <script src="sampleapp-components/js/sample-app-global-variables.js"></script>
         
         <!-- External Libraries -->
-        <script src="../node_modules/jQuery/tmp/jquery.js"></script>
-        <script src="../lib/js/jquery.fancybox-1.3.4.pack.js"></script>
-        <script src="../lib/js/jquery.expander-min.js"></script>
+        <script src="../node_modules/jquery/dist/jquery.js"></script>
+        <script src="../node_modules/jquery.browser/dist/jquery.browser.js"></script>
+        <script src="../lib/js/jquery.fancybox-1.3.4.js"></script>
+        <script src="../node_modules/jquery-expander/jquery.expander.js"></script>
         <script src="../node_modules/qtip2/dist/jquery.qtip.js"></script>
-        <script src="../lib/js/bootstrap.min.js"></script>
-        <script src="../lib/js/jquery-ui-1.10.3.custom.min.js"></script>
-        <script src="../lib/js/underscore.js"></script>
+        <script src="../node_modules/bootstrap/dist/js/bootstrap.js"></script>
+        <script src="../node_modules/jquery-ui-bundle/jquery-ui.js"></script>
+        <script src="../node_modules/backbone/node_modules/underscore/underscore.js"></script>
         <script src="../node_modules/backbone/backbone.js"></script>
         <script src="../lib/js/cytoscape.js"></script>
         <script src="../node_modules/cytoscape-panzoom/cytoscape-panzoom.js"></script>
