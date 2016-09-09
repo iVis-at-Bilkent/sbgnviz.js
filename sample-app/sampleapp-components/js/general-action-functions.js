@@ -109,10 +109,6 @@ var generalActionFunctions = {
     nodes.removeClass('noderesize-resized');
     nodes.addClass('noderesize-resized');
 
-    if (_.isEqual(nodes, cy.nodes(':selected'))) {
-      inspectorUtilities.handleSBGNInspector();
-    }
-
     return result;
   },
   changeNodeLabel: function (param) {
@@ -139,10 +135,6 @@ var generalActionFunctions = {
 
     nodes.removeClass('changeContent');
     nodes.addClass('changeContent');
-
-    if (_.isEqual(nodes, cy.nodes(':selected'))) {
-      inspectorUtilities.handleSBGNInspector();
-    }
 
     return result;
   },
@@ -172,10 +164,6 @@ var generalActionFunctions = {
 
     cy.forceRender();
 
-    if (_.isEqual(eles, cy.nodes(':selected'))) {
-      inspectorUtilities.handleSBGNInspector();
-    }
-
     return result;
   },
   changeStyleCss: function (param) {
@@ -201,10 +189,6 @@ var generalActionFunctions = {
       }
     }
     cy.forceRender();
-
-    if (_.isEqual(eles, cy.nodes(':selected'))) {
-      inspectorUtilities.handleSBGNInspector();
-    }
 
     return result;
   }

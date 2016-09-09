@@ -911,7 +911,6 @@ var PathsBetweenQuery = Backbone.View.extend({
             el: '#sbgn-network-container',
             model: {cytoscapeJsGraph: sbgnmlToJson.convert(data)}
           })).render();
-          inspectorUtilities.handleSBGNInspector();
         }
       });
       
