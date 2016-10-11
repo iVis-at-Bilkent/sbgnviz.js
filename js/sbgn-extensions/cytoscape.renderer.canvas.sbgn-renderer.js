@@ -2024,7 +2024,7 @@ var truncateText = function (textProp, font) {
   var context = document.createElement('canvas').getContext("2d");
   context.font = font;
   var fitLabelsToNodes = sbgnStyleRules['fit-labels-to-nodes'];
-  var text = (typeof textProp.label === 'undefined') ? "" : textProp.label;
+  var text = textProp.label || "";
   //If fit labels to nodes is false do not truncate
   if (fitLabelsToNodes == false) {
     return text;
