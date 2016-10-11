@@ -7,21 +7,21 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
         <!-- jQuery UI -->
-        <link href="../lib/css/jquery-ui.css" rel="stylesheet">
-        <link href="../lib/css/jquery.fancybox-1.3.4.css" rel="stylesheet">
+        <link href="lib/css/jquery-ui.css" rel="stylesheet">
+        <link href="lib/css/jquery.fancybox-1.3.4.css" rel="stylesheet">
 
         <!-- Loading Bootstrap -->
-        <link href="../lib/css/bootstrap.css" rel="stylesheet">
+        <link href="lib/css/bootstrap.css" rel="stylesheet">
 
         <!-- Loading cytoscape.js plugins -->
-        <link href="../lib/css/cytoscape.js-panzoom.css" rel="stylesheet" type="text/css" />
-        <link href="../lib/css/font-awesome-4.0.3/css/font-awesome.css" rel="stylesheet" type="text/css" />
-        <link href="../lib/css/jquery.qtip.min.css" rel="stylesheet" type="text/css" />
-        <link href="../node_modules/cytoscape-context-menus/cytoscape-context-menus.css" rel="stylesheet" type="text/css" />
+        <link href="lib/css/cytoscape.js-panzoom.css" rel="stylesheet" type="text/css" />
+        <link href="lib/css/font-awesome-4.0.3/css/font-awesome.css" rel="stylesheet" type="text/css" />
+        <link href="lib/css/jquery.qtip.min.css" rel="stylesheet" type="text/css" />
+        <link href="node_modules/cytoscape-context-menus/cytoscape-context-menus.css" rel="stylesheet" type="text/css" />
 <!--        <link href="../node_modules/cytoscape-edge-bend-editing/cytoscape.js-edge-bend-editing.css" rel="stylesheet" type="text/css" />-->
 
         <!-- Loading sample app css -->
-        <link href="sampleapp-components/css/sbgn-viz.css" rel="stylesheet">
+        <link href="css/sbgnviz.css" rel="stylesheet">
 
     </head>
 
@@ -119,37 +119,6 @@
                                         <li><a href="#" id="expand-all">Expand All</a></li>
                                     </ul>
                                 </li>
-                                
-<!--                                <li class="dropdown-submenu">
-                                    <a href="#" id="add-node-menu-option" class="dropdown-toggle" data-toggle="dropdown">
-                                        Align
-                                        <b class="right-caret"></b>
-                                    </a>
-                                    <ul class="dropdown-menu" id="add-node-submenu">
-                                        <li class="dropdown-submenu">
-                                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                                                Horizontal
-                                                <b class="right-caret"></b>
-                                            </a>
-                                            <ul class="dropdown-menu">
-                                                <li><a href="#" id="align-horizontal-top">Top</a></li>
-                                                <li><a href="#" id="align-horizontal-middle">Middle</a></li>
-                                                <li><a href="#" id="align-horizontal-bottom">Bottom</a></li>
-                                            </ul>
-                                        </li>
-                                        <li class="dropdown-submenu">
-                                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                                                Vertical
-                                                <b class="right-caret"></b>
-                                            </a>
-                                            <ul class="dropdown-menu">
-                                                <li><a href="#" id="align-vertical-left">Left</a></li>
-                                                <li><a href="#" id="align-vertical-center">Center</a></li>
-                                                <li><a href="#" id="align-vertical-right">Right</a></li>
-                                            </ul>
-                                        </li>
-                                    </ul>
-                                </li>-->
                             </ul>
                         </li>
                         
@@ -227,70 +196,47 @@
             <table width="100%" height="100%" align="center" valign="center">
                 <tr>
                 <div class="inside-menu">
-                <img id="load-file-icon" class="sbgn-toolbar-element" src="sampleapp-images/toolbar-icons/load.png" title="Load: Load an SBGN-PD map from SBGN-ML file">
-                <img id="save-icon" class="sbgn-toolbar-element" src="sampleapp-images/toolbar-icons/save.png" title="Save: Save current SBGN-PD map to an SBGN-ML file">
-                <img id="properties-icon" class="sbgn-toolbar-element" src="sampleapp-images/toolbar-icons/properties.png" title="Properties: Modify general properties of current SBGN-PD map" >
+                <img id="load-file-icon" class="sbgn-toolbar-element" src="img/toolbar-icons/load.png" title="Load: Load an SBGN-PD map from SBGN-ML file">
+                <img id="save-icon" class="sbgn-toolbar-element" src="img/toolbar-icons/save.png" title="Save: Save current SBGN-PD map to an SBGN-ML file">
+                <img id="properties-icon" class="sbgn-toolbar-element" src="img/toolbar-icons/properties.png" title="Properties: Modify general properties of current SBGN-PD map" >
                 </div>
                 
                 <div class="menu-break-large sbgn-toolbar-element">&nbsp</div>
                 <div class="inside-menu">
                 
-                <img id="delete-selected-simple-icon" class="sbgn-toolbar-element" src="sampleapp-images/toolbar-icons/deletesimple.png" title="Delete Selected Simple: Delete selected nodes and interactions" >
-                <img id="delete-selected-smart-icon" class="sbgn-toolbar-element" src="sampleapp-images/toolbar-icons/deletesmart.png" title="Delete Selected Smart: Delete selected nodes and any processes they are involved in" >
+                <img id="delete-selected-simple-icon" class="sbgn-toolbar-element" src="img/toolbar-icons/deletesimple.png" title="Delete Selected Simple: Delete selected nodes and interactions" >
+                <img id="delete-selected-smart-icon" class="sbgn-toolbar-element" src="img/toolbar-icons/deletesmart.png" title="Delete Selected Smart: Delete selected nodes and any processes they are involved in" >
 
                 <div class="menu-break-small sbgn-toolbar-element">&nbsp</div>
-                <img id="undo-icon" class="sbgn-toolbar-element" src="sampleapp-images/toolbar-icons/undo.png" title="Undo: Undo the last operation" >
-                <img id="redo-icon" class="sbgn-toolbar-element" src="sampleapp-images/toolbar-icons/redo.png" title="Redo: Redo the last undone operation" >
+                <img id="undo-icon" class="sbgn-toolbar-element" src="img/toolbar-icons/undo.png" title="Undo: Undo the last operation" >
+                <img id="redo-icon" class="sbgn-toolbar-element" src="img/toolbar-icons/redo.png" title="Redo: Redo the last undone operation" >
 
                 </div>
                 
                 <div class="menu-break-large sbgn-toolbar-element">&nbsp</div>
                 <div class="inside-menu">
-                <img id="hide-selected-icon" class="sbgn-toolbar-element" src="sampleapp-images/toolbar-icons/hideselected.png" title="Hide Selected: Hide selected nodes and any processes they are involved in" >
-                <img id="show-selected-icon" class="sbgn-toolbar-element" src="sampleapp-images/toolbar-icons/showselected.png" title="Show Selected: Show selected nodes and any processes they are involved in, hiding the remaining nodes and their interactions" >
+                <img id="hide-selected-icon" class="sbgn-toolbar-element" src="img/toolbar-icons/hideselected.png" title="Hide Selected: Hide selected nodes and any processes they are involved in" >
+               <!--TODO: 'show-selected-icon' does not work, and probably is not needed -->
+                <!--<img id="show-selected-icon" class="sbgn-toolbar-element" src="img/toolbar-icons/showselected.png" title="Show Selected: Show selected nodes and any processes they are involved in, hiding the remaining nodes and their interactions" >-->
 
                 <div class="menu-break-small sbgn-toolbar-element">&nbsp</div>
-                <img id="collapse-selected-icon" class="sbgn-toolbar-element" src="sampleapp-images/toolbar-icons/collapseselected.png" title="Collapse Selected: Collapse selected compound node to hide its members" >
-                <img id="expand-selected-icon" class="sbgn-toolbar-element" src="sampleapp-images/toolbar-icons/expandselected.png" title="Expand Selected: Expand selected collapsed node to show its members" >
-                
-<!--                <div class="menu-break-small sbgn-toolbar-element">&nbsp</div>
-                <div class="btn-group sbgn-toolbar-element" role="group" id="align-list">
-                    <button id="align-button" title="Align to First Selected: Align positions of selected nodes based on the first (if any) selected node" type="button" class="btn" aria-haspopup="true" aria-expanded="false">
-                        <div style="height: 16px;">
-                            <img style="float: left; height: 16px; width: auto;" id="sbgn-align-img" src="sampleapp-images/align/align.png"/>
-                            <span style="float: right;" class="caret"></span>
-                        </div>
-                    </button>
-                    <button id="align-dd-button" type="button" class="btn dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <div style="height: 16px;">
-                            <span class="caret"></span>
-                            <span class="sr-only"></span>
-                        </div>
-                    </button>
-                    <ul id="align-menu" class="dropdown-menu" >
-                        <li><a class="dd-list-href" href="#" id="align-horizontal-top-icon"><img src="sampleapp-images/align/align-horizontal-top.png" class="sbgn-select-img"/>Align Horizontal Top</a></li>
-                        <li><a class="dd-list-href" href="#" id="align-horizontal-middle-icon"><img src="sampleapp-images/align/align-horizontal-middle.png" class="sbgn-select-img"/>Align Horizontal Middle</a></li>
-                        <li><a class="dd-list-href" href="#" id="align-horizontal-bottom-icon"><img src="sampleapp-images/align/align-horizontal-bottom.png" class="sbgn-select-img"/>Align Horizontal Bottom</a></li>
-                        <li><a class="dd-list-href" href="#" id="align-vertical-left-icon"><img src="sampleapp-images/align/align-vertical-left.png" class="sbgn-select-img"/>Align Vertical Left</a></li>
-                        <li><a class="dd-list-href" href="#" id="align-vertical-center-icon"><img src="sampleapp-images/align/align-vertical-center.png" class="sbgn-select-img"/>Align Vertical Center</a></li>
-                        <li><a class="dd-list-href" href="#" id="align-vertical-right-icon"><img src="sampleapp-images/align/align-vertical-right.png" class="sbgn-select-img"/>Align Vertical Right</a></li>
-                    </ul>
-                </div>-->
+                <img id="collapse-selected-icon" class="sbgn-toolbar-element" src="img/toolbar-icons/collapseselected.png" title="Collapse Selected: Collapse selected compound node to hide its members" >
+                <img id="expand-selected-icon" class="sbgn-toolbar-element" src="img/toolbar-icons/expandselected.png" title="Expand Selected: Expand selected collapsed node to show its members" >
                     
                 </div>
                 
                 <div class="menu-break-large sbgn-toolbar-element">&nbsp</div>
                 <div class="inside-menu">
-                <img id="search-by-label-icon" class="sbgn-toolbar-element" src="sampleapp-images/search.png" title="Search: Search and find (case insensitive) all nodes with specified label text, selecting them and highlighting them along with their processes" >
+                <img id="search-by-label-icon" class="sbgn-toolbar-element" src="img/search.png" title="Search: Search and find (case insensitive) all nodes with specified label text, selecting them and highlighting them along with their processes" >
                 <input id="search-by-label-text-box" class="sbgn-toolbar-element" type="label">
-                <img id="highlight-neighbors-of-selected-icon" class="sbgn-toolbar-element" src="sampleapp-images/toolbar-icons/highlightneighborsofselected.png" title="Highlight Neighbors of Selected: Highlight selected nodes and their neighbors by ghosting remaining nodes" >
-                <img id="remove-highlights-icon" class="sbgn-toolbar-element" src="sampleapp-images/toolbar-icons/removehighlights.png" title="Remove Highlights: Remove any highlights" >
+                <img id="highlight-neighbors-of-selected-icon" class="sbgn-toolbar-element" src="img/toolbar-icons/highlightneighborsofselected.png" title="Highlight Neighbors of Selected: Highlight selected nodes and their neighbors by ghosting remaining nodes" >
+                <img id="remove-highlights-icon" class="sbgn-toolbar-element" src="img/toolbar-icons/removehighlights.png" title="Remove Highlights: Remove any highlights" >
                 </div>
                 
                 <div class="menu-break-large sbgn-toolbar-element">&nbsp</div>
                 <div class="inside-menu">
-                <img id="perform-layout-icon" class="sbgn-toolbar-element" src="sampleapp-images/toolbar-icons/layout-cose.png" title="Perform Layout: Perform a force-directed layout of current map, maintaining compound structures" >
-                <img id="layout-properties-icon" class="sbgn-toolbar-element" src="sampleapp-images/toolbar-icons/layoutproperties.png" title="Layout Properties: Modify parameters used during layout" >
+                <img id="perform-layout-icon" class="sbgn-toolbar-element" src="img/toolbar-icons/layout-cose.png" title="Perform Layout: Perform a force-directed layout of current map, maintaining compound structures" >
+                <img id="layout-properties-icon" class="sbgn-toolbar-element" src="img/toolbar-icons/layoutproperties.png" title="Layout Properties: Modify parameters used during layout" >
                 </div>
                 </tr>
                 
@@ -328,14 +274,14 @@
         <script type="text/template" id="node-legend-template">
             <div class="sbgn-frame">
             <h2 class="sbgn-text">Node Legend</h2>
-            <img src="sampleapp-images/node_legend_sbgn.png" alt="" class="centered">
+            <img src="img/node_legend_sbgn.png" alt="" class="centered">
             </div>
         </script>
 
         <script type="text/template" id="edge-legend-template">
             <div class="sbgn-frame">
             <h2 class="sbgn-text">Interaction Legend</h2>
-            <img src="sampleapp-images/interaction_legend_sbgn.png" alt="" class="centered">
+            <img src="img/interaction_legend_sbgn.png" alt="" class="centered">
             </div>
         </script>
 
@@ -345,11 +291,11 @@
 
             <table width="100%" height="100%" align="center" valign="center">
             <tr><td>
-            <img src="sampleapp-images/i-vis.png" alt="" class="centered">
+            <img src="img/i-vis.png" alt="" class="centered">
             </td></tr>
 
             <tr><td>
-            <img src="sampleapp-images/cbio.png" alt="" class="centered">
+            <img src="img/cbio.png" alt="" class="centered">
             </td></tr>
 
             <tr><td>
@@ -406,7 +352,7 @@
 
         <script type="text/template" id="loading-small-template">
             <p class="sbgn-text"> <%= name %> </p>
-            <img class="centered" src="sampleapp-images/loading-small.gif" height="auto" width="auto" align="middle">
+            <img class="centered" src="img/loading-small.gif" height="auto" width="auto" align="middle">
         </script>
 
         <script type="text/template" id="layout-settings-template">
@@ -719,56 +665,40 @@
         </script>
 
         <!--global variables-->
-        <script src="sampleapp-components/js/sample-app-global-variables.js"></script>
+        <script src="js/sbgnviz-global.js"></script>
         
         <!-- External Libraries -->
-        <script src="../node_modules/jquery/dist/jquery.js"></script>
-        <script src="../node_modules/jquery.browser/dist/jquery.browser.js"></script>
-        <script src="../lib/js/jquery.fancybox-1.3.4.js"></script>
-        <script src="../node_modules/jquery-expander/jquery.expander.js"></script>
-        <script src="../node_modules/qtip2/dist/jquery.qtip.js"></script>
-        <script src="../node_modules/bootstrap/dist/js/bootstrap.js"></script>
-        <script src="../node_modules/jquery-ui-bundle/jquery-ui.js"></script>
-        <script src="../node_modules/backbone/node_modules/underscore/underscore.js"></script>
-        <script src="../node_modules/backbone/backbone.js"></script>
-        <script src="../lib/js/cytoscape.js"></script>
-        <script src="../node_modules/cytoscape-panzoom/cytoscape-panzoom.js"></script>
-        <script src="../node_modules/cytoscape-qtip/cytoscape-qtip.js"></script>
-        <script src="../node_modules/filesaverjs/FileSaver.js"></script>
-        <script src="../lib/js/jquery.noty.packaged.min.js"></script>
-        <script src="../node_modules/cytoscape-cose-bilkent/cytoscape-cose-bilkent.js"></script>
-        <script src="../node_modules/cytoscape-undo-redo/cytoscape-undo-redo.js"></script>
-        <script src="../node_modules/cytoscape-clipboard/cytoscape-clipboard.js"></script>
-        <script src="../node_modules/cytoscape-context-menus/cytoscape-context-menus.js"></script>
-        <script src="../node_modules/cytoscape-expand-collapse/cytoscape-expand-collapse.js"></script>
-        <script src="../node_modules/cytoscape-edge-bend-editing/cytoscape-edge-bend-editing.js"></script>
-        <script src="../node_modules/cytoscape-view-utilities/cytoscape-view-utilities.js"></script>
+        <script src="node_modules/jquery/dist/jquery.js"></script>
+        <script src="node_modules/jquery.browser/dist/jquery.browser.js"></script>
+        <script src="lib/js/jquery.fancybox-1.3.4.js"></script>
+        <script src="node_modules/jquery-expander/jquery.expander.js"></script>
+        <script src="node_modules/qtip2/dist/jquery.qtip.js"></script>
+        <script src="node_modules/bootstrap/dist/js/bootstrap.js"></script>
+        <script src="node_modules/jquery-ui-bundle/jquery-ui.js"></script>
+        <script src="node_modules/underscore/underscore-min.js"></script>
+        <script src="node_modules/backbone/backbone-min.js"></script>
+        <script src="lib/js/cytoscape.js"></script>
+        <script src="node_modules/cytoscape-panzoom/cytoscape-panzoom.js"></script>
+        <script src="node_modules/cytoscape-qtip/cytoscape-qtip.js"></script>
+        <script src="node_modules/filesaverjs/FileSaver.js"></script>
+        <script src="lib/js/jquery.noty.packaged.min.js"></script>
+        <script src="node_modules/cytoscape-cose-bilkent/cytoscape-cose-bilkent.js"></script>
+        <script src="node_modules/cytoscape-undo-redo/cytoscape-undo-redo.js"></script>
+        <script src="node_modules/cytoscape-clipboard/cytoscape-clipboard.js"></script>
+        <script src="node_modules/cytoscape-context-menus/cytoscape-context-menus.js"></script>
+        <script src="node_modules/cytoscape-expand-collapse/cytoscape-expand-collapse.js"></script>
+        <script src="node_modules/cytoscape-edge-bend-editing/cytoscape-edge-bend-editing.js"></script>
+        <script src="node_modules/cytoscape-view-utilities/cytoscape-view-utilities.js"></script>
 
         <!-- Core SBGNViz components -->
-        <script src="../src/sbgn-extensions/cytoscape.renderer.canvas.sbgn-renderer.js"></script>
-        <script src="../src/utilities/number-input-utilities.js"></script>
-        <script src="../src/utilities/dialog-utilities.js"></script>
-        <script src="../src/utilities/fancybox-utilities.js"></script>
-        <script src="../src/utilities/sbgn-style-rules.js"></script>
-        <script src="../src/utilities/json-to-sbgnml-converter.js"></script>
-        <script src="../src/utilities/sbgnml-to-json-converter.js"></script>
-        <script src="../src/utilities/sbgn-filtering.js"></script>
-        <script src="../src/utilities/sbgn-element-utilities.js"></script>
-        <script src="../src/utilities/add-remove-utilities.js"></script>
-        
-        
+        <script src="js/sbgn-extensions/cytoscape.renderer.canvas.sbgn-renderer.js"></script>
+        <script src="js/utilities/dialog-utilities.js"></script>
+        <script src="js/utilities/json-to-sbgnml-converter.js"></script>
+        <script src="js/utilities/sbgnml-to-json-converter.js"></script>
+        <script src="js/utilities/sbgn-element-utilities.js"></script>
         <!-- Sample application components -->
-        <script src="sampleapp-components/js/add-remove-action-functions.js"></script>
-        <script src="sampleapp-components/js/general-action-functions.js"></script>
-        <script src="sampleapp-components/js/register-undo-redo-actions.js"></script>
-        
-        <script src="sampleapp-components/js/general-sample-app-functions.js"></script>
-        <script src="sampleapp-components/js/sample-app-stylesheet-helpers.js"></script>
-        <script src="sampleapp-components/js/common-element-properties.js"></script>
-        <script src="sampleapp-components/js/sample-app-cytoscape-sbgn.js"></script>
-        <script src="sampleapp-components/js/sample-app-menu-functions.js"></script>
-        <script src="sampleapp-components/js/sample-app-mode-handler.js"></script>
-        <script src="sampleapp-components/js/biogene-info.js"></script>
-
+        <script src="js/sbgnviz-style.js"></script>
+        <script src="js/sbgnviz.js"></script>
+        <script src="js/biogene-info.js"></script>
     </body>
 </html>

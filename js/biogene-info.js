@@ -19,6 +19,8 @@
 
 /**
  * Backbone view for the BioGene information.
+ *
+ * TODO: make this an external NPM module (dependency)?..
  */
 var BioGeneView = Backbone.View.extend({
 
@@ -184,7 +186,8 @@ var bioGeneQtip = function (node) {
           geneClass != 'unspecified entity')
     return;
 
-  var queryScriptURL = "sampleapp-components/php/BioGeneQuery.php";
+  // use a biogene proxy (no PHP) to enable CORS requests (AJAX)
+  var queryScriptURL = "http://www.pathwaycommons.org/biogene/retrieve.do"; //="sampleapp-components/php/BioGeneQuery.php";
   var geneName = node._private.data.sbgnlabel;
 
   // set the query parameters
@@ -199,31 +202,30 @@ var bioGeneQtip = function (node) {
     content: {
       text: function (event, api) {
         $.ajax({
-          type: "POST",
+          type: "GET", //"POST",
           url: queryScriptURL,
           async: true,
-          data: queryParams,
-        })
-                .then(function (content) {
-                  queryResult = JSON.parse(content);
-                  if (queryResult.count > 0 && queryParams.query != "" && typeof queryParams.query != 'undefined')
-                  {
-                    var info = (new BioGeneView(
-                            {
-                              el: '#biogene-container',
-                              model: queryResult.geneInfo[0]
-                            })).render();
-                    var html = $('#biogene-container').html();
-                    api.set('content.text', html);
-                  }
-                  else {
-                    api.set('content.text', "No additional information available &#013; for the selected node!");
-                  }
-                }, function (xhr, status, error) {
-                  api.set('content.text', "Error retrieving data: " + error);
-                });
-        api.set('content.title', node._private.data.sbgnlabel);
-        return _.template($("#loading-small-template").html());
+          data: queryParams
+        }).then(function (queryResult) {
+            // - json parse is not required when no PHP involved
+            if (queryResult.count > 0 && queryParams.query)
+            {
+                var info = (new BioGeneView(
+                    {
+                        el: '#biogene-container',
+                        model: queryResult.geneInfo[0]
+                    })).render();
+                var html = $('#biogene-container').html();
+                api.set('content.text', html);
+            }
+            else {
+                api.set('content.text', "No additional information available &#013; for the selected node!");
+            }
+        }, function (xhr, status, error) {
+            api.set('content.text', "Error retrieving data: " + error);
+        });
+          api.set('content.title', node._private.data.sbgnlabel);
+          return _.template($("#loading-small-template").html());
       }
     },
     show: {

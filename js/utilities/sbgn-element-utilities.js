@@ -1,0 +1,241 @@
+var sbgnElementUtilities = {
+    //the list of the element classes handled by the tool
+    handledElements: {
+        'unspecified entity': true,
+        'simple chemical': true,
+        'macromolecule': true,
+        'nucleic acid feature': true,
+        'perturbing agent': true,
+        'source and sink': true,
+        'complex': true,
+        'process': true,
+        'omitted process': true,
+        'uncertain process': true,
+        'association': true,
+        'dissociation': true,
+        'phenotype': true,
+        'tag': true,
+        'consumption': true,
+        'production': true,
+        'modulation': true,
+        'stimulation': true,
+        'catalysis': true,
+        'inhibition': true,
+        'necessary stimulation': true,
+        'logic arc': true,
+        'equivalence arc': true,
+        'and operator': true,
+        'or operator': true,
+        'not operator': true,
+        'and': true,
+        'or': true,
+        'not': true,
+        'nucleic acid feature multimer': true,
+        'macromolecule multimer': true,
+        'simple chemical multimer': true,
+        'complex multimer': true,
+        'compartment': true
+    },
+
+    //this method returns the nodes non of whose ancestors is not in given nodes
+    getTopMostNodes: function (nodes) {
+        var nodesMap = {};
+        for (var i = 0; i < nodes.length; i++) {
+            nodesMap[nodes[i].id()] = true;
+        }
+        var roots = nodes.filter(function (i, ele) {
+            var parent = ele.parent()[0];
+            while(parent != null){
+              if(nodesMap[parent.id()]){
+                return false;
+              }
+              parent = parent.parent()[0];
+            }
+            return true;
+        });
+
+        return roots;
+    },
+    //This method checks if all of the given nodes have the same parent assuming that the size 
+    //of  nodes is not 0
+    allHaveTheSameParent: function (nodes) {
+        if (nodes.length == 0) {
+            return true;
+        }
+        var parent = nodes[0].data("parent");
+        for (var i = 0; i < nodes.length; i++) {
+            var node = nodes[i];
+            if (node.data("parent") != parent) {
+                return false;
+            }
+        }
+        return true;
+    },
+    //This method propogates given replacement to the children of the given node recursively
+    propogateReplacementToChildren: function (node, dx, dy) {
+        var children = node.children();
+        for(var i = 0; i < children.length; i++){
+            var child = children[i];
+            child.position({
+               x: child.position('x') + dx,
+               y: child.position('y') + dy
+            });
+            
+            this.propogateReplacementToChildren(child, dx, dy);
+        }
+    },
+    moveNodes: function(positionDiff, nodes, notCalcTopMostNodes) {
+      var topMostNodes = notCalcTopMostNodes ? nodes : sbgnElementUtilities.getTopMostNodes(nodes);
+      for (var i = 0; i < topMostNodes.length; i++) {
+        var node = topMostNodes[i];
+        var oldX = node.position("x");
+        var oldY = node.position("y");
+        node.position({
+          x: oldX + positionDiff.x,
+          y: oldY + positionDiff.y
+        });
+        var children = node.children();
+        this.moveNodes(positionDiff, children, true);
+      }
+    },
+    convertToModelPosition: function (renderedPosition) {
+      var pan = cy.pan();
+      var zoom = cy.zoom();
+
+      var x = (renderedPosition.x - pan.x) / zoom;
+      var y = (renderedPosition.y - pan.y) / zoom;
+
+      return {
+        x: x,
+        y: y
+      };
+    },
+    //the following were moved here from what used to be utilities/sbgn-filtering.js
+    processTypes : ['process', 'omitted process', 'uncertain process',
+        'association', 'dissociation', 'phenotype'],
+    deleteSelected: function(){
+        var allNodes = cy.nodes();
+        var selectedNodes = cy.nodes(":selected");
+        cy.elements().unselect();
+        var nodesToShow = this.expandRemainingNodes(selectedNodes, allNodes);
+        var nodesNotToShow = allNodes.not(nodesToShow);
+        var connectedEdges = nodesNotToShow.connectedEdges();
+        var removedEles = connectedEdges.remove();
+        removedEles = removedEles.union(nodesNotToShow.remove());
+        return removedEles;
+    },
+    getProcessesOfSelected: function(){
+        var selectedEles = cy.elements(":selected");
+        selectedEles = this.expandNodes(selectedEles);
+        return selectedEles;
+    },
+    getNeighboursOfSelected: function(){
+        var selectedEles = cy.elements(":selected");
+        selectedEles = selectedEles.add(selectedEles.parents("node[sbgnclass='complex']"));
+        selectedEles = selectedEles.add(selectedEles.descendants());
+        var neighborhoodEles = selectedEles.neighborhood();
+        var elesToHighlight = selectedEles.add(neighborhoodEles);
+        elesToHighlight = elesToHighlight.add(elesToHighlight.descendants());
+        return elesToHighlight;
+    },
+    expandNodes: function(nodesToShow){
+        var self = this;
+        //add children
+        nodesToShow = nodesToShow.add(nodesToShow.nodes().descendants());
+        //add parents
+        nodesToShow = nodesToShow.add(nodesToShow.parents());
+        //add complex children
+        nodesToShow = nodesToShow.add(nodesToShow.nodes("node[sbgnclass='complex']").descendants());
+
+        // var processes = nodesToShow.nodes("node[sbgnclass='process']");
+        // var nonProcesses = nodesToShow.nodes("node[sbgnclass!='process']");
+        // var neighborProcesses = nonProcesses.neighborhood("node[sbgnclass='process']");
+
+        var processes = nodesToShow.filter(function(){
+            return $.inArray(this._private.data.sbgnclass, self.processTypes) >= 0;
+        });
+        var nonProcesses = nodesToShow.filter(function(){
+            return $.inArray(this._private.data.sbgnclass, self.processTypes) === -1;
+        });
+        var neighborProcesses = nonProcesses.neighborhood().filter(function(){
+            return $.inArray(this._private.data.sbgnclass, self.processTypes) >= 0;
+        });
+
+        nodesToShow = nodesToShow.add(processes.neighborhood());
+        nodesToShow = nodesToShow.add(neighborProcesses);
+        nodesToShow = nodesToShow.add(neighborProcesses.neighborhood());
+
+        //add parents
+        nodesToShow = nodesToShow.add(nodesToShow.nodes().parents());
+        //add children
+        nodesToShow = nodesToShow.add(nodesToShow.nodes("node[sbgnclass='complex']").descendants());
+
+        return nodesToShow;
+    },
+    expandRemainingNodes: function(nodesToFilter, allNodes){
+        nodesToFilter = this.expandNodes(nodesToFilter);
+        var nodesToShow = allNodes.not(nodesToFilter);
+        nodesToShow = this.expandNodes(nodesToShow);
+        return nodesToShow;
+    },
+    noneIsNotHighlighted: function(){
+        var notHighlightedNodes = cy.nodes(":visible").nodes(".unhighlighted");
+        var notHighlightedEdges = cy.edges(":visible").edges(".unhighlighted");
+
+        return notHighlightedNodes.length + notHighlightedEdges.length === 0;
+    },
+    // the following were moved here from what used to be add-remove-utilities.js
+    //TODO: remove add/remove features (it's SBGN VIEWER, not editor...)
+    removeNodes: function (nodes) {
+        var removedEles = nodes.connectedEdges().remove();
+        var children = nodes.children();
+        if (children != null && children.length > 0) {
+            removedEles = removedEles.union(this.removeNodes(children));
+        }
+        var parents = nodes.parents();
+        removedEles = removedEles.union(nodes.remove());
+        cy.nodes().updateCompoundBounds();
+        refreshPaddings();
+        return removedEles;
+    },
+    removeEdges: function (edges) {
+        return edges.remove();
+    },
+    restoreEles: function (eles) {
+        eles.restore();
+        return eles;
+    },
+    removeElesSimply: function (eles) {
+        cy.elements().unselect();
+        return eles.remove();
+    },
+    removeEles: function (eles) {
+        cy.elements().unselect();
+        var edges = eles.edges();
+        var nodes = eles.nodes();
+        var removedEles = this.removeEdges(edges);
+        removedEles = removedEles.union(this.removeNodes(nodes));
+        return removedEles;
+    },
+    // the following were moved here from what used to be add-remove-action-functions.js (removing duplicate declarations)
+    restoreSelected: function (eles) {
+        var param = {};
+        param.eles = restoreEles(eles);
+        param.firstTime = false;
+        return param;
+    },
+    deleteSelected: function (param) {
+        if (param.firstTime) {
+            return deleteSelected();
+        }
+        return this.removeElesSimply(param.eles);
+    },
+    // (this is the only function) moved here from common-element-properies.js
+    isEPNClass: function(sbgnclass) {
+        return (sbgnclass == 'unspecified entity'
+        || sbgnclass == 'simple chemical'
+        || sbgnclass == 'macromolecule'
+        || sbgnclass == 'nucleic acid feature'
+        || sbgnclass == 'complex');
+    }
+};
