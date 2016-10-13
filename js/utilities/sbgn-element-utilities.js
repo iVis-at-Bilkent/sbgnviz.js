@@ -226,7 +226,7 @@ var sbgnElementUtilities = {
     },
     deleteSelected: function (param) {
         if (param.firstTime) {
-            return deleteSelected();
+            return this.removeEles(param.eles);
         }
         return this.removeElesSimply(param.eles);
     },
@@ -354,7 +354,6 @@ var sbgnElementUtilities = {
     },
     getDynamicLabelTextSize: function(ele) {
         // Calculates the dynamic label size for the given node.
-
         var dynamicLabelSize = sbgnStyleRules['dynamic-label-size'];
         var dynamicLabelSizeCoefficient;
 

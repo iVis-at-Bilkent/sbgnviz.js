@@ -6,4 +6,3 @@ window.cyArrowShapes = {};
 window.modeHandler = {
     mode: "selection-mode"
 };
-

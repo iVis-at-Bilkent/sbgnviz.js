@@ -1,15 +1,13 @@
 function loadXMLDoc(filename) {
   if (window.XMLHttpRequest) {
     xhttp = new XMLHttpRequest();
-  }
-  else {
+  } else {
     xhttp = new ActiveXObject("Microsoft.XMLHTTP");
   }
   xhttp.open("GET", filename, false);
   xhttp.send();
   return xhttp.responseXML;
 }
-;
 
 function textToXmlObject(text) {
   if (window.ActiveXObject) {
@@ -22,7 +20,6 @@ function textToXmlObject(text) {
   }
   return doc;
 }
-;
 
 var sbgnmlToJson = {
   insertedNodes: {},

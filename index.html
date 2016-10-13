@@ -22,7 +22,6 @@
 
         <!-- Loading sample app css -->
         <link href="css/sbgnviz.css" rel="stylesheet">
-
     </head>
 
     <body>
@@ -664,11 +663,11 @@
             Right click to a node to see its detailed information
         </script>
 
-        <!--global variables-->
+        <!--global variables script must come first-->
         <script src="js/sbgnviz-global.js"></script>
         
         <!-- External Libraries -->
-        <script src="node_modules/jquery/dist/jquery.js"></script>
+        <script src="node_modules/jquery/dist/jquery.min.js"></script>
         <script src="node_modules/jquery.browser/dist/jquery.browser.js"></script>
         <script src="lib/js/jquery.fancybox-1.3.4.js"></script>
         <script src="node_modules/jquery-expander/jquery.expander.js"></script>
@@ -690,14 +689,13 @@
         <script src="node_modules/cytoscape-edge-bend-editing/cytoscape-edge-bend-editing.js"></script>
         <script src="node_modules/cytoscape-view-utilities/cytoscape-view-utilities.js"></script>
 
-        <!-- Core SBGNViz components -->
+        <!-- SBGNViz components -->
         <script src="js/sbgn-extensions/cytoscape.renderer.canvas.sbgn-renderer.js"></script>
         <script src="js/utilities/dialog-utilities.js"></script>
         <script src="js/utilities/json-to-sbgnml-converter.js"></script>
         <script src="js/utilities/sbgnml-to-json-converter.js"></script>
         <script src="js/utilities/sbgn-element-utilities.js"></script>
-        <!-- Sample application components -->
-        <script src="js/sbgnviz.js"></script>
         <script src="js/biogene-info.js"></script>
+        <script src="js/sbgnviz.js"></script>
     </body>
 </html>
