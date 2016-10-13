@@ -1,12 +1,9 @@
-/nbproject
+/nbproject/
+
 *.xml
 
-.idea/vcs.xml
+.idea/
 
-.idea/sbgnviz-js.iml
-
-.idea/modules.xml
-
-.idea/misc.xml
 /HTML5Application/nbproject/private/
+
 node_modules/
