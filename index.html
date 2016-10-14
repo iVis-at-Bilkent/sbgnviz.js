@@ -6,22 +6,50 @@
         <title>SBGNViz.js</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        <!-- jQuery UI -->
-        <link href="lib/css/jquery-ui.css" rel="stylesheet">
+        <link href="node_modules/jquery-ui-bundle/jquery-ui.css" rel="stylesheet">
         <link href="lib/css/jquery.fancybox-1.3.4.css" rel="stylesheet">
-
-        <!-- Loading Bootstrap -->
         <link href="lib/css/bootstrap.css" rel="stylesheet">
-
-        <!-- Loading cytoscape.js plugins -->
-        <link href="lib/css/cytoscape.js-panzoom.css" rel="stylesheet" type="text/css" />
-        <link href="lib/css/font-awesome-4.0.3/css/font-awesome.css" rel="stylesheet" type="text/css" />
+        <!--does NOT work:  <link href="node_modules/bootstrap/dist/css/bootstrap.css" rel="stylesheet">-->
+        <!--cytoscape.js plugins -->
+        <link href="node_modules/cytoscape-panzoom/cytoscape.js-panzoom.css" rel="stylesheet" type="text/css" />
+        <link href="node_modules/cytoscape-panzoom/font-awesome-4.0.3/css/font-awesome.css" rel="stylesheet" type="text/css" />
         <link href="lib/css/jquery.qtip.min.css" rel="stylesheet" type="text/css" />
         <link href="node_modules/cytoscape-context-menus/cytoscape-context-menus.css" rel="stylesheet" type="text/css" />
-<!--        <link href="../node_modules/cytoscape-edge-bend-editing/cytoscape.js-edge-bend-editing.css" rel="stylesheet" type="text/css" />-->
-
-        <!-- Loading sample app css -->
+        <!-- app's style -->
         <link href="css/sbgnviz.css" rel="stylesheet">
+
+        <!--global variables must come first-->
+        <script src="js/sbgnviz-global.js"></script>
+        <!-- libraries -->
+        <script src="node_modules/jquery/dist/jquery.min.js"></script>
+        <script src="node_modules/jquery.browser/dist/jquery.browser.js"></script>
+        <script src="lib/js/jquery.fancybox-1.3.4.js"></script>
+        <script src="node_modules/jquery-expander/jquery.expander.js"></script>
+        <script src="node_modules/qtip2/dist/jquery.qtip.js"></script>
+        <script src="node_modules/bootstrap/dist/js/bootstrap.js"></script>
+        <script src="node_modules/jquery-ui-bundle/jquery-ui.js"></script>
+        <script src="node_modules/underscore/underscore-min.js"></script>
+        <script src="node_modules/backbone/backbone-min.js"></script>
+        <script src="lib/js/cytoscape.js"></script>
+        <script src="node_modules/cytoscape-panzoom/cytoscape-panzoom.js"></script>
+        <script src="node_modules/cytoscape-qtip/cytoscape-qtip.js"></script>
+        <script src="node_modules/filesaverjs/FileSaver.js"></script>
+        <script src="lib/js/jquery.noty.packaged.min.js"></script>
+        <script src="node_modules/cytoscape-cose-bilkent/cytoscape-cose-bilkent.js"></script>
+        <script src="node_modules/cytoscape-undo-redo/cytoscape-undo-redo.js"></script>
+        <script src="node_modules/cytoscape-clipboard/cytoscape-clipboard.js"></script>
+        <script src="node_modules/cytoscape-context-menus/cytoscape-context-menus.js"></script>
+        <script src="node_modules/cytoscape-expand-collapse/cytoscape-expand-collapse.js"></script>
+        <script src="node_modules/cytoscape-edge-bend-editing/cytoscape-edge-bend-editing.js"></script>
+        <script src="node_modules/cytoscape-view-utilities/cytoscape-view-utilities.js"></script>
+        <!-- components -->
+        <script src="js/sbgn-extensions/cytoscape.renderer.canvas.sbgn-renderer.js"></script>
+        <script src="js/utilities/dialog-utilities.js"></script>
+        <script src="js/utilities/json-to-sbgnml-converter.js"></script>
+        <script src="js/utilities/sbgnml-to-json-converter.js"></script>
+        <script src="js/utilities/sbgn-element-utilities.js"></script>
+        <script src="js/biogene-info.js"></script>
+        <script src="js/sbgnviz.js"></script>
     </head>
 
     <body>
@@ -662,40 +690,5 @@
         <script type="text/template" id="noty-info">
             Right click to a node to see its detailed information
         </script>
-
-        <!--global variables script must come first-->
-        <script src="js/sbgnviz-global.js"></script>
-        
-        <!-- External Libraries -->
-        <script src="node_modules/jquery/dist/jquery.min.js"></script>
-        <script src="node_modules/jquery.browser/dist/jquery.browser.js"></script>
-        <script src="lib/js/jquery.fancybox-1.3.4.js"></script>
-        <script src="node_modules/jquery-expander/jquery.expander.js"></script>
-        <script src="node_modules/qtip2/dist/jquery.qtip.js"></script>
-        <script src="node_modules/bootstrap/dist/js/bootstrap.js"></script>
-        <script src="node_modules/jquery-ui-bundle/jquery-ui.js"></script>
-        <script src="node_modules/underscore/underscore-min.js"></script>
-        <script src="node_modules/backbone/backbone-min.js"></script>
-        <script src="lib/js/cytoscape.js"></script>
-        <script src="node_modules/cytoscape-panzoom/cytoscape-panzoom.js"></script>
-        <script src="node_modules/cytoscape-qtip/cytoscape-qtip.js"></script>
-        <script src="node_modules/filesaverjs/FileSaver.js"></script>
-        <script src="lib/js/jquery.noty.packaged.min.js"></script>
-        <script src="node_modules/cytoscape-cose-bilkent/cytoscape-cose-bilkent.js"></script>
-        <script src="node_modules/cytoscape-undo-redo/cytoscape-undo-redo.js"></script>
-        <script src="node_modules/cytoscape-clipboard/cytoscape-clipboard.js"></script>
-        <script src="node_modules/cytoscape-context-menus/cytoscape-context-menus.js"></script>
-        <script src="node_modules/cytoscape-expand-collapse/cytoscape-expand-collapse.js"></script>
-        <script src="node_modules/cytoscape-edge-bend-editing/cytoscape-edge-bend-editing.js"></script>
-        <script src="node_modules/cytoscape-view-utilities/cytoscape-view-utilities.js"></script>
-
-        <!-- SBGNViz components -->
-        <script src="js/sbgn-extensions/cytoscape.renderer.canvas.sbgn-renderer.js"></script>
-        <script src="js/utilities/dialog-utilities.js"></script>
-        <script src="js/utilities/json-to-sbgnml-converter.js"></script>
-        <script src="js/utilities/sbgnml-to-json-converter.js"></script>
-        <script src="js/utilities/sbgn-element-utilities.js"></script>
-        <script src="js/biogene-info.js"></script>
-        <script src="js/sbgnviz.js"></script>
     </body>
 </html>
