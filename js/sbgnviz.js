@@ -124,7 +124,7 @@ function cytoscapeExtensionsAndContextMenu() {
       return ele.data('bendPointPositions');
     },
     // whether the bend editing operations are undoable (requires cytoscape-undo-redo.js)
-    undoable: false, // was 'true' in orig. sbgnviz
+    undoable: true,
     // title of remove bend point menu item
     removeBendMenuItemTitle: "Delete Bend Point"
   });
@@ -1189,8 +1189,7 @@ function registerUndoRedoActions() {
     });
 
     // register general actions
-    // (generalActionFunctions.changeBendPoints is undefined, perhaps removed in refactoring from editor to viewer...)
-    // ur.action("changeBendPoints", generalActionFunctions.changeBendPoints, generalActionFunctions.changeBendPoints);
+    // (generalActionFunctions.changeBendPoints is undefined, perhaps - removed in refactoring from editor to viewer...)
     // register add remove actions
     ur.action("removeEles", sbgnElementUtilities.removeEles, sbgnElementUtilities.restoreEles);
     ur.action("deleteSelected", sbgnElementUtilities.deleteSelected, sbgnElementUtilities.restoreSelected);
