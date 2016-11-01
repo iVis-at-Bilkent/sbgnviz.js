@@ -10,6 +10,23 @@ var defaultSbgnStyleRules = {
 
 var sbgnStyleRules = _.clone(this.defaultSbgnStyleRules);
 
+//A function to trigger incremental layout. 
+var triggerIncrementalLayout = function () {
+  beforePerformLayout();
+
+  var preferences = {
+    randomize: false,
+    animate: sbgnStyleRules['animate-on-drawing-changes'] ? 'end' : false,
+    fit: false
+  };
+
+  if (sbgnLayoutProp.currentLayoutProperties.animate === 'during') {
+    delete preferences.animate;
+  }
+
+  sbgnLayoutProp.applyLayout(preferences, false); // layout must not be undoable
+};
+
 var sbgnvizUpdate = function (cyGraph) {
   console.log('cy update called');
   
@@ -53,6 +70,13 @@ var getExpandCollapseOptions = function() {
     },
     animate: function(){
       return sbgnStyleRules['animate-on-drawing-changes'];
+    },
+    layoutBy: function(){
+      if(!sbgnStyleRules['rearrange-after-expand-collapse']) {
+        return;
+      }
+      
+      triggerIncrementalLayout();
     }
   };
 };
