@@ -141,7 +141,7 @@ body {
     margin: auto;
     border: 1px solid #ddd;
     height: 680px;
-    width: 1000px;
+    width: 800px;
     /*overflow: auto !important;*/
     overflow: hidden;
     border-radius: 0.25em;
@@ -149,12 +149,24 @@ body {
 }
 
 .target-cursor {
-    cursor: url(../../sampleapp-images/drag-target.cur), pointer;
+    cursor: url(../../sampleapp-images/drag-target.cur), pointer!important;
 }
 
 #sbgn-inspector-and-canvas {
     margin: auto;
     overflow: auto !important;
+}
+
+#sbgn-inspector {
+    margin: auto;
+    border: 1px solid #ddd;
+    height: 680px;
+    width: 200px;
+    overflow: auto !important;
+    border-radius: 0.25em;
+    /*padding-left: 2px;*/
+    padding-right: 2px;
+    /*float: right;*/
 }
 
 .inside-menu {
@@ -256,6 +268,17 @@ body {
     border-radius: 5px;
 }
 
+.selectedTypeSustainable > .btn-selectedTypeSustainable {
+  background-color: #cccccc;
+  *background-color: #bfbfbf;
+  background-image: -moz-linear-gradient(top, #d9d9d9, #cccccc);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#d9d9d9), to(#cccccc));
+  background-image: -webkit-linear-gradient(top, #d9d9d9, #cccccc);
+  background-image: -o-linear-gradient(top, #d9d9d9, #cccccc);
+  background-image: linear-gradient(to bottom, #d9d9d9, #cccccc);
+  background-repeat: repeat-x;
+}
+
 .selectedMenuItem {
     background-color: gray;
 }
@@ -314,6 +337,15 @@ img.sbgn-toolbar-element:hover {
 
 #align-dd-button:focus {
     outline: none;
+}
+
+#node-label-textbox {
+    position: absolute;
+    top: 150px;
+    left: 150px;
+    z-index: 100;
+    display: none;
+    width: 100px;
 }
 
 .dd-list-href {
@@ -406,6 +438,12 @@ menu:not([title]):before{
     content:"\2630";
 }
 
+.inspector-input-box{
+    padding-bottom: 0.5px !important;
+    padding-top: 0.5px !important;
+    margin-bottom: 2px !important;
+}
+
 .dialog-table * {
     margin-bottom: 0px !important;
     padding-bottom: 2px !important;
@@ -419,5 +457,33 @@ menu:not([title]):before{
 }
 
 .customized-context-menus-menu-item {
-    width: 150px !important;
+    width: 175px !important;
+}
+
+.accordion-toggle:after {
+    /* symbol for "opening" panels */
+    font-family: 'Glyphicons Halflings';  /* essential for enabling glyphicon */
+    content:"\25B3"; 
+    float: right;     
+}
+
+.accordion-toggle.collapsed:after {
+    /* symbol for "collapsed" panels */
+    content:"\25BD";
+}
+
+hr.inspector-divider {
+    padding: 0px !important;
+    margin-top: 5px !important;
+    margin-bottom: 5px !important;
+    width: 100% !important;
+}
+
+.sbgn-label-font {
+    font-size: 11px !important;
+    /*font-weight: bold;*/
+}
+
+#biogene-template-div th {
+    text-align: right;
 }

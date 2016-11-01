@@ -9,7 +9,6 @@ function loadXMLDoc(filename) {
   xhttp.send();
   return xhttp.responseXML;
 }
-;
 
 function textToXmlObject(text) {
   if (window.ActiveXObject) {
@@ -22,7 +21,6 @@ function textToXmlObject(text) {
   }
   return doc;
 }
-;
 
 var sbgnmlToJson = {
   insertedNodes: {},

@@ -1,557 +1,557 @@
 <?xml version='1.0' encoding='UTF-8' standalone='yes'?>
-<sbgn xmlns='http://sbgn.org/libsbgn/pd/0.1'>
-<map>
+<sbgn xmlns='http://sbgn.org/libsbgn/0.2'>
+<map language='process description'>
 <glyph id='nucleoplasm' class='compartment'  >
 <label text='nucleoplasm' />
-<bbox y='9.617870951978546' x='155.6405302159763' w='819.8258' h='745.1245' />
+<bbox y='17.58503059552254' x='17.065742691358082' w='1131.507131012282' h='844.2160121434334' />
 </glyph>
 <glyph id='http___www.reactome.org_biopax_48887Complex2697' class='complex'  compartmentRef='nucleoplasm' >
 <label text='53BP1:H2AX complex at site of double-strand break' />
-<bbox y='489.14566366744816' x='871.4044668241731' w='96.999985' h='101.0' />
+<bbox y='560.3458284178022' x='829.6427431678823' w='119.29999999999995' h='101.29999999999995' />
 <glyph id='http___www.reactome.org_biopax_48887Protein8106_http___www.reactome.org_biopax_48887Complex2697' class='macromolecule' >
 <label text='MDC1' />
-<bbox y='554.6456636674482' x='864.9044593241731' w='48.0' h='20.0' />
+<bbox y='562.0958284178022' x='899.1927431678822' w='48' h='45' />
 </glyph>
 <glyph id='http___www.reactome.org_biopax_48887Protein8109_http___www.reactome.org_biopax_48887Complex2697' class='macromolecule' >
 <label text='TP53BP1' />
-<bbox y='554.6456636674482' x='922.9044593241731' w='48.0' h='20.0' />
+<bbox y='614.8958284178021' x='831.3927431678823' w='48' h='45' />
 </glyph>
 <glyph id='http___www.reactome.org_biopax_48887PhysicalEntity136_http___www.reactome.org_biopax_48887Complex2697' class='unspecified entity' >
 <label text='DNA double-strand break ends' />
-<bbox y='504.64566366744816' x='864.9044593241731' w='40.0' h='40.0' />
+<bbox y='614.8958284178021' x='887.1927431678822' w='40' h='40' />
 </glyph>
 <glyph id='http___www.reactome.org_biopax_48887Protein1283_http___www.reactome.org_biopax_48887Complex2697' class='macromolecule' >
 <label text='H2AFX' />
-<bbox y='504.64566366744816' x='914.9044593241731' w='60.0' h='20.0' />
+<bbox y='562.0958284178022' x='831.3927431678823' w='60' h='45' />
 <glyph id='http___www.reactome.org_biopax_48887Protein1283_http___www.reactome.org_biopax_48887Complex2697.state.1' class='state variable'>
 <state value='P' variable='S139' />
-<bbox y='517.1456636674482' x='919.9044643241731' w='50.0' h='15.0' />
+<bbox y='599.5958284178022' x='836.3927481678822' w='50.0' h='15.0' />
 </glyph>
 </glyph>
 </glyph>
 <glyph id='http___www.reactome.org_biopax_48887Complex2701' class='complex'  compartmentRef='nucleoplasm' >
 <label text='BRCA1:53BP1 complex at site of DNA double-strand break' />
-<bbox y='333.65782060634683' x='996.7961418324664' w='97.0' h='126.0' />
+<bbox y='416.53650787847675' x='986.7228737036401' w='155.0999999999999' h='101.30000000000007' />
 <glyph id='http___www.reactome.org_biopax_48887Protein8106_http___www.reactome.org_biopax_48887Complex2701' class='macromolecule' >
 <label text='MDC1' />
-<bbox y='396.65782060634683' x='990.2961418324664' w='48.0' h='20.0' />
+<bbox y='418.28650787847675' x='1056.27287370364' w='48' h='45' />
 </glyph>
 <glyph id='http___www.reactome.org_biopax_48887Protein1277_http___www.reactome.org_biopax_48887Complex2701' class='macromolecule' >
 <label text='BRCA1' />
-<bbox y='396.65782060634683' x='1048.2961418324664' w='48.0' h='20.0' />
+<bbox y='471.08650787847677' x='988.4728737036401' w='48' h='45' />
 </glyph>
 <glyph id='http___www.reactome.org_biopax_48887Protein8109_http___www.reactome.org_biopax_48887Complex2701' class='macromolecule' >
 <label text='TP53BP1' />
-<bbox y='426.65782060634683' x='990.2961418324664' w='48.0' h='20.0' />
+<bbox y='471.08650787847677' x='1044.27287370364' w='48' h='45' />
 </glyph>
 <glyph id='http___www.reactome.org_biopax_48887PhysicalEntity136_http___www.reactome.org_biopax_48887Complex2701' class='unspecified entity' >
 <label text='DNA double-strand break ends' />
-<bbox y='346.65782060634683' x='990.2961418324664' w='40.0' h='40.0' />
+<bbox y='471.08650787847677' x='1100.07287370364' w='40' h='40' />
 </glyph>
 <glyph id='http___www.reactome.org_biopax_48887Protein1283_http___www.reactome.org_biopax_48887Complex2701' class='macromolecule' >
 <label text='H2AFX' />
-<bbox y='346.65782060634683' x='1040.2961418324664' w='60.0' h='20.0' />
+<bbox y='418.28650787847675' x='988.4728737036401' w='60' h='45' />
 <glyph id='http___www.reactome.org_biopax_48887Protein1283_http___www.reactome.org_biopax_48887Complex2701.state.1' class='state variable'>
 <state value='P' variable='S139' />
-<bbox y='359.15782060634683' x='1045.2961448324666' w='50.0' h='15.0' />
+<bbox y='455.78650787847675' x='993.4728767036402' w='50.0' h='15.0' />
 </glyph>
 </glyph>
 </glyph>
 <glyph id='http___www.reactome.org_biopax_48887Complex2695' class='complex'  compartmentRef='nucleoplasm' >
 <label text='MDC1/NFBD1:gamma-H2AX complex' />
-<bbox y='72.51415878174976' x='580.0416787582803' w='64.0' h='56.0' />
+<bbox y='71.32554098218517' x='633.6535261851755' w='119.29999999999995' h='55.25' />
 <glyph id='http___www.reactome.org_biopax_48887Protein8106_http___www.reactome.org_biopax_48887Complex2695' class='macromolecule' >
 <label text='MDC1' />
-<bbox y='105.51415878174976' x='582.0416787582803' w='48.0' h='20.0' />
+<bbox y='73.07554098218517' x='703.2035261851754' w='48' h='45' />
 </glyph>
 <glyph id='http___www.reactome.org_biopax_48887Protein1283_http___www.reactome.org_biopax_48887Complex2695' class='macromolecule' >
 <label text='H2AFX' />
-<bbox y='75.51415878174976' x='582.0416787582803' w='60.0' h='20.0' />
+<bbox y='73.07554098218517' x='635.4035261851755' w='60' h='45' />
 <glyph id='http___www.reactome.org_biopax_48887Protein1283_http___www.reactome.org_biopax_48887Complex2695.state.1' class='state variable'>
 <state value='P' variable='S139' />
-<bbox y='88.01415878174976' x='587.0416787582803' w='50.0' h='15.0' />
+<bbox y='110.57554098218517' x='640.4035261851755' w='50.0' h='15.0' />
 </glyph>
 </glyph>
 </glyph>
 <glyph id='http___www.reactome.org_biopax_48887Complex2694' class='complex'  compartmentRef='nucleoplasm' >
 <label text='gamma H2AX:MDC1/NFBD1 complex at site of DNA double-strand break' />
-<bbox y='561.5618246314561' x='713.1009725656306' w='64.0' h='101.0' />
+<bbox y='630.9222210674491' x='656.056563016114' w='119.29999999999995' h='96.29999999999995' />
 <glyph id='http___www.reactome.org_biopax_48887Protein8106_http___www.reactome.org_biopax_48887Complex2694' class='macromolecule' >
 <label text='MDC1' />
-<bbox y='627.0618246314561' x='690.1009725656306' w='48.0' h='20.0' />
+<bbox y='632.6722210674491' x='725.6065630161139' w='48' h='45' />
 </glyph>
 <glyph id='http___www.reactome.org_biopax_48887PhysicalEntity136_http___www.reactome.org_biopax_48887Complex2694' class='unspecified entity' >
 <label text='DNA double-strand break ends' />
-<bbox y='577.0618246314561' x='690.1009725656306' w='40.0' h='40.0' />
+<bbox y='685.472221067449' x='657.806563016114' w='40' h='40' />
 </glyph>
 <glyph id='http___www.reactome.org_biopax_48887Protein1283_http___www.reactome.org_biopax_48887Complex2694' class='macromolecule' >
 <label text='H2AFX' />
-<bbox y='577.0618246314561' x='740.1009725656306' w='60.0' h='20.0' />
+<bbox y='632.6722210674491' x='657.806563016114' w='60' h='45' />
 <glyph id='http___www.reactome.org_biopax_48887Protein1283_http___www.reactome.org_biopax_48887Complex2694.state.1' class='state variable'>
 <state value='P' variable='S139' />
-<bbox y='589.5618246314561' x='745.1009725656306' w='50.0' h='15.0' />
+<bbox y='670.1722210674491' x='662.806563016114' w='50.0' h='15.0' />
 </glyph>
 </glyph>
 </glyph>
 <glyph id='http___www.reactome.org_biopax_48887Complex2698' class='complex'  compartmentRef='nucleoplasm' >
 <label text='gamma-H2AX:NBS1 complex at the site of double-strand break' />
-<bbox y='444.7011245028266' x='325.0333197722929' w='64.0' h='101.0' />
+<bbox y='493.5620572151105' x='322.4608680822181' w='119.30000000000001' h='96.29999999999995' />
 <glyph id='http___www.reactome.org_biopax_48887PhysicalEntity136_http___www.reactome.org_biopax_48887Complex2698' class='unspecified entity' >
 <label text='DNA double-strand break ends' />
-<bbox y='460.2011245028266' x='302.0333197722929' w='40.0' h='40.0' />
+<bbox y='548.1120572151104' x='324.21086808221804' w='40' h='40' />
 </glyph>
 <glyph id='http___www.reactome.org_biopax_48887Protein1283_http___www.reactome.org_biopax_48887Complex2698' class='macromolecule' >
 <label text='H2AFX' />
-<bbox y='460.2011245028266' x='352.0333197722929' w='60.0' h='20.0' />
+<bbox y='495.3120572151105' x='324.21086808221804' w='60' h='45' />
 <glyph id='http___www.reactome.org_biopax_48887Protein1283_http___www.reactome.org_biopax_48887Complex2698.state.1' class='state variable'>
 <state value='P' variable='S139' />
-<bbox y='472.7011245028266' x='357.0333197722929' w='50.0' h='15.0' />
+<bbox y='532.8120572151105' x='329.21086808221804' w='50.0' h='15.0' />
 </glyph>
 </glyph>
 <glyph id='http___www.reactome.org_biopax_48887Protein1271_http___www.reactome.org_biopax_48887Complex2698' class='macromolecule' >
 <label text='NBN' />
-<bbox y='510.2011245028266' x='302.0333197722929' w='48.0' h='20.0' />
+<bbox y='495.3120572151105' x='392.01086808221805' w='48' h='45' />
 </glyph>
 </glyph>
 <glyph id='http___www.reactome.org_biopax_48887Protein8107' class='macromolecule' compartmentRef='nucleoplasm' >
 <label text='NBN' />
-<bbox y='278.7142348306322' x='519.3512045486701' w='60.0' h='20.0' />
+<bbox y='215.55088389043323' x='587.0810391670534' w='60' h='45' />
 <glyph id='http___www.reactome.org_biopax_48887Protein8107.state.1' class='state variable'>
 <state value='P' variable='S343' />
-<bbox y='291.2142348306322' x='524.3512045486701' w='50.0' h='15.0' />
+<bbox y='253.05088389043323' x='592.0810391670534' w='50.0' h='15.0' />
 </glyph>
 </glyph>
 <glyph id='http___www.reactome.org_biopax_48887Protein1277' class='macromolecule' compartmentRef='nucleoplasm' >
 <label text='BRCA1' />
-<bbox y='351.1424459068701' x='746.9172968137066' w='48.0' h='20.0' />
+<bbox y='366.36042404677175' x='758.2733986263781' w='48' h='45' />
 </glyph>
 <glyph id='http___www.reactome.org_biopax_48887Protein1283' class='macromolecule' compartmentRef='nucleoplasm' >
 <label text='H2AFX' />
-<bbox y='364.9588254237758' x='576.4494053607752' w='60.0' h='20.0' />
+<bbox y='451.02962180619306' x='630.4100737570919' w='60' h='45' />
 <glyph id='http___www.reactome.org_biopax_48887Protein1283.state.1' class='state variable'>
 <state value='P' variable='S139' />
-<bbox y='377.4588254237758' x='581.4494053607752' w='50.0' h='15.0' />
+<bbox y='488.52962180619306' x='635.4100737570919' w='50.0' h='15.0' />
 </glyph>
 </glyph>
 <glyph id='http___www.reactome.org_biopax_48887Complex465' class='complex'  compartmentRef='nucleoplasm' >
 <label text='MRN' />
-<bbox y='304.156708179682' x='259.5634073906997' w='52.0' h='74.0' />
+<bbox y='310.32613316350546' x='256.95795666376523' w='107.30000000000001' h='101.30000000000001' />
 <glyph id='http___www.reactome.org_biopax_48887Protein1269_http___www.reactome.org_biopax_48887Complex465' class='macromolecule' >
 <label text='RAD50' />
-<bbox y='316.156708179682' x='232.5634073906997' w='48.0' h='20.0' />
+<bbox y='312.07613316350546' x='258.70795666376523' w='48' h='45' />
 </glyph>
 <glyph id='http___www.reactome.org_biopax_48887Protein1270_http___www.reactome.org_biopax_48887Complex465' class='macromolecule' >
 <label text='MRE11A' />
-<bbox y='346.156708179682' x='232.5634073906997' w='48.0' h='20.0' />
+<bbox y='312.07613316350546' x='314.50795666376524' w='48' h='45' />
 </glyph>
 <glyph id='http___www.reactome.org_biopax_48887Protein1271_http___www.reactome.org_biopax_48887Complex465' class='macromolecule' >
 <label text='NBN' />
-<bbox y='316.156708179682' x='290.5634073906997' w='48.0' h='20.0' />
+<bbox y='364.8761331635055' x='258.70795666376523' w='48' h='45' />
 </glyph>
 </glyph>
 <glyph id='http___www.reactome.org_biopax_48887Complex2700' class='complex'  compartmentRef='nucleoplasm' >
 <label text='DNA double-strand break ends: MRN complex' />
-<bbox y='425.4143898638547' x='37.310718599486165' w='97.0' h='126.0' />
+<bbox y='514.7670319964252' x='23.815742691358082' w='155.1' h='101.29999999999995' />
 <glyph id='http___www.reactome.org_biopax_48887Protein1269_http___www.reactome.org_biopax_48887Complex2700' class='macromolecule' >
 <label text='RAD50' />
-<bbox y='488.4143898638547' x='30.810718599486165' w='48.0' h='20.0' />
+<bbox y='516.5170319964252' x='93.36574269135808' w='48' h='45' />
 </glyph>
 <glyph id='http___www.reactome.org_biopax_48887PhysicalEntity136_http___www.reactome.org_biopax_48887Complex2700' class='unspecified entity' >
 <label text='DNA double-strand break ends' />
-<bbox y='438.4143898638547' x='30.810718599486165' w='40.0' h='40.0' />
+<bbox y='569.3170319964252' x='137.16574269135808' w='40' h='40' />
 </glyph>
 <glyph id='http___www.reactome.org_biopax_48887Protein1283_http___www.reactome.org_biopax_48887Complex2700' class='macromolecule' >
 <label text='H2AFX' />
-<bbox y='438.4143898638547' x='80.81071859948617' w='60.0' h='20.0' />
+<bbox y='516.5170319964252' x='25.565742691358082' w='60' h='45' />
 <glyph id='http___www.reactome.org_biopax_48887Protein1283_http___www.reactome.org_biopax_48887Complex2700.state.1' class='state variable'>
 <state value='P' variable='S139' />
-<bbox y='450.9143898638547' x='85.81071859948617' w='50.0' h='15.0' />
+<bbox y='554.0170319964252' x='30.565742691358082' w='50.0' h='15.0' />
 </glyph>
 </glyph>
 <glyph id='http___www.reactome.org_biopax_48887Protein1270_http___www.reactome.org_biopax_48887Complex2700' class='macromolecule' >
 <label text='MRE11A' />
-<bbox y='488.4143898638547' x='88.81071859948617' w='48.0' h='20.0' />
+<bbox y='569.3170319964252' x='25.565742691358082' w='48' h='45' />
 </glyph>
 <glyph id='http___www.reactome.org_biopax_48887Protein1271_http___www.reactome.org_biopax_48887Complex2700' class='macromolecule' >
 <label text='NBN' />
-<bbox y='518.4143898638547' x='30.810718599486165' w='48.0' h='20.0' />
+<bbox y='569.3170319964252' x='81.36574269135808' w='48' h='45' />
 </glyph>
 </glyph>
 <glyph id='http___www.reactome.org_biopax_48887Protein8104' class='macromolecule' compartmentRef='nucleoplasm' >
 <label text='ATM' />
-<bbox y='285.6907281594979' x='713.7277186410313' w='60.0' h='20.0' />
+<bbox y='291.33789860947314' x='736.9893613446237' w='60' h='45' />
 <glyph id='http___www.reactome.org_biopax_48887Protein8104.state.1' class='state variable'>
 <state value='P' variable='S1981' />
-<bbox y='298.1907281594979' x='718.7277186410313' w='50.0' h='15.0' />
+<bbox y='328.83789860947314' x='741.9893613446237' w='50.0' h='15.0' />
 </glyph>
 </glyph>
 <glyph id='http___www.reactome.org_biopax_48887Protein8109' class='macromolecule' compartmentRef='nucleoplasm' >
 <label text='TP53BP1' />
-<bbox y='724.3577921290189' x='901.6888875203103' w='48.0' h='20.0' />
+<bbox y='815.051042738956' x='871.8311501219981' w='48' h='45' />
 </glyph>
 <glyph id='http___www.reactome.org_biopax_48887Protein8105' class='macromolecule' compartmentRef='nucleoplasm' >
 <label text='BRCA1' />
-<bbox y='290.911147687372' x='904.7234866283193' w='115.0' h='20.0' />
+<bbox y='327.0206829278636' x='960.2288272236937' w='115' h='45' />
 <glyph id='http___www.reactome.org_biopax_48887Protein8105.state.1' class='state variable'>
 <state value='P' variable='S1542' />
-<bbox y='303.411147687372' x='909.7234866283193' w='50.0' h='15.0' />
+<bbox y='364.5206829278636' x='965.2288272236937' w='50.0' h='15.0' />
 </glyph>
 <glyph id='http___www.reactome.org_biopax_48887Protein8105.state.2' class='state variable'>
 <state value='P' variable='S1189' />
-<bbox y='303.411147687372' x='964.7235266283193' w='50.0' h='15.0' />
+<bbox y='364.5206829278636' x='1020.2288672236937' w='50.0' h='15.0' />
 </glyph>
 <glyph id='http___www.reactome.org_biopax_48887Protein8105.state.3' class='state variable'>
 <state value='P' variable='S1524' />
-<bbox y='303.411147687372' x='1019.7235266283193' w='50.0' h='15.0' />
+<bbox y='364.5206829278636' x='1075.2288672236937' w='50.0' h='15.0' />
 </glyph>
 </glyph>
 <glyph id='http___www.reactome.org_biopax_48887Protein8106' class='macromolecule' compartmentRef='nucleoplasm' >
 <label text='MDC1' />
-<bbox y='406.6877628126403' x='783.0061756270493' w='48.0' h='20.0' />
+<bbox y='432.47236031276054' x='798.0116325031023' w='48' h='45' />
 </glyph>
 <glyph id='http___www.reactome.org_biopax_48887Protein1269' class='macromolecule' compartmentRef='nucleoplasm' >
 <label text='RAD50' />
-<bbox y='20.002449774938214' x='287.77875793076134' w='48.0' h='20.0' />
+<bbox y='20.235804035457512' x='267.295108635714' w='48' h='45' />
 </glyph>
 <glyph id='http___www.reactome.org_biopax_48887Protein916' class='macromolecule' compartmentRef='nucleoplasm' >
 <label text='H2AFX' />
-<bbox y='441.0578514029107' x='666.2316354089062' w='48.0' h='20.0' />
+<bbox y='453.7492595987819' x='718.3824057165618' w='48' h='45' />
 </glyph>
 <glyph id='http___www.reactome.org_biopax_48887Complex2696' class='complex'  compartmentRef='nucleoplasm' >
 <label text='ATM associated with DNA double-strand break ends' />
-<bbox y='40.78032333264855' x='749.6490567638261' w='64.0' h='88.0' />
+<bbox y='24.335030595522575' x='822.6975812195832' w='131.29999999999995' h='101.3' />
 <glyph id='http___www.reactome.org_biopax_48887Protein8106_http___www.reactome.org_biopax_48887Complex2696' class='macromolecule' >
 <label text='MDC1' />
-<bbox y='59.78032333264855' x='792.6490567638261' w='48.0' h='20.0' />
+<bbox y='78.88503059552258' x='824.4475812195832' w='48' h='45' />
 </glyph>
 <glyph id='http___www.reactome.org_biopax_48887Protein1283_http___www.reactome.org_biopax_48887Complex2696' class='macromolecule' >
 <label text='H2AFX' />
-<bbox y='59.78032333264855' x='722.6490567638261' w='60.0' h='20.0' />
+<bbox y='26.085030595522582' x='824.4475812195832' w='60' h='45' />
 <glyph id='http___www.reactome.org_biopax_48887Protein1283_http___www.reactome.org_biopax_48887Complex2696.state.1' class='state variable'>
 <state value='P' variable='S139' />
-<bbox y='72.28032333264855' x='727.6490567638261' w='50.0' h='15.0' />
+<bbox y='63.58503059552258' x='829.4475812195832' w='50.0' h='15.0' />
 </glyph>
 </glyph>
 <glyph id='http___www.reactome.org_biopax_48887Protein8104_http___www.reactome.org_biopax_48887Complex2696' class='macromolecule' >
 <label text='ATM' />
-<bbox y='89.78032333264855' x='722.6490567638261' w='60.0' h='20.0' />
+<bbox y='26.085030595522582' x='892.2475812195831' w='60' h='45' />
 <glyph id='http___www.reactome.org_biopax_48887Protein8104_http___www.reactome.org_biopax_48887Complex2696.state.1' class='state variable'>
 <state value='P' variable='S1981' />
-<bbox y='102.28032333264855' x='727.6490567638261' w='50.0' h='15.0' />
+<bbox y='63.58503059552258' x='897.2475812195831' w='50.0' h='15.0' />
 </glyph>
 </glyph>
 </glyph>
 <glyph id='http___www.reactome.org_biopax_48887Protein1271' class='macromolecule' compartmentRef='nucleoplasm' >
 <label text='NBN' />
-<bbox y='336.3454506919868' x='504.09216670726437' w='48.0' h='20.0' />
+<bbox y='339.3799844151264' x='523.7465443316219' w='48' h='45' />
 </glyph>
 <glyph id='http___www.reactome.org_biopax_48887Protein1270' class='macromolecule' compartmentRef='nucleoplasm' >
 <label text='MRE11A' />
-<bbox y='75.64358563584756' x='185.42406264061822' w='48.0' h='20.0' />
+<bbox y='111.50322175534646' x='172.15324539190073' w='48' h='45' />
 </glyph>
 <glyph id='http___www.reactome.org_biopax_48887Complex2693' class='complex'  compartmentRef='nucleoplasm' >
 <label text='gamma H2AX-coated DNA double-strand break ends' />
-<bbox y='469.2315822813209' x='551.370572120455' w='64.0' h='76.0' />
+<bbox y='521.7121046264632' x='527.5035645494713' w='111.29999999999995' h='55.25' />
 <glyph id='http___www.reactome.org_biopax_48887PhysicalEntity136_http___www.reactome.org_biopax_48887Complex2693' class='unspecified entity' >
 <label text='DNA double-strand break ends' />
-<bbox y='487.2315822813209' x='528.370572120455' w='40.0' h='40.0' />
+<bbox y='523.4621046264632' x='597.0535645494713' w='40' h='40' />
 </glyph>
 <glyph id='http___www.reactome.org_biopax_48887Protein1283_http___www.reactome.org_biopax_48887Complex2693' class='macromolecule' >
 <label text='H2AFX' />
-<bbox y='487.2315822813209' x='578.370572120455' w='60.0' h='20.0' />
+<bbox y='523.4621046264632' x='529.2535645494713' w='60' h='45' />
 <glyph id='http___www.reactome.org_biopax_48887Protein1283_http___www.reactome.org_biopax_48887Complex2693.state.1' class='state variable'>
 <state value='P' variable='S139' />
-<bbox y='499.7315822813209' x='583.370572120455' w='50.0' h='15.0' />
+<bbox y='560.9621046264632' x='534.2535645494713' w='50.0' h='15.0' />
 </glyph>
 </glyph>
 </glyph>
 <glyph id='http___www.reactome.org_biopax_48887Complex2699' class='complex'  compartmentRef='nucleoplasm' >
 <label text='RAD50:MRE11 complex' />
-<bbox y='167.26717186185715' x='333.14343492644196' w='52.0' h='49.0' />
+<bbox y='178.9828290602472' x='318.9479505561276' w='107.30000000000001' h='48.5' />
 <glyph id='http___www.reactome.org_biopax_48887Protein1269_http___www.reactome.org_biopax_48887Complex2699' class='macromolecule' >
 <label text='RAD50' />
-<bbox y='166.76717186185715' x='335.14343492644196' w='48.0' h='20.0' />
+<bbox y='180.7328290602472' x='320.6979505561275' w='48' h='45' />
 </glyph>
 <glyph id='http___www.reactome.org_biopax_48887Protein1270_http___www.reactome.org_biopax_48887Complex2699' class='macromolecule' >
 <label text='MRE11A' />
-<bbox y='196.76717186185715' x='335.14343492644196' w='48.0' h='20.0' />
+<bbox y='180.7328290602472' x='376.49795055612753' w='48' h='45' />
 </glyph>
 </glyph>
 <glyph id='http___www.reactome.org_biopax_48887Protein8108' class='macromolecule' compartmentRef='nucleoplasm' >
 <label text='MDC1' />
-<bbox y='221.64815625668723' x='894.8580663224566' w='48.0' h='20.0' />
+<bbox y='264.45565565825575' x='924.1787673811134' w='48' h='45' />
 <glyph id='http___www.reactome.org_biopax_48887Protein8108.state.1' class='state variable'>
 <state value='P' />
-<bbox y='234.14815625668723' x='914.3580663224566' w='9.0' h='15.0' />
+<bbox y='301.95565565825575' x='943.6787673811134' w='9.0' h='15.0' />
 </glyph>
 </glyph>
 <glyph id='http___www.reactome.org_biopax_48887SmallMolecule18http___www.reactome.org_biopax_48887BiochemicalReaction2195LEFT_TO_RIGHT' class='simple chemical' compartmentRef='nucleoplasm' >
 <label text='ATP' />
-<bbox y='418.7367861117334' x='738.4216085900478' w='36.0' h='15.0' />
+<bbox y='399.78652908166936' x='600.8036470146063' w='36' h='40' />
 <clone/>
 </glyph>
 <glyph id='http___www.reactome.org_biopax_48887SmallMolecule19http___www.reactome.org_biopax_48887BiochemicalReaction2198LEFT_TO_RIGHT' class='simple chemical' compartmentRef='nucleoplasm' >
 <label text='ADP' />
-<bbox y='229.2653277623208' x='761.6972993933346' w='36.0' h='15.0' />
+<bbox y='240.75205415377678' x='805.4051273903564' w='36' h='40' />
 <clone/>
 </glyph>
 <glyph id='http___www.reactome.org_biopax_48887SmallMolecule19http___www.reactome.org_biopax_48887BiochemicalReaction2195LEFT_TO_RIGHT' class='simple chemical' compartmentRef='nucleoplasm' >
 <label text='ADP' />
-<bbox y='414.3409812493219' x='606.8688993100975' w='36.0' h='15.0' />
+<bbox y='347.9715297046929' x='608.5008811370913' w='36' h='40' />
 <clone/>
 </glyph>
 <glyph id='http___www.reactome.org_biopax_48887SmallMolecule19http___www.reactome.org_biopax_48887BiochemicalReaction2197LEFT_TO_RIGHT' class='simple chemical' compartmentRef='nucleoplasm' >
 <label text='ADP' />
-<bbox y='242.40677364151702' x='653.0038695453322' w='36.0' h='15.0' />
+<bbox y='239.3461828643333' x='678.744914206446' w='36' h='40' />
 <clone/>
 </glyph>
 <glyph id='http___www.reactome.org_biopax_48887SmallMolecule19http___www.reactome.org_biopax_48887BiochemicalReaction2196LEFT_TO_RIGHT' class='simple chemical' compartmentRef='nucleoplasm' >
 <label text='ADP' />
-<bbox y='265.3110377543826' x='872.5698263913248' w='36.0' h='15.0' />
+<bbox y='370.4967300238475' x='922.7679557393495' w='36' h='40' />
 <clone/>
 </glyph>
 <glyph id='http___www.reactome.org_biopax_48887SmallMolecule18http___www.reactome.org_biopax_48887BiochemicalReaction2198LEFT_TO_RIGHT' class='simple chemical' compartmentRef='nucleoplasm' >
 <label text='ATP' />
-<bbox y='203.68590934118458' x='828.11593689305' w='36.0' h='15.0' />
+<bbox y='242.1916420283796' x='866.2118829947143' w='36' h='40' />
 <clone/>
 </glyph>
 <glyph id='http___www.reactome.org_biopax_48887SmallMolecule18http___www.reactome.org_biopax_48887BiochemicalReaction2197LEFT_TO_RIGHT' class='simple chemical' compartmentRef='nucleoplasm' >
 <label text='ATP' />
-<bbox y='246.0017000804404' x='584.6753991731023' w='36.0' h='15.0' />
+<bbox y='278.44016687570644' x='570.007975644089' w='36' h='40' />
 <clone/>
 </glyph>
 <glyph id='http___www.reactome.org_biopax_48887SmallMolecule18http___www.reactome.org_biopax_48887BiochemicalReaction2196LEFT_TO_RIGHT' class='simple chemical' compartmentRef='nucleoplasm' >
 <label text='ATP' />
-<bbox y='352.8482472456992' x='910.2178868110905' w='36.0' h='15.0' />
+<bbox y='414.15157457888665' x='900.6521066477006' w='36' h='40' />
 <clone/>
 </glyph>
 <glyph id='http___www.reactome.org_biopax_48887BiochemicalReaction2196LEFT_TO_RIGHT' class='process' compartmentRef='nucleoplasm' >
-<bbox y='324.41304916164086' x='843.2787876542875' w='15.0' h='15.0' />
+<bbox y='367.59370598974874' x='866.0539410839815' w='15' h='15' />
 </glyph>
 <glyph id='http___www.reactome.org_biopax_48887BiochemicalReaction2195LEFT_TO_RIGHT' class='process' compartmentRef='nucleoplasm' >
-<bbox y='368.53443177627287' x='688.7252308857155' w='15.0' h='15.0' />
+<bbox y='387.54377713706316' x='694.3581713751597' w='15' h='15' />
 </glyph>
 <glyph id='http___www.reactome.org_biopax_48887BiochemicalReaction2205LEFT_TO_RIGHT' class='process' compartmentRef='nucleoplasm' >
-<bbox y='444.14723294321425' x='224.4364569621822' w='15.0' h='15.0' />
+<bbox y='496.12788481531277' x='252.08008863318804' w='15' h='15' />
 </glyph>
 <glyph id='http___www.reactome.org_biopax_48887BiochemicalReaction2201LEFT_TO_RIGHT' class='process' compartmentRef='nucleoplasm' >
-<bbox y='658.930216222896' x='884.3365148511275' w='15.0' h='15.0' />
+<bbox y='749.1368823430591' x='849.8190313163534' w='15' h='15' />
 </glyph>
 <glyph id='http___www.reactome.org_biopax_48887BiochemicalReaction2204LEFT_TO_RIGHT' class='process' compartmentRef='nucleoplasm' >
-<bbox y='299.3665037416872' x='425.2192845883136' w='15.0' h='15.0' />
+<bbox y='313.8291673307046' x='443.6323924850319' w='15' h='15' />
 </glyph>
 <glyph id='http___www.reactome.org_biopax_48887BiochemicalReaction2200LEFT_TO_RIGHT' class='process' compartmentRef='nucleoplasm' >
-<bbox y='193.7590155615036' x='718.7888791669038' w='15.0' h='15.0' />
+<bbox y='202.27087451829013' x='767.4184105630504' w='15' h='15' />
 </glyph>
 <glyph id='http___www.reactome.org_biopax_48887BiochemicalReaction2202LEFT_TO_RIGHT' class='process' compartmentRef='nucleoplasm' >
-<bbox y='419.3552654255666' x='493.94118759983814' w='15.0' h='15.0' />
+<bbox y='451.5475498549073' x='513.5007559243771' w='15' h='15' />
 </glyph>
 <glyph id='http___www.reactome.org_biopax_48887BiochemicalReaction2198LEFT_TO_RIGHT' class='process' compartmentRef='nucleoplasm' >
-<bbox y='282.3909107395855' x='826.4894723426023' w='15.0' h='15.0' />
+<bbox y='325.3511307213031' x='849.4211898513023' w='15' h='15' />
 </glyph>
 <glyph id='http___www.reactome.org_biopax_48887BiochemicalReaction2199LEFT_TO_RIGHT' class='process' compartmentRef='nucleoplasm' >
-<bbox y='482.8308679543304' x='747.4025395305873' w='15.0' h='15.0' />
+<bbox y='544.9038745861824' x='735.6035838303848' w='15' h='15' />
 </glyph>
 <glyph id='http___www.reactome.org_biopax_48887BiochemicalReaction2203LEFT_TO_RIGHT' class='process' compartmentRef='nucleoplasm' >
-<bbox y='94.60802076396396' x='288.51811141204166' w='15.0' h='15.0' />
+<bbox y='121.45502946211118' x='276.8822516574163' w='15' h='15' />
 </glyph>
 <glyph id='http___www.reactome.org_biopax_48887BiochemicalReaction2197LEFT_TO_RIGHT' class='process' compartmentRef='nucleoplasm' >
-<bbox y='311.4044552386033' x='637.7475702137326' w='15.0' h='15.0' />
+<bbox y='320.40637212720407' x='662.2489439249828' w='15' h='15' />
 </glyph>
 <glyph id='http___www.reactome.org_biopax_48887BiochemicalReaction2206LEFT_TO_RIGHT' class='process' compartmentRef='nucleoplasm' >
-<bbox y='413.4074468887138' x='883.4076492612053' w='15.0' h='15.0' />
+<bbox y='473.5517231595477' x='887.4209473635851' w='15' h='15' />
 </glyph>
-<arc target='http___www.reactome.org_biopax_48887BiochemicalReaction2206LEFT_TO_RIGHT' source='http___www.reactome.org_biopax_48887Complex2697' class='consumption'>
-<start y='483.14566366744816' x='906.1067132150947'/>
-<end y='429.1574468887138' x='892.9223644010265'/>
+<arc id='http___www.reactome.org_biopax_48887Complex2697-http___www.reactome.org_biopax_48887BiochemicalReaction2206LEFT_TO_RIGHT' target='http___www.reactome.org_biopax_48887BiochemicalReaction2206LEFT_TO_RIGHT' source='http___www.reactome.org_biopax_48887Complex2697' class='consumption'>
+<start y='554.0958284178022' x='891.7572244777426'/>
+<end y='489.0517231595477' x='894.5744473551689'/>
 </arc>
-<arc target='http___www.reactome.org_biopax_48887BiochemicalReaction2200LEFT_TO_RIGHT' source='http___www.reactome.org_biopax_48887Protein8104' class='consumption'>
-<start y='284.9407281594979' x='741.7425007604138'/>
-<end y='209.5090155615036' x='727.8124184706335'/>
+<arc id='http___www.reactome.org_biopax_48887Protein8104-http___www.reactome.org_biopax_48887BiochemicalReaction2200LEFT_TO_RIGHT' target='http___www.reactome.org_biopax_48887BiochemicalReaction2200LEFT_TO_RIGHT' source='http___www.reactome.org_biopax_48887Protein8104' class='consumption'>
+<start y='290.83789860947314' x='768.7417717130035'/>
+<end y='217.77087451829013' x='774.3088765218748'/>
 </arc>
-<arc target='http___www.reactome.org_biopax_48887BiochemicalReaction2203LEFT_TO_RIGHT' source='http___www.reactome.org_biopax_48887Protein1270' class='consumption'>
-<start y='90.34939134885352' x='234.17406264061822'/>
-<end y='100.53941885962864' x='287.76811141204166'/>
+<arc id='http___www.reactome.org_biopax_48887Protein1270-http___www.reactome.org_biopax_48887BiochemicalReaction2203LEFT_TO_RIGHT' target='http___www.reactome.org_biopax_48887BiochemicalReaction2203LEFT_TO_RIGHT' source='http___www.reactome.org_biopax_48887Protein1270' class='consumption'>
+<start y='132.60140713202338' x='220.65324539190073'/>
+<end y='129.41276484931873' x='276.3822516574163'/>
 </arc>
-<arc target='http___www.reactome.org_biopax_48887Complex2694' source='http___www.reactome.org_biopax_48887BiochemicalReaction2199LEFT_TO_RIGHT' class='production'>
-<start y='498.5808679543304' x='754.2382637402034'/>
-<end y='552.5715023892653' x='749.8910308477673'/>
+<arc id='http___www.reactome.org_biopax_48887BiochemicalReaction2199LEFT_TO_RIGHT-http___www.reactome.org_biopax_48887Complex2694' target='http___www.reactome.org_biopax_48887Complex2694' source='http___www.reactome.org_biopax_48887BiochemicalReaction2199LEFT_TO_RIGHT' class='production'>
+<start y='560.4038745861824' x='741.3732686206051'/>
+<end y='621.7400229045421' x='728.1069098275359'/>
 </arc>
-<arc target='http___www.reactome.org_biopax_48887SmallMolecule19http___www.reactome.org_biopax_48887BiochemicalReaction2197LEFT_TO_RIGHT' source='http___www.reactome.org_biopax_48887BiochemicalReaction2197LEFT_TO_RIGHT' class='production'>
-<start y='310.6544552386033' x='648.3272312192506'/>
-<end y='260.85825558202316' x='666.9157662865672'/>
+<arc id='http___www.reactome.org_biopax_48887BiochemicalReaction2197LEFT_TO_RIGHT-http___www.reactome.org_biopax_48887SmallMolecule19http___www.reactome.org_biopax_48887BiochemicalReaction2197LEFT_TO_RIGHT' target='http___www.reactome.org_biopax_48887SmallMolecule19http___www.reactome.org_biopax_48887BiochemicalReaction2197LEFT_TO_RIGHT' source='http___www.reactome.org_biopax_48887BiochemicalReaction2197LEFT_TO_RIGHT' class='production'>
+<start y='319.90637212720407' x='672.8989901044595'/>
+<end y='281.3930875436415' x='688.0638182246532'/>
 </arc>
-<arc target='http___www.reactome.org_biopax_48887Complex2697' source='http___www.reactome.org_biopax_48887BiochemicalReaction2201LEFT_TO_RIGHT' class='production'>
-<start y='658.180216222896' x='893.6629245929716'/>
-<end y='599.0747444611195' x='906.7478711895784'/>
+<arc id='http___www.reactome.org_biopax_48887BiochemicalReaction2201LEFT_TO_RIGHT-http___www.reactome.org_biopax_48887Complex2697' target='http___www.reactome.org_biopax_48887Complex2697' source='http___www.reactome.org_biopax_48887BiochemicalReaction2201LEFT_TO_RIGHT' class='production'>
+<start y='748.6368823430591' x='859.075333457256'/>
+<end y='670.8260457539027' x='876.157750818125'/>
 </arc>
-<arc target='http___www.reactome.org_biopax_48887BiochemicalReaction2201LEFT_TO_RIGHT' source='http___www.reactome.org_biopax_48887Complex2694' class='consumption'>
-<start y='640.4065725498085' x='821.6009725656306'/>
-<end y='663.3734296826815' x='883.5865148511275'/>
+<arc id='http___www.reactome.org_biopax_48887Complex2694-http___www.reactome.org_biopax_48887BiochemicalReaction2201LEFT_TO_RIGHT' target='http___www.reactome.org_biopax_48887BiochemicalReaction2201LEFT_TO_RIGHT' source='http___www.reactome.org_biopax_48887Complex2694' class='consumption'>
+<start y='715.1672855728253' x='781.6065630161139'/>
+<end y='752.2550839205552' x='849.3190313163534'/>
 </arc>
-<arc target='http___www.reactome.org_biopax_48887BiochemicalReaction2195LEFT_TO_RIGHT' source='http___www.reactome.org_biopax_48887Protein8104' class='catalysis'>
-<start y='313.2412236751809' x='733.3511469769962'/>
-<end y='365.2020276163101' x='702.6297918258441'/>
+<arc id='http___www.reactome.org_biopax_48887Protein8104-http___www.reactome.org_biopax_48887BiochemicalReaction2195LEFT_TO_RIGHT' target='http___www.reactome.org_biopax_48887BiochemicalReaction2195LEFT_TO_RIGHT' source='http___www.reactome.org_biopax_48887Protein8104' class='catalysis'>
+<start y='340.64081972043977' x='745.4920734848315'/>
+<end y='384.70351301191977' x='710.1515821390163'/>
 </arc>
-<arc target='http___www.reactome.org_biopax_48887BiochemicalReaction2196LEFT_TO_RIGHT' source='http___www.reactome.org_biopax_48887Protein8104' class='catalysis'>
-<start y='305.3089447166653' x='772.1532953561417'/>
-<end y='328.1599969406484' x='839.6870563349156'/>
+<arc id='http___www.reactome.org_biopax_48887Protein8104-http___www.reactome.org_biopax_48887BiochemicalReaction2196LEFT_TO_RIGHT' target='http___www.reactome.org_biopax_48887BiochemicalReaction2196LEFT_TO_RIGHT' source='http___www.reactome.org_biopax_48887Protein8104' class='catalysis'>
+<start y='331.1040477784135' x='797.0266754964515'/>
+<end y='369.00005124545754' x='862.9530236416422'/>
 </arc>
-<arc target='http___www.reactome.org_biopax_48887BiochemicalReaction2206LEFT_TO_RIGHT' source='http___www.reactome.org_biopax_48887Protein1277' class='consumption'>
-<start y='371.5623755179953' x='791.8374173855589'/>
-<end y='416.7982727089318' x='882.6576492612053'/>
+<arc id='http___www.reactome.org_biopax_48887Protein1277-http___www.reactome.org_biopax_48887BiochemicalReaction2206LEFT_TO_RIGHT' target='http___www.reactome.org_biopax_48887BiochemicalReaction2206LEFT_TO_RIGHT' source='http___www.reactome.org_biopax_48887Protein1277' class='consumption'>
+<start y='407.8578280190262' x='805.4861205474252'/>
+<end y='474.50448443868765' x='886.9209473635851'/>
 </arc>
-<arc target='http___www.reactome.org_biopax_48887SmallMolecule19http___www.reactome.org_biopax_48887BiochemicalReaction2195LEFT_TO_RIGHT' source='http___www.reactome.org_biopax_48887BiochemicalReaction2195LEFT_TO_RIGHT' class='production'>
-<start y='381.3304444048394' x='687.9752308857155'/>
-<end y='413.4154027936553' x='637.9940610373013'/>
+<arc id='http___www.reactome.org_biopax_48887BiochemicalReaction2195LEFT_TO_RIGHT-http___www.reactome.org_biopax_48887SmallMolecule19http___www.reactome.org_biopax_48887BiochemicalReaction2195LEFT_TO_RIGHT' target='http___www.reactome.org_biopax_48887SmallMolecule19http___www.reactome.org_biopax_48887BiochemicalReaction2195LEFT_TO_RIGHT' source='http___www.reactome.org_biopax_48887BiochemicalReaction2195LEFT_TO_RIGHT' class='production'>
+<start y='392.1697621774654' x='693.8581713751597'/>
+<end y='375.4773012045749' x='647.3936645231106'/>
 </arc>
-<arc target='http___www.reactome.org_biopax_48887BiochemicalReaction2195LEFT_TO_RIGHT' source='http___www.reactome.org_biopax_48887SmallMolecule18http___www.reactome.org_biopax_48887BiochemicalReaction2195LEFT_TO_RIGHT' class='consumption'>
-<start y='418.9400551449903' x='747.6722824061419'/>
-<end y='382.9147365232102' x='704.4752308857155'/>
+<arc id='http___www.reactome.org_biopax_48887SmallMolecule18http___www.reactome.org_biopax_48887BiochemicalReaction2195LEFT_TO_RIGHT-http___www.reactome.org_biopax_48887BiochemicalReaction2195LEFT_TO_RIGHT' target='http___www.reactome.org_biopax_48887BiochemicalReaction2195LEFT_TO_RIGHT' source='http___www.reactome.org_biopax_48887SmallMolecule18http___www.reactome.org_biopax_48887BiochemicalReaction2195LEFT_TO_RIGHT' class='consumption'>
+<start y='414.3212894789718' x='637.1489336154954'/>
+<end y='397.4270550750302' x='693.8581713751597'/>
 </arc>
-<arc target='http___www.reactome.org_biopax_48887BiochemicalReaction2199LEFT_TO_RIGHT' source='http___www.reactome.org_biopax_48887Protein916' class='stimulation'>
-<start y='461.8078514029107' x='707.9336680092754'/>
-<end y='483.7636682862266' x='744.0883271940378'/>
+<arc id='http___www.reactome.org_biopax_48887Protein916-http___www.reactome.org_biopax_48887BiochemicalReaction2199LEFT_TO_RIGHT' target='http___www.reactome.org_biopax_48887BiochemicalReaction2199LEFT_TO_RIGHT' source='http___www.reactome.org_biopax_48887Protein916' class='stimulation'>
+<start y='499.2492595987819' x='742.6002138772449'/>
+<end y='541.4040090962134' x='742.9994159838573'/>
 </arc>
-<arc target='http___www.reactome.org_biopax_48887Protein1283' source='http___www.reactome.org_biopax_48887BiochemicalReaction2195LEFT_TO_RIGHT' class='production'>
-<start y='375.93558832530806' x='687.9752308857155'/>
-<end y='375.3631824164591' x='640.1991900665362'/>
+<arc id='http___www.reactome.org_biopax_48887BiochemicalReaction2195LEFT_TO_RIGHT-http___www.reactome.org_biopax_48887Protein1283' target='http___www.reactome.org_biopax_48887Protein1283' source='http___www.reactome.org_biopax_48887BiochemicalReaction2195LEFT_TO_RIGHT' class='production'>
+<start y='403.04377713706316' x='697.6333996046271'/>
+<end y='447.87681661943157' x='673.9572296555921'/>
 </arc>
-<arc target='http___www.reactome.org_biopax_48887BiochemicalReaction2205LEFT_TO_RIGHT' source='http___www.reactome.org_biopax_48887Complex465' class='consumption'>
-<start y='387.656708179682' x='262.9944748938825'/>
-<end y='443.39723294321425' x='235.9406224051659'/>
+<arc id='http___www.reactome.org_biopax_48887Complex465-http___www.reactome.org_biopax_48887BiochemicalReaction2205LEFT_TO_RIGHT' target='http___www.reactome.org_biopax_48887BiochemicalReaction2205LEFT_TO_RIGHT' source='http___www.reactome.org_biopax_48887Complex465' class='consumption'>
+<start y='417.8761331635054' x='290.2542935834349'/>
+<end y='495.62788481531277' x='262.44176358297085'/>
 </arc>
-<arc target='http___www.reactome.org_biopax_48887BiochemicalReaction2204LEFT_TO_RIGHT' source='http___www.reactome.org_biopax_48887Protein1271' class='consumption'>
-<start y='336.94732258328975' x='505.388254027477'/>
-<end y='310.2815343573474' x='440.9692845883136'/>
+<arc id='http___www.reactome.org_biopax_48887Protein1271-http___www.reactome.org_biopax_48887BiochemicalReaction2204LEFT_TO_RIGHT' target='http___www.reactome.org_biopax_48887BiochemicalReaction2204LEFT_TO_RIGHT' source='http___www.reactome.org_biopax_48887Protein1271' class='consumption'>
+<start y='351.59686336526335' x='523.2465443316219'/>
+<end y='324.6869211429048' x='459.1323924850319'/>
 </arc>
-<arc target='http___www.reactome.org_biopax_48887SmallMolecule19http___www.reactome.org_biopax_48887BiochemicalReaction2198LEFT_TO_RIGHT' source='http___www.reactome.org_biopax_48887BiochemicalReaction2198LEFT_TO_RIGHT' class='production'>
-<start y='281.81818062484166' x='825.7394723426023'/>
-<end y='246.3877900133945' x='789.5310622521189'/>
+<arc id='http___www.reactome.org_biopax_48887BiochemicalReaction2198LEFT_TO_RIGHT-http___www.reactome.org_biopax_48887SmallMolecule19http___www.reactome.org_biopax_48887BiochemicalReaction2198LEFT_TO_RIGHT' target='http___www.reactome.org_biopax_48887SmallMolecule19http___www.reactome.org_biopax_48887BiochemicalReaction2198LEFT_TO_RIGHT' source='http___www.reactome.org_biopax_48887BiochemicalReaction2198LEFT_TO_RIGHT' class='production'>
+<start y='324.8511307213031' x='853.2023003390844'/>
+<end y='282.1512611546233' x='833.3527882010098'/>
 </arc>
-<arc target='http___www.reactome.org_biopax_48887BiochemicalReaction2196LEFT_TO_RIGHT' source='http___www.reactome.org_biopax_48887Protein8106' class='stimulation'>
-<start y='405.9377628126403' x='812.5568352403627'/>
-<end y='342.828681433256' x='845.1426054027679'/>
+<arc id='http___www.reactome.org_biopax_48887Protein8106-http___www.reactome.org_biopax_48887BiochemicalReaction2196LEFT_TO_RIGHT' target='http___www.reactome.org_biopax_48887BiochemicalReaction2196LEFT_TO_RIGHT' source='http___www.reactome.org_biopax_48887Protein8106' class='stimulation'>
+<start y='431.97236031276054' x='836.8525572458556'/>
+<end y='385.6144853357305' x='866.76532827925'/>
 </arc>
-<arc target='http___www.reactome.org_biopax_48887BiochemicalReaction2198LEFT_TO_RIGHT' source='http___www.reactome.org_biopax_48887SmallMolecule18http___www.reactome.org_biopax_48887BiochemicalReaction2198LEFT_TO_RIGHT' class='consumption'>
-<start y='219.417016415527' x='844.8477299637001'/>
-<end y='281.6409107395855' x='835.260590197423'/>
+<arc id='http___www.reactome.org_biopax_48887SmallMolecule18http___www.reactome.org_biopax_48887BiochemicalReaction2198LEFT_TO_RIGHT-http___www.reactome.org_biopax_48887BiochemicalReaction2198LEFT_TO_RIGHT' target='http___www.reactome.org_biopax_48887BiochemicalReaction2198LEFT_TO_RIGHT' source='http___www.reactome.org_biopax_48887SmallMolecule18http___www.reactome.org_biopax_48887BiochemicalReaction2198LEFT_TO_RIGHT' class='consumption'>
+<start y='281.50546884168716' x='876.7523367860284'/>
+<end y='324.8511307213031' x='860.0110161320458'/>
 </arc>
-<arc target='http___www.reactome.org_biopax_48887BiochemicalReaction2201LEFT_TO_RIGHT' source='http___www.reactome.org_biopax_48887Protein8109' class='consumption'>
-<start y='723.6077921290189' x='920.3315197453046'/>
-<end y='674.680216222896' x='895.9479831435738'/>
+<arc id='http___www.reactome.org_biopax_48887Protein8109-http___www.reactome.org_biopax_48887BiochemicalReaction2201LEFT_TO_RIGHT' target='http___www.reactome.org_biopax_48887BiochemicalReaction2201LEFT_TO_RIGHT' source='http___www.reactome.org_biopax_48887Protein8109' class='consumption'>
+<start y='814.551042738956' x='884.8840090011375'/>
+<end y='764.6368823430591' x='861.1267325757832'/>
 </arc>
-<arc target='http___www.reactome.org_biopax_48887BiochemicalReaction2202LEFT_TO_RIGHT' source='http___www.reactome.org_biopax_48887Protein1271' class='consumption'>
-<start y='357.0954506919868' x='524.5336188910397'/>
-<end y='418.6052654255666' x='504.17216615647567'/>
+<arc id='http___www.reactome.org_biopax_48887Protein1271-http___www.reactome.org_biopax_48887BiochemicalReaction2202LEFT_TO_RIGHT' target='http___www.reactome.org_biopax_48887BiochemicalReaction2202LEFT_TO_RIGHT' source='http___www.reactome.org_biopax_48887Protein1271' class='consumption'>
+<start y='384.8799844151264' x='541.4156958578287'/>
+<end y='451.0475498549073' x='523.2027901761312'/>
 </arc>
-<arc target='http___www.reactome.org_biopax_48887SmallMolecule19http___www.reactome.org_biopax_48887BiochemicalReaction2196LEFT_TO_RIGHT' source='http___www.reactome.org_biopax_48887BiochemicalReaction2196LEFT_TO_RIGHT' class='production'>
-<start y='323.66304916164086' x='856.3331852418498'/>
-<end y='283.2098070557276' x='883.5687477099905'/>
+<arc id='http___www.reactome.org_biopax_48887BiochemicalReaction2196LEFT_TO_RIGHT-http___www.reactome.org_biopax_48887SmallMolecule19http___www.reactome.org_biopax_48887BiochemicalReaction2196LEFT_TO_RIGHT' target='http___www.reactome.org_biopax_48887SmallMolecule19http___www.reactome.org_biopax_48887BiochemicalReaction2196LEFT_TO_RIGHT' source='http___www.reactome.org_biopax_48887BiochemicalReaction2196LEFT_TO_RIGHT' class='production'>
+<start y='376.9270169875311' x='881.5539410839815'/>
+<end y='385.563172607171' x='919.2394429113817'/>
 </arc>
-<arc target='http___www.reactome.org_biopax_48887BiochemicalReaction2199LEFT_TO_RIGHT' source='http___www.reactome.org_biopax_48887Protein8106' class='consumption'>
-<start y='427.4377628126403' x='799.4003843318656'/>
-<end y='482.0808679543304' x='760.7395421524725'/>
+<arc id='http___www.reactome.org_biopax_48887Protein8106-http___www.reactome.org_biopax_48887BiochemicalReaction2199LEFT_TO_RIGHT' target='http___www.reactome.org_biopax_48887BiochemicalReaction2199LEFT_TO_RIGHT' source='http___www.reactome.org_biopax_48887Protein8106' class='consumption'>
+<start y='477.63895512166107' x='803.6543609389325'/>
+<end y='544.4038745861824' x='749.5826413929125'/>
 </arc>
-<arc target='http___www.reactome.org_biopax_48887BiochemicalReaction2195LEFT_TO_RIGHT' source='http___www.reactome.org_biopax_48887Protein916' class='consumption'>
-<start y='440.3078514029107' x='691.090449252588'/>
-<end y='384.28443177627287' x='695.5661411917272'/>
+<arc id='http___www.reactome.org_biopax_48887Protein916-http___www.reactome.org_biopax_48887BiochemicalReaction2195LEFT_TO_RIGHT' target='http___www.reactome.org_biopax_48887BiochemicalReaction2195LEFT_TO_RIGHT' source='http___www.reactome.org_biopax_48887Protein916' class='consumption'>
+<start y='453.2492595987819' x='730.9046413883758'/>
+<end y='403.04377713706316' x='705.8504372284418'/>
 </arc>
-<arc target='http___www.reactome.org_biopax_48887BiochemicalReaction2196LEFT_TO_RIGHT' source='http___www.reactome.org_biopax_48887SmallMolecule18http___www.reactome.org_biopax_48887BiochemicalReaction2196LEFT_TO_RIGHT' class='consumption'>
-<start y='355.0622443545354' x='913.8222317914945'/>
-<end y='334.94240237917336' x='859.0287876542875'/>
+<arc id='http___www.reactome.org_biopax_48887SmallMolecule18http___www.reactome.org_biopax_48887BiochemicalReaction2196LEFT_TO_RIGHT-http___www.reactome.org_biopax_48887BiochemicalReaction2196LEFT_TO_RIGHT' target='http___www.reactome.org_biopax_48887BiochemicalReaction2196LEFT_TO_RIGHT' source='http___www.reactome.org_biopax_48887SmallMolecule18http___www.reactome.org_biopax_48887BiochemicalReaction2196LEFT_TO_RIGHT' class='consumption'>
+<start y='418.1034979471278' x='906.3973667763158'/>
+<end y='383.09370598974874' x='879.6629547197379'/>
 </arc>
-<arc target='http___www.reactome.org_biopax_48887BiochemicalReaction2202LEFT_TO_RIGHT' source='http___www.reactome.org_biopax_48887Complex2693' class='consumption'>
-<start y='465.7315822813209' x='541.068690289922'/>
-<end y='434.9488769904516' x='509.69118759983814'/>
+<arc id='http___www.reactome.org_biopax_48887Complex2693-http___www.reactome.org_biopax_48887BiochemicalReaction2202LEFT_TO_RIGHT' target='http___www.reactome.org_biopax_48887BiochemicalReaction2202LEFT_TO_RIGHT' source='http___www.reactome.org_biopax_48887Complex2693' class='consumption'>
+<start y='515.4621046264632' x='559.8349603376988'/>
+<end y='467.0475498549073' x='526.5077325647957'/>
 </arc>
-<arc target='http___www.reactome.org_biopax_48887BiochemicalReaction2204LEFT_TO_RIGHT' source='http___www.reactome.org_biopax_48887Complex2699' class='consumption'>
-<start y='238.26717186185715' x='388.86799503812904'/>
-<end y='298.6165037416872' x='427.44557231043365'/>
+<arc id='http___www.reactome.org_biopax_48887Complex2699-http___www.reactome.org_biopax_48887BiochemicalReaction2204LEFT_TO_RIGHT' target='http___www.reactome.org_biopax_48887BiochemicalReaction2204LEFT_TO_RIGHT' source='http___www.reactome.org_biopax_48887Complex2699' class='consumption'>
+<start y='233.73282906024724' x='392.8805479161406'/>
+<end y='313.3291673307046' x='445.81236694797934'/>
 </arc>
-<arc target='http___www.reactome.org_biopax_48887BiochemicalReaction2198LEFT_TO_RIGHT' source='http___www.reactome.org_biopax_48887Protein8104' class='catalysis'>
-<start y='293.71487040858426' x='774.4777186410313'/>
-<end y='290.6133888096669' x='822.7456463917053'/>
+<arc id='http___www.reactome.org_biopax_48887Protein8104-http___www.reactome.org_biopax_48887BiochemicalReaction2198LEFT_TO_RIGHT' target='http___www.reactome.org_biopax_48887BiochemicalReaction2198LEFT_TO_RIGHT' source='http___www.reactome.org_biopax_48887Protein8104' class='catalysis'>
+<start y='320.28615601778046' x='797.4893613446237'/>
+<end y='330.539246397428' x='845.9860693352773'/>
 </arc>
-<arc target='http___www.reactome.org_biopax_48887BiochemicalReaction2203LEFT_TO_RIGHT' source='http___www.reactome.org_biopax_48887Protein1269' class='consumption'>
-<start y='40.75244977493821' x='309.42905113623334'/>
-<end y='93.85802076396396' x='297.8213747659818'/>
+<arc id='http___www.reactome.org_biopax_48887Protein1269-http___www.reactome.org_biopax_48887BiochemicalReaction2203LEFT_TO_RIGHT' target='http___www.reactome.org_biopax_48887BiochemicalReaction2203LEFT_TO_RIGHT' source='http___www.reactome.org_biopax_48887Protein1269' class='consumption'>
+<start y='65.7358040354575' x='289.45102212584266'/>
+<end y='120.95502946211118' x='285.02367305215415'/>
 </arc>
-<arc target='http___www.reactome.org_biopax_48887Complex2696' source='http___www.reactome.org_biopax_48887BiochemicalReaction2200LEFT_TO_RIGHT' class='production'>
-<start y='193.0090155615036' x='730.2099522527627'/>
-<end y='133.9898600803142' x='758.2606700839646'/>
+<arc id='http___www.reactome.org_biopax_48887BiochemicalReaction2200LEFT_TO_RIGHT-http___www.reactome.org_biopax_48887Complex2696' target='http___www.reactome.org_biopax_48887Complex2696' source='http___www.reactome.org_biopax_48887BiochemicalReaction2200LEFT_TO_RIGHT' class='production'>
+<start y='201.77087451829013' x='781.6508190923336'/>
+<end y='134.18039083230443' x='838.5316627005711'/>
 </arc>
-<arc target='http___www.reactome.org_biopax_48887Protein8105' source='http___www.reactome.org_biopax_48887BiochemicalReaction2196LEFT_TO_RIGHT' class='production'>
-<start y='329.61804823726027' x='859.0287876542875'/>
-<end y='315.6575476748039' x='909.2135733843198'/>
+<arc id='http___www.reactome.org_biopax_48887BiochemicalReaction2196LEFT_TO_RIGHT-http___www.reactome.org_biopax_48887Protein8105' target='http___www.reactome.org_biopax_48887Protein8105' source='http___www.reactome.org_biopax_48887BiochemicalReaction2196LEFT_TO_RIGHT' class='production'>
+<start y='373.6747058436565' x='881.5539410839815'/>
+<end y='360.33238069161325' x='956.7749349015603'/>
 </arc>
-<arc target='http___www.reactome.org_biopax_48887BiochemicalReaction2197LEFT_TO_RIGHT' source='http___www.reactome.org_biopax_48887Protein1277' class='stimulation'>
-<start y='353.1137239598314' x='747.0296242216107'/>
-<end y='322.63307537582085' x='656.3412483415449'/>
+<arc id='http___www.reactome.org_biopax_48887Protein1277-http___www.reactome.org_biopax_48887BiochemicalReaction2197LEFT_TO_RIGHT' target='http___www.reactome.org_biopax_48887BiochemicalReaction2197LEFT_TO_RIGHT' source='http___www.reactome.org_biopax_48887Protein1277' class='stimulation'>
+<start y='375.58887097866443' x='757.7733986263781'/>
+<end y='333.6688498343052' x='680.3867873709956'/>
 </arc>
-<arc target='http___www.reactome.org_biopax_48887BiochemicalReaction2197LEFT_TO_RIGHT' source='http___www.reactome.org_biopax_48887Protein8104' class='catalysis'>
-<start y='302.8407929540082' x='713.3948281134274'/>
-<end y='316.2714704752407' x='656.4175443165193'/>
+<arc id='http___www.reactome.org_biopax_48887Protein8104-http___www.reactome.org_biopax_48887BiochemicalReaction2197LEFT_TO_RIGHT' target='http___www.reactome.org_biopax_48887BiochemicalReaction2197LEFT_TO_RIGHT' source='http___www.reactome.org_biopax_48887Protein8104' class='catalysis'>
+<start y='318.2505538990845' x='736.4893613446237'/>
+<end y='326.3193950561724' x='680.7180311275158'/>
 </arc>
-<arc target='http___www.reactome.org_biopax_48887BiochemicalReaction2197LEFT_TO_RIGHT' source='http___www.reactome.org_biopax_48887SmallMolecule18http___www.reactome.org_biopax_48887BiochemicalReaction2197LEFT_TO_RIGHT' class='consumption'>
-<start y='261.4328214345348' x='607.8379501086704'/>
-<end y='310.6544552386033' x='639.877453767784'/>
+<arc id='http___www.reactome.org_biopax_48887SmallMolecule18http___www.reactome.org_biopax_48887BiochemicalReaction2197LEFT_TO_RIGHT-http___www.reactome.org_biopax_48887BiochemicalReaction2197LEFT_TO_RIGHT' target='http___www.reactome.org_biopax_48887BiochemicalReaction2197LEFT_TO_RIGHT' source='http___www.reactome.org_biopax_48887SmallMolecule18http___www.reactome.org_biopax_48887BiochemicalReaction2197LEFT_TO_RIGHT' class='consumption'>
+<start y='304.9517555126036' x='606.0715014929013'/>
+<end y='325.022510497355' x='661.7489439249828'/>
 </arc>
-<arc target='http___www.reactome.org_biopax_48887BiochemicalReaction2205LEFT_TO_RIGHT' source='http___www.reactome.org_biopax_48887Complex2698' class='consumption'>
-<start y='468.566781886514' x='280.5333197722929'/>
-<end y='454.51956400967936' x='240.1864569621822'/>
+<arc id='http___www.reactome.org_biopax_48887Complex2698-http___www.reactome.org_biopax_48887BiochemicalReaction2205LEFT_TO_RIGHT' target='http___www.reactome.org_biopax_48887BiochemicalReaction2205LEFT_TO_RIGHT' source='http___www.reactome.org_biopax_48887Complex2698' class='consumption'>
+<start y='521.2294733906057' x='316.2108680822181'/>
+<end y='506.11438968019957' x='267.58008863318804'/>
 </arc>
-<arc target='http___www.reactome.org_biopax_48887Complex2700' source='http___www.reactome.org_biopax_48887BiochemicalReaction2205LEFT_TO_RIGHT' class='production'>
-<start y='453.7230414078558' x='223.6864569621822'/>
-<end y='468.43396097068756' x='165.2200384748108'/>
+<arc id='http___www.reactome.org_biopax_48887BiochemicalReaction2205LEFT_TO_RIGHT-http___www.reactome.org_biopax_48887Complex2700' target='http___www.reactome.org_biopax_48887Complex2700' source='http___www.reactome.org_biopax_48887BiochemicalReaction2205LEFT_TO_RIGHT' class='production'>
+<start y='506.7522107069145' x='251.58008863318804'/>
+<end y='531.5983710005519' x='187.96019453590674'/>
 </arc>
-<arc target='http___www.reactome.org_biopax_48887BiochemicalReaction2206LEFT_TO_RIGHT' source='http___www.reactome.org_biopax_48887Protein8106' class='stimulation'>
-<start y='417.9325226048009' x='831.7561756270493'/>
-<end y='420.34183744125346' x='879.6614362064402'/>
+<arc id='http___www.reactome.org_biopax_48887Protein8106-http___www.reactome.org_biopax_48887BiochemicalReaction2206LEFT_TO_RIGHT' target='http___www.reactome.org_biopax_48887BiochemicalReaction2206LEFT_TO_RIGHT' source='http___www.reactome.org_biopax_48887Protein8106' class='stimulation'>
+<start y='463.73590981214824' x='846.5116325031023'/>
+<end y='477.17976143363455' x='884.0962167802182'/>
 </arc>
-<arc target='http___www.reactome.org_biopax_48887BiochemicalReaction2199LEFT_TO_RIGHT' source='http___www.reactome.org_biopax_48887Complex2693' class='consumption'>
-<start y='499.6941846432268' x='659.870572120455'/>
-<end y='491.14372456236015' x='746.6525395305873'/>
+<arc id='http___www.reactome.org_biopax_48887Complex2693-http___www.reactome.org_biopax_48887BiochemicalReaction2199LEFT_TO_RIGHT' target='http___www.reactome.org_biopax_48887BiochemicalReaction2199LEFT_TO_RIGHT' source='http___www.reactome.org_biopax_48887Complex2693' class='consumption'>
+<start y='550.5239319951628' x='645.0535645494713'/>
+<end y='552.2504881734263' x='735.1035838303848'/>
 </arc>
-<arc target='http___www.reactome.org_biopax_48887Complex465' source='http___www.reactome.org_biopax_48887BiochemicalReaction2204LEFT_TO_RIGHT' class='production'>
-<start y='308.7889154862998' x='424.4692845883136'/>
-<end y='323.1159280588352' x='362.98513372694936'/>
+<arc id='http___www.reactome.org_biopax_48887BiochemicalReaction2204LEFT_TO_RIGHT-http___www.reactome.org_biopax_48887Complex465' target='http___www.reactome.org_biopax_48887Complex465' source='http___www.reactome.org_biopax_48887BiochemicalReaction2204LEFT_TO_RIGHT' class='production'>
+<start y='323.5862532589187' x='443.1323924850319'/>
+<end y='343.26159589625564' x='373.39524197112155'/>
 </arc>
-<arc target='http___www.reactome.org_biopax_48887BiochemicalReaction2196LEFT_TO_RIGHT' source='http___www.reactome.org_biopax_48887Protein1277' class='consumption'>
-<start y='352.5462975238369' x='794.4039678298618'/>
-<end y='334.9325585723719' x='842.5287876542875'/>
+<arc id='http___www.reactome.org_biopax_48887Protein1277-http___www.reactome.org_biopax_48887BiochemicalReaction2196LEFT_TO_RIGHT' target='http___www.reactome.org_biopax_48887BiochemicalReaction2196LEFT_TO_RIGHT' source='http___www.reactome.org_biopax_48887Protein1277' class='consumption'>
+<start y='385.16539131234515' x='806.7733986263781'/>
+<end y='376.300247290786' x='865.5539410839815'/>
 </arc>
-<arc target='http___www.reactome.org_biopax_48887BiochemicalReaction2198LEFT_TO_RIGHT' source='http___www.reactome.org_biopax_48887Protein8106' class='consumption'>
-<start y='405.9377628126403' x='809.2938541849134'/>
-<end y='298.1409107395855' x='832.2338120540089'/>
+<arc id='http___www.reactome.org_biopax_48887Protein8106-http___www.reactome.org_biopax_48887BiochemicalReaction2198LEFT_TO_RIGHT' target='http___www.reactome.org_biopax_48887BiochemicalReaction2198LEFT_TO_RIGHT' source='http___www.reactome.org_biopax_48887Protein8106' class='consumption'>
+<start y='431.97236031276054' x='828.586409236801'/>
+<end y='340.8511307213031' x='854.634310987407'/>
 </arc>
-<arc target='http___www.reactome.org_biopax_48887BiochemicalReaction2197LEFT_TO_RIGHT' source='http___www.reactome.org_biopax_48887Protein1271' class='consumption'>
-<start y='340.560919598715' x='552.7883944909548'/>
-<end y='320.8368305769539' x='636.9975702137326'/>
+<arc id='http___www.reactome.org_biopax_48887Protein1271-http___www.reactome.org_biopax_48887BiochemicalReaction2197LEFT_TO_RIGHT' target='http___www.reactome.org_biopax_48887BiochemicalReaction2197LEFT_TO_RIGHT' source='http___www.reactome.org_biopax_48887Protein1271' class='consumption'>
+<start y='355.05754892346096' x='572.2465443316219'/>
+<end y='330.13410616529893' x='661.7489439249828'/>
 </arc>
-<arc target='http___www.reactome.org_biopax_48887Protein8107' source='http___www.reactome.org_biopax_48887BiochemicalReaction2197LEFT_TO_RIGHT' class='production'>
-<start y='316.3071793497997' x='636.9975702137326'/>
-<end y='298.745138548104' x='581.2134168095561'/>
+<arc id='http___www.reactome.org_biopax_48887BiochemicalReaction2197LEFT_TO_RIGHT-http___www.reactome.org_biopax_48887Protein8107' target='http___www.reactome.org_biopax_48887Protein8107' source='http___www.reactome.org_biopax_48887BiochemicalReaction2197LEFT_TO_RIGHT' class='production'>
+<start y='319.90637212720407' x='665.0598231341281'/>
+<end y='269.1773008591952' x='635.3254802861824'/>
 </arc>
-<arc target='http___www.reactome.org_biopax_48887Complex2699' source='http___www.reactome.org_biopax_48887BiochemicalReaction2203LEFT_TO_RIGHT' class='production'>
-<start y='110.35802076396396' x='301.82659735705346'/>
-<end y='142.8141627463949' x='324.6776330581756'/>
+<arc id='http___www.reactome.org_biopax_48887BiochemicalReaction2203LEFT_TO_RIGHT-http___www.reactome.org_biopax_48887Complex2699' target='http___www.reactome.org_biopax_48887Complex2699' source='http___www.reactome.org_biopax_48887BiochemicalReaction2203LEFT_TO_RIGHT' class='production'>
+<start y='135.69104588779717' x='292.3822516574163'/>
+<end y='170.80056040559128' x='334.0799106879536'/>
 </arc>
-<arc target='http___www.reactome.org_biopax_48887Complex2698' source='http___www.reactome.org_biopax_48887BiochemicalReaction2202LEFT_TO_RIGHT' class='production'>
-<start y='430.75985418426745' x='493.19118759983814'/>
-<end y='457.71156635281176' x='436.24495353229173'/>
+<arc id='http___www.reactome.org_biopax_48887BiochemicalReaction2202LEFT_TO_RIGHT-http___www.reactome.org_biopax_48887Complex2698' target='http___www.reactome.org_biopax_48887Complex2698' source='http___www.reactome.org_biopax_48887BiochemicalReaction2202LEFT_TO_RIGHT' class='production'>
+<start y='463.80899123236145' x='513.0007559243771'/>
+<end y='500.95534254775083' x='450.58881236244565'/>
 </arc>
-<arc target='http___www.reactome.org_biopax_48887Complex2701' source='http___www.reactome.org_biopax_48887BiochemicalReaction2206LEFT_TO_RIGHT' class='production'>
-<start y='419.6116286998214' x='899.1576492612053'/>
-<end y='409.1390887828524' x='965.8324768377803'/>
+<arc id='http___www.reactome.org_biopax_48887BiochemicalReaction2206LEFT_TO_RIGHT-http___www.reactome.org_biopax_48887Complex2701' target='http___www.reactome.org_biopax_48887Complex2701' source='http___www.reactome.org_biopax_48887BiochemicalReaction2206LEFT_TO_RIGHT' class='production'>
+<start y='480.3967455360523' x='902.9209473635851'/>
+<end y='474.2921960177026' x='977.482878023412'/>
 </arc>
-<arc target='http___www.reactome.org_biopax_48887BiochemicalReaction2200LEFT_TO_RIGHT' source='http___www.reactome.org_biopax_48887Complex2695' class='consumption'>
-<start y='143.41930474992526' x='660.6971929618846'/>
-<end y='193.9840445735035' x='718.0388791669038'/>
+<arc id='http___www.reactome.org_biopax_48887Complex2695-http___www.reactome.org_biopax_48887BiochemicalReaction2200LEFT_TO_RIGHT' target='http___www.reactome.org_biopax_48887BiochemicalReaction2200LEFT_TO_RIGHT' source='http___www.reactome.org_biopax_48887Complex2695' class='consumption'>
+<start y='132.82554098218517' x='718.2511519509811'/>
+<end y='201.77087451829013' x='769.0267203452955'/>
 </arc>
-<arc target='http___www.reactome.org_biopax_48887Protein8108' source='http___www.reactome.org_biopax_48887BiochemicalReaction2198LEFT_TO_RIGHT' class='production'>
-<start y='284.22918474707086' x='842.2394723426023'/>
-<end y='244.09567585659306' x='900.7201280267863'/>
+<arc id='http___www.reactome.org_biopax_48887BiochemicalReaction2198LEFT_TO_RIGHT-http___www.reactome.org_biopax_48887Protein8108' target='http___www.reactome.org_biopax_48887Protein8108' source='http___www.reactome.org_biopax_48887BiochemicalReaction2198LEFT_TO_RIGHT' class='production'>
+<start y='328.82775194616045' x='864.9211898513023'/>
+<end y='300.62515612788275' x='920.99862604502'/>
 </arc>
 </map>
 </sbgn>

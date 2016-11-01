@@ -303,8 +303,8 @@
   };
 
   $$.sbgn.drawStateText = function (context, textProp) {
-    var stateValue = stringAfterValueCheck(textProp.state.value);
-    var stateVariable = stringAfterValueCheck(textProp.state.variable);
+    var stateValue = textProp.state.value || '';
+    var stateVariable = textProp.state.variable || '';
 
     var stateLabel = stateValue + (stateVariable
             ? "@" + stateVariable
@@ -336,7 +336,7 @@
     context.globalAlpha = textProp.opacity;
     var text;
     
-    textProp.label = stringAfterValueCheck(textProp.label);
+    textProp.label = textProp.label || '';
     
     if (truncate == false) {
       text = textProp.label;
@@ -396,7 +396,7 @@
 
         context.fill();
 
-        textProp.label = stringAfterValueCheck(state.label.text);
+        textProp.label = state.label.text || '';
         $$.sbgn.drawInfoText(context, textProp);
 
         context.stroke();
@@ -568,8 +568,7 @@
       context.fillStyle = oldStyle;
       context.globalAlpha = oldGlobalAlpha;
     }
-  }
-  ;
+  };
 
   $$.sbgn.drawEllipsePath = function (context, x, y, width, height) {
     window.cyNodeShapes['ellipse'].drawPath(context, x, y, width, height);
@@ -2006,3 +2005,24 @@
     return false;
   };
 })(cytoscape);
+
+//TODO: use CSS's "text-overflow:ellipsis" style instead of function below?
+var truncateText = function (textProp, font) {
+  var context = document.createElement('canvas').getContext("2d");
+  context.font = font;
+  var fitLabelsToNodes = sbgnStyleRules['fit-labels-to-nodes'];
+  var text = textProp.label || "";
+  //If fit labels to nodes is false do not truncate
+  if (fitLabelsToNodes == false) {
+    return text;
+  }
+  var width;
+  var len = text.length;
+  var ellipsis = "..";
+  var textWidth = (textProp.width > 30) ? textProp.width - 10 : textProp.width;
+  while ((width = context.measureText(text).width) > textWidth) {
+    --len;
+    text = text.substring(0, len) + ellipsis;
+  }
+  return text;
+};
