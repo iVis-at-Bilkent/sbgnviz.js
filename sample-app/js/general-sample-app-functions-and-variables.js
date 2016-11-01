@@ -46,6 +46,17 @@ var sbgnvizUpdate = function (cyGraph) {
   window.firstSelectedNode = null;
 };
 
+var getExpandCollapseOptions = function() {
+  return {
+    fisheye: function(){
+      return sbgnStyleRules['rearrange-after-expand-collapse'];
+    },
+    animate: function(){
+      return sbgnStyleRules['animate-on-drawing-changes'];
+    }
+  };
+};
+
 function dynamicResize() {
     var win = $(this); //this = window
 

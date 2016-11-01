@@ -288,78 +288,10 @@ function registerUndoRedoActions() {
 }
 
 function cytoscapeExtensionsAndContextMenu() {
-  // init the extension:
-  cy.viewUtilities({
-    node: {
-      highlighted: {}, // styles for when nodes are highlighted.
-      unhighlighted: {// styles for when nodes are unhighlighted.
-        'border-opacity': 0.3,
-        'text-opacity': 0.3,
-        'background-opacity': 0.3
-      },
-      hidden: {
-        'display': 'none'
-      }
-    },
-    edge: {
-      highlighted: {}, // styles for when edges are highlighted.
-      unhighlighted: {// styles for when edges are unhighlighted.
-        'opacity': 0.3,
-        'text-opacity': 0.3,
-        'background-opacity': 0.3
-      },
-      hidden: {
-        'display': 'none'
-      }
-    }
-  });
+  cy.expandCollapse(getExpandCollapseOptions());
 
-  cy.clipboard({
-    clipboardSize: 5, // Size of clipboard: 0 - unlimited; if exceeded, first item is removed.
-    shortcuts: {
-      enabled: true, // Whether keyboard shortcuts are enabled
-      undoable: true // and if undoRedo extension exists
-    }
-  });
-
-  // init the pan-zoom extension:
-  sbgnNetworkContainer.cytoscapePanzoom({
-    fitPadding: 10,
-    fitSelector: ':visible',
-    animateOnFit: function () {
-      return sbgnStyleRules['animate-on-drawing-changes'];
-    },
-    animateOnZoom: function () {
-      return sbgnStyleRules['animate-on-drawing-changes'];
-    }
-  });
-
-  // initialize undo-redo extension
-  cy.undoRedo({});
-
-  //init expand-collapse cy extension:
-  cy.expandCollapse({
-    fisheye: function () {
-      return sbgnStyleRules['rearrange-after-expand-collapse'];
-    },
-    animate: function () {
-      return sbgnStyleRules['animate-on-drawing-changes'];
-    },
-    layoutBy: function () {
-      if (!sbgnStyleRules['rearrange-after-expand-collapse']) {
-        return;
-      }
-      beforePerformLayout();
-      var preferences = {
-        randomize: false,
-        animate: sbgnStyleRules['animate-on-drawing-changes'] ? 'end' : false,
-        fit: false
-      };
-      if (sbgnLayoutProp.currentLayoutProperties.animate === 'during') {
-        delete preferences.animate;
-      }
-      sbgnLayoutProp.applyLayout(preferences, false); // layout must not be undoable
-    }
+  var contextMenus = cy.contextMenus({
+    menuItemClasses: ['customized-context-menus-menu-item']
   });
 
   cy.edgeBendEditing({
@@ -373,10 +305,6 @@ function cytoscapeExtensionsAndContextMenu() {
     removeBendMenuItemTitle: "Delete Bend Point"
   });
 
-  //context menus
-  var contextMenus = cy.contextMenus({
-    menuItemClasses: ['customized-context-menus-menu-item']
-  });
   contextMenus.appendMenuItems([
     {
       id: 'ctx-menu-sbgn-properties',
@@ -391,7 +319,9 @@ function cytoscapeExtensionsAndContextMenu() {
       title: 'Delete',
       selector: 'node, edge',
       onClickFunction: function (event) {
-        cy.undoRedo().do("removeEles", event.cyTarget);
+        cy.undoRedo().do("deleteElesSimple", {
+          eles: event.cyTarget
+        });
       }
     },
     {
@@ -433,7 +363,7 @@ function cytoscapeExtensionsAndContextMenu() {
     {
       id: 'ctx-menu-collapse',
       title: 'Collapse',
-      selector: 'node',
+      selector: 'node[expanded-collapsed="expanded"]',
       onClickFunction: function (event) {
         cy.undoRedo().do("collapse", {
           nodes: event.cyTarget
@@ -457,6 +387,56 @@ function cytoscapeExtensionsAndContextMenu() {
       }
     }
   ]);
+
+  cy.clipboard({
+    clipboardSize: 5, // Size of clipboard. 0 means unlimited. If size is exceeded, first added item in clipboard will be removed.
+    shortcuts: {
+      enabled: true, // Whether keyboard shortcuts are enabled
+      undoable: true // and if undoRedo extension exists
+    }
+  });
+
+  cy.viewUtilities({
+    node: {
+      highlighted: {
+        'border-width': '10px'
+      }, // styles for when nodes are highlighted.
+      unhighlighted: {// styles for when nodes are unhighlighted.
+        'opacity': function (ele) {
+          return ele.css('opacity');
+        }
+      },
+      hidden: {
+        "display": "none"
+      }
+    },
+    edge: {
+      highlighted: {
+        'width': '10px'
+      }, // styles for when edges are highlighted.
+      unhighlighted: {// styles for when edges are unhighlighted.
+        'opacity': function (ele) {
+          return ele.css('opacity');
+        }
+      },
+      hidden: {
+        "display": "none"
+      }
+    }
+  });
+
+  var panProps = ({
+    fitPadding: 10,
+    fitSelector: ':visible',
+    animateOnFit: function () {
+      return sbgnStyleRules['animate-on-drawing-changes'];
+    },
+    animateOnZoom: function () {
+      return sbgnStyleRules['animate-on-drawing-changes'];
+    }
+  });
+
+  sbgnNetworkContainer.cytoscapePanzoom(panProps);
 }
 
 function bindCyEvents() {
