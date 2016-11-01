@@ -2006,19 +2006,6 @@
   };
 })(cytoscape);
 
-var defaultSbgnStyleRules = {
-  'compound-padding': 10,
-  'dynamic-label-size': 'regular',
-  'fit-labels-to-nodes': false,
-  'rearrange-after-expand-collapse': true,
-  'tiling-padding-vertical': 20,
-  'tiling-padding-horizontal': 20,
-  'animate-on-drawing-changes': true
-};
-
-var sbgnStyleRules = _.clone(this.defaultSbgnStyleRules);
-
-
 //TODO: use CSS's "text-overflow:ellipsis" style instead of function below?
 var truncateText = function (textProp, font) {
   var context = document.createElement('canvas').getContext("2d");

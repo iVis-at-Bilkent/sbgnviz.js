@@ -6,7 +6,8 @@
         <title>SBGNViz.js</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        <link href="node_modules/jquery-ui-bundle/jquery-ui.css" rel="stylesheet">
+<!--    does NOT work as expected:   <link href="node_modules/jquery-ui-bundle/jquery-ui.css" rel="stylesheet">-->
+        <link href="lib/css/jquery-ui.css" rel="stylesheet">
         <link href="lib/css/jquery.fancybox-1.3.4.css" rel="stylesheet">
         <link href="lib/css/bootstrap.css" rel="stylesheet">
         <!--does NOT work:  <link href="node_modules/bootstrap/dist/css/bootstrap.css" rel="stylesheet">-->
@@ -16,10 +17,10 @@
         <link href="lib/css/jquery.qtip.min.css" rel="stylesheet" type="text/css" />
         <link href="node_modules/cytoscape-context-menus/cytoscape-context-menus.css" rel="stylesheet" type="text/css" />
         <!-- app's style -->
-        <link href="css/sbgnviz.css" rel="stylesheet">
+        <link href="sample-app/css/sbgnviz.css" rel="stylesheet">
 
         <!--global variables must come first-->
-        <script src="js/sbgnviz-global.js"></script>
+        <script src="src/sbgnviz-global.js"></script>
         <!-- libraries -->
         <script src="node_modules/jquery/dist/jquery.min.js"></script>
         <script src="node_modules/jquery.browser/dist/jquery.browser.js"></script>
@@ -43,13 +44,18 @@
         <script src="node_modules/cytoscape-edge-bend-editing/cytoscape-edge-bend-editing.js"></script>
         <script src="node_modules/cytoscape-view-utilities/cytoscape-view-utilities.js"></script>
         <!-- components -->
-        <script src="js/sbgn-extensions/cytoscape.renderer.canvas.sbgn-renderer.js"></script>
-        <script src="js/utilities/dialog-utilities.js"></script>
-        <script src="js/utilities/json-to-sbgnml-converter.js"></script>
-        <script src="js/utilities/sbgnml-to-json-converter.js"></script>
-        <script src="js/utilities/sbgn-element-utilities.js"></script>
-        <script src="js/biogene-info.js"></script>
-        <script src="js/sbgnviz.js"></script>
+        <script src="src/sbgn-extensions/cytoscape.renderer.canvas.sbgn-renderer.js"></script>
+        <script src="src/utilities/dialog-utilities.js"></script>
+        <script src="src/utilities/json-to-sbgnml-converter.js"></script>
+        <script src="src/utilities/sbgnml-to-json-converter.js"></script>
+        <script src="src/utilities/sbgn-element-utilities.js"></script>
+        <script src="sample-app/js/action-functions/add-remove-action-functions.js"></script>
+        <script src="sample-app/js/biogene-info.js"></script>
+        <script src="sample-app/js/general-sample-app-functions-and-variables.js"></script>
+        <script src="sample-app/js/sample-app-cytoscape-sbgn.js"></script>
+        <script src="sample-app/js/sample-app-menu-functions.js"></script>
+        
+        <!--<script src="js/sbgnviz.js"></script>-->
     </head>
 
     <body>
@@ -223,47 +229,47 @@
             <table width="100%" height="100%" align="center" valign="center">
                 <tr>
                 <div class="inside-menu">
-                <img id="load-file-icon" class="sbgn-toolbar-element" src="img/toolbar-icons/load.png" title="Load: Load an SBGN-PD map from SBGN-ML file">
-                <img id="save-icon" class="sbgn-toolbar-element" src="img/toolbar-icons/save.png" title="Save: Save current SBGN-PD map to an SBGN-ML file">
-                <img id="properties-icon" class="sbgn-toolbar-element" src="img/toolbar-icons/properties.png" title="Properties: Modify general properties of current SBGN-PD map" >
+                <img id="load-file-icon" class="sbgn-toolbar-element" src="sample-app/sampleapp-images/toolbar-icons/load.png" title="Load: Load an SBGN-PD map from SBGN-ML file">
+                <img id="save-icon" class="sbgn-toolbar-element" src="sample-app/sampleapp-images/toolbar-icons/save.png" title="Save: Save current SBGN-PD map to an SBGN-ML file">
+                <img id="properties-icon" class="sbgn-toolbar-element" src="sample-app/sampleapp-images/toolbar-icons/properties.png" title="Properties: Modify general properties of current SBGN-PD map" >
                 </div>
                 
                 <div class="menu-break-large sbgn-toolbar-element">&nbsp</div>
                 <div class="inside-menu">
                 
-                <img id="delete-selected-simple-icon" class="sbgn-toolbar-element" src="img/toolbar-icons/deletesimple.png" title="Delete Selected Simple: Delete selected nodes and interactions" >
-                <img id="delete-selected-smart-icon" class="sbgn-toolbar-element" src="img/toolbar-icons/deletesmart.png" title="Delete Selected Smart: Delete selected nodes and any processes they are involved in" >
+                <img id="delete-selected-simple-icon" class="sbgn-toolbar-element" src="sample-app/sampleapp-images/toolbar-icons/deletesimple.png" title="Delete Selected Simple: Delete selected nodes and interactions" >
+                <img id="delete-selected-smart-icon" class="sbgn-toolbar-element" src="sample-app/sampleapp-images/toolbar-icons/deletesmart.png" title="Delete Selected Smart: Delete selected nodes and any processes they are involved in" >
 
                 <div class="menu-break-small sbgn-toolbar-element">&nbsp</div>
-                <img id="undo-icon" class="sbgn-toolbar-element" src="img/toolbar-icons/undo.png" title="Undo: Undo the last operation" >
-                <img id="redo-icon" class="sbgn-toolbar-element" src="img/toolbar-icons/redo.png" title="Redo: Redo the last undone operation" >
+                <img id="undo-icon" class="sbgn-toolbar-element" src="sample-app/sampleapp-images/toolbar-icons/undo.png" title="Undo: Undo the last operation" >
+                <img id="redo-icon" class="sbgn-toolbar-element" src="sample-app/sampleapp-images/toolbar-icons/redo.png" title="Redo: Redo the last undone operation" >
 
                 </div>
                 
                 <div class="menu-break-large sbgn-toolbar-element">&nbsp</div>
                 <div class="inside-menu">
-                <img id="hide-selected-icon" class="sbgn-toolbar-element" src="img/toolbar-icons/hideselected.png" title="Hide Selected: Hide selected nodes and any processes they are involved in" >
+                <img id="hide-selected-icon" class="sbgn-toolbar-element" src="sample-app/sampleapp-images/toolbar-icons/hideselected.png" title="Hide Selected: Hide selected nodes and any processes they are involved in" >
                <!--TODO: 'show-selected-icon' does not work, and probably is not needed -->
-                <!--<img id="show-selected-icon" class="sbgn-toolbar-element" src="img/toolbar-icons/showselected.png" title="Show Selected: Show selected nodes and any processes they are involved in, hiding the remaining nodes and their interactions" >-->
+                <!--<img id="show-selected-icon" class="sbgn-toolbar-element" src="sample-app/sampleapp-images/toolbar-icons/showselected.png" title="Show Selected: Show selected nodes and any processes they are involved in, hiding the remaining nodes and their interactions" >-->
 
                 <div class="menu-break-small sbgn-toolbar-element">&nbsp</div>
-                <img id="collapse-selected-icon" class="sbgn-toolbar-element" src="img/toolbar-icons/collapseselected.png" title="Collapse Selected: Collapse selected compound node to hide its members" >
-                <img id="expand-selected-icon" class="sbgn-toolbar-element" src="img/toolbar-icons/expandselected.png" title="Expand Selected: Expand selected collapsed node to show its members" >
+                <img id="collapse-selected-icon" class="sbgn-toolbar-element" src="sample-app/sampleapp-images/toolbar-icons/collapseselected.png" title="Collapse Selected: Collapse selected compound node to hide its members" >
+                <img id="expand-selected-icon" class="sbgn-toolbar-element" src="sample-app/sampleapp-images/toolbar-icons/expandselected.png" title="Expand Selected: Expand selected collapsed node to show its members" >
                     
                 </div>
                 
                 <div class="menu-break-large sbgn-toolbar-element">&nbsp</div>
                 <div class="inside-menu">
-                <img id="search-by-label-icon" class="sbgn-toolbar-element" src="img/search.png" title="Search: Search and find (case insensitive) all nodes with specified label text, selecting them and highlighting them along with their processes" >
+                <img id="search-by-label-icon" class="sbgn-toolbar-element" src="sample-app/sampleapp-images/search.png" title="Search: Search and find (case insensitive) all nodes with specified label text, selecting them and highlighting them along with their processes" >
                 <input id="search-by-label-text-box" class="sbgn-toolbar-element" type="label">
-                <img id="highlight-neighbors-of-selected-icon" class="sbgn-toolbar-element" src="img/toolbar-icons/highlightneighborsofselected.png" title="Highlight Neighbors of Selected: Highlight selected nodes and their neighbors by ghosting remaining nodes" >
-                <img id="remove-highlights-icon" class="sbgn-toolbar-element" src="img/toolbar-icons/removehighlights.png" title="Remove Highlights: Remove any highlights" >
+                <img id="highlight-neighbors-of-selected-icon" class="sbgn-toolbar-element" src="sample-app/sampleapp-images/toolbar-icons/highlightneighborsofselected.png" title="Highlight Neighbors of Selected: Highlight selected nodes and their neighbors by ghosting remaining nodes" >
+                <img id="remove-highlights-icon" class="sbgn-toolbar-element" src="sample-app/sampleapp-images/toolbar-icons/removehighlights.png" title="Remove Highlights: Remove any highlights" >
                 </div>
                 
                 <div class="menu-break-large sbgn-toolbar-element">&nbsp</div>
                 <div class="inside-menu">
-                <img id="perform-layout-icon" class="sbgn-toolbar-element" src="img/toolbar-icons/layout-cose.png" title="Perform Layout: Perform a force-directed layout of current map, maintaining compound structures" >
-                <img id="layout-properties-icon" class="sbgn-toolbar-element" src="img/toolbar-icons/layoutproperties.png" title="Layout Properties: Modify parameters used during layout" >
+                <img id="perform-layout-icon" class="sbgn-toolbar-element" src="sample-app/sampleapp-images/toolbar-icons/layout-cose.png" title="Perform Layout: Perform a force-directed layout of current map, maintaining compound structures" >
+                <img id="layout-properties-icon" class="sbgn-toolbar-element" src="sample-app/sampleapp-images/toolbar-icons/layoutproperties.png" title="Layout Properties: Modify parameters used during layout" >
                 </div>
                 </tr>
                 
@@ -301,14 +307,14 @@
         <script type="text/template" id="node-legend-template">
             <div class="sbgn-frame">
             <h2 class="sbgn-text">Node Legend</h2>
-            <img src="img/node_legend_sbgn.png" alt="" class="centered">
+            <img src="sample-app/sampleapp-images/node_legend_sbgn.png" alt="" class="centered">
             </div>
         </script>
 
         <script type="text/template" id="edge-legend-template">
             <div class="sbgn-frame">
             <h2 class="sbgn-text">Interaction Legend</h2>
-            <img src="img/interaction_legend_sbgn.png" alt="" class="centered">
+            <img src="sample-app/sampleapp-images/interaction_legend_sbgn.png" alt="" class="centered">
             </div>
         </script>
 
@@ -318,11 +324,11 @@
 
             <table width="100%" height="100%" align="center" valign="center">
             <tr><td>
-            <img src="img/i-vis.png" alt="" class="centered">
+            <img src="sample-app/sampleapp-images/i-vis.png" alt="" class="centered">
             </td></tr>
 
             <tr><td>
-            <img src="img/cbio.png" alt="" class="centered">
+            <img src="sample-app/sampleapp-images/cbio.png" alt="" class="centered">
             </td></tr>
 
             <tr><td>
@@ -379,7 +385,7 @@
 
         <script type="text/template" id="loading-small-template">
             <p class="sbgn-text"> <%= name %> </p>
-            <img class="centered" src="img/loading-small.gif" height="auto" width="auto" align="middle">
+            <img class="centered" src="sample-app/sampleapp-images/loading-small.gif" height="auto" width="auto" align="middle">
         </script>
 
         <script type="text/template" id="layout-settings-template">

@@ -113,11 +113,10 @@ var sbgnElementUtilities = {
     //the following were moved here from what used to be utilities/sbgn-filtering.js
     processTypes : ['process', 'omitted process', 'uncertain process',
         'association', 'dissociation', 'phenotype'],
-    deleteSelected: function(){
+    deleteElesSmart: function(eles){
         var allNodes = cy.nodes();
-        var selectedNodes = cy.nodes(":selected");
         cy.elements().unselect();
-        var nodesToShow = this.expandRemainingNodes(selectedNodes, allNodes);
+        var nodesToShow = this.extendRemainingNodes (eles, allNodes);
         var nodesNotToShow = allNodes.not(nodesToShow);
         var connectedEdges = nodesNotToShow.connectedEdges();
         var removedEles = connectedEdges.remove();
@@ -126,7 +125,7 @@ var sbgnElementUtilities = {
     },
     getProcessesOfSelected: function(){
         var selectedEles = cy.elements(":selected");
-        selectedEles = this.expandNodes(selectedEles);
+        selectedEles = this.extendNodeList(selectedEles);
         return selectedEles;
     },
     getNeighboursOfSelected: function(){
@@ -138,7 +137,7 @@ var sbgnElementUtilities = {
         elesToHighlight = elesToHighlight.add(elesToHighlight.descendants());
         return elesToHighlight;
     },
-    expandNodes: function(nodesToShow){
+    extendNodeList: function(nodesToShow){
         var self = this;
         //add children
         nodesToShow = nodesToShow.add(nodesToShow.nodes().descendants());
@@ -172,10 +171,10 @@ var sbgnElementUtilities = {
 
         return nodesToShow;
     },
-    expandRemainingNodes: function(nodesToFilter, allNodes){
-        nodesToFilter = this.expandNodes(nodesToFilter);
+    extendRemainingNodes : function(nodesToFilter, allNodes){
+        nodesToFilter = this.extendNodeList(nodesToFilter);
         var nodesToShow = allNodes.not(nodesToFilter);
-        nodesToShow = this.expandNodes(nodesToShow);
+        nodesToShow = this.extendNodeList(nodesToShow);
         return nodesToShow;
     },
     noneIsNotHighlighted: function(){
@@ -209,26 +208,13 @@ var sbgnElementUtilities = {
         cy.elements().unselect();
         return eles.remove();
     },
-    removeEles: function (eles) {
+    deleteElesSimple: function (eles) {
         cy.elements().unselect();
         var edges = eles.edges();
         var nodes = eles.nodes();
         var removedEles = this.removeEdges(edges);
         removedEles = removedEles.union(this.removeNodes(nodes));
         return removedEles;
-    },
-    // the following were moved here from what used to be add-remove-action-functions.js (removing duplicate declarations)
-    restoreSelected: function (eles) {
-        var param = {};
-        param.eles = restoreEles(eles);
-        param.firstTime = false;
-        return param;
-    },
-    deleteSelected: function (param) {
-        if (param.firstTime) {
-            return this.removeEles(param.eles);
-        }
-        return this.removeElesSimply(param.eles);
     },
     // (this is the only function) moved here from common-element-properies.js
     isEPNClass: function(sbgnclass) {

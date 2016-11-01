@@ -22,6 +22,7 @@
     "cytoscape-qtip": "~2.3.0",
     "filesaverjs": "~0.2.2",
     "backbone": "1.3.3",
+    "underscore": "1.8.3",
     "cytoscape-cose-bilkent": "latest",
     "cytoscape-undo-redo": "latest",
     "cytoscape-expand-collapse": "latest",
