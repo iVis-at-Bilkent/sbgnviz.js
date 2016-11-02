@@ -36,6 +36,12 @@ var sbgnElementUtilities = {
         'complex multimer': true,
         'compartment': true
     },
+    //the following were moved here from what used to be utilities/sbgn-filtering.js
+    processTypes : ['process', 'omitted process', 'uncertain process',
+        'association', 'dissociation', 'phenotype'],
+      
+    // Section Start
+    // General Element Utilities
 
     //this method returns the nodes non of whose ancestors is not in given nodes
     getTopMostNodes: function (nodes) {
@@ -110,19 +116,13 @@ var sbgnElementUtilities = {
         y: y
       };
     },
-    //the following were moved here from what used to be utilities/sbgn-filtering.js
-    processTypes : ['process', 'omitted process', 'uncertain process',
-        'association', 'dissociation', 'phenotype'],
-    deleteElesSmart: function(eles){
-        var allNodes = cy.nodes();
-        cy.elements().unselect();
-        var nodesToShow = this.extendRemainingNodes (eles, allNodes);
-        var nodesNotToShow = allNodes.not(nodesToShow);
-        var connectedEdges = nodesNotToShow.connectedEdges();
-        var removedEles = connectedEdges.remove();
-        removedEles = removedEles.union(nodesNotToShow.remove());
-        return removedEles;
-    },
+    
+    // Section End
+    // General Element Utilities
+
+    // Section Start
+    // Element Filtering Utilities
+    
     getProcessesOfSelected: function(){
         var selectedEles = cy.elements(":selected");
         selectedEles = this.extendNodeList(selectedEles);
@@ -183,8 +183,14 @@ var sbgnElementUtilities = {
 
         return notHighlightedNodes.length + notHighlightedEdges.length === 0;
     },
-    // the following were moved here from what used to be add-remove-utilities.js
-    //TODO: remove add/remove features (it's SBGN VIEWER, not editor...)
+    
+    // Section End
+    // Element Filtering Utilities
+
+    // Section Start
+    // Add remove utilities
+
+    
     removeNodes: function (nodes) {
         var removedEles = nodes.connectedEdges().remove();
         var children = nodes.children();
@@ -216,7 +222,23 @@ var sbgnElementUtilities = {
         removedEles = removedEles.union(this.removeNodes(nodes));
         return removedEles;
     },
-    // (this is the only function) moved here from common-element-properies.js
+    deleteElesSmart: function(eles){
+        var allNodes = cy.nodes();
+        cy.elements().unselect();
+        var nodesToShow = this.extendRemainingNodes (eles, allNodes);
+        var nodesNotToShow = allNodes.not(nodesToShow);
+        var connectedEdges = nodesNotToShow.connectedEdges();
+        var removedEles = connectedEdges.remove();
+        removedEles = removedEles.union(nodesNotToShow.remove());
+        return removedEles;
+    },
+    
+    // Section End
+    // Add remove utilities
+
+    // Section Start
+    // Common element properties
+    
     isEPNClass: function(sbgnclass) {
         return (sbgnclass == 'unspecified entity'
         || sbgnclass == 'simple chemical'
@@ -224,6 +246,13 @@ var sbgnElementUtilities = {
         || sbgnclass == 'nucleic acid feature'
         || sbgnclass == 'complex');
     },
+    
+    // Section End
+    // Common element properties
+
+    // Section Start
+    // Stylesheet helpers
+    
     getCyShape: function(ele) {
         var shape = ele.data('sbgnclass');
         if (shape.endsWith(' multimer')) {
@@ -358,4 +387,7 @@ var sbgnElementUtilities = {
 
         return textHeight;
     }
+    
+    // Section End
+    // Stylesheet helpers
 };

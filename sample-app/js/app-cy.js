@@ -283,8 +283,8 @@ function registerUndoRedoActions() {
 
     // register general actions
     // register add remove actions
-    ur.action("deleteElesSimple", addRemoveActionFunctions.deleteElesSimple, addRemoveActionFunctions.restoreEles);
-    ur.action("deleteElesSmart", addRemoveActionFunctions.deleteElesSmart, addRemoveActionFunctions.restoreEles);
+    ur.action("deleteElesSimple", undoRedoActionFunctions.deleteElesSimple, undoRedoActionFunctions.restoreEles);
+    ur.action("deleteElesSmart", undoRedoActionFunctions.deleteElesSmart, undoRedoActionFunctions.restoreEles);
 }
 
 function cytoscapeExtensionsAndContextMenu() {

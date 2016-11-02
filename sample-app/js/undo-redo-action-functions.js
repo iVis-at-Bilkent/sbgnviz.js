@@ -1,4 +1,6 @@
-var addRemoveActionFunctions = {
+var undoRedoActionFunctions = {
+  // Section Start
+  // Add/remove action functions
   deleteElesSimple: function (param) {
     return sbgnElementUtilities.deleteElesSimple(param.eles);
   },
@@ -13,4 +15,6 @@ var addRemoveActionFunctions = {
     }
     return sbgnElementUtilities.removeElesSimply(param.eles);
   },
+  // Section End
+  // Add/remove action functions
 };
