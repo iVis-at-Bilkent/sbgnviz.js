@@ -59,6 +59,8 @@ var sbgnvizUpdate = function (cyGraph) {
   refreshPaddings();
 
   cy.endBatch();
+  
+  cy.edgeBendEditing('get').initBendPoints(cy.edges());
 
   window.firstSelectedNode = null;
 };
