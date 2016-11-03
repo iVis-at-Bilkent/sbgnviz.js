@@ -496,7 +496,7 @@ function loadSample(filename){
   setTimeout(function () {
     sbgnvizUpdate(sbgnmlToJson.convert(xmlObject));
     endSpinner("load-spinner");
-  }, 100);
+  }, 0);
 }
 
 function loadSBGNMLFile(file) {
@@ -508,9 +508,13 @@ function loadSBGNMLFile(file) {
 
     reader.onload = function (e) {
       var text = this.result;
-      sbgnvizUpdate(sbgnmlToJson.convert(textToXmlObject(text)));
-      endSpinner("load-file-spinner");
+      
+      setTimeout(function () {
+        sbgnvizUpdate(sbgnmlToJson.convert(textToXmlObject(text)));
+        endSpinner("load-file-spinner");
+      }, 0);
     };
+    
     reader.readAsText(file);
     setFileContent(file.name);
   });
