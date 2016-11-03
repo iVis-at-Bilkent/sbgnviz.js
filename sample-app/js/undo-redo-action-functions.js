@@ -13,7 +13,7 @@ var undoRedoActionFunctions = {
     if (param.firstTime) {
       return sbgnElementUtilities.deleteElesSmart(param.eles);
     }
-    return sbgnElementUtilities.removeElesSimply(param.eles);
+    return sbgnElementUtilities.deleteElesSimple(param.eles);
   },
   // Section End
   // Add/remove action functions

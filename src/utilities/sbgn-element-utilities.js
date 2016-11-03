@@ -191,46 +191,20 @@ var sbgnElementUtilities = {
     // Add remove utilities
 
     
-    removeNodes: function (nodes) {
-        var removedEles = nodes.connectedEdges().remove();
-        var children = nodes.children();
-        if (children != null && children.length > 0) {
-            removedEles = removedEles.union(this.removeNodes(children));
-        }
-        var parents = nodes.parents();
-        removedEles = removedEles.union(nodes.remove());
-        cy.nodes().updateCompoundBounds();
-        refreshPaddings();
-        return removedEles;
-    },
-    removeEdges: function (edges) {
-        return edges.remove();
-    },
     restoreEles: function (eles) {
         eles.restore();
         return eles;
     },
-    removeElesSimply: function (eles) {
-        cy.elements().unselect();
-        return eles.remove();
-    },
     deleteElesSimple: function (eles) {
-        cy.elements().unselect();
-        var edges = eles.edges();
-        var nodes = eles.nodes();
-        var removedEles = this.removeEdges(edges);
-        removedEles = removedEles.union(this.removeNodes(nodes));
-        return removedEles;
+      cy.elements().unselect();
+      return eles.remove();
     },
-    deleteElesSmart: function(eles){
-        var allNodes = cy.nodes();
-        cy.elements().unselect();
-        var nodesToShow = this.extendRemainingNodes (eles, allNodes);
-        var nodesNotToShow = allNodes.not(nodesToShow);
-        var connectedEdges = nodesNotToShow.connectedEdges();
-        var removedEles = connectedEdges.remove();
-        removedEles = removedEles.union(nodesNotToShow.remove());
-        return removedEles;
+    deleteElesSmart: function (eles) {
+      var allNodes = cy.nodes();
+      cy.elements().unselect();
+      var nodesToKeep = this.extendRemainingNodes(eles, allNodes);
+      var nodesNotToKeep = allNodes.not(nodesToKeep);
+      return nodesNotToKeep.remove();
     },
     
     // Section End
