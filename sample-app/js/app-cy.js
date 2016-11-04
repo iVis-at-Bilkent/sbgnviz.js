@@ -365,7 +365,7 @@ function cytoscapeExtensionsAndContextMenu() {
     {
       id: 'ctx-menu-collapse',
       title: 'Collapse',
-      selector: 'node[expanded-collapsed="expanded"]',
+      selector: 'node[expanded-collapsed!="collapsed"][sbgnclass="complex"],[expanded-collapsed!="collapsed"][sbgnclass="compartment"]',
       onClickFunction: function (event) {
         cy.undoRedo().do("collapse", {
           nodes: event.cyTarget
