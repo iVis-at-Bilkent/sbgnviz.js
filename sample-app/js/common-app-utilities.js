@@ -61,8 +61,6 @@ var sbgnvizUpdate = function (cyGraph) {
   cy.endBatch();
   
   cy.edgeBendEditing('get').initBendPoints(cy.edges());
-
-  window.firstSelectedNode = null;
 };
 
 var getExpandCollapseOptions = function() {

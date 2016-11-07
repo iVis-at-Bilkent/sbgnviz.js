@@ -77,19 +77,6 @@ var sbgnElementUtilities = {
         }
         return true;
     },
-    //This method propogates given replacement to the children of the given node recursively
-    propogateReplacementToChildren: function (node, dx, dy) {
-        var children = node.children();
-        for(var i = 0; i < children.length; i++){
-            var child = children[i];
-            child.position({
-               x: child.position('x') + dx,
-               y: child.position('y') + dy
-            });
-            
-            this.propogateReplacementToChildren(child, dx, dy);
-        }
-    },
     moveNodes: function(positionDiff, nodes, notCalcTopMostNodes) {
       var topMostNodes = notCalcTopMostNodes ? nodes : sbgnElementUtilities.getTopMostNodes(nodes);
       for (var i = 0; i < topMostNodes.length; i++) {

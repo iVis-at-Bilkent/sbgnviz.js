@@ -512,51 +512,6 @@ function bindCyEvents() {
     refreshUndoRedoButtonsStatus();
   });
 
-  cy.on("mousedown", "node", function () {
-    var self = this;
-    if (window.ctrlKeyDown) {
-      enableDragAndDropMode();
-      window.nodeToDragAndDrop = self;
-    }
-  });
-
-  cy.on("mouseup", function (event) {
-    var self = event.cyTarget;
-    if (window.dragAndDropModeEnabled) {
-      var nodesData = getNodesData();
-      nodesData.firstTime = true;
-      var newParent;
-      if (self != cy) {
-        newParent = self;
-      }
-      var node = window.nodeToDragAndDrop;
-
-      if (newParent && self.data("sbgnclass") != "complex" && self.data("sbgnclass") != "compartment") {
-        return;
-      }
-
-      if (newParent && self.data("sbgnclass") == "complex" && !sbgnElementUtilities.isEPNClass(node.data("sbgnclass"))) {
-        return;
-      }
-
-      disableDragAndDropMode();
-
-      if (node.parent()[0] == newParent || node._private.data.parent == node.id()) {
-        return;
-      }
-
-      var param = {
-        newParent: newParent,
-        node: node,
-        nodesData: nodesData,
-        posX: event.cyPosition.x,
-        posY: event.cyPosition.y
-      };
-
-      cy.undoRedo().do("changeParent", param);
-    }
-  });
-
   cy.on('mouseover', 'node', function (event) {
     var node = this;
 
@@ -577,18 +532,6 @@ function bindCyEvents() {
     }
     this.mouseover = false;           //make preset layout to redraw the nodes
     cy.forceRender();
-  });
-
-  cy.on('select', 'node', function (event) {
-    if (cy.nodes(':selected').filter(':visible').length == 1) {
-      window.firstSelectedNode = this;
-    }
-  });
-
-  cy.on('unselect', 'node', function (event) {
-    if (window.firstSelectedNode == this) {
-      window.firstSelectedNode = null;
-    }
   });
   
   cy.on('tapend', 'node', function (event) {

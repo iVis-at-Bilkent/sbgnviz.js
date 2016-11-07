@@ -50,7 +50,7 @@ An example call is here.
         );"
 
 In BRp.registerNodeShapes function 
-"var nodeShapes = this.nodeShapes = {}" => "var nodeShapes = this.nodeShapes = window.cyNodeShapes"
+"var nodeShapes = this.nodeShapes = {}" => "var nodeShapes = this.nodeShapes = cyVariables.cyNodeShapes"
 
 Added "cytoscape.sbgn.registerSbgnNodeShapes();" statement to BRp.registerNodeShapes function.
 
@@ -69,17 +69,17 @@ An example call is
         }"
 
 Before the definition of CRp.drawPolygonPath function,
-"var CRp = {};" => "var CRp = window.cyRenderer;"
+"var CRp = {};" => "var CRp = cyVariables.cyRenderer;"
 
 CRp.usePaths function returns false.
 
-"var math = {};" => "var math = window.cyMath;"
+"var math = {};" => "var math = cyVariables.cyMath;"
 
-"var styfn = {};" => "var styfn = window.cyStyfn;"
+"var styfn = {};" => "var styfn = cyVariables.cyStyfn;"
 
 Add 'cytoscape.sbgn.registerSbgnArrowShapes();' to the end of 'registerArrowShapes' function
 
-Replace 'var arrowShapes = this.arrowShapes = {};' at the beggining of 'registerArrowShapes' function with 'var arrowShapes = this.arrowShapes = window.cyArrowShapes;'
+Replace 'var arrowShapes = this.arrowShapes = {};' at the beggining of 'registerArrowShapes' function with 'var arrowShapes = this.arrowShapes = cyVariables.cyArrowShapes;'
 
 In 'BRp.findEndpoints' add  'var porttarget = edge._private.data.porttarget;'
                             'var portsource = edge._private.data.portsource;' inside variables.
