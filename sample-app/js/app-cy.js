@@ -20,7 +20,6 @@ $(document).ready(function ()
   });
 });
 
-// sbgnviz stylesheet to use with cytoscape.js
 var sbgnStyleSheet = cytoscape.stylesheet()
     .selector("node")
     .css({
@@ -34,7 +33,7 @@ var sbgnStyleSheet = cytoscape.stylesheet()
     })
     .selector("node[?sbgnclonemarker][sbgnclass='perturbing agent']")
     .css({
-      'background-image': 'sampleapp-images/clone_bg.png',
+      'background-image': 'sample-app/sampleapp-images/clone_bg.png',
       'background-position-x': '50%',
       'background-position-y': '100%',
       'background-width': '100%',
@@ -81,21 +80,6 @@ var sbgnStyleSheet = cytoscape.stylesheet()
       'background-color': '#F4F3EE',
       'text-valign': 'bottom',
       'text-halign': 'center',
-      'font-size': function (ele) {
-        return sbgnElementUtilities.getLabelTextSize(ele);
-      },
-      'width': function(ele){
-        if(ele.children() == null || ele.children().length == 0){
-          return '36';
-        }
-        return ele.data('width');
-      },
-      'height': function(ele){
-        if(ele.children() == null || ele.children().length == 0){
-          return '36';
-        }
-        return ele.data('height');
-      },
       'content': function(ele){
         return sbgnElementUtilities.getElementContent(ele);
       }
@@ -108,28 +92,18 @@ var sbgnStyleSheet = cytoscape.stylesheet()
       'content': function(ele){
         return sbgnElementUtilities.getElementContent(ele);
       },
-      'width': function(ele){
-        if(ele.children() == null || ele.children().length == 0){
-          return '36';
-        }
-        return ele.data('width');
-      },
-      'height': function(ele){
-        if(ele.children() == null || ele.children().length == 0){
-          return '36';
-        }
-        return ele.data('height');
-      },
       'text-valign': 'bottom',
-      'text-halign': 'center',
-      'font-size': function (ele) {
-        return sbgnElementUtilities.getLabelTextSize(ele);
-      }
+      'text-halign': 'center'
     })
-    .selector("node[sbgnclass][sbgnclass!='complex'][sbgnclass!='compartment'][sbgnclass!='submap']")
+    .selector("node[sbgnbbox][sbgnclass][sbgnclass!='complex'][sbgnclass!='compartment'][sbgnclass!='submap']")
     .css({
       'width': 'data(sbgnbbox.w)',
       'height': 'data(sbgnbbox.h)'
+    })
+    .selector("node[expanded-collapsed='collapsed']")
+    .css({
+      'width': 36,
+      'height': 36
     })
     .selector("node:selected")
     .css({
@@ -150,6 +124,48 @@ var sbgnStyleSheet = cytoscape.stylesheet()
       'width': 1.5,
       'target-arrow-color': '#555',
       'source-arrow-color': '#555',
+      'text-border-color': function(ele){
+        if(ele.selected()) {
+          return '#d67614';
+        }
+        return ele.data('lineColor') || ele.css('line-color');
+      },
+      'color': function(ele){
+        if(ele.selected()) {
+          return '#d67614';
+        }
+        return ele.data('lineColor') || ele.css('line-color');
+      }
+//          'target-arrow-shape': 'data(sbgnclass)'
+    })
+    .selector("edge[sbgncardinality > 0]")
+    .css({
+      'text-rotation': 'autorotate',
+      'text-background-shape': 'rectangle',
+      'text-border-opacity': '1',
+      'text-border-width': '1',
+      'text-background-color': 'white',
+      'text-background-opacity': '1'
+    })
+    .selector("edge[sbgnclass='consumption'][sbgncardinality > 0]")
+    .css({
+      'source-label': function(ele) {
+        return '' + ele.data('sbgncardinality');
+      },
+      'source-text-margin-y': '-10',
+      'source-text-offset': function(ele) {
+        return sbgnElementUtilities.getCardinalityDistance(ele);
+      }
+    })
+    .selector("edge[sbgnclass='production'][sbgncardinality > 0]")
+    .css({
+      'target-label': function(ele) {
+        return '' + ele.data('sbgncardinality');
+      },
+      'target-text-margin-y': '-10',
+      'target-text-offset': function(ele) {
+        return sbgnElementUtilities.getCardinalityDistance(ele);
+      }
     })
     .selector("edge[sbgnclass]")
     .css({
@@ -162,14 +178,9 @@ var sbgnStyleSheet = cytoscape.stylesheet()
     .css({
       'target-arrow-fill': 'filled'
     })
-    .selector("edge[sbgnclass='consumption']")
-    .css({
-      'line-style': 'consumption'
-    })
     .selector("edge[sbgnclass='production']")
     .css({
-      'target-arrow-fill': 'filled',
-      'line-style': 'production'
+      'target-arrow-fill': 'filled'
     })
     .selector("edge:selected")
     .css({
@@ -218,7 +229,7 @@ var sbgnStyleSheet = cytoscape.stylesheet()
       'source-arrow-color': '#d67614',
       'target-arrow-color': '#d67614'
     })
-    .selector("node.changeBackgroundOpacity")
+    .selector("node.changeBackgroundOpacity[backgroundOpacity]")
     .css({
       'background-opacity': 'data(backgroundOpacity)'
     })
@@ -578,6 +589,10 @@ function bindCyEvents() {
     if (window.firstSelectedNode == this) {
       window.firstSelectedNode = null;
     }
+  });
+  
+  cy.on('tapend', 'node', function (event) {
+    cy.style().update();
   });
 
   cy.on('tap', function (event) {

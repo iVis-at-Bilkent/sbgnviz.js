@@ -331,35 +331,54 @@ var sbgnElementUtilities = {
         var font = this.getLabelTextSize(ele) + "px Arial";
         return truncateText(textProp, font); //func. in the cytoscape.renderer.canvas.sbgn-renderer.js
     },
-    getLabelTextSize: function(ele) {
-        var sbgnclass = ele.data('sbgnclass');
-        if (sbgnclass.endsWith('process')) {
-            return 18;
-        }
-        else if(sbgnclass === 'complex' || sbgnclass === 'compartment') {
-            return 16;
-        }
-        return this.getDynamicLabelTextSize(ele);
-    },
-    getDynamicLabelTextSize: function(ele) {
-        // Calculates the dynamic label size for the given node.
-        var dynamicLabelSize = sbgnStyleRules['dynamic-label-size'];
-        var dynamicLabelSizeCoefficient;
+    getLabelTextSize: function (ele) {
+      var sbgnclass = ele.data('sbgnclass');
 
+      // These types of nodes cannot have label but this is statement is needed as a workaround
+      if (sbgnclass === 'association' || sbgnclass === 'dissociation') {
+        return 20;
+      }
+
+      if (sbgnclass === 'and' || sbgnclass === 'or' || sbgnclass === 'not') {
+        return sbgnElementUtilities.getDynamicLabelTextSize(ele, 1);
+      }
+
+      if (sbgnclass.endsWith('process')) {
+        return sbgnElementUtilities.getDynamicLabelTextSize(ele, 1.5);
+      }
+
+      if (sbgnclass === 'complex' || sbgnclass === 'compartment') {
+        return 16;
+      }
+
+      return sbgnElementUtilities.getDynamicLabelTextSize(ele);
+    },
+    getDynamicLabelTextSize: function (ele, dynamicLabelSizeCoefficient) {
+      var dynamicLabelSize = sbgnStyleRules['dynamic-label-size'];
+
+      if (dynamicLabelSizeCoefficient === undefined) {
         if (dynamicLabelSize == 'small') {
-            dynamicLabelSizeCoefficient = 0.75;
+          dynamicLabelSizeCoefficient = 0.75;
         }
         else if (dynamicLabelSize == 'regular') {
-            dynamicLabelSizeCoefficient = 1;
+          dynamicLabelSizeCoefficient = 1;
         }
         else if (dynamicLabelSize == 'large') {
-            dynamicLabelSizeCoefficient = 1.25;
+          dynamicLabelSizeCoefficient = 1.25;
         }
+      }
+      
+      var h = ele.height();
+      var textHeight = parseInt(h / 2.45) * dynamicLabelSizeCoefficient;
 
-        var h = ele.height();
-        var textHeight = parseInt(h / 2.45) * dynamicLabelSizeCoefficient;
+      return textHeight;
+    },
+    getCardinalityDistance: function (ele) {
+        var srcPos = ele.source().position();
+        var tgtPos = ele.target().position();
 
-        return textHeight;
+        var distance = Math.sqrt(Math.pow((srcPos.x - tgtPos.x), 2) + Math.pow((srcPos.y - tgtPos.y), 2));
+        return distance * 0.15;
     }
     
     // Section End
