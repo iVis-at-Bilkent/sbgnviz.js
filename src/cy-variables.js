@@ -8,3 +8,5 @@ var cyVariables = {
   cyRenderer: {},
   cyArrowShapes: {}
 };
+
+module.exports = cyVariables;

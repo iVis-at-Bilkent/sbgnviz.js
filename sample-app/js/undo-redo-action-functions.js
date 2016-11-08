@@ -18,3 +18,5 @@ var undoRedoActionFunctions = {
   // Section End
   // Add/remove action functions
 };
+
+module.exports = undoRedoActionFunctions;

@@ -1,27 +1,3 @@
-function loadXMLDoc(filename) {
-  if (window.XMLHttpRequest) {
-    xhttp = new XMLHttpRequest();
-  }
-  else {
-    xhttp = new ActiveXObject("Microsoft.XMLHTTP");
-  }
-  xhttp.open("GET", filename, false);
-  xhttp.send();
-  return xhttp.responseXML;
-}
-
-function textToXmlObject(text) {
-  if (window.ActiveXObject) {
-    var doc = new ActiveXObject('Microsoft.XMLDOM');
-    doc.async = 'false';
-    doc.loadXML(text);
-  } else {
-    var parser = new DOMParser();
-    var doc = parser.parseFromString(text, 'text/xml');
-  }
-  return doc;
-}
-
 var sbgnmlToJson = {
   insertedNodes: {},
   getAllCompartments: function (xmlObject) {
@@ -326,3 +302,5 @@ var sbgnmlToJson = {
     return cytoscapeJsGraph;
   }
 };
+
+module.exports = sbgnmlToJson;

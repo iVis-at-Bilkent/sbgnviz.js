@@ -244,3 +244,5 @@ var jsonToSbgnml = {
         return sbgnmlText;
     }
 };
+
+module.exports = jsonToSbgnml;

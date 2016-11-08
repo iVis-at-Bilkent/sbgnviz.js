@@ -371,3 +371,5 @@ var sbgnElementUtilities = {
     // Section End
     // Stylesheet helpers
 };
+
+module.exports = sbgnElementUtilities;

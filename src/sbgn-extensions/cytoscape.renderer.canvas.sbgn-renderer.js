@@ -1,4 +1,6 @@
-(function ($$) {
+module.exports = function (cytoscape) {
+  var $$ = cytoscape;
+  
   var sbgnShapes = $$.sbgnShapes = {
     'source and sink': true,
     'nucleic acid feature': true,
@@ -2004,7 +2006,7 @@
 
     return false;
   };
-})(cytoscape);
+};
 
 //TODO: use CSS's "text-overflow:ellipsis" style instead of function below?
 var truncateText = function (textProp, font) {

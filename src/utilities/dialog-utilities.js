@@ -89,4 +89,6 @@ var dialogUtilities = {
   }
 };
 
+module.exports = dialogUtilities;
+
 
