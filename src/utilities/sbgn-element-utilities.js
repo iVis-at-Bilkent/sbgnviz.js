@@ -1,3 +1,6 @@
+var textUtilities = require('./text-utilities').truncateText;
+var sbgnStyleRules = require('../../sample-app/js/common-app-utilities').sbgnStyleRules;
+
 var sbgnElementUtilities = {
     //the list of the element classes handled by the tool
     handledElements: {
@@ -78,7 +81,7 @@ var sbgnElementUtilities = {
         return true;
     },
     moveNodes: function(positionDiff, nodes, notCalcTopMostNodes) {
-      var topMostNodes = notCalcTopMostNodes ? nodes : sbgnElementUtilities.getTopMostNodes(nodes);
+      var topMostNodes = notCalcTopMostNodes ? nodes : this.getTopMostNodes(nodes);
       for (var i = 0; i < topMostNodes.length; i++) {
         var node = topMostNodes[i];
         var oldX = node.position("x");
@@ -327,18 +330,18 @@ var sbgnElementUtilities = {
       }
 
       if (sbgnclass === 'and' || sbgnclass === 'or' || sbgnclass === 'not') {
-        return sbgnElementUtilities.getDynamicLabelTextSize(ele, 1);
+        return this.getDynamicLabelTextSize(ele, 1);
       }
 
       if (sbgnclass.endsWith('process')) {
-        return sbgnElementUtilities.getDynamicLabelTextSize(ele, 1.5);
+        return this.getDynamicLabelTextSize(ele, 1.5);
       }
 
       if (sbgnclass === 'complex' || sbgnclass === 'compartment') {
         return 16;
       }
 
-      return sbgnElementUtilities.getDynamicLabelTextSize(ele);
+      return this.getDynamicLabelTextSize(ele);
     },
     getDynamicLabelTextSize: function (ele, dynamicLabelSizeCoefficient) {
       var dynamicLabelSize = sbgnStyleRules['dynamic-label-size'];

@@ -1,7 +1,12 @@
 // Handle sbgnviz menu functions which are to be triggered on events
 module.exports = function () {
-  var BackboneViews = require('backbone-views');
-  var commonAppUtilities = require('common-app-utilities');
+  var BackboneViews = require('./backbone-views');
+  var commonAppUtilities = require('./common-app-utilities');
+  var sbgnmlToJson = require('../../src/utilities/sbgnml-to-json-converter');
+  var jsonToSbgnml = require('../../src/utilities/json-to-sbgnml-converter');
+  var sbgnElementUtilities = require('../../src/utilities/sbgn-element-utilities');
+  var dialogUtilities = require('../../src/utilities/dialog-utilities');
+  
   var sbgnvizUpdate = commonAppUtilities.sbgnvizUpdate;
   var dynamicResize = commonAppUtilities.dynamicResize;
   var sbgnStyleRules = commonAppUtilities.sbgnStyleRules;

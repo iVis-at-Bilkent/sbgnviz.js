@@ -1,5 +1,7 @@
 module.exports = function (cytoscape) {
   var $$ = cytoscape;
+  var truncateText = require('../utilities/text-utilities').truncateText;
+  var cyVariables = require('../cy-variables');
   
   var sbgnShapes = $$.sbgnShapes = {
     'source and sink': true,
@@ -2006,25 +2008,4 @@ module.exports = function (cytoscape) {
 
     return false;
   };
-};
-
-//TODO: use CSS's "text-overflow:ellipsis" style instead of function below?
-var truncateText = function (textProp, font) {
-  var context = document.createElement('canvas').getContext("2d");
-  context.font = font;
-  var fitLabelsToNodes = sbgnStyleRules['fit-labels-to-nodes'];
-  var text = textProp.label || "";
-  //If fit labels to nodes is false do not truncate
-  if (fitLabelsToNodes == false) {
-    return text;
-  }
-  var width;
-  var len = text.length;
-  var ellipsis = "..";
-  var textWidth = (textProp.width > 30) ? textProp.width - 10 : textProp.width;
-  while ((width = context.measureText(text).width) > textWidth) {
-    --len;
-    text = text.substring(0, len) + ellipsis;
-  }
-  return text;
 };

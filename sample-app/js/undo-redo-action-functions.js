@@ -1,3 +1,5 @@
+var sbgnElementUtilities = require('../../src/utilities/sbgn-element-utilities');
+
 var undoRedoActionFunctions = {
   // Section Start
   // Add/remove action functions

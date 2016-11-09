@@ -1,4 +1,7 @@
-var commonAppUtilities = require('common-app-utilities');
+var commonAppUtilities = require('./common-app-utilities');
+var sbgnmlToJson = require('../../src/utilities/sbgnml-to-json-converter');
+var dialogUtilities = require('../../src/utilities/dialog-utilities');
+
 var sbgnvizUpdate = commonAppUtilities.sbgnvizUpdate;
 var calculatePaddings = commonAppUtilities.calculatePaddings;
 var sbgnStyleRules = commonAppUtilities.sbgnStyleRules;

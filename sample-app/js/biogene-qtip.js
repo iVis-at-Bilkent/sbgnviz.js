@@ -18,7 +18,7 @@
  */
 
 var bioGeneQtip = function (node) {
-  var BioGeneView = require('backbone-views').BioGeneView;
+  var BioGeneView = require('./backbone-views').BioGeneView;
   
   $(".qtip").remove();
 

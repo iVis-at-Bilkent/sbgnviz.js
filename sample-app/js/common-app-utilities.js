@@ -1,4 +1,4 @@
-var commonAppUtilities = commonAppUtilities ? commonAppUtilities : {
+var commonAppUtilities = commonAppUtilities || {
   sbgnNetworkContainer: undefined,
   sbgnLayoutProp: undefined,
   sbgnProperties: undefined,

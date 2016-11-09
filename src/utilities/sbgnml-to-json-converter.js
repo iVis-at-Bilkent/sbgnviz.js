@@ -1,3 +1,5 @@
+var sbgnElementUtilities = require('./sbgn-element-utilities');
+
 var sbgnmlToJson = {
   insertedNodes: {},
   getAllCompartments: function (xmlObject) {
