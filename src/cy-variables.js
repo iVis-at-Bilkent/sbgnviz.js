@@ -9,4 +9,4 @@ var cyVariables = {
   cyArrowShapes: {}
 };
 
-module.exports = cyVariables;
+//module.exports = cyVariables;

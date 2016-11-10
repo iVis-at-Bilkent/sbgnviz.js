@@ -7,17 +7,23 @@ module.exports = function () {
   var sbgnElementUtilities = require('../../src/utilities/sbgn-element-utilities');
   var dialogUtilities = require('../../src/utilities/dialog-utilities');
   
-  var sbgnvizUpdate = commonAppUtilities.sbgnvizUpdate;
-  var dynamicResize = commonAppUtilities.dynamicResize;
+  var setFileContent = commonAppUtilities.setFileContent.bind(commonAppUtilities);
+  var startSpinner = commonAppUtilities.startSpinner.bind(commonAppUtilities);
+  var endSpinner = commonAppUtilities.endSpinner.bind(commonAppUtilities);
+  var beforePerformLayout = commonAppUtilities.beforePerformLayout.bind(commonAppUtilities);
+  var sbgnvizUpdate = commonAppUtilities.sbgnvizUpdate.bind(commonAppUtilities);
+  var dynamicResize = commonAppUtilities.dynamicResize.bind(commonAppUtilities);
   var sbgnStyleRules = commonAppUtilities.sbgnStyleRules;
+  
+  var sbgnLayoutProp, sbgnProperties, pathsBetweenQuery;
 
   $(document).ready(function ()
   {
     console.log('init the sbgnviz template/page');
 
-    commonAppUtilities.sbgnLayoutProp = new BackboneViews.SBGNLayout({el: '#sbgn-layout-table'});
-    commonAppUtilities.sbgnProperties = new BackboneViews.SBGNProperties({el: '#sbgn-properties-table'});
-    commonAppUtilities.pathsBetweenQuery = new BackboneViews.PathsBetweenQuery({el: '#query-pathsbetween-table'});
+    sbgnLayoutProp = commonAppUtilities.sbgnLayoutProp = new BackboneViews.SBGNLayout({el: '#sbgn-layout-table'});
+    sbgnProperties = commonAppUtilities.sbgnProperties = new BackboneViews.SBGNProperties({el: '#sbgn-properties-table'});
+    pathsBetweenQuery = commonAppUtilities.pathsBetweenQuery = new BackboneViews.PathsBetweenQuery({el: '#query-pathsbetween-table'});
 
     toolbarButtonsAndMenu();
 
@@ -415,7 +421,7 @@ module.exports = function () {
       $("#save-as-sbgnml").trigger('click');
     });
 
-    sbgnNetworkContainer.on("click", ".biogene-info .expandable", function (evt) {
+    commonAppUtilities.sbgnNetworkContainer.on("click", ".biogene-info .expandable", function (evt) {
       var expanderOpts = {slicePoint: 150,
         expandPrefix: ' ',
         expandText: ' (...)',
@@ -431,21 +437,6 @@ module.exports = function () {
       expanderOpts.widow = 0;
     });
   }
-
-  var startSpinner = function (id) {
-
-    if ($('.' + id).length === 0) {
-      var containerWidth = $('#sbgn-network-container').width();
-      var containerHeight = $('#sbgn-network-container').height();
-      $('#sbgn-network-container:parent').prepend('<i style="position: absolute; z-index: 9999999; left: ' + containerWidth / 2 + 'px; top: ' + containerHeight / 2 + 'px;" class="fa fa-spinner fa-spin fa-3x fa-fw ' + id + '"></i>');
-    }
-  };
-
-  var endSpinner = function (id) {
-    if ($('.' + id).length > 0) {
-      $('.' + id).remove();
-    }
-  };
 
   function setFileContent(fileName) {
     var span = document.getElementById('file-name');
@@ -484,24 +475,6 @@ module.exports = function () {
       reader.readAsText(file);
       setFileContent(file.name);
     });
-  }
-
-  function beforePerformLayout() {
-    var nodes = cy.nodes();
-    var edges = cy.edges();
-
-    nodes.removeData("ports");
-    edges.removeData("portsource");
-    edges.removeData("porttarget");
-
-    nodes.data("ports", []);
-    edges.data("portsource", []);
-    edges.data("porttarget", []);
-
-    // TODO do this by using extension API
-    cy.$('.edgebendediting-hasbendpoints').removeClass('edgebendediting-hasbendpoints');
-    edges.scratch('cyedgebendeditingWeights', []);
-    edges.scratch('cyedgebendeditingDistances', []);
   }
   
   function loadXMLDoc(filename) {

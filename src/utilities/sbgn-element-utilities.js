@@ -1,4 +1,4 @@
-var textUtilities = require('./text-utilities').truncateText;
+var truncateText = require('./text-utilities').truncateText;
 var sbgnStyleRules = require('../../sample-app/js/common-app-utilities').sbgnStyleRules;
 
 var sbgnElementUtilities = {

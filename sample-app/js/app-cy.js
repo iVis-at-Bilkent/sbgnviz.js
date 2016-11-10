@@ -3,10 +3,11 @@ module.exports = function () {
   var undoRedoActionFunctions = require('./undo-redo-action-functions');
   var sbgnElementUtilities = require('../../src/utilities/sbgn-element-utilities');
   
-  var getExpandCollapseOptions = commonAppUtilities.getExpandCollapseOptions;
-  var getInfoLabel = commonAppUtilities.getInfoLabel;
-  var nodeQtipFunction = commonAppUtilities.nodeQtipFunction;
-  var refreshUndoRedoButtonsStatus = commonAppUtilities.refreshUndoRedoButtonsStatus;
+  var getExpandCollapseOptions = commonAppUtilities.getExpandCollapseOptions.bind(commonAppUtilities);
+  var getInfoLabel = commonAppUtilities.getInfoLabel.bind(commonAppUtilities);
+  var nodeQtipFunction = commonAppUtilities.nodeQtipFunction.bind(commonAppUtilities);
+  var refreshUndoRedoButtonsStatus = commonAppUtilities.refreshUndoRedoButtonsStatus.bind(commonAppUtilities);
+  var refreshPaddings = commonAppUtilities.refreshPaddings.bind(commonAppUtilities);
   var sbgnStyleRules = commonAppUtilities.sbgnStyleRules;
 
   $(document).ready(function ()
@@ -458,7 +459,7 @@ module.exports = function () {
       }
     });
 
-    sbgnNetworkContainer.cytoscapePanzoom(panProps);
+    commonAppUtilities.sbgnNetworkContainer.cytoscapePanzoom(panProps);
   }
 
   function bindCyEvents() {

@@ -2,9 +2,14 @@ var commonAppUtilities = require('./common-app-utilities');
 var sbgnmlToJson = require('../../src/utilities/sbgnml-to-json-converter');
 var dialogUtilities = require('../../src/utilities/dialog-utilities');
 
-var sbgnvizUpdate = commonAppUtilities.sbgnvizUpdate;
-var calculatePaddings = commonAppUtilities.calculatePaddings;
+var setFileContent = commonAppUtilities.setFileContent.bind(commonAppUtilities);
+var startSpinner = commonAppUtilities.startSpinner.bind(commonAppUtilities);
+var endSpinner = commonAppUtilities.endSpinner.bind(commonAppUtilities);
+var sbgnvizUpdate = commonAppUtilities.sbgnvizUpdate.bind(commonAppUtilities);
+var calculatePaddings = commonAppUtilities.calculatePaddings.bind(commonAppUtilities);
 var sbgnStyleRules = commonAppUtilities.sbgnStyleRules;
+var defaultSbgnStyleRules = commonAppUtilities.defaultSbgnStyleRules;
+var refreshPaddings = commonAppUtilities.refreshPaddings.bind(commonAppUtilities);
 
 /**
  * Backbone view for the BioGene information.

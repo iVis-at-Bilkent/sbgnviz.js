@@ -1,45 +1,39 @@
 var gulp = require('gulp');
-var uglify = require('gulp-uglify');
-var concat = require('gulp-concat');
-var clean = require('gulp-clean');
-
-var paths = {
-	sources: [
-		"src/sbgn-extensions/*.js",
-		"src/utilities/*.js"
-	]
-};
-
+var path = require('path');
+var replace = require('gulp-replace');
+var child_process = require('child_process');
+var fs = require('fs');
+var shell = require('gulp-shell');
+var jshint = require('gulp-jshint');
+var jshStylish = require('jshint-stylish');
+var exec = require('child_process').exec;
+var runSequence = require('run-sequence');
+var prompt = require('gulp-prompt');
+var browserify = require('browserify');
+var buffer = require('vinyl-buffer');
+var source = require('vinyl-source-stream');
+var gutil = require('gulp-util');
+var notifier = require('node-notifier');
+var derequire = require('gulp-derequire');
 var version;
 
-gulp.task('default', function() {
+var browserifyOpts = {
+  entries: './src/index.js',
+  debug: true,
+  standalone: 'sbgnviz'
+};
 
+var logError = function( err ){
+  notifier.notify({ title: 'sbgnviz', message: 'Error: ' + err.message });
+  gutil.log( gutil.colors.red('Error in watch:'), gutil.colors.red(err) );
+};
+
+gulp.task('build', function(){
+  return browserify( browserifyOpts )
+    .bundle()
+    .on( 'error', logError )
+    .pipe( source('sbgnviz.js') )
+    .pipe( buffer() )
+    .pipe( derequire() )
+    .pipe( gulp.dest('.') )
 });
-
-gulp.task('version', function() {
-	//var now = new Date();
-	//version = process.env['VERSION'];
-	version = '1.0';
-});
-
-gulp.task('build', ['version'], function() {
-	return gulp.src( paths.sources )
-		//.pipe( replace('{{VERSION}}', version) )
-		.pipe( concat('sbgnviz-core.js') )
-		.pipe( gulp.dest('build') )
-		.pipe( uglify({
-			mangle: true,
-			preserveComments: 'some'
-		}) )
-		.pipe( concat('sbgnviz-core.min.js') )
-		.pipe( gulp.dest('build') );
-});
-
-gulp.task('clean', function() {
-	return gulp.src(['build'])
-		.pipe( clean({ read: false }) );
-});
-
-
-// TODO inject: js into debug.html
-gulp.task('make', ['clean', 'build']);

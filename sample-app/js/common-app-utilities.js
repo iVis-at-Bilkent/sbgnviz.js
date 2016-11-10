@@ -1,30 +1,56 @@
+var defaultSbgnStyleRules = {
+  'compound-padding': 10,
+  'dynamic-label-size': 'regular',
+  'fit-labels-to-nodes': false,
+  'rearrange-after-expand-collapse': true,
+  'tiling-padding-vertical': 20,
+  'tiling-padding-horizontal': 20,
+  'animate-on-drawing-changes': true
+};
+
 var commonAppUtilities = commonAppUtilities || {
   sbgnNetworkContainer: undefined,
   sbgnLayoutProp: undefined,
   sbgnProperties: undefined,
   pathsBetweenQuery: undefined,
-  defaultSbgnStyleRules: {
-    'compound-padding': 10,
-    'dynamic-label-size': 'regular',
-    'fit-labels-to-nodes': false,
-    'rearrange-after-expand-collapse': true,
-    'tiling-padding-vertical': 20,
-    'tiling-padding-horizontal': 20,
-    'animate-on-drawing-changes': true
+  defaultSbgnStyleRules: defaultSbgnStyleRules,
+  sbgnStyleRules: _.clone(defaultSbgnStyleRules),
+  setFileContent: function (fileName) {
+    var span = document.getElementById('file-name');
+    while (span.firstChild) {
+      span.removeChild(span.firstChild);
+    }
+    span.appendChild(document.createTextNode(fileName));
   },
-  sbgnStyleRules: _.clone(this.defaultSbgnStyleRules),
   triggerIncrementalLayout: function () {
-    beforePerformLayout();
+    this.beforePerformLayout();
     var preferences = {
       randomize: false,
       animate: this.sbgnStyleRules['animate-on-drawing-changes'] ? 'end' : false,
       fit: false
     };
-    if (sbgnLayoutProp.currentLayoutProperties.animate === 'during') {
+    if (this.sbgnLayoutProp.currentLayoutProperties.animate === 'during') {
       delete preferences.animate;
     }
 
-    sbgnLayoutProp.applyLayout(preferences, false); // layout must not be undoable
+    this.sbgnLayoutProp.applyLayout(preferences, false); // layout must not be undoable
+  },
+  beforePerformLayout: function() {
+    var nodes = cy.nodes();
+    var edges = cy.edges();
+
+    nodes.removeData("ports");
+    edges.removeData("portsource");
+    edges.removeData("porttarget");
+
+    nodes.data("ports", []);
+    edges.data("portsource", []);
+    edges.data("porttarget", []);
+
+    // TODO do this by using extension API
+    cy.$('.edgebendediting-hasbendpoints').removeClass('edgebendediting-hasbendpoints');
+    edges.scratch('cyedgebendeditingWeights', []);
+    edges.scratch('cyedgebendeditingDistances', []);
   },
   sbgnvizUpdate: function (cyGraph) {
     console.log('cy update called');
@@ -48,7 +74,7 @@ var commonAppUtilities = commonAppUtilities || {
       positions: positionMap
     }
     );
-    refreshPaddings();
+    this.refreshPaddings();
     cy.endBatch();
     cy.edgeBendEditing('get').initBendPoints(cy.edges());
   },
@@ -71,7 +97,7 @@ var commonAppUtilities = commonAppUtilities || {
     };
   },
   dynamicResize: function () {
-    var win = $(this); //this = window
+    var win = $(window);//$(this); //this = window
 
     var windowWidth = win.width();
     var windowHeight = win.height();
@@ -227,8 +253,12 @@ var commonAppUtilities = commonAppUtilities || {
 
     return calc_padding;
   },
-  calculateTilingPaddings: this.calculatePaddings,
-  calculateCompoundPaddings: this.calculatePaddings,
+  calculateTilingPaddings: function() {
+    return this.calculatePaddings();
+  },
+  calculateCompoundPaddings: function() {
+    return this.calculatePaddings();
+  },
   refreshPaddings: function () {
     var calc_padding = this.calculateCompoundPaddings();
     var nodes = cy.nodes();
@@ -241,6 +271,19 @@ var commonAppUtilities = commonAppUtilities || {
     compounds.css('padding-right', calc_padding);
     compounds.css('padding-top', calc_padding);
     compounds.css('padding-bottom', calc_padding);
+  },
+  startSpinner: function (id) {
+
+    if ($('.' + id).length === 0) {
+      var containerWidth = $('#sbgn-network-container').width();
+      var containerHeight = $('#sbgn-network-container').height();
+      $('#sbgn-network-container:parent').prepend('<i style="position: absolute; z-index: 9999999; left: ' + containerWidth / 2 + 'px; top: ' + containerHeight / 2 + 'px;" class="fa fa-spinner fa-spin fa-3x fa-fw ' + id + '"></i>');
+    }
+  },
+  endSpinner: function (id) {
+    if ($('.' + id).length > 0) {
+      $('.' + id).remove();
+    }
   }
 };
 

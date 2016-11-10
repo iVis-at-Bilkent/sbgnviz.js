@@ -1,7 +1,7 @@
-module.exports = function (cytoscape) {
+module.exports = function () {
   var $$ = cytoscape;
   var truncateText = require('../utilities/text-utilities').truncateText;
-  var cyVariables = require('../cy-variables');
+//  var cyVariables = require('../cy-variables');
   
   var sbgnShapes = $$.sbgnShapes = {
     'source and sink': true,
