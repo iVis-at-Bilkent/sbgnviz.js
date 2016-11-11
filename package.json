@@ -3,7 +3,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build-sbgnviz-js": "gulp build",
-    "build-app-js": "browserify main.js -o app.js",
+    "build-app-js": "browserify main.js -o app.js --debug",
     "watch-sampleapp-js": "nodemon -e js --watch sample-app/js/ -x \"npm run build-sbgnviz-js\"",
     "watch-src-js": "nodemon -e js --watch src -x \"npm run build-sbgnviz-js\"",
     "watch-sbgnviz-js": "nodemon -e js --watch sbgnviz.js -x \"npm run build-app-js\"",
