@@ -4,12 +4,12 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build-sbgnviz-js": "gulp build",
     "build-app-js": "browserify main.js -o app.js",
-    "watch-sampleapp-js": "nodemon -e js -w sample-app/js/ -x 'npm run build-sbgnviz-js'",
-    "watch-src-js": "nodemon -e js -w src -x 'build-sbgnviz-js'",
-    "watch-sbgnviz-js": "nodemon -e js -w sbgnviz.js -x 'npm run build-app-js'",
-    "watch-main-js": "nodemon -e js -w main.js -x 'npm run build-app-js'",
-    "watch-js": "npm run watch-sampleapp-js & npm run watch-src-js & npm run watch-main-js & npm run watch sbgnviz-js",
-    "release-build": "npm run build-sbgnviz-js & npm run build-app-js",
+    "watch-sampleapp-js": "nodemon -e js --watch sample-app/js/ -x \"npm run build-sbgnviz-js\"",
+    "watch-src-js": "nodemon -e js --watch src -x \"npm run build-sbgnviz-js\"",
+    "watch-sbgnviz-js": "nodemon -e js --watch sbgnviz.js -x \"npm run build-app-js\"",
+    "watch-main-js": "nodemon -e js --watch main.js -x \"npm run build-app-js\"",
+    "watch-js": "parallelshell \"npm run watch-sampleapp-js\" \"npm run watch-src-js\" \"npm run watch-main-js\" \"npm run watch-sbgnviz-js\"",
+    "release-build": "npm run build-sbgnviz-js && npm run build-app-js",
     "debug-build": "npm run watch-js"
   },
   "repository": {
@@ -49,6 +49,7 @@
     "run-sequence": "^1.1.4",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0",
-    "nodemon": "latest"
+    "nodemon": "latest",
+    "parallelshell": "^2.0.0"
   }
 }
