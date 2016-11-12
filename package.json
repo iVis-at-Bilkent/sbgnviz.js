@@ -9,8 +9,9 @@
     "watch-sbgnviz-js": "nodemon -e js --watch sbgnviz.js -x \"npm run build-app-js\"",
     "watch-main-js": "nodemon -e js --watch main.js -x \"npm run build-app-js\"",
     "watch-js": "parallelshell \"npm run watch-sampleapp-js\" \"npm run watch-src-js\" \"npm run watch-main-js\" \"npm run watch-sbgnviz-js\"",
+    "watch-server": "nodemon server.js",
     "release-build": "npm run build-sbgnviz-js && npm run build-app-js",
-    "debug-build": "npm run watch-js"
+    "debug-build": "parallelshell \"npm run watch-js\" \"npm run watch-server\""
   },
   "repository": {
     "type": "git",
