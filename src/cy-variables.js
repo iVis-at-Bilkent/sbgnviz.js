@@ -9,4 +9,6 @@ var cyVariables = {
   cyArrowShapes: {}
 };
 
-//module.exports = cyVariables;
+if( typeof module !== 'undefined' && module.exports) {
+  module.exports = cyVariables;
+}
