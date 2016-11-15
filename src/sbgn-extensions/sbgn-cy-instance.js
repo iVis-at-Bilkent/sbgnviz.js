@@ -1,6 +1,6 @@
 var sbgnElementUtilities = require('../utilities/sbgn-element-utilities');
 
-module.exports = function (containerSelector) {
+module.exports = function (containerSelector, imgPath) {
   $(document).ready(function ()
   {
     var sbgnNetworkContainer = $(containerSelector);
@@ -40,7 +40,7 @@ module.exports = function (containerSelector) {
           })
           .selector("node[?sbgnclonemarker][sbgnclass='perturbing agent']")
           .css({
-            'background-image': 'sample-app/sampleapp-images/clone_bg.png',
+            'background-image': imgPath + '/clone_bg.png',
             'background-position-x': '50%',
             'background-position-y': '100%',
             'background-width': '100%',

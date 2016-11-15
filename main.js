@@ -31,5 +31,6 @@ libs['cytoscape-view-utilities'] = require('cytoscape-view-utilities');
 
 sbgnviz({
   libs: libs,
-  networkContainerSelector: '#sbgn-network-container'
+  networkContainerSelector: '#sbgn-network-container',
+  imgPath: 'src/img'
 });
