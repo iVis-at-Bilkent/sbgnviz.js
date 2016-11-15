@@ -1,5 +1,7 @@
 (function(){
-  var register = function(libs) {
+  var register = function(options) {
+    var libs = options.libs;
+    
     if (libs === undefined) {
       libs = {};
     }
@@ -27,10 +29,12 @@
     cyViewUtilities( cytoscape, $ );
     
     var sbgnRenderer = require('./sbgn-extensions/cytoscape.renderer.canvas.sbgn-renderer');
+    var sbgnCyInstance = require('./sbgn-extensions/sbgn-cy-instance');
     var appCy = require('../sample-app/js/app-cy');
     var appMenu = require('../sample-app/js/app-menu');
     
     sbgnRenderer();
+    sbgnCyInstance(options.networkContainerSelector);
     appCy();
     appMenu();
     

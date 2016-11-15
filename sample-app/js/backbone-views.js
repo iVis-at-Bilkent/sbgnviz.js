@@ -344,14 +344,12 @@ var SBGNProperties = Backbone.View.extend({
       //Refresh label size if needed
       if (sbgnStyleRules['dynamic-label-size'] != self.currentSBGNProperties.dynamicLabelSize) {
         sbgnStyleRules['dynamic-label-size'] = '' + self.currentSBGNProperties.dynamicLabelSize;
-        cy.nodes().removeClass('changeLabelTextSize');
-        cy.nodes().addClass('changeLabelTextSize');
+        cy.style().update();
       }
       //Refresh truncations if needed
       if (sbgnStyleRules['fit-labels-to-nodes'] != self.currentSBGNProperties.fitLabelsToNodes) {
         sbgnStyleRules['fit-labels-to-nodes'] = self.currentSBGNProperties.fitLabelsToNodes;
-        cy.nodes().removeClass('changeContent');
-        cy.nodes().addClass('changeContent');
+        cy.style().update();
       }
 
       sbgnStyleRules['rearrange-after-expand-collapse'] =

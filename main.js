@@ -29,4 +29,7 @@ libs['cytoscape-expand-collapse'] = require('cytoscape-expand-collapse');
 libs['cytoscape-edge-bend-editing'] = require('cytoscape-edge-bend-editing');
 libs['cytoscape-view-utilities'] = require('cytoscape-view-utilities');
 
-sbgnviz(libs);
+sbgnviz({
+  libs: libs,
+  networkContainerSelector: '#sbgn-network-container'
+});

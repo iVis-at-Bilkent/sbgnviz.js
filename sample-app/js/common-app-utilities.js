@@ -61,7 +61,7 @@ var commonAppUtilities = commonAppUtilities || {
     // clear data
     cy.remove('*');
     cy.add(cyGraph);
-    cy.nodes().addClass('changeLabelTextSize');
+    
     //add position information to data for preset layout
     var positionMap = {};
     for (var i = 0; i < cyGraph.nodes.length; i++) {
@@ -76,6 +76,7 @@ var commonAppUtilities = commonAppUtilities || {
     );
     this.refreshPaddings();
     cy.endBatch();
+    cy.style().update();
     cy.edgeBendEditing('get').initBendPoints(cy.edges());
   },
   getExpandCollapseOptions: function () {
