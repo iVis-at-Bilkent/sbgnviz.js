@@ -268,7 +268,6 @@ module.exports = function () {
 
     cy.on("afterCollapse", "node", function (event) {
       var node = this;
-      // TODO enable the following line
       refreshPaddings();
 
       if (node._private.data.sbgnclass == "complex") {
@@ -288,7 +287,7 @@ module.exports = function () {
       if (node._private.data.sbgnclass == "complex") {
         node.removeStyle('content');
       }
-      // TODO enable the following line
+      
       refreshPaddings();
     });
   }
