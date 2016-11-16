@@ -122,12 +122,17 @@ var sbgnElementUtilities = {
     },
     getNeighboursOfSelected: function(){
         var selectedEles = cy.elements(":selected");
-        selectedEles = selectedEles.add(selectedEles.parents("node[sbgnclass='complex']"));
-        selectedEles = selectedEles.add(selectedEles.descendants());
-        var neighborhoodEles = selectedEles.neighborhood();
-        var elesToHighlight = selectedEles.add(neighborhoodEles);
-        elesToHighlight = elesToHighlight.add(elesToHighlight.descendants());
+        var elesToHighlight = this.getNeighboursOfEles(selectedEles);
         return elesToHighlight;
+    },
+    getNeighboursOfEles: function(_eles){
+        var eles = _eles;
+        eles = eles.add(eles.parents("node[sbgnclass='complex']"));
+        eles = eles.add(eles.descendants());
+        var neighborhoodEles = eles.neighborhood();
+        var elesToReturn = eles.add(neighborhoodEles);
+        elesToReturn = elesToReturn.add(elesToReturn.descendants());
+        return elesToReturn;
     },
     extendNodeList: function(nodesToShow){
         var self = this;
