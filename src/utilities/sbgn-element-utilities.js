@@ -1,5 +1,4 @@
 var truncateText = require('./text-utilities').truncateText;
-var sbgnStyleRules = require('../../sample-app/js/common-app-utilities').sbgnStyleRules;
 var optionUtilities = require('./option-utilities');
 var options = optionUtilities.getOptions();
 

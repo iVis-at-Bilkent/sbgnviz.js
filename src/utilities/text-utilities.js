@@ -1,5 +1,3 @@
-var commonAppUtilities = require('../../sample-app/js/common-app-utilities');
-var sbgnStyleRules = commonAppUtilities.sbgnStyleRules;
 var optionUtilities = require('./option-utilities');
 var options = optionUtilities.getOptions();
 
