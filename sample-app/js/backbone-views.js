@@ -1,6 +1,6 @@
 var commonAppUtilities = require('./common-app-utilities');
-var sbgnmlToJson = require('../../src/utilities/sbgnml-to-json-converter');
-var dialogUtilities = require('../../src/utilities/dialog-utilities');
+var sbgnmlToJson = sbgnviz.sbgnmlToJsonConverter;
+var dialogUtilities = sbgnviz.dialogUtilities;
 
 var setFileContent = commonAppUtilities.setFileContent.bind(commonAppUtilities);
 var startSpinner = commonAppUtilities.startSpinner.bind(commonAppUtilities);

@@ -1,5 +1,7 @@
 var truncateText = require('./text-utilities').truncateText;
 var sbgnStyleRules = require('../../sample-app/js/common-app-utilities').sbgnStyleRules;
+var optionUtilities = require('./option-utilities');
+var options = optionUtilities.getOptions();
 
 var sbgnElementUtilities = {
     //the list of the element classes handled by the tool
@@ -344,7 +346,8 @@ var sbgnElementUtilities = {
       return this.getDynamicLabelTextSize(ele);
     },
     getDynamicLabelTextSize: function (ele, dynamicLabelSizeCoefficient) {
-      var dynamicLabelSize = sbgnStyleRules['dynamic-label-size'];
+      var dynamicLabelSize = options.dynamicLabelSize;
+      dynamicLabelSize = typeof dynamicLabelSize === 'function' ? dynamicLabelSize.call() : dynamicLabelSize;
 
       if (dynamicLabelSizeCoefficient === undefined) {
         if (dynamicLabelSize == 'small') {

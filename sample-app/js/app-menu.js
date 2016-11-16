@@ -2,9 +2,9 @@
 module.exports = function () {
   var BackboneViews = require('./backbone-views');
   var commonAppUtilities = require('./common-app-utilities');
-  var sbgnmlToJson = require('../../src/utilities/sbgnml-to-json-converter');
-  var jsonToSbgnml = require('../../src/utilities/json-to-sbgnml-converter');
-  var sbgnElementUtilities = require('../../src/utilities/sbgn-element-utilities');
+  var sbgnmlToJson = sbgnviz.sbgnmlToJsonConverter;
+  var jsonToSbgnml = sbgnviz.jsonToSbgnmlConverter;
+  var sbgnElementUtilities = sbgnviz.sbgnElementUtilities;
   var dialogUtilities = require('../../src/utilities/dialog-utilities');
   
   var setFileContent = commonAppUtilities.setFileContent.bind(commonAppUtilities);

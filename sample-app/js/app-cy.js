@@ -1,7 +1,7 @@
 module.exports = function () {
   var commonAppUtilities = require('./common-app-utilities');
   var undoRedoActionFunctions = require('./undo-redo-action-functions');
-  var sbgnElementUtilities = require('../../src/utilities/sbgn-element-utilities');
+  var sbgnElementUtilities = sbgnviz.sbgnElementUtilities;
 
   var getExpandCollapseOptions = commonAppUtilities.getExpandCollapseOptions.bind(commonAppUtilities);
   var getInfoLabel = commonAppUtilities.getInfoLabel.bind(commonAppUtilities);

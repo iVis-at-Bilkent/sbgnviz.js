@@ -1,4 +1,4 @@
-var sbgnElementUtilities = require('../../src/utilities/sbgn-element-utilities');
+var sbgnElementUtilities = sbgnviz.sbgnElementUtilities;
 
 var undoRedoActionFunctions = {
   // Section Start

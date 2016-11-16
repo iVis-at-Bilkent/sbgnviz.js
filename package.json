@@ -3,12 +3,11 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build-sbgnviz-js": "gulp build",
-    "build-app-js": "browserify main.js -o app.js --debug",
-    "watch-sampleapp-js": "nodemon -e js --watch sample-app/js/ -x \"npm run build-sbgnviz-js\"",
+    "build-app-js": "browserify sample-app/main.js -o sample-app/app.js --debug",
+    "watch-sampleapp-js": "nodemon -e js --watch sample-app --ignore sample-app/app.js -x \"npm run build-app-js\"",
     "watch-src-js": "nodemon -e js --watch src -x \"npm run build-sbgnviz-js\"",
     "watch-sbgnviz-js": "nodemon -e js --watch sbgnviz.js -x \"npm run build-app-js\"",
-    "watch-main-js": "nodemon -e js --watch main.js -x \"npm run build-app-js\"",
-    "watch-js": "parallelshell \"npm run watch-sampleapp-js\" \"npm run watch-src-js\" \"npm run watch-main-js\" \"npm run watch-sbgnviz-js\"",
+    "watch-js": "parallelshell \"npm run watch-sampleapp-js\" \"npm run watch-src-js\" \"npm run watch-sbgnviz-js\"",
     "watch-server": "nodemon server.js",
     "release-build": "npm run build-sbgnviz-js && npm run build-app-js",
     "debug-build": "parallelshell \"npm run watch-js\" \"npm run watch-server\""

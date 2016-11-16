@@ -1,14 +1,19 @@
 (function(){
-  var register = function(options) {
+  var sbgnviz = window.sbgnviz = function(_options) {
+    var optionUtilities = require('./utilities/option-utilities');
+    var options = optionUtilities.extendOptions(_options);
+    
+    var sbgnRenderer = require('./sbgn-extensions/cytoscape.renderer.canvas.sbgn-renderer');
+    var sbgnCyInstance = require('./sbgn-extensions/sbgn-cy-instance');
+    
+    // Utilities to be exposed
+    var sbgnElementUtilities = require('./utilities/sbgn-element-utilities');
+    var jsonToSbgnmlConverter = require('./utilities/json-to-sbgnml-converter');
+    var sbgnmlToJsonConverter = require('./utilities/sbgnml-to-json-converter');
+    var dialogUtilities = require('./utilities/dialog-utilities');
+    
     var libs = options.libs;
-    
-    if (libs === undefined) {
-      libs = {};
-    }
-    
-    // The path of core library images when sbgnviz is required from npm and located 
-    // in node_modules using default option is enough
-    var imgPath = options.imgPath || 'node_modules/sbgnviz/src/img';
+    var imgPath = options.imgPath;
     
     // Get cy extension instances
     var cyPanzoom = libs['cytoscape-panzoom'];
@@ -32,17 +37,17 @@
     cyEdgeBendEditing( cytoscape, $ );
     cyViewUtilities( cytoscape, $ );
     
-    var sbgnRenderer = require('./sbgn-extensions/cytoscape.renderer.canvas.sbgn-renderer');
-    var sbgnCyInstance = require('./sbgn-extensions/sbgn-cy-instance');
-    var appCy = require('../sample-app/js/app-cy');
-    var appMenu = require('../sample-app/js/app-menu');
-    
     sbgnRenderer();
     sbgnCyInstance(options.networkContainerSelector, imgPath);
-    appCy();
-    appMenu();
     
+    // Expose the api
+    sbgnviz.sbgnElementUtilities = sbgnElementUtilities;
+    sbgnviz.sbgnmlToJsonConverter = sbgnmlToJsonConverter;
+    sbgnviz.jsonToSbgnmlConverter = jsonToSbgnmlConverter;
+    sbgnviz.dialogUtilities = dialogUtilities;
   };
   
-  module.exports = register;
+  if ( typeof module !== 'undefined' && module.exports ) {
+    module.exports = sbgnviz;
+  }
 })();

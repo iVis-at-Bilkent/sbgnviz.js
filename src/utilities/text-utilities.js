@@ -1,12 +1,17 @@
 var commonAppUtilities = require('../../sample-app/js/common-app-utilities');
 var sbgnStyleRules = commonAppUtilities.sbgnStyleRules;
+var optionUtilities = require('./option-utilities');
+var options = optionUtilities.getOptions();
 
 var textUtilities = {
   //TODO: use CSS's "text-overflow:ellipsis" style instead of function below?
   truncateText: function (textProp, font) {
     var context = document.createElement('canvas').getContext("2d");
     context.font = font;
-    var fitLabelsToNodes = sbgnStyleRules['fit-labels-to-nodes'];
+    
+    var fitLabelsToNodes = options.fitLabelsToNodes;
+    fitLabelsToNodes = typeof fitLabelsToNodes === 'function' ? fitLabelsToNodes.call() : fitLabelsToNodes;
+    
     var text = textProp.label || "";
     //If fit labels to nodes is false do not truncate
     if (fitLabelsToNodes == false) {
