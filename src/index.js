@@ -38,7 +38,7 @@
     cyViewUtilities( cytoscape, $ );
     
     sbgnRenderer();
-    sbgnCyInstance(options.networkContainerSelector, imgPath);
+    sbgnCyInstance();
     
     // Expose the api
     sbgnviz.sbgnElementUtilities = sbgnElementUtilities;

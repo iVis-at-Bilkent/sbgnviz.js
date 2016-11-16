@@ -1,6 +1,11 @@
 var sbgnElementUtilities = require('../utilities/sbgn-element-utilities');
+var optionUtilities = require('../utilities/option-utilities');
+var options = optionUtilities.getOptions();
 
-module.exports = function (containerSelector, imgPath) {
+module.exports = function () {
+  var containerSelector = options.networkContainerSelector;
+  var imgPath = options.imgPath;
+  
   $(document).ready(function ()
   {
     var sbgnNetworkContainer = $(containerSelector);
