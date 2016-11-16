@@ -8,7 +8,7 @@ var defaultSbgnStyleRules = {
   'animate-on-drawing-changes': true
 };
 
-var commonAppUtilities = commonAppUtilities || {
+var commonAppUtilities = {
   sbgnNetworkContainer: undefined,
   sbgnLayoutProp: undefined,
   sbgnProperties: undefined,
@@ -57,6 +57,7 @@ var commonAppUtilities = commonAppUtilities || {
     // Reset undo/redo stack and buttons when a new graph is loaded
     cy.undoRedo().reset();
     this.resetUndoRedoButtons();
+    
     cy.startBatch();
     // clear data
     cy.remove('*');
@@ -69,14 +70,18 @@ var commonAppUtilities = commonAppUtilities || {
       var yPos = cyGraph.nodes[i].data.sbgnbbox.y;
       positionMap[cyGraph.nodes[i].data.id] = {'x': xPos, 'y': yPos};
     }
+    
     cy.layout({
       name: 'preset',
       positions: positionMap
-    }
-    );
+    });
+    
     this.refreshPaddings();
     cy.endBatch();
+    
+    // Update the style
     cy.style().update();
+    // Initilize the bend points once the elements are created
     cy.edgeBendEditing('get').initBendPoints(cy.edges());
   },
   getExpandCollapseOptions: function () {
@@ -273,17 +278,17 @@ var commonAppUtilities = commonAppUtilities || {
     compounds.css('padding-top', calc_padding);
     compounds.css('padding-bottom', calc_padding);
   },
-  startSpinner: function (id) {
+  startSpinner: function (className) {
 
-    if ($('.' + id).length === 0) {
+    if ($('.' + className).length === 0) {
       var containerWidth = $('#sbgn-network-container').width();
       var containerHeight = $('#sbgn-network-container').height();
-      $('#sbgn-network-container:parent').prepend('<i style="position: absolute; z-index: 9999999; left: ' + containerWidth / 2 + 'px; top: ' + containerHeight / 2 + 'px;" class="fa fa-spinner fa-spin fa-3x fa-fw ' + id + '"></i>');
+      $('#sbgn-network-container:parent').prepend('<i style="position: absolute; z-index: 9999999; left: ' + containerWidth / 2 + 'px; top: ' + containerHeight / 2 + 'px;" class="fa fa-spinner fa-spin fa-3x fa-fw ' + className + '"></i>');
     }
   },
-  endSpinner: function (id) {
-    if ($('.' + id).length > 0) {
-      $('.' + id).remove();
+  endSpinner: function (className) {
+    if ($('.' + className).length > 0) {
+      $('.' + className).remove();
     }
   }
 };
