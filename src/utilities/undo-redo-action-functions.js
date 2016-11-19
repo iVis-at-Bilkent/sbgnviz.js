@@ -1,4 +1,7 @@
-var sbgnElementUtilities = sbgnviz.sbgnElementUtilities;
+/*
+ * This file exports the functions to be utilized in undoredo extension actions 
+ */
+var sbgnElementUtilities = require('./sbgn-element-utilities');
 
 var undoRedoActionFunctions = {
   // Section Start

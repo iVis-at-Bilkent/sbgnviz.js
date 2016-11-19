@@ -12,8 +12,14 @@ var defaults = {
   dynamicLabelSize: function () {
     return 'regular';
   },
+  // percentage used to calculate compound paddings
+  compoundPadding: function () {
+    return 10;
+  },
   // The selector of the component containing the sbgn network
-  networkContainerSelector: '#sbgn-network-container'
+  networkContainerSelector: '#sbgn-network-container',
+  // Whether the actions are undoable, requires cytoscape-undo-redo extension
+  undoable: true
 };
 
 var optionUtilities = function () {
@@ -26,12 +32,11 @@ optionUtilities.extendOptions = function (options) {
   var result = {};
 
   for (var prop in defaults) {
-    if (options[prop]) {
-      result[prop] = options[prop];
-    }
-    else {
-      result[prop] = defaults[prop];
-    }
+    result[prop] = defaults[prop];
+  }
+  
+  for (var prop in options) {
+    result[prop] = options[prop];
   }
 
   optionUtilities.options = result;

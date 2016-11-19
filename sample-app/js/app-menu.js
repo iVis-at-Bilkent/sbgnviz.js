@@ -2,20 +2,15 @@
 module.exports = function () {
   var BackboneViews = require('./backbone-views');
   var commonAppUtilities = require('./common-app-utilities');
-  var sbgnmlToJson = sbgnviz.sbgnmlToJsonConverter;
-  var jsonToSbgnml = sbgnviz.jsonToSbgnmlConverter;
-  var sbgnElementUtilities = sbgnviz.sbgnElementUtilities;
-  var dialogUtilities = require('../../src/utilities/dialog-utilities');
   
-  var setFileContent = commonAppUtilities.setFileContent.bind(commonAppUtilities);
-  var startSpinner = commonAppUtilities.startSpinner.bind(commonAppUtilities);
-  var endSpinner = commonAppUtilities.endSpinner.bind(commonAppUtilities);
-  var beforePerformLayout = commonAppUtilities.beforePerformLayout.bind(commonAppUtilities);
-  var sbgnvizUpdate = commonAppUtilities.sbgnvizUpdate.bind(commonAppUtilities);
   var dynamicResize = commonAppUtilities.dynamicResize.bind(commonAppUtilities);
   var sbgnStyleRules = commonAppUtilities.sbgnStyleRules;
   
   var sbgnLayoutProp, sbgnProperties, pathsBetweenQuery;
+
+  function loadSample(filename) {
+    return sbgnviz.loadSample(filename, 'sample-app/samples/');
+  }
 
   $(document).ready(function ()
   {
@@ -33,41 +28,15 @@ module.exports = function () {
     dynamicResize();
 
   });
-
-  function expandSelected() {
-    var nodes = cy.nodes(":selected").filter("[expanded-collapsed='collapsed']");
-    if (nodes.expandableNodes().length == 0) {
-      return;
-    }
-    cy.undoRedo().do("expand", {
-      nodes: nodes,
-    });
-  }
-
-  function hideSelected() {
-    var selectedEles = cy.$(":selected");
-    if (selectedEles.length === 0) {
-      return;
-    }
-    cy.undoRedo().do("hide", selectedEles);
-  }
-
-  function showSelected() {
-    if (cy.elements(":selected").length === cy.elements(':visible').length) {
-      return;
-    }
-    cy.undoRedo().do("show", cy.elements(":selected"));
-  }
-
-  function collapseSelected() {
-    var nodes = cy.nodes(":selected");
-    if (nodes.collapsibleNodes().length == 0) {
-      return;
-    }
-    cy.undoRedo().do("collapse", {
-      nodes: nodes
-    });
-  }
+  
+  // Events triggered by sbgnviz module
+  $(document).on('sbgnvizLoadSample sbgnvizLoadFile', function(event, filename) {
+    commonAppUtilities.setFileContent(filename);
+  });
+  
+  $(document).on('sbgnvizUpdateEnd', function(event) {
+    commonAppUtilities.resetUndoRedoButtons();
+  });
 
   function toolbarButtonsAndMenu() {
 
@@ -78,14 +47,14 @@ module.exports = function () {
     $("#file-input").change(function () {
       if ($(this).val() != "") {
         var file = this.files[0];
-        loadSBGNMLFile(file);
+        sbgnviz.loadSBGNMLFile(file);
         $(this).val("");
       }
     });
 
     $("#node-legend").click(function (e) {
       e.preventDefault();
-      dialogUtilities.openFancybox($("#node-legend-template"), {
+      sbgnviz.openFancybox($("#node-legend-template"), {
         'autoDimensions': false,
         'width': 504,
         'height': 325
@@ -94,7 +63,7 @@ module.exports = function () {
 
     $("#edge-legend").click(function (e) {
       e.preventDefault();
-      dialogUtilities.openFancybox($("#edge-legend-template"), {
+      sbgnviz.openFancybox($("#edge-legend-template"), {
         'autoDimensions': false,
         'width': 325,
         'height': 285
@@ -103,7 +72,7 @@ module.exports = function () {
 
     $("#quick-help").click(function (e) {
       e.preventDefault();
-      dialogUtilities.openFancybox($("#quick-help-template"), {
+      sbgnviz.openFancybox($("#quick-help-template"), {
         'autoDimensions': false,
         'width': 420,
         'height': "auto"
@@ -112,105 +81,56 @@ module.exports = function () {
 
     $("#about").click(function (e) {
       e.preventDefault();
-      dialogUtilities.openFancybox($("#about-template"), {
+      sbgnviz.openFancybox($("#about-template"), {
         'autoDimensions': false,
         'width': 300,
         'height': 320
       });
     });
 
-    $("#load-sample1").click(function (e) {
-      loadSample('neuronal_muscle_signalling.xml');
+    var selectorToSampleFileName = {
+      "#load-sample1" : 'neuronal_muscle_signalling.xml',
+      "#load-sample2" : 'CaM-CaMK_dependent_signaling_to_the_nucleus.xml',
+      "#load-sample3" : 'activated_stat1alpha_induction_of_the_irf1_gene.xml',
+      "#load-sample4" : 'glycolysis.xml',
+      "#load-sample5" : 'mapk_cascade.xml',
+      "#load-sample6" : 'polyq_proteins_interference.xml',
+      "#load-sample7" : 'insulin-like_growth_factor_signaling.xml',
+      "#load-sample8" : 'atm_mediated_phosphorylation_of_repair_proteins.xml',
+      "#load-sample9" : 'vitamins_b6_activation_to_pyridoxal_phosphate.xml'
+    };
+
+    for ( var selector in selectorToSampleFileName ) {
+      (function(selector){
+        $(selector).click(function (e) {
+          loadSample(selectorToSampleFileName[selector]);
+        });
+      })(selector);
+    }
+
+    $("#hide-selected, #hide-selected-icon").click(function(e) {
+      sbgnviz.hideEles(cy.elements(":selected"));
     });
-
-    $("#load-sample2").click(function (e) {
-      loadSample('CaM-CaMK_dependent_signaling_to_the_nucleus.xml');
+    
+    $("#show-selected, #show-selected-icon").click(function(e) {
+      sbgnviz.showEles(cy.elements(":selected"));
     });
-
-    $("#load-sample3").click(function (e) {
-      loadSample('activated_stat1alpha_induction_of_the_irf1_gene.xml');
-    });
-
-    $("#load-sample4").click(function (e) {
-      loadSample('glycolysis.xml');
-    });
-
-    $("#load-sample5").click(function (e) {
-      loadSample('mapk_cascade.xml');
-    });
-
-    $("#load-sample6").click(function (e) {
-      loadSample('polyq_proteins_interference.xml');
-    });
-
-    $("#load-sample7").click(function (e) {
-      loadSample('insulin-like_growth_factor_signaling.xml');
-    });
-
-    $("#load-sample8").click(function (e) {
-      loadSample('atm_mediated_phosphorylation_of_repair_proteins.xml');
-    });
-
-    $("#load-sample9").click(function (e) {
-      loadSample('vitamins_b6_activation_to_pyridoxal_phosphate.xml');
-    });
-
-    $("#hide-selected, #hide-selected-icon").click(hideSelected);
-
-    $("#show-selected, #show-selected-icon").click(showSelected); //TODO: remove weird feature (or fix)?
 
     $("#show-all").click(function (e) {
-      if (cy.elements().length === cy.elements(':visible').length) {
-        return;
-      }
-      cy.undoRedo().do("show", cy.elements());
+      sbgnviz.showAll();
     });
 
     $("#delete-selected-smart, #delete-selected-smart-icon").click(function (e) {
-      var sel = cy.$(":selected");
-      if (sel.length == 0) {
-        return;
-      }
-      cy.undoRedo().do("deleteElesSmart", {
-        firstTime: true,
-        eles: sel
-      });
+      sbgnviz.deleteElesSmart(cy.elements(':selected'));
     });
 
     $("#neighbors-of-selected, #highlight-neighbors-of-selected-icon").click(function (e) {
-      var elesToHighlight = sbgnElementUtilities.getNeighboursOfSelected();
-      if (elesToHighlight.length === 0) {
-        return;
-      }
-      var notHighlightedEles = cy.elements(".nothighlighted").filter(":visible");
-      var highlightedEles = cy.elements(':visible').difference(notHighlightedEles);
-      if (elesToHighlight.same(highlightedEles)) {
-        return;
-      }
-      cy.undoRedo().do("highlight", elesToHighlight);
+      sbgnviz.highlightNeighbours(cy.elements(':selected'));
     });
 
     $("#search-by-label-icon").click(function (e) {
-      var text = $("#search-by-label-text-box").val().toLowerCase();
-      if (text.length == 0) {
-        return;
-      }
-      cy.nodes().unselect();
-
-      var nodesToSelect = cy.nodes(":visible").filter(function (i, ele) {
-        if (ele.data("sbgnlabel") && ele.data("sbgnlabel").toLowerCase().indexOf(text) >= 0) {
-          return true;
-        }
-        return false;
-      });
-
-      if (nodesToSelect.length == 0) {
-        return;
-      }
-      nodesToSelect.select();
-
-      var nodesToHighlight = sbgnElementUtilities.getProcessesOfSelected();
-      cy.undoRedo().do("highlight", nodesToHighlight);
+      var label = $("#search-by-label-text-box").val().toLowerCase();
+      sbgnviz.searchByLabel(label);
     });
 
     $("#search-by-label-text-box").keydown(function (e) {
@@ -224,41 +144,19 @@ module.exports = function () {
     });
 
     $("#processes-of-selected").click(function (e) {
-      var elesToHighlight = sbgnElementUtilities.getProcessesOfSelected();
-      if (elesToHighlight.length === 0) {
-        return;
-      }
-      var notHighlightedEles = cy.elements(".nothighlighted").filter(":visible");
-      var highlightedEles = cy.elements(':visible').difference(notHighlightedEles);
-      if (elesToHighlight.same(highlightedEles)) {
-        return;
-      }
-      cy.undoRedo().do("highlight", elesToHighlight);
+      sbgnviz.highlightProcesses(cy.elements(':selected'));
     });
 
     $("#remove-highlights, #remove-highlights-icon").click(function (e) {
-      if (sbgnElementUtilities.noneIsNotHighlighted()) {
-        return;
-      }
-      cy.undoRedo().do("removeHighlights");
+      sbgnviz.removeHighlights();
     });
 
-    $("#layout-properties").click(function (e) {
+    $("#layout-properties", "#layout-properties-icon").click(function (e) {
       sbgnLayoutProp.render();
     });
 
-    $("#layout-properties-icon").click(function (e) {
-      $("#layout-properties").trigger('click');
-    });
-
     $("#delete-selected-simple, #delete-selected-simple-icon").click(function (e) {
-      var selectedEles = cy.$(":selected");
-      if (selectedEles.length == 0) {
-        return;
-      }
-      cy.undoRedo().do("deleteElesSimple", {
-        eles: selectedEles
-      });
+      sbgnviz.deleteElesSimple(cy.elements(':selected'));
     });
 
     $("#sbgn-properties, #properties-icon").click(function (e) {
@@ -270,59 +168,34 @@ module.exports = function () {
     });
 
     $("#collapse-selected,#collapse-selected-icon").click(function (e) {
-      collapseSelected();
+      sbgnviz.collapseNodes(cy.nodes(":selected"));
     });
 
     $("#expand-selected,#expand-selected-icon").click(function (e) {
-      expandSelected();
+      sbgnviz.expandNodes(cy.nodes(":selected"));
     });
 
     $("#collapse-complexes").click(function (e) {
-      var complexes = cy.nodes("[sbgnclass='complex']");
-      if (complexes.collapsibleNodes().length == 0) {
-        return;
-      }
-      cy.undoRedo().do("collapseRecursively", {
-        nodes: complexes
-      });
+      sbgnviz.collapseComplexes();
     });
     $("#expand-complexes").click(function (e) {
-      var nodes = cy.nodes(":selected").filter("[sbgnclass='complex'][expanded-collapsed='collapsed']");
-      if (nodes.expandableNodes().length == 0) {
-        return;
-      }
-      cy.undoRedo().do("expandRecursively", {
-        nodes: nodes
-      });
+      sbgnviz.expandComplexes
     });
 
     $("#collapse-all").click(function (e) {
-      var nodes = cy.nodes(':visible');
-      if (nodes.collapsibleNodes().length == 0) {
-        return;
-      }
-      cy.undoRedo().do("collapseRecursively", {
-        nodes: nodes
-      });
+      sbgnviz.collapseAll();
     });
 
     $("#expand-all").click(function (e) {
-      var nodes = cy.nodes(':visible').filter("[expanded-collapsed='collapsed']");
-      if (nodes.expandableNodes().length == 0) {
-        return;
-      }
-      cy.undoRedo().do("expandRecursively", {
-        nodes: nodes
-      });
+      sbgnviz.expandAll();
     });
 
-    $("#perform-layout-icon").click(function (e) {
-      $("#perform-layout").trigger('click');
-    });
-
-    $("#perform-layout").click(function (e) {
-      startSpinner("layout-spinner");
-      beforePerformLayout();
+    $("#perform-layout, #perform-layout-icon").click(function (e) {
+      // TODO think whether here is the right place to start the spinner
+      sbgnviz.startSpinner("layout-spinner"); 
+      
+      // If 'animate-on-drawing-changes' is false then animate option must be 'end' instead of false
+      // If it is 'during' use it as is 
       var preferences = {
         animate: sbgnStyleRules['animate-on-drawing-changes'] ? 'end' : false
       };
@@ -341,84 +214,17 @@ module.exports = function () {
     });
 
     $("#save-as-png").click(function (evt) {
-      var pngContent = cy.png({scale: 3, full: true});
-
-      // see http://stackoverflow.com/questions/16245767/creating-a-blob-from-a-base64-string-in-javascript
-      function b64toBlob(b64Data, contentType, sliceSize) {
-        contentType = contentType || '';
-        sliceSize = sliceSize || 512;
-
-        var byteCharacters = atob(b64Data);
-        var byteArrays = [];
-
-        for (var offset = 0; offset < byteCharacters.length; offset += sliceSize) {
-          var slice = byteCharacters.slice(offset, offset + sliceSize);
-
-          var byteNumbers = new Array(slice.length);
-          for (var i = 0; i < slice.length; i++) {
-            byteNumbers[i] = slice.charCodeAt(i);
-          }
-
-          var byteArray = new Uint8Array(byteNumbers);
-
-          byteArrays.push(byteArray);
-        }
-
-        var blob = new Blob(byteArrays, {type: contentType});
-        return blob;
-      }
-
-      // this is to remove the beginning of the pngContent: data:img/png;base64,
-      var b64data = pngContent.substr(pngContent.indexOf(",") + 1);
-      saveAs(b64toBlob(b64data, "image/png"), "network.png");
+      sbgnviz.saveAsPng(); // the default filename is 'network.png'
     });
 
     $("#save-as-jpg").click(function (evt) {
-      var pngContent = cy.jpg({scale: 3, full: true});
-
-      // see http://stackoverflow.com/questions/16245767/creating-a-blob-from-a-base64-string-in-javascript
-      function b64toBlob(b64Data, contentType, sliceSize) {
-        contentType = contentType || '';
-        sliceSize = sliceSize || 512;
-
-        var byteCharacters = atob(b64Data);
-        var byteArrays = [];
-
-        for (var offset = 0; offset < byteCharacters.length; offset += sliceSize) {
-          var slice = byteCharacters.slice(offset, offset + sliceSize);
-
-          var byteNumbers = new Array(slice.length);
-          for (var i = 0; i < slice.length; i++) {
-            byteNumbers[i] = slice.charCodeAt(i);
-          }
-
-          var byteArray = new Uint8Array(byteNumbers);
-
-          byteArrays.push(byteArray);
-        }
-
-        var blob = new Blob(byteArrays, {type: contentType});
-        return blob;
-      }
-
-      // this is to remove the beginning of the pngContent: data:img/png;base64,
-      var b64data = pngContent.substr(pngContent.indexOf(",") + 1);
-      saveAs(b64toBlob(b64data, "image/jpg"), "network.jpg");
+      sbgnviz.saveAsJpg(); // the default filename is 'network.jpg'
     });
 
     //TODO: could simply keep/store original input SBGN-ML data and use it here instead of converting from JSON
-    $("#save-as-sbgnml").click(function (evt) {
-      var sbgnmlText = jsonToSbgnml.createSbgnml();
-
-      var blob = new Blob([sbgnmlText], {
-        type: "text/plain;charset=utf-8;",
-      });
+    $("#save-as-sbgnml", "#save-icon").click(function (evt) {
       var filename = document.getElementById('file-name').innerHTML;
-      saveAs(blob, filename);
-    });
-
-    $("#save-icon").click(function (evt) {
-      $("#save-as-sbgnml").trigger('click');
+      sbgnviz.saveAsSbgnml(filename);
     });
 
     commonAppUtilities.sbgnNetworkContainer.on("click", ".biogene-info .expandable", function (evt) {
@@ -438,69 +244,7 @@ module.exports = function () {
     });
   }
 
-  function setFileContent(fileName) {
-    var span = document.getElementById('file-name');
-    while (span.firstChild) {
-      span.removeChild(span.firstChild);
-    }
-    span.appendChild(document.createTextNode(fileName));
-  }
-
-  function loadSample(filename) {
-    startSpinner("load-spinner");
-    var xmlObject = loadXMLDoc('sample-app/samples/' + filename);
-    setFileContent(filename.replace('xml', 'sbgnml'));
-    setTimeout(function () {
-      sbgnvizUpdate(sbgnmlToJson.convert(xmlObject));
-      endSpinner("load-spinner");
-    }, 0);
-  }
-
-  function loadSBGNMLFile(file) {
-    startSpinner("load-file-spinner");
-    $("#load-file-spinner").ready(function () {
-      var textType = /text.*/;
-
-      var reader = new FileReader();
-
-      reader.onload = function (e) {
-        var text = this.result;
-
-        setTimeout(function () {
-          sbgnvizUpdate(sbgnmlToJson.convert(textToXmlObject(text)));
-          endSpinner("load-file-spinner");
-        }, 0);
-      };
-
-      reader.readAsText(file);
-      setFileContent(file.name);
-    });
-  }
-  
-  function loadXMLDoc(filename) {
-    if (window.XMLHttpRequest) {
-      xhttp = new XMLHttpRequest();
-    }
-    else {
-      xhttp = new ActiveXObject("Microsoft.XMLHTTP");
-    }
-    xhttp.open("GET", filename, false);
-    xhttp.send();
-    return xhttp.responseXML;
-  }
-
-  function textToXmlObject(text) {
-    if (window.ActiveXObject) {
-      var doc = new ActiveXObject('Microsoft.XMLDOM');
-      doc.async = 'false';
-      doc.loadXML(text);
-    } else {
-      var parser = new DOMParser();
-      var doc = parser.parseFromString(text, 'text/xml');
-    }
-    return doc;
-  }
-
+// TODO move this to the core
 //Handle keyboard events
   $(document).keydown(function (e) {
     if (e.ctrlKey && e.target.nodeName === 'BODY') {

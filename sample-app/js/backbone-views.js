@@ -1,15 +1,8 @@
 var commonAppUtilities = require('./common-app-utilities');
-var sbgnmlToJson = sbgnviz.sbgnmlToJsonConverter;
-var dialogUtilities = sbgnviz.dialogUtilities;
 
 var setFileContent = commonAppUtilities.setFileContent.bind(commonAppUtilities);
-var startSpinner = commonAppUtilities.startSpinner.bind(commonAppUtilities);
-var endSpinner = commonAppUtilities.endSpinner.bind(commonAppUtilities);
-var sbgnvizUpdate = commonAppUtilities.sbgnvizUpdate.bind(commonAppUtilities);
-var calculatePaddings = commonAppUtilities.calculatePaddings.bind(commonAppUtilities);
 var sbgnStyleRules = commonAppUtilities.sbgnStyleRules;
 var defaultSbgnStyleRules = commonAppUtilities.defaultSbgnStyleRules;
-var refreshPaddings = commonAppUtilities.refreshPaddings.bind(commonAppUtilities);
 
 /**
  * Backbone view for the BioGene information.
@@ -201,16 +194,16 @@ var SBGNLayout = Backbone.View.extend({
     animationDuration: 1000,
     randomize: true,
     tilingPaddingVertical: function () {
-      return calculatePaddings(parseInt(sbgnStyleRules['tiling-padding-vertical'], 10));
+      return sbgnviz.calculatePaddings(parseInt(sbgnStyleRules['tiling-padding-vertical'], 10));
     },
     tilingPaddingHorizontal: function () {
-      return calculatePaddings(parseInt(sbgnStyleRules['tiling-padding-horizontal'], 10));
+      return sbgnviz.calculatePaddings(parseInt(sbgnStyleRules['tiling-padding-horizontal'], 10));
     },
     gravityRangeCompound: 1.5,
     gravityCompound: 1.0,
     gravityRange: 3.8,
     stop: function () {
-      endSpinner('layout-spinner');
+      sbgnviz.endSpinner('layout-spinner');
     }
   },
   currentLayoutProperties: null,
@@ -228,20 +221,12 @@ var SBGNLayout = Backbone.View.extend({
   copyProperties: function () {
     this.currentLayoutProperties = _.clone(this.defaultLayoutProperties);
   },
-  applyLayout: function (preferences, undoable) {
+  applyLayout: function (preferences, notUndoable) {
     if (preferences === undefined) {
       preferences = {};
     }
     var options = $.extend({}, this.currentLayoutProperties, preferences);
-    if (undoable === false) {
-      cy.elements().filter(':visible').layout(options);
-    }
-    else {
-      cy.undoRedo().do("layout", {
-        options: options,
-        eles: cy.elements().filter(':visible')
-      });
-    }
+    sbgnviz.performLayout(options, notUndoable);
   },
   render: function () {
     var self = this;
@@ -254,7 +239,7 @@ var SBGNLayout = Backbone.View.extend({
     self.template = self.template(templateProperties);
     $(self.el).html(self.template);
 
-    dialogUtilities.openDialog(self.el);
+    sbgnviz.openDialog(self.el);
 
     $(document).off("click", "#save-layout").on("click", "#save-layout", function (evt) {
       self.currentLayoutProperties.nodeRepulsion = Number(document.getElementById("node-repulsion").value);
@@ -320,7 +305,7 @@ var SBGNProperties = Backbone.View.extend({
     self.template = self.template(self.currentSBGNProperties);
     $(self.el).html(self.template);
 
-    dialogUtilities.openDialog(self.el);
+    sbgnviz.openDialog(self.el);
 
     $(document).off("click", "#save-sbgn").on("click", "#save-sbgn", function (evt) {
 
@@ -339,7 +324,7 @@ var SBGNProperties = Backbone.View.extend({
       //Refresh paddings if needed
       if (sbgnStyleRules['compound-padding'] != self.currentSBGNProperties.compoundPadding) {
         sbgnStyleRules['compound-padding'] = self.currentSBGNProperties.compoundPadding;
-        refreshPaddings();
+        sbgnviz.refreshPaddings();
       }
       //Refresh label size if needed
       if (sbgnStyleRules['dynamic-label-size'] != self.currentSBGNProperties.dynamicLabelSize) {
@@ -402,7 +387,7 @@ var PathsBetweenQuery = Backbone.View.extend({
       }
     });
 
-    dialogUtilities.openDialog(self.el, {width: 'auto'});
+    sbgnviz.openDialog(self.el, {width: 'auto'});
 
     $(document).off("click", "#save-query-pathsbetween").on("click", "#save-query-pathsbetween", function (evt) {
 
@@ -430,15 +415,15 @@ var PathsBetweenQuery = Backbone.View.extend({
       filename = filename + '_PATHSBETWEEN.sbgnml';
       setFileContent(filename);
 
-      startSpinner('paths-between-spinner');
+      sbgnviz.startSpinner('paths-between-spinner');
 
       queryURL = queryURL + sources;
       $.ajax({
         url: queryURL,
         type: 'GET',
         success: function (data) {
-          sbgnvizUpdate(sbgnmlToJson.convert(data));
-          endSpinner('paths-between-spinner');
+          sbgnviz.sbgnvizUpdate(sbgnviz.convertSbgnmlToJson(data));
+          sbgnviz.endSpinner('paths-between-spinner');
         }
       });
 

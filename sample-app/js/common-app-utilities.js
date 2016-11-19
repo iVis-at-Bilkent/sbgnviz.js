@@ -23,7 +23,8 @@ var commonAppUtilities = {
     span.appendChild(document.createTextNode(fileName));
   },
   triggerIncrementalLayout: function () {
-    this.beforePerformLayout();
+    // If 'animate-on-drawing-changes' is false then animate option must be 'end' instead of false
+    // If it is 'during' use it as is. Set 'randomize' and 'fit' options to true
     var preferences = {
       randomize: false,
       animate: this.sbgnStyleRules['animate-on-drawing-changes'] ? 'end' : false,
@@ -33,56 +34,7 @@ var commonAppUtilities = {
       delete preferences.animate;
     }
 
-    this.sbgnLayoutProp.applyLayout(preferences, false); // layout must not be undoable
-  },
-  beforePerformLayout: function() {
-    var nodes = cy.nodes();
-    var edges = cy.edges();
-
-    nodes.removeData("ports");
-    edges.removeData("portsource");
-    edges.removeData("porttarget");
-
-    nodes.data("ports", []);
-    edges.data("portsource", []);
-    edges.data("porttarget", []);
-
-    // TODO do this by using extension API
-    cy.$('.edgebendediting-hasbendpoints').removeClass('edgebendediting-hasbendpoints');
-    edges.scratch('cyedgebendeditingWeights', []);
-    edges.scratch('cyedgebendeditingDistances', []);
-  },
-  sbgnvizUpdate: function (cyGraph) {
-    console.log('cy update called');
-    // Reset undo/redo stack and buttons when a new graph is loaded
-    cy.undoRedo().reset();
-    this.resetUndoRedoButtons();
-    
-    cy.startBatch();
-    // clear data
-    cy.remove('*');
-    cy.add(cyGraph);
-    
-    //add position information to data for preset layout
-    var positionMap = {};
-    for (var i = 0; i < cyGraph.nodes.length; i++) {
-      var xPos = cyGraph.nodes[i].data.sbgnbbox.x;
-      var yPos = cyGraph.nodes[i].data.sbgnbbox.y;
-      positionMap[cyGraph.nodes[i].data.id] = {'x': xPos, 'y': yPos};
-    }
-    
-    cy.layout({
-      name: 'preset',
-      positions: positionMap
-    });
-    
-    this.refreshPaddings();
-    cy.endBatch();
-    
-    // Update the style
-    cy.style().update();
-    // Initilize the bend points once the elements are created
-    cy.edgeBendEditing('get').initBendPoints(cy.edges());
+    this.sbgnLayoutProp.applyLayout(preferences, true); // layout must not be undoable
   },
   getExpandCollapseOptions: function () {
     var self = this;
@@ -123,42 +75,6 @@ var commonAppUtilities = {
       $("#sbgn-network-container").height(windowHeight * 0.85);
       $("#sbgn-inspector").height(windowHeight * 0.85);
     }
-  },
-  getInfoLabel: function (node) {
-    /* Info label of a collapsed node cannot be changed if
-     * the node is collapsed return the already existing info label of it
-     */
-    if (node._private.data.collapsedChildren != null) {
-      return node._private.data.infoLabel;
-    }
-
-    /*
-     * If the node is simple then it's infolabel is equal to it's sbgnlabel
-     */
-    if (node.children() == null || node.children().length == 0) {
-      return node._private.data.sbgnlabel;
-    }
-
-    var children = node.children();
-    var infoLabel = "";
-    /*
-     * Get the info label of the given node by it's children info recursively
-     */
-    for (var i = 0; i < children.length; i++) {
-      var child = children[i];
-      var childInfo = this.getInfoLabel(child);
-      if (childInfo == null || childInfo == "") {
-        continue;
-      }
-
-      if (infoLabel != "") {
-        infoLabel += ":";
-      }
-      infoLabel += childInfo;
-    }
-
-    //return info label
-    return infoLabel;
   },
   nodeQtipFunction: function (node) {
     /*    * Check the sbgnlabel of the node if it is not valid
@@ -233,63 +149,6 @@ var commonAppUtilities = {
   resetUndoRedoButtons: function () {
     $("#undo-last-action").parent("li").addClass("disabled");
     $("#redo-last-action").parent("li").addClass("disabled");
-  },
-  calculatePaddings: function (paddingPercent) {
-    //As default use the compound padding value
-    if (!paddingPercent) {
-      paddingPercent = parseInt(this.sbgnStyleRules['compound-padding'], 10);
-    }
-
-    var nodes = cy.nodes();
-    var total = 0;
-    var numOfSimples = 0;
-    for (var i = 0; i < nodes.length; i++) {
-      var theNode = nodes[i];
-      if (theNode.children() == null || theNode.children().length == 0) {
-        total += Number(theNode.width());
-        total += Number(theNode.height());
-        numOfSimples++;
-      }
-    }
-
-    var calc_padding = (paddingPercent / 100) * Math.floor(total / (2 * numOfSimples));
-    if (calc_padding < 5) {
-      calc_padding = 5;
-    }
-
-    return calc_padding;
-  },
-  calculateTilingPaddings: function() {
-    return this.calculatePaddings();
-  },
-  calculateCompoundPaddings: function() {
-    return this.calculatePaddings();
-  },
-  refreshPaddings: function () {
-    var calc_padding = this.calculateCompoundPaddings();
-    var nodes = cy.nodes();
-    nodes.css('padding-left', 0);
-    nodes.css('padding-right', 0);
-    nodes.css('padding-top', 0);
-    nodes.css('padding-bottom', 0);
-    var compounds = nodes.filter('$node > node');
-    compounds.css('padding-left', calc_padding);
-    compounds.css('padding-right', calc_padding);
-    compounds.css('padding-top', calc_padding);
-    compounds.css('padding-bottom', calc_padding);
-  },
-  startSpinner: function (className) {
-
-    if ($('.' + className).length === 0) {
-      var containerWidth = $('#sbgn-network-container').width();
-      var containerHeight = $('#sbgn-network-container').height();
-      $('#sbgn-network-container:parent').prepend('<i style="position: absolute; z-index: 9999999; left: ' + containerWidth / 2 + 'px; top: ' + containerHeight / 2 + 'px;" class="fa fa-spinner fa-spin fa-3x fa-fw ' + className + '"></i>');
-    }
-  },
-  endSpinner: function (className) {
-    if ($('.' + className).length > 0) {
-      $('.' + className).remove();
-    }
   }
 };
 

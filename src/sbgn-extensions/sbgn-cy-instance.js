@@ -1,4 +1,8 @@
 var sbgnElementUtilities = require('../utilities/sbgn-element-utilities');
+var sbgnGraphUtilities = require('../utilities/sbgn-graph-utilities');
+var undoRedoActionFunctions = require('../utilities/undo-redo-action-functions');
+var refreshPaddings = sbgnGraphUtilities.refreshPaddings.bind(sbgnGraphUtilities);
+
 var optionUtilities = require('../utilities/option-utilities');
 var options = optionUtilities.getOptions();
 
@@ -20,10 +24,79 @@ module.exports = function () {
       wheelSensitivity: 0.1,
       ready: function () {
         window.cy = this;
+        // If undoable register undo/redo actions
+        if (options.undoable) {
+          registerUndoRedoActions();
+        }
         bindCyEvents();
       }
     });
   });
+  
+  // Note that in ChiSE this function is in a seperate file but in the viewer it has just 2 methods and so it is located in this file
+  function registerUndoRedoActions() {
+    // create or get the undo-redo instance
+    var ur = cy.undoRedo();
+
+    // register general actions
+    // register add remove actions
+    ur.action("deleteElesSimple", undoRedoActionFunctions.deleteElesSimple, undoRedoActionFunctions.restoreEles);
+    ur.action("deleteElesSmart", undoRedoActionFunctions.deleteElesSmart, undoRedoActionFunctions.restoreEles);
+  }
+  
+  function bindCyEvents() {
+    cy.on('tapend', 'node', function (event) {
+      cy.style().update();
+    });
+    
+    cy.on("beforeCollapse", "node", function (event) {
+      var node = this;
+      //The children info of complex nodes should be shown when they are collapsed
+      if (node._private.data.sbgnclass == "complex") {
+        //The node is being collapsed store infolabel to use it later
+        var infoLabel = sbgnElementUtilities.getInfoLabel(node);
+        node._private.data.infoLabel = infoLabel;
+      }
+
+      var edges = cy.edges();
+      // remove bend points before collapse
+      for (var i = 0; i < edges.length; i++) {
+        var edge = edges[i];
+        if (edge.hasClass('edgebendediting-hasbendpoints')) {
+          edge.removeClass('edgebendediting-hasbendpoints');
+          delete edge._private.classes['edgebendediting-hasbendpoints'];
+        }
+      }
+
+      edges.scratch('cyedgebendeditingWeights', []);
+      edges.scratch('cyedgebendeditingDistances', []);
+    });
+
+    cy.on("afterCollapse", "node", function (event) {
+      var node = this;
+      refreshPaddings();
+
+      if (node._private.data.sbgnclass == "complex") {
+        node.addClass('changeContent');
+      }
+    });
+
+    cy.on("beforeExpand", "node", function (event) {
+      var node = this;
+      node.removeData("infoLabel");
+    });
+
+    cy.on("afterExpand", "node", function (event) {
+      var node = this;
+      cy.nodes().updateCompoundBounds();
+      //Don't show children info when the complex node is expanded
+      if (node._private.data.sbgnclass == "complex") {
+        node.removeStyle('content');
+      }
+      
+      refreshPaddings();
+    });
+  }
 
   var sbgnStyleSheet = cytoscape.stylesheet()
           .selector("node")
@@ -193,10 +266,4 @@ module.exports = function () {
             'selection-box-color': '#d67614',
             'selection-box-opacity': '0.2', 'selection-box-border-color': '#d67614'
           });
-
-  function bindCyEvents() {
-    cy.on('tapend', 'node', function (event) {
-      cy.style().update();
-    });
-  }
 };

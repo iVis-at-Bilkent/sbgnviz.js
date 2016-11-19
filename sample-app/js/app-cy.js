@@ -1,13 +1,9 @@
 module.exports = function () {
   var commonAppUtilities = require('./common-app-utilities');
-  var undoRedoActionFunctions = require('./undo-redo-action-functions');
-  var sbgnElementUtilities = sbgnviz.sbgnElementUtilities;
 
   var getExpandCollapseOptions = commonAppUtilities.getExpandCollapseOptions.bind(commonAppUtilities);
-  var getInfoLabel = commonAppUtilities.getInfoLabel.bind(commonAppUtilities);
   var nodeQtipFunction = commonAppUtilities.nodeQtipFunction.bind(commonAppUtilities);
   var refreshUndoRedoButtonsStatus = commonAppUtilities.refreshUndoRedoButtonsStatus.bind(commonAppUtilities);
-  var refreshPaddings = commonAppUtilities.refreshPaddings.bind(commonAppUtilities);
   var sbgnStyleRules = commonAppUtilities.sbgnStyleRules;
 
   $(document).ready(function ()
@@ -15,23 +11,10 @@ module.exports = function () {
     commonAppUtilities.sbgnNetworkContainer = $('#sbgn-network-container');
     // create and init cytoscape:
     cy.ready(function () {
-      registerUndoRedoActions();
       cytoscapeExtensionsAndContextMenu();
       bindCyEvents();
     });
   });
-// end of sbgnStyleSheet
-
-// Note that in ChiSE this function is in a seperate file but in the viewer it has just 2 methods and so it is located in this file
-  function registerUndoRedoActions() {
-    // create undo-redo instance
-    var ur = cy.undoRedo({});
-
-    // register general actions
-    // register add remove actions
-    ur.action("deleteElesSimple", undoRedoActionFunctions.deleteElesSimple, undoRedoActionFunctions.restoreEles);
-    ur.action("deleteElesSmart", undoRedoActionFunctions.deleteElesSmart, undoRedoActionFunctions.restoreEles);
-  }
 
   function cytoscapeExtensionsAndContextMenu() {
     cy.expandCollapse(getExpandCollapseOptions());
@@ -241,55 +224,5 @@ module.exports = function () {
 
       nodeQtipFunction(node);
     });
-    
-    // TODO move these functions to sbgn-cy-instance.js once we are ready for it
-    cy.on("beforeCollapse", "node", function (event) {
-      var node = this;
-      //The children info of complex nodes should be shown when they are collapsed
-      if (node._private.data.sbgnclass == "complex") {
-        //The node is being collapsed store infolabel to use it later
-        var infoLabel = getInfoLabel(node);
-        node._private.data.infoLabel = infoLabel;
-      }
-
-      var edges = cy.edges();
-      // remove bend points before collapse
-      for (var i = 0; i < edges.length; i++) {
-        var edge = edges[i];
-        if (edge.hasClass('edgebendediting-hasbendpoints')) {
-          edge.removeClass('edgebendediting-hasbendpoints');
-          delete edge._private.classes['edgebendediting-hasbendpoints'];
-        }
-      }
-
-      edges.scratch('cyedgebendeditingWeights', []);
-      edges.scratch('cyedgebendeditingDistances', []);
-    });
-
-    cy.on("afterCollapse", "node", function (event) {
-      var node = this;
-      refreshPaddings();
-
-      if (node._private.data.sbgnclass == "complex") {
-        node.addClass('changeContent');
-      }
-    });
-
-    cy.on("beforeExpand", "node", function (event) {
-      var node = this;
-      node.removeData("infoLabel");
-    });
-
-    cy.on("afterExpand", "node", function (event) {
-      var node = this;
-      cy.nodes().updateCompoundBounds();
-      //Don't show children info when the complex node is expanded
-      if (node._private.data.sbgnclass == "complex") {
-        node.removeStyle('content');
-      }
-      
-      refreshPaddings();
-    });
   }
 };
-

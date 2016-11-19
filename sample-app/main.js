@@ -26,6 +26,10 @@ sbgnviz({
   // dynamic label size it may be 'small', 'regular', 'large'
   dynamicLabelSize: function () {
     return sbgnStyleRules['dynamic-label-size'];
+  },
+  // percentage used to calculate compound paddings
+  compoundPadding: function () {
+    return sbgnStyleRules['compound-padding'];
   }
 });
 

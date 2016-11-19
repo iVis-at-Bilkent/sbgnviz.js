@@ -207,20 +207,6 @@ var sbgnElementUtilities = {
     // Add remove utilities
 
     // Section Start
-    // Common element properties
-    
-    isEPNClass: function(sbgnclass) {
-        return (sbgnclass == 'unspecified entity'
-        || sbgnclass == 'simple chemical'
-        || sbgnclass == 'macromolecule'
-        || sbgnclass == 'nucleic acid feature'
-        || sbgnclass == 'complex');
-    },
-    
-    // Section End
-    // Common element properties
-
-    // Section Start
     // Stylesheet helpers
     
     getCyShape: function(ele) {
@@ -371,11 +357,47 @@ var sbgnElementUtilities = {
       return textHeight;
     },
     getCardinalityDistance: function (ele) {
-        var srcPos = ele.source().position();
-        var tgtPos = ele.target().position();
+      var srcPos = ele.source().position();
+      var tgtPos = ele.target().position();
 
-        var distance = Math.sqrt(Math.pow((srcPos.x - tgtPos.x), 2) + Math.pow((srcPos.y - tgtPos.y), 2));
-        return distance * 0.15;
+      var distance = Math.sqrt(Math.pow((srcPos.x - tgtPos.x), 2) + Math.pow((srcPos.y - tgtPos.y), 2));
+      return distance * 0.15;
+    },
+    getInfoLabel: function(node) {
+      /* Info label of a collapsed node cannot be changed if
+      * the node is collapsed return the already existing info label of it
+      */
+      if (node._private.data.collapsedChildren != null) {
+        return node._private.data.infoLabel;
+      }
+
+      /*
+       * If the node is simple then it's infolabel is equal to it's sbgnlabel
+       */
+      if (node.children() == null || node.children().length == 0) {
+        return node._private.data.sbgnlabel;
+      }
+
+      var children = node.children();
+      var infoLabel = "";
+      /*
+       * Get the info label of the given node by it's children info recursively
+       */
+      for (var i = 0; i < children.length; i++) {
+        var child = children[i];
+        var childInfo = this.getInfoLabel(child);
+        if (childInfo == null || childInfo == "") {
+          continue;
+        }
+
+        if (infoLabel != "") {
+          infoLabel += ":";
+        }
+        infoLabel += childInfo;
+      }
+
+      //return info label
+      return infoLabel;
     }
     
     // Section End
