@@ -1,6 +1,6 @@
 module.exports = function () {
   var commonAppUtilities = require('./common-app-utilities');
-  var bioGeneQtip = require('./biogene-qtip')
+  var bioGeneQtip = require('./biogene-qtip');
   
   var getExpandCollapseOptions = commonAppUtilities.getExpandCollapseOptions.bind(commonAppUtilities);
   var nodeQtipFunction = commonAppUtilities.nodeQtipFunction.bind(commonAppUtilities);
