@@ -77,39 +77,9 @@ var commonAppUtilities = {
     }
   },
   nodeQtipFunction: function (node) {
-    /*    * Check the sbgnlabel of the node if it is not valid
-     * then check the infolabel if it is also not valid do not show qtip
-     */
-    var label = node._private.data.sbgnlabel;
-    if (label == null || label == "")
-      label = this.getInfoLabel(node);
-    if (label == null || label == "")
-      return;
     node.qtip({
       content: function () {
-        var contentHtml = "<b style='text-align:center;font-size:16px;'>" + label + "</b>";
-        var sbgnstatesandinfos = node._private.data.sbgnstatesandinfos;
-        for (var i = 0; i < sbgnstatesandinfos.length; i++) {
-          var sbgnstateandinfo = sbgnstatesandinfos[i];
-          if (sbgnstateandinfo.clazz == "state variable") {
-            var value = sbgnstateandinfo.state.value;
-            var variable = sbgnstateandinfo.state.variable;
-            var stateLabel = (variable == null /*|| typeof stateVariable === undefined */) ? value :
-                    value + "@" + variable;
-            if (stateLabel == null) {
-              stateLabel = "";
-            }
-            contentHtml += "<div style='text-align:center;font-size:14px;'>" + stateLabel + "</div>";
-          }
-          else if (sbgnstateandinfo.clazz == "unit of information") {
-            var stateLabel = sbgnstateandinfo.label.text;
-            if (stateLabel == null) {
-              stateLabel = "";
-            }
-            contentHtml += "<div style='text-align:center;font-size:14px;'>" + stateLabel + "</div>";
-          }
-        }
-        return contentHtml;
+        return sbgnviz.getQtipContent(node);
       },
       show: {
         ready: true

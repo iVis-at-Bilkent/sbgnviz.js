@@ -296,4 +296,8 @@ mainUtilities.convertSbgnmlToJson = function(data) {
   return sbgnmlToJson.convert(data);
 };
 
+mainUtilities.getQtipContent = function(node) {
+  return sbgnElementUtilities.getQtipContent(node);
+};
+
 module.exports = mainUtilities;
