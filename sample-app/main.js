@@ -43,7 +43,8 @@ sbgnviz({
   // percentage used to calculate compound paddings
   compoundPadding: function () {
     return sbgnStyleRules['compound-padding'];
-  }
+  },
+  undoable: true
 });
 
 appCy();

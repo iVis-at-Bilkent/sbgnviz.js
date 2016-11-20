@@ -6,6 +6,9 @@ var sbgnElementUtilities = require('./sbgn-element-utilities');
 var sbgnGraphUtilities = require('./sbgn-graph-utilities');
 var jsonToSbgnml = require('./json-to-sbgnml-converter');
 var sbgnmlToJson = require('./sbgnml-to-json-converter');
+var optionUtilities = require('./option-utilities');
+
+var options = optionUtilities.getOptions();
 
 // Helpers start
 function beforePerformLayout() {
@@ -34,49 +37,163 @@ mainUtilities.expandNodes = function(nodes) {
   if (nodesToExpand.expandableNodes().length == 0) {
     return;
   }
-  cy.undoRedo().do("expand", {
-    nodes: nodesToExpand,
-  });
-};
-
-mainUtilities.hideEles = function(eles) {
-  if (eles.length === 0) {
-    return;
+  if(options.undoable) {
+    cy.undoRedo().do("expand", {
+      nodes: nodesToExpand,
+    });
   }
-  cy.undoRedo().do("hide", eles);
-};
-
-mainUtilities.showEles = function(eles) {
-  if (eles.length === cy.elements(':visible').length) {
-    return;
+  else {
+    nodes.expand();
   }
-  cy.undoRedo().do("show", eles);
 };
 
 mainUtilities.collapseNodes = function(nodes) {
   if (nodes.collapsibleNodes().length == 0) {
     return;
   }
-  cy.undoRedo().do("collapse", {
-    nodes: nodes
-  });
+  
+  if(options.undoable) {
+    cy.undoRedo().do("collapse", {
+      nodes: nodes
+    });
+  }
+  else {
+    nodes.collapse();
+  }
+};
+
+mainUtilities.collapseComplexes = function() {
+  var complexes = cy.nodes("[sbgnclass='complex']");
+  if (complexes.collapsibleNodes().length == 0) {
+    return;
+  }
+  
+  if (options.undoable) {
+    cy.undoRedo().do("collapseRecursively", {
+      nodes: complexes
+    });
+  }
+  else {
+    complexes.collapseRecursively();
+  }
+};
+
+mainUtilities.expandComplexes = function() {
+  var nodes = cy.nodes(":selected").filter("[sbgnclass='complex'][expanded-collapsed='collapsed']");
+  if (nodes.expandableNodes().length == 0) {
+    return;
+  }
+  
+  if (options.undoable) {
+    cy.undoRedo().do("expandRecursively", {
+      nodes: nodes
+    });
+  }
+  else {
+    nodes.expandRecursively();
+  }
+};
+
+mainUtilities.collapseAll = function() {
+  var nodes = cy.nodes(':visible');
+  if (nodes.collapsibleNodes().length == 0) {
+    return;
+  }
+  
+  if (options.undoable) {
+    cy.undoRedo().do("collapseRecursively", {
+      nodes: nodes
+    });
+  }
+  else {
+    nodes.collapseRecursively();
+  }
+};
+
+mainUtilities.expandAll = function() {
+  var nodes = cy.nodes(':visible').filter("[expanded-collapsed='collapsed']");
+  if (nodes.expandableNodes().length == 0) {
+    return;
+  }
+  
+  if (options.undoable) {
+    cy.undoRedo().do("expandRecursively", {
+      nodes: nodes
+    });
+  }
+  else {
+    nodes.expandRecursively();
+  }
+};
+
+mainUtilities.hideEles = function(eles) {
+  if (eles.length === 0) {
+    return;
+  }
+  
+  if(options.undoable) {
+    cy.undoRedo().do("hide", eles);
+  }
+  else {
+    eles.hideEles();
+  }
+};
+
+mainUtilities.showEles = function(eles) {
+  if (eles.length === cy.elements(':visible').length) {
+    return;
+  }
+  
+  if(options.undoable) {
+    cy.undoRedo().do("show", eles);
+  }
+  else {
+    eles.showEles();
+  }
 };
 
 mainUtilities.showAll = function() {
   if (cy.elements().length === cy.elements(':visible').length) {
     return;
   }
-  cy.undoRedo().do("show", cy.elements());
+  
+  if(options.undoable) {
+    cy.undoRedo().do("show", cy.elements());
+  }
+  else {
+    cy.elements().showEles();
+  }
+};
+
+mainUtilities.deleteElesSimple = function(eles) {
+  if (eles.length == 0) {
+    return;
+  }
+  
+  if (options.undoable) {
+    cy.undoRedo().do("deleteElesSimple", {
+      eles: eles
+    });
+  }
+  else {
+    eles.remove();
+  }
 };
 
 mainUtilities.deleteElesSmart = function(eles) {
   if (eles.length == 0) {
     return;
   }
-  cy.undoRedo().do("deleteElesSmart", {
-    firstTime: true,
-    eles: eles
-  });
+  
+  if(options.undoable) {
+    cy.undoRedo().do("deleteElesSmart", {
+      firstTime: true,
+      eles: eles
+    });
+  }
+  else {
+    sbgnElementUtilities.deleteElesSmart(eles);
+  }
 };
 
 mainUtilities.highlightNeighbours = function(eles) {
@@ -89,7 +206,13 @@ mainUtilities.highlightNeighbours = function(eles) {
   if (elesToHighlight.same(highlightedEles)) {
     return;
   }
-  cy.undoRedo().do("highlight", elesToHighlight);
+  
+  if (options.undoable) {
+    cy.undoRedo().do("highlight", elesToHighlight);
+  }
+  else {
+    elesToHighlight.highlight();
+  }
 };
 
 mainUtilities.searchByLabel = function(label) {
@@ -109,7 +232,13 @@ mainUtilities.searchByLabel = function(label) {
   }
 
   nodesToHighlight = sbgnElementUtilities.extendNodeList(nodesToHighlight);
-  cy.undoRedo().do("highlight", nodesToHighlight);
+  
+  if (options.undoable) {
+    cy.undoRedo().do("highlight", nodesToHighlight);
+  }
+  else {
+    nodesToHighlight.highlight();
+  }
 };
 
 mainUtilities.highlightProcesses = function(eles) {
@@ -122,75 +251,38 @@ mainUtilities.highlightProcesses = function(eles) {
   if (elesToHighlight.same(highlightedEles)) {
     return;
   }
-  cy.undoRedo().do("highlight", elesToHighlight);
+  
+  if (options.undoable) {
+    cy.undoRedo().do("highlight", elesToHighlight);
+  }
+  else {
+    elesToHighlight.highlight();
+  }
 };
 
 mainUtilities.removeHighlights = function() {
   if (sbgnElementUtilities.noneIsNotHighlighted()) {
     return;
   }
-  cy.undoRedo().do("removeHighlights");
-};
-
-mainUtilities.deleteElesSimple = function(eles) {
-  if (eles.length == 0) {
-    return;
+  
+  if (options.undoable) {
+    cy.undoRedo().do("removeHighlights");
   }
-  cy.undoRedo().do("deleteElesSimple", {
-    eles: eles
-  });
-};
-
-mainUtilities.collapseComplexes = function() {
-  var complexes = cy.nodes("[sbgnclass='complex']");
-  if (complexes.collapsibleNodes().length == 0) {
-    return;
+  else {
+    cy.removeHighlights()
   }
-  cy.undoRedo().do("collapseRecursively", {
-    nodes: complexes
-  });
 };
 
-mainUtilities.expandComplexes = function() {
-  var nodes = cy.nodes(":selected").filter("[sbgnclass='complex'][expanded-collapsed='collapsed']");
-  if (nodes.expandableNodes().length == 0) {
-    return;
-  }
-  cy.undoRedo().do("expandRecursively", {
-    nodes: nodes
-  });
-};
-
-mainUtilities.collapseAll = function() {
-  var nodes = cy.nodes(':visible');
-  if (nodes.collapsibleNodes().length == 0) {
-    return;
-  }
-  cy.undoRedo().do("collapseRecursively", {
-    nodes: nodes
-  });
-};
-
-mainUtilities.expandAll = function() {
-  var nodes = cy.nodes(':visible').filter("[expanded-collapsed='collapsed']");
-  if (nodes.expandableNodes().length == 0) {
-    return;
-  }
-  cy.undoRedo().do("expandRecursively", {
-    nodes: nodes
-  });
-};
-
-mainUtilities.performLayout = function(options, notUndoable) {
+mainUtilities.performLayout = function(layoutOptions, notUndoable) {
   // Things to do before performing layout
   beforePerformLayout();
   
-  if (notUndoable) { // 'notUndoable' flag can be used to have composite actions in undo/redo stack
-    cy.elements().filter(':visible').layout(options);
+  if (!options.undoable || notUndoable) { // 'notUndoable' flag can be used to have composite actions in undo/redo stack
+    cy.elements().filter(':visible').layout(layoutOptions);
   }
   else {
     cy.undoRedo().do("layout", {
-      options: options,
+      options: layoutOptions,
       eles: cy.elements().filter(':visible')
     });
   }
