@@ -1,15 +1,15 @@
 module.exports = function () {
-  var commonAppUtilities = require('./common-app-utilities');
+  var appUtilities = require('./app-utilities');
   var bioGeneQtip = require('./biogene-qtip');
   
-  var getExpandCollapseOptions = commonAppUtilities.getExpandCollapseOptions.bind(commonAppUtilities);
-  var nodeQtipFunction = commonAppUtilities.nodeQtipFunction.bind(commonAppUtilities);
-  var refreshUndoRedoButtonsStatus = commonAppUtilities.refreshUndoRedoButtonsStatus.bind(commonAppUtilities);
-  var sbgnStyleRules = commonAppUtilities.sbgnStyleRules;
+  var getExpandCollapseOptions = appUtilities.getExpandCollapseOptions.bind(appUtilities);
+  var nodeQtipFunction = appUtilities.nodeQtipFunction.bind(appUtilities);
+  var refreshUndoRedoButtonsStatus = appUtilities.refreshUndoRedoButtonsStatus.bind(appUtilities);
+  var sbgnStyleRules = appUtilities.sbgnStyleRules;
 
   $(document).ready(function ()
   {
-    commonAppUtilities.sbgnNetworkContainer = $('#sbgn-network-container');
+    appUtilities.sbgnNetworkContainer = $('#sbgn-network-container');
     // create and init cytoscape:
     cy.ready(function () {
       cytoscapeExtensionsAndContextMenu();
@@ -168,7 +168,7 @@ module.exports = function () {
       }
     });
 
-    commonAppUtilities.sbgnNetworkContainer.cytoscapePanzoom(panProps);
+    appUtilities.sbgnNetworkContainer.cytoscapePanzoom(panProps);
   }
 
   function bindCyEvents() {

@@ -8,7 +8,7 @@ var defaultSbgnStyleRules = {
   'animate-on-drawing-changes': true
 };
 
-var commonAppUtilities = {
+var appUtilities = {
   sbgnNetworkContainer: undefined,
   sbgnLayoutProp: undefined,
   sbgnProperties: undefined,
@@ -122,4 +122,4 @@ var commonAppUtilities = {
   }
 };
 
-module.exports = commonAppUtilities;
+module.exports = appUtilities;

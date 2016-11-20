@@ -1,6 +1,6 @@
 var sbgnviz = require('../sbgnviz');
-var commonAppUtilities = require('./js/common-app-utilities');
-var sbgnStyleRules = commonAppUtilities.sbgnStyleRules;
+var appUtilities = require('./js/app-utilities');
+var sbgnStyleRules = appUtilities.sbgnStyleRules;
 var appCy = require('./js/app-cy');
 var appMenu = require('./js/app-menu');
 

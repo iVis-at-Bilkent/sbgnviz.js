@@ -1,10 +1,10 @@
 // Handle sbgnviz menu functions which are to be triggered on events
 module.exports = function () {
   var BackboneViews = require('./backbone-views');
-  var commonAppUtilities = require('./common-app-utilities');
+  var appUtilities = require('./app-utilities');
   
-  var dynamicResize = commonAppUtilities.dynamicResize.bind(commonAppUtilities);
-  var sbgnStyleRules = commonAppUtilities.sbgnStyleRules;
+  var dynamicResize = appUtilities.dynamicResize.bind(appUtilities);
+  var sbgnStyleRules = appUtilities.sbgnStyleRules;
   
   var sbgnLayoutProp, sbgnProperties, pathsBetweenQuery;
 
@@ -16,9 +16,9 @@ module.exports = function () {
   {
     console.log('init the sbgnviz template/page');
 
-    sbgnLayoutProp = commonAppUtilities.sbgnLayoutProp = new BackboneViews.SBGNLayout({el: '#sbgn-layout-table'});
-    sbgnProperties = commonAppUtilities.sbgnProperties = new BackboneViews.SBGNProperties({el: '#sbgn-properties-table'});
-    pathsBetweenQuery = commonAppUtilities.pathsBetweenQuery = new BackboneViews.PathsBetweenQuery({el: '#query-pathsbetween-table'});
+    sbgnLayoutProp = appUtilities.sbgnLayoutProp = new BackboneViews.SBGNLayout({el: '#sbgn-layout-table'});
+    sbgnProperties = appUtilities.sbgnProperties = new BackboneViews.SBGNProperties({el: '#sbgn-properties-table'});
+    pathsBetweenQuery = appUtilities.pathsBetweenQuery = new BackboneViews.PathsBetweenQuery({el: '#query-pathsbetween-table'});
 
     toolbarButtonsAndMenu();
 
@@ -31,11 +31,11 @@ module.exports = function () {
   
   // Events triggered by sbgnviz module
   $(document).on('sbgnvizLoadSample sbgnvizLoadFile', function(event, filename) {
-    commonAppUtilities.setFileContent(filename);
+    appUtilities.setFileContent(filename);
   });
   
   $(document).on('sbgnvizUpdateEnd', function(event) {
-    commonAppUtilities.resetUndoRedoButtons();
+    appUtilities.resetUndoRedoButtons();
   });
 
   function toolbarButtonsAndMenu() {
@@ -227,7 +227,7 @@ module.exports = function () {
       sbgnviz.saveAsSbgnml(filename);
     });
 
-    commonAppUtilities.sbgnNetworkContainer.on("click", ".biogene-info .expandable", function (evt) {
+    appUtilities.sbgnNetworkContainer.on("click", ".biogene-info .expandable", function (evt) {
       var expanderOpts = {slicePoint: 150,
         expandPrefix: ' ',
         expandText: ' (...)',

@@ -1,8 +1,8 @@
-var commonAppUtilities = require('./common-app-utilities');
+var appUtilities = require('./app-utilities');
 
-var setFileContent = commonAppUtilities.setFileContent.bind(commonAppUtilities);
-var sbgnStyleRules = commonAppUtilities.sbgnStyleRules;
-var defaultSbgnStyleRules = commonAppUtilities.defaultSbgnStyleRules;
+var setFileContent = appUtilities.setFileContent.bind(appUtilities);
+var sbgnStyleRules = appUtilities.sbgnStyleRules;
+var defaultSbgnStyleRules = appUtilities.defaultSbgnStyleRules;
 
 /**
  * Backbone view for the BioGene information.
