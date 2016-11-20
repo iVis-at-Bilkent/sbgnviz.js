@@ -151,7 +151,7 @@ module.exports = function () {
       sbgnviz.removeHighlights();
     });
 
-    $("#layout-properties", "#layout-properties-icon").click(function (e) {
+    $("#layout-properties, #layout-properties-icon").click(function (e) {
       sbgnLayoutProp.render();
     });
 
