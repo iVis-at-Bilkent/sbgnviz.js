@@ -4,17 +4,30 @@ var sbgnStyleRules = commonAppUtilities.sbgnStyleRules;
 var appCy = require('./js/app-cy');
 var appMenu = require('./js/app-menu');
 
-var libs = {};
+// Get cy extension instances
+var cyPanzoom = require('cytoscape-panzoom');
+var cyQtip = require('cytoscape-qtip');
+var cyCoseBilkent = require('cytoscape-cose-bilkent');
+var cyUndoRedo = require('cytoscape-undo-redo');
+var cyClipboard = require('cytoscape-clipboard');
+var cyContextMenus = require('cytoscape-context-menus');
+var cyExpandCollapse = require('cytoscape-expand-collapse');
+var cyEdgeBendEditing = require('cytoscape-edge-bend-editing');
+var cyViewUtilities = require('cytoscape-view-utilities');
 
-libs['cytoscape-panzoom'] = require('cytoscape-panzoom');
-libs['cytoscape-qtip'] = require('cytoscape-qtip');
-libs['cytoscape-cose-bilkent'] = require('cytoscape-cose-bilkent');
-libs['cytoscape-undo-redo'] = require('cytoscape-undo-redo');
-libs['cytoscape-clipboard'] = require('cytoscape-clipboard');
-libs['cytoscape-context-menus'] = require('cytoscape-context-menus');
-libs['cytoscape-expand-collapse'] = require('cytoscape-expand-collapse');
-libs['cytoscape-edge-bend-editing'] = require('cytoscape-edge-bend-editing');
-libs['cytoscape-view-utilities'] = require('cytoscape-view-utilities');
+// Register cy extensions
+cyPanzoom( cytoscape, $ );
+cyQtip( cytoscape, $ );
+cyCoseBilkent( cytoscape );
+cyUndoRedo( cytoscape );
+cyClipboard( cytoscape );
+cyContextMenus( cytoscape, $ );
+cyExpandCollapse( cytoscape, $ );
+cyEdgeBendEditing( cytoscape, $ );
+cyViewUtilities( cytoscape, $ );
+
+// Libraries to pass sbgnviz
+var libs = {};
 
 sbgnviz({
   libs: libs,

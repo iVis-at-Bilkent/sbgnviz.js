@@ -24,7 +24,7 @@ var commonAppUtilities = {
   },
   triggerIncrementalLayout: function () {
     // If 'animate-on-drawing-changes' is false then animate option must be 'end' instead of false
-    // If it is 'during' use it as is. Set 'randomize' and 'fit' options to true
+    // If it is 'during' use it as is. Set 'randomize' and 'fit' options to false
     var preferences = {
       randomize: false,
       animate: this.sbgnStyleRules['animate-on-drawing-changes'] ? 'end' : false,
