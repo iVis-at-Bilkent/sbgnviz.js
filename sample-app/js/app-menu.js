@@ -124,7 +124,7 @@ module.exports = function () {
       sbgnviz.deleteElesSmart(cy.elements(':selected'));
     });
 
-    $("#neighbors-of-selected, #highlight-neighbors-of-selected-icon").click(function (e) {
+    $("#highlight-neighbors-of-selected, #highlight-neighbors-of-selected-icon").click(function (e) {
       sbgnviz.highlightNeighbours(cy.elements(':selected'));
     });
 
@@ -143,7 +143,7 @@ module.exports = function () {
       $("#search-by-label-text-box").focus();
     });
 
-    $("#processes-of-selected").click(function (e) {
+    $("#highlight-processes-of-selected").click(function (e) {
       sbgnviz.highlightProcesses(cy.elements(':selected'));
     });
 
