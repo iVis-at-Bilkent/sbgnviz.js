@@ -73,14 +73,8 @@ sbgnGraphUtilities.calculatePaddings = function(paddingPercent) {
 sbgnGraphUtilities.refreshPaddings = function() {
   var calc_padding = this.calculatePaddings();
   var nodes = cy.nodes();
-  cy.startBatch();
-  // TODO remove these
-  nodes.css('padding-left', 0);
-  nodes.css('padding-right', 0);
-  nodes.css('padding-top', 0);
-  nodes.css('padding-bottom', 0);
   var compounds = nodes.filter('$node > node');
-  // TODO use 'padding' at once
+  cy.startBatch();
   compounds.css('padding-left', calc_padding);
   compounds.css('padding-right', calc_padding);
   compounds.css('padding-top', calc_padding);

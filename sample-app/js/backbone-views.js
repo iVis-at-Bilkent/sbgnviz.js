@@ -326,14 +326,22 @@ var SBGNProperties = Backbone.View.extend({
         sbgnStyleRules['compound-padding'] = self.currentSBGNProperties.compoundPadding;
         sbgnviz.refreshPaddings();
       }
+      
+      var updateStyle = false;
+      
       //Refresh label size if needed
       if (sbgnStyleRules['dynamic-label-size'] != self.currentSBGNProperties.dynamicLabelSize) {
         sbgnStyleRules['dynamic-label-size'] = '' + self.currentSBGNProperties.dynamicLabelSize;
-        cy.style().update();
+        updateStyle = true;
       }
       //Refresh truncations if needed
       if (sbgnStyleRules['fit-labels-to-nodes'] != self.currentSBGNProperties.fitLabelsToNodes) {
         sbgnStyleRules['fit-labels-to-nodes'] = self.currentSBGNProperties.fitLabelsToNodes;
+        updateStyle = true;
+      }
+      
+      // Update the stylesheet if needed
+      if(updateStyle) {
         cy.style().update();
       }
 
