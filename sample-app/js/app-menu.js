@@ -243,17 +243,4 @@ module.exports = function () {
       expanderOpts.widow = 0;
     });
   }
-
-// TODO move this to the core
-//Handle keyboard events
-  $(document).keydown(function (e) {
-    if (e.ctrlKey && e.target.nodeName === 'BODY') {
-      if (e.which === 90) { // ctrl + z
-        cy.undoRedo().undo();
-      }
-      else if (e.which === 89) { // ctrl + y
-        cy.undoRedo().redo();
-      }
-    }
-  });
 };

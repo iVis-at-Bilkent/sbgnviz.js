@@ -11,6 +11,7 @@
     var fileUtilities = require('./utilities/file-utilities');
     var sbgnGraphUtilities = require('./utilities/sbgn-graph-utilities');
     var mainUtilities = require('./utilities/main-utilities');
+    require('./utilities/keyboard-input-utilities'); // require keybord input utilities
     // Utilities to be exposed as is
     var sbgnElementUtilities = require('./utilities/sbgn-element-utilities');
     var undoRedoActionFunctions = require('./utilities/undo-redo-action-functions');
