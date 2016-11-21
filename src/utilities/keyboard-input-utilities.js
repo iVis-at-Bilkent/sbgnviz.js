@@ -41,12 +41,12 @@ var keyboardInputUtilities = {
 $(document).ready(function () {
   $(document).on('keydown', '.integer-input', function(e){
     var value = $(this).attr('value');
-    return numberInputUtilities.isIntegerFieldInput(value, e);
+    return keyboardInputUtilities.isIntegerFieldInput(value, e);
   });
   
   $(document).on('keydown', '.float-input', function(e){
     var value = $(this).attr('value');
-    return numberInputUtilities.isFloatFieldInput(value, e);
+    return keyboardInputUtilities.isFloatFieldInput(value, e);
   });
   
   $(document).on('change', '.integer-input,.float-input', function(e){
