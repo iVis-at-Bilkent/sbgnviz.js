@@ -16,7 +16,7 @@
     var sbgnElementUtilities = require('./utilities/sbgn-element-utilities');
     var undoRedoActionFunctions = require('./utilities/undo-redo-action-functions');
     
-    var libs = options.libs;
+//    var libs = options.libs;
     
     sbgnRenderer();
     sbgnCyInstance();

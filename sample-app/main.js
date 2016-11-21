@@ -27,10 +27,10 @@ cyEdgeBendEditing( cytoscape, $ );
 cyViewUtilities( cytoscape, $ );
 
 // Libraries to pass sbgnviz
-var libs = {};
+//var libs = {};
 
 sbgnviz({
-  libs: libs,
+//  libs: libs,
   networkContainerSelector: '#sbgn-network-container',
   imgPath: 'src/img',
   fitLabelsToNodes: function () {
