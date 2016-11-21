@@ -1,3 +1,7 @@
+/*
+ * Text utilities for common usage
+ */
+
 var optionUtilities = require('./option-utilities');
 var options = optionUtilities.getOptions();
 

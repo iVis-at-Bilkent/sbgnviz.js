@@ -1,3 +1,8 @@
+/*
+ * 
+ * Common utilities for sbgnviz graphs
+ */
+
 var optionUtilities = require('./option-utilities');
 var options = optionUtilities.getOptions();
 /*

@@ -1,3 +1,7 @@
+/*
+ * Common utilities for sbgn elements 
+ */
+
 var truncateText = require('./text-utilities').truncateText;
 var optionUtilities = require('./option-utilities');
 var options = optionUtilities.getOptions();

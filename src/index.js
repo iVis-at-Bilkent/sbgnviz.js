@@ -3,7 +3,7 @@
     var optionUtilities = require('./utilities/option-utilities');
     var options = optionUtilities.extendOptions(_options);
     
-    var sbgnRenderer = require('./sbgn-extensions/cytoscape.renderer.canvas.sbgn-renderer');
+    var sbgnRenderer = require('./sbgn-extensions/sbgn-cy-renderer');
     var sbgnCyInstance = require('./sbgn-extensions/sbgn-cy-instance');
     
     // Utilities whose functions will be exposed seperately

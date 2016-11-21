@@ -1,3 +1,7 @@
+/*
+ * Commonly needed UI Utilities
+ */
+
 var optionUtilities = require('./option-utilities');
 var options = optionUtilities.getOptions();
 

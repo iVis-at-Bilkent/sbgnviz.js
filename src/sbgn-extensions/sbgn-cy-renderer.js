@@ -1,3 +1,7 @@
+/*
+ * Render sbgn specific shapes which are not supported by cytoscape.js core
+ */
+
 module.exports = function () {
   var $$ = cytoscape;
   var truncateText = require('../utilities/text-utilities').truncateText;
@@ -31,19 +35,6 @@ module.exports = function () {
   };
 
   $$.sbgn = {
-  };
-
-  $$.sbgn.cardinalityProperties = function () {
-    return {
-      boxLength: 13,
-      distanceToNode: 25,
-    };
-  };
-
-  $$.sbgn.drawCardinalityText = function (context, textProp) {
-    textProp.color = "#0f0f0f";
-    textProp.font = "9px Arial";
-    $$.sbgn.drawText(context, textProp, false);
   };
 
   $$.sbgn.addPortReplacementIfAny = function (node, edgePort) {
@@ -91,127 +82,6 @@ module.exports = function () {
       context.stroke();
     }
   };
-
-  $$.sbgn.drawQuadraticLineCardinality = function (context, edge, pts, type) {
-    context.moveTo(pts[0], pts[1]);
-    context.quadraticCurveTo(pts[2], pts[3], pts[4], pts[5]);
-
-    //if cardinality is zero, return here.
-    var cardinality = edge._private.data.sbgncardinality;
-    if (cardinality == 0 || cardinality == null)
-      return;
-
-    var carProp = $$.sbgn.cardinalityProperties();
-
-    var totalLength = qBezierLength(pts);
-
-    var startLength = totalLength - 25;
-
-    var startPortion = startLength / totalLength;
-
-    if (type === "consumption") {
-      startPortion = carProp.distanceToSource / totalLength;
-    } else {
-      startPortion = (totalLength - carProp.distanceToTarget) / totalLength;
-    }
-
-    var t = startPortion;
-    var x1 = (1 - t) * (1 - t) * pts[0] + 2 * (1 - t) * t * pts[2] + t * t * pts[4];
-    var y1 = (1 - t) * (1 - t) * pts[1] + 2 * (1 - t) * t * pts[3] + t * t * pts[5];
-
-    //get a short line to determine tanget line
-    t = startPortion + 0.01;
-    var x2 = (1 - t) * (1 - t) * pts[0] + 2 * (1 - t) * t * pts[2] + t * t * pts[4];
-    var y2 = (1 - t) * (1 - t) * pts[1] + 2 * (1 - t) * t * pts[3] + t * t * pts[5];
-
-    var dispX = x1 - x2;
-    var dispY = y1 - y2;
-
-    var angle = Math.asin(dispY / (Math.sqrt(dispX * dispX + dispY * dispY)));
-
-    if (dispX < 0) {
-      angle = angle + Math.PI / 2;
-    } else {
-      angle = -(Math.PI / 2 + angle);
-    }
-
-
-    context.translate(x1, y1);
-    context.rotate(-angle);
-
-    context.rect(0, -13 / 2, 13, 13);
-
-    context.rotate(-Math.PI / 2);
-
-    var textProp = {'centerX': 0, 'centerY': 13 / 2,
-      'opacity': edge.css('text-opacity') * edge.css('opacity'),
-      'width': 13, 'label': cardinality};
-    $$.sbgn.drawCardinalityText(context, textProp);
-
-    context.rotate(Math.PI / 2);
-
-    context.rotate(angle);
-    context.translate(-x1, -y1);
-
-  };
-
-  $$.sbgn.drawStraightLineCardinality = function (context, edge, pts, type) {
-    context.moveTo(pts[0], pts[1]);
-    context.lineTo(pts[2], pts[3]);
-
-    //if cardinality is zero, return here.
-    var cardinality = edge._private.data.sbgncardinality;
-    if (cardinality <= 0 || cardinality == null)
-      return;
-
-    var carProp = $$.sbgn.cardinalityProperties();
-
-    var length = (Math.sqrt((pts[2] - pts[0]) * (pts[2] - pts[0]) +
-            (pts[3] - pts[1]) * (pts[3] - pts[1])));
-
-    var dispX, dispY, startX, startY;
-
-    //TODO : you may need to change here
-    if (type === "consumption") {
-      startX = edge._private.rscratch.arrowStartX;
-      startY = edge._private.rscratch.arrowStartY;
-    } else {
-      startX = edge._private.rscratch.arrowEndX;
-      startY = edge._private.rscratch.arrowEndY;
-    }
-    var srcPos = (type === "consumption") ? edge.source().position() : edge.target().position();
-    //var srcPos = edge.source().position();
-    dispX = startX - srcPos.x;
-    dispY = startY - srcPos.y;
-
-    var angle = Math.asin(dispY / (Math.sqrt(dispX * dispX + dispY * dispY)));
-
-    if (dispX < 0) {
-      angle = angle + Math.PI / 2;
-    } else {
-      angle = -(Math.PI / 2 + angle);
-    }
-
-    context.translate(startX, startY);
-    context.rotate(-angle);
-
-    if (length > carProp.distanceToNode) {
-      context.rect(0, -carProp.distanceToNode, carProp.boxLength, carProp.boxLength);
-
-      context.rotate(Math.PI / 2);
-
-      var textProp = {'centerX': -carProp.distanceToNode + carProp.boxLength / 2, 'centerY': -carProp.boxLength / 2,
-        'opacity': edge.css('text-opacity') * edge.css('opacity'),
-        'width': carProp.boxLength, 'label': cardinality};
-      $$.sbgn.drawCardinalityText(context, textProp);
-
-      context.rotate(-Math.PI / 2);
-    }
-
-    context.rotate(angle);
-    context.translate(-startX, -startY);
-  }
-  ;
 
   var unitOfInfoRadius = 4;
   var stateVarRadius = 15;

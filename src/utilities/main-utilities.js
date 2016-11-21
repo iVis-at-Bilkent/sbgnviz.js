@@ -1,9 +1,9 @@
 /* 
- * These are the main utilities to be directly utilized by the user interactions
+ * These are the main utilities to be directly utilized by the user interactions.
+ * Idealy, this file is just required by index.js
  */
 
 var sbgnElementUtilities = require('./sbgn-element-utilities');
-var sbgnGraphUtilities = require('./sbgn-graph-utilities');
 var jsonToSbgnml = require('./json-to-sbgnml-converter');
 var sbgnmlToJson = require('./sbgnml-to-json-converter');
 var optionUtilities = require('./option-utilities');

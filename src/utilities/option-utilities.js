@@ -1,3 +1,7 @@
+/*
+ *  Extend default options and get current options by using this file 
+ */
+
 // default options
 var defaults = {
   // The path of core library images when sbgnviz is required from npm and located 
@@ -24,8 +28,6 @@ var defaults = {
 
 var optionUtilities = function () {
 };
-
-//var self = optionUtilities;
 
 // Extend the defaults options with the user options
 optionUtilities.extendOptions = function (options) {
