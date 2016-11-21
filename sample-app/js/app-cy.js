@@ -5,7 +5,6 @@ module.exports = function () {
   var getExpandCollapseOptions = appUtilities.getExpandCollapseOptions.bind(appUtilities);
   var nodeQtipFunction = appUtilities.nodeQtipFunction.bind(appUtilities);
   var refreshUndoRedoButtonsStatus = appUtilities.refreshUndoRedoButtonsStatus.bind(appUtilities);
-  var sbgnStyleRules = appUtilities.sbgnStyleRules;
 
   $(document).ready(function ()
   {
@@ -161,10 +160,10 @@ module.exports = function () {
       fitPadding: 10,
       fitSelector: ':visible',
       animateOnFit: function () {
-        return sbgnStyleRules['animate-on-drawing-changes'];
+        return appUtilities.getSbgnProperties().animateOnDrawingChanges;
       },
       animateOnZoom: function () {
-        return sbgnStyleRules['animate-on-drawing-changes'];
+        return appUtilities.getSbgnProperties().animateOnDrawingChanges;
       }
     });
 

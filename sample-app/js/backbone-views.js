@@ -1,8 +1,6 @@
 var appUtilities = require('./app-utilities');
 
 var setFileContent = appUtilities.setFileContent.bind(appUtilities);
-var sbgnStyleRules = appUtilities.sbgnStyleRules;
-var defaultSbgnStyleRules = appUtilities.defaultSbgnStyleRules;
 
 /**
  * Backbone view for the BioGene information.
@@ -193,12 +191,8 @@ var SBGNLayout = Backbone.View.extend({
     animate: 'end',
     animationDuration: 1000,
     randomize: true,
-    tilingPaddingVertical: function () {
-      return sbgnviz.calculatePaddings(parseInt(sbgnStyleRules['tiling-padding-vertical'], 10));
-    },
-    tilingPaddingHorizontal: function () {
-      return sbgnviz.calculatePaddings(parseInt(sbgnStyleRules['tiling-padding-horizontal'], 10));
-    },
+    tilingPaddingVertical: 20,
+    tilingPaddingHorizontal: 20,
     gravityRangeCompound: 1.5,
     gravityCompound: 1.0,
     gravityRange: 3.8,
@@ -211,12 +205,8 @@ var SBGNLayout = Backbone.View.extend({
     var self = this;
     self.copyProperties();
 
-    var templateProperties = _.clone(self.currentLayoutProperties);
-    templateProperties.tilingPaddingVertical = sbgnStyleRules['tiling-padding-vertical'];
-    templateProperties.tilingPaddingHorizontal = sbgnStyleRules['tiling-padding-horizontal'];
-
     self.template = _.template($("#layout-settings-template").html());
-    self.template = self.template(templateProperties);
+    self.template = self.template(self.currentLayoutProperties);
   },
   copyProperties: function () {
     this.currentLayoutProperties = _.clone(this.defaultLayoutProperties);
@@ -226,17 +216,23 @@ var SBGNLayout = Backbone.View.extend({
       preferences = {};
     }
     var options = $.extend({}, this.currentLayoutProperties, preferences);
+    var verticalPaddingPercent = options.tilingPaddingVertical;
+    var horizontalPaddingPercent = options.tilingPaddingHorizontal;
+    // In dialog properties we keep tiling padding vertical/horizontal percentadges to be displayed
+    // in dialog, in layout options we use a function using these values
+    options.tilingPaddingVertical = function () {
+      return sbgnviz.calculatePaddings(verticalPaddingPercent);
+    };
+    options.tilingPaddingHorizontal = function () {
+      return sbgnviz.calculatePaddings(horizontalPaddingPercent);
+    };
     sbgnviz.performLayout(options, notUndoable);
   },
   render: function () {
     var self = this;
 
-    var templateProperties = _.clone(self.currentLayoutProperties);
-    templateProperties.tilingPaddingVertical = sbgnStyleRules['tiling-padding-vertical'];
-    templateProperties.tilingPaddingHorizontal = sbgnStyleRules['tiling-padding-horizontal'];
-
     self.template = _.template($("#layout-settings-template").html());
-    self.template = self.template(templateProperties);
+    self.template = self.template(self.currentLayoutProperties);
     $(self.el).html(self.template);
 
     sbgnviz.openDialog(self.el);
@@ -254,23 +250,15 @@ var SBGNLayout = Backbone.View.extend({
       self.currentLayoutProperties.gravityRangeCompound = Number(document.getElementById("gravity-range-compound").value);
       self.currentLayoutProperties.gravityCompound = Number(document.getElementById("gravity-compound").value);
       self.currentLayoutProperties.gravityRange = Number(document.getElementById("gravity-range").value);
-
-      sbgnStyleRules['tiling-padding-vertical'] = Number(document.getElementById("tiling-padding-vertical").value);
-      sbgnStyleRules['tiling-padding-horizontal'] = Number(document.getElementById("tiling-padding-horizontal").value);
+      self.currentLayoutProperties.tilingPaddingVertical = Number(document.getElementById("tiling-padding-vertical").value);
+      self.currentLayoutProperties.tilingPaddingHorizontal = Number(document.getElementById("tiling-padding-horizontal").value);
     });
 
     $(document).off("click", "#default-layout").on("click", "#default-layout", function (evt) {
       self.copyProperties();
 
-      sbgnStyleRules['tiling-padding-vertical'] = defaultSbgnStyleRules['tiling-padding-vertical'];
-      sbgnStyleRules['tiling-padding-horizontal'] = defaultSbgnStyleRules['tiling-padding-horizontal'];
-
-      var templateProperties = _.clone(self.currentLayoutProperties);
-      templateProperties.tilingPaddingVertical = sbgnStyleRules['tiling-padding-vertical'];
-      templateProperties.tilingPaddingHorizontal = sbgnStyleRules['tiling-padding-horizontal'];
-
       self.template = _.template($("#layout-settings-template").html());
-      self.template = self.template(templateProperties);
+      self.template = self.template(self.currentLayoutProperties);
       $(self.el).html(self.template);
     });
 
@@ -283,11 +271,11 @@ var SBGNLayout = Backbone.View.extend({
  */
 var SBGNProperties = Backbone.View.extend({
   defaultSBGNProperties: {
-    compoundPadding: parseInt(sbgnStyleRules['compound-padding'], 10),
-    dynamicLabelSize: sbgnStyleRules['dynamic-label-size'],
-    fitLabelsToNodes: sbgnStyleRules['fit-labels-to-nodes'],
-    rearrangeAfterExpandCollapse: sbgnStyleRules['rearrange-after-expand-collapse'],
-    animateOnDrawingChanges: sbgnStyleRules['animate-on-drawing-changes']
+    compoundPadding: 10,
+    dynamicLabelSize: 'regular',
+    fitLabelsToNodes: false,
+    rearrangeAfterExpandCollapse: true,
+    animateOnDrawingChanges: true
   },
   currentSBGNProperties: null,
   initialize: function () {
@@ -308,11 +296,6 @@ var SBGNProperties = Backbone.View.extend({
     sbgnviz.openDialog(self.el);
 
     $(document).off("click", "#save-sbgn").on("click", "#save-sbgn", function (evt) {
-
-      var param = {};
-      param.firstTime = true;
-      param.previousSBGNProperties = _.clone(self.currentSBGNProperties);
-
       self.currentSBGNProperties.compoundPadding = Number(document.getElementById("compound-padding").value);
       self.currentSBGNProperties.dynamicLabelSize = $('select[name="dynamic-label-size"] option:selected').val();
       self.currentSBGNProperties.fitLabelsToNodes = document.getElementById("fit-labels-to-nodes").checked;
@@ -321,35 +304,8 @@ var SBGNProperties = Backbone.View.extend({
       self.currentSBGNProperties.animateOnDrawingChanges =
               document.getElementById("animate-on-drawing-changes").checked;
 
-      //Refresh paddings if needed
-      if (sbgnStyleRules['compound-padding'] != self.currentSBGNProperties.compoundPadding) {
-        sbgnStyleRules['compound-padding'] = self.currentSBGNProperties.compoundPadding;
-        sbgnviz.refreshPaddings();
-      }
-      
-      var updateStyle = false;
-      
-      //Refresh label size if needed
-      if (sbgnStyleRules['dynamic-label-size'] != self.currentSBGNProperties.dynamicLabelSize) {
-        sbgnStyleRules['dynamic-label-size'] = '' + self.currentSBGNProperties.dynamicLabelSize;
-        updateStyle = true;
-      }
-      //Refresh truncations if needed
-      if (sbgnStyleRules['fit-labels-to-nodes'] != self.currentSBGNProperties.fitLabelsToNodes) {
-        sbgnStyleRules['fit-labels-to-nodes'] = self.currentSBGNProperties.fitLabelsToNodes;
-        updateStyle = true;
-      }
-      
-      // Update the stylesheet if needed
-      if(updateStyle) {
-        cy.style().update();
-      }
-
-      sbgnStyleRules['rearrange-after-expand-collapse'] =
-              self.currentSBGNProperties.rearrangeAfterExpandCollapse;
-
-      sbgnStyleRules['animate-on-drawing-changes'] =
-              self.currentSBGNProperties.animateOnDrawingChanges;
+      sbgnviz.refreshPaddings();
+      cy.style().update();
     });
 
     $(document).off("click", "#default-sbgn").on("click", "#default-sbgn", function (evt) {

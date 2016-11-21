@@ -1,6 +1,5 @@
 var sbgnviz = require('../sbgnviz');
 var appUtilities = require('./js/app-utilities');
-var sbgnStyleRules = appUtilities.sbgnStyleRules;
 var appCy = require('./js/app-cy');
 var appMenu = require('./js/app-menu');
 
@@ -33,16 +32,17 @@ sbgnviz({
 //  libs: libs,
   networkContainerSelector: '#sbgn-network-container',
   imgPath: 'src/img',
+  // whether to fit label to nodes
   fitLabelsToNodes: function () {
-    return sbgnStyleRules['fit-labels-to-nodes'];
+    return appUtilities.getSbgnProperties().fitLabelsToNodes;
   },
   // dynamic label size it may be 'small', 'regular', 'large'
   dynamicLabelSize: function () {
-    return sbgnStyleRules['dynamic-label-size'];
+    return appUtilities.getSbgnProperties().dynamicLabelSize;
   },
   // percentage used to calculate compound paddings
   compoundPadding: function () {
-    return sbgnStyleRules['compound-padding'];
+    return appUtilities.getSbgnProperties().compoundPadding;
   },
   undoable: true
 });

@@ -1,20 +1,20 @@
-var defaultSbgnStyleRules = {
-  'compound-padding': 10,
-  'dynamic-label-size': 'regular',
-  'fit-labels-to-nodes': false,
-  'rearrange-after-expand-collapse': true,
-  'tiling-padding-vertical': 20,
-  'tiling-padding-horizontal': 20,
-  'animate-on-drawing-changes': true
-};
-
 var appUtilities = {
   sbgnNetworkContainer: undefined,
   sbgnLayoutProp: undefined,
   sbgnProperties: undefined,
   pathsBetweenQuery: undefined,
-  defaultSbgnStyleRules: defaultSbgnStyleRules,
-  sbgnStyleRules: _.clone(defaultSbgnStyleRules),
+  getLayoutProperties: function() {
+    if (this.sbgnLayoutProp === undefined) {
+      return undefined;
+    }
+    return this.sbgnLayoutProp.currentLayoutProperties;
+  },
+  getSbgnProperties: function() {
+    if (this.sbgnProperties === undefined) {
+      return undefined;
+    }
+    return this.sbgnProperties.currentSBGNProperties;
+  },
   setFileContent: function (fileName) {
     var span = document.getElementById('file-name');
     while (span.firstChild) {
@@ -27,7 +27,7 @@ var appUtilities = {
     // If it is 'during' use it as is. Set 'randomize' and 'fit' options to false
     var preferences = {
       randomize: false,
-      animate: this.sbgnStyleRules['animate-on-drawing-changes'] ? 'end' : false,
+      animate: this.getLayoutProperties().animateOnDrawingChanges ? 'end' : false,
       fit: false
     };
     if (this.sbgnLayoutProp.currentLayoutProperties.animate === 'during') {
@@ -40,13 +40,13 @@ var appUtilities = {
     var self = this;
     return {
       fisheye: function () {
-        return self.sbgnStyleRules['rearrange-after-expand-collapse'];
+        return self.getSbgnProperties().rearrangeAfterExpandCollapse;
       },
       animate: function () {
-        return self.sbgnStyleRules['animate-on-drawing-changes'];
+        return self.getSbgnProperties().animateOnDrawingChanges;
       },
       layoutBy: function () {
-        if (!self.sbgnStyleRules['rearrange-after-expand-collapse']) {
+        if (!self.getSbgnProperties().rearrangeAfterExpandCollapse) {
           return;
         }
 

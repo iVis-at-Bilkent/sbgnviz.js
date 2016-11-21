@@ -4,7 +4,6 @@ module.exports = function () {
   var appUtilities = require('./app-utilities');
   
   var dynamicResize = appUtilities.dynamicResize.bind(appUtilities);
-  var sbgnStyleRules = appUtilities.sbgnStyleRules;
   
   var sbgnLayoutProp, sbgnProperties, pathsBetweenQuery;
 
@@ -197,9 +196,9 @@ module.exports = function () {
       // If 'animate-on-drawing-changes' is false then animate option must be 'end' instead of false
       // If it is 'during' use it as is 
       var preferences = {
-        animate: sbgnStyleRules['animate-on-drawing-changes'] ? 'end' : false
+        animate: appUtilities.getSbgnProperties().animateOnDrawingChanges ? 'end' : false
       };
-      if (sbgnLayoutProp.currentLayoutProperties.animate == 'during') {
+      if (appUtilities.getLayoutProperties().animate == 'during') {
         delete preferences.animate;
       }
       sbgnLayoutProp.applyLayout(preferences);
