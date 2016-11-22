@@ -281,7 +281,7 @@ var GeneralPropertiesView = Backbone.View.extend({
   initialize: function () {
     var self = this;
     self.copyProperties();
-    self.template = _.template($("#sbgn-properties-template").html());
+    self.template = _.template($("#general-properties-template").html());
     self.template = self.template(self.currentSBGNProperties);
   },
   copyProperties: function () {
@@ -289,7 +289,7 @@ var GeneralPropertiesView = Backbone.View.extend({
   },
   render: function () {
     var self = this;
-    self.template = _.template($("#sbgn-properties-template").html());
+    self.template = _.template($("#general-properties-template").html());
     self.template = self.template(self.currentSBGNProperties);
     $(self.el).html(self.template);
 
@@ -310,7 +310,7 @@ var GeneralPropertiesView = Backbone.View.extend({
 
     $(document).off("click", "#default-sbgn").on("click", "#default-sbgn", function (evt) {
       self.copyProperties();
-      self.template = _.template($("#sbgn-properties-template").html());
+      self.template = _.template($("#general-properties-template").html());
       self.template = self.template(self.currentSBGNProperties);
       $(self.el).html(self.template);
     });
