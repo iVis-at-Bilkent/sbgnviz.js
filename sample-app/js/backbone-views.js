@@ -177,7 +177,7 @@ var BioGeneView = Backbone.View.extend({
 /**
  * SBGN Layout view for the Sample Application.
  */
-var SBGNLayout = Backbone.View.extend({
+var LayoutPropertiesView = Backbone.View.extend({
   defaultLayoutProperties: {
     name: 'cose-bilkent',
     nodeRepulsion: 4500,
@@ -269,7 +269,7 @@ var SBGNLayout = Backbone.View.extend({
 /**
  * SBGN Properties view for the Sample Application.
  */
-var SBGNProperties = Backbone.View.extend({
+var GeneralPropertiesView = Backbone.View.extend({
   defaultSBGNProperties: {
     compoundPadding: 10,
     dynamicLabelSize: 'regular',
@@ -322,7 +322,7 @@ var SBGNProperties = Backbone.View.extend({
 /**
  * Paths Between Query view for the Sample Application.
  */
-var PathsBetweenQuery = Backbone.View.extend({
+var PathsBetweenQueryView = Backbone.View.extend({
   defaultQueryParameters: {
     geneSymbols: "",
     lengthLimit: 1
@@ -404,7 +404,7 @@ var PathsBetweenQuery = Backbone.View.extend({
 
 module.exports = {
   BioGeneView: BioGeneView,
-  SBGNLayout: SBGNLayout,
-  SBGNProperties: SBGNProperties,
-  PathsBetweenQuery: PathsBetweenQuery
+  LayoutPropertiesView: LayoutPropertiesView,
+  GeneralPropertiesView: GeneralPropertiesView,
+  PathsBetweenQueryView: PathsBetweenQueryView
 };

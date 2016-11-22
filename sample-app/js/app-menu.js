@@ -5,7 +5,7 @@ module.exports = function () {
   
   var dynamicResize = appUtilities.dynamicResize.bind(appUtilities);
   
-  var sbgnLayoutProp, sbgnProperties, pathsBetweenQuery;
+  var layoutPropertiesView, generalPropertiesView, pathsBetweenQueryView;
 
   function loadSample(filename) {
     return sbgnviz.loadSample(filename, 'sample-app/samples/');
@@ -15,9 +15,9 @@ module.exports = function () {
   {
     console.log('init the sbgnviz template/page');
 
-    sbgnLayoutProp = appUtilities.sbgnLayoutProp = new BackboneViews.SBGNLayout({el: '#sbgn-layout-table'});
-    sbgnProperties = appUtilities.sbgnProperties = new BackboneViews.SBGNProperties({el: '#sbgn-properties-table'});
-    pathsBetweenQuery = appUtilities.pathsBetweenQuery = new BackboneViews.PathsBetweenQuery({el: '#query-pathsbetween-table'});
+    layoutPropertiesView = appUtilities.layoutPropertiesView = new BackboneViews.LayoutPropertiesView({el: '#sbgn-layout-table'});
+    generalPropertiesView = appUtilities.generalPropertiesView = new BackboneViews.GeneralPropertiesView({el: '#sbgn-properties-table'});
+    pathsBetweenQueryView = appUtilities.pathsBetweenQueryView = new BackboneViews.PathsBetweenQueryView({el: '#query-pathsbetween-table'});
 
     toolbarButtonsAndMenu();
 
@@ -151,7 +151,7 @@ module.exports = function () {
     });
 
     $("#layout-properties, #layout-properties-icon").click(function (e) {
-      sbgnLayoutProp.render();
+      layoutPropertiesView.render();
     });
 
     $("#delete-selected-simple, #delete-selected-simple-icon").click(function (e) {
@@ -159,11 +159,11 @@ module.exports = function () {
     });
 
     $("#sbgn-properties, #properties-icon").click(function (e) {
-      sbgnProperties.render();
+      generalPropertiesView.render();
     });
 
     $("#query-pathsbetween").click(function (e) {
-      pathsBetweenQuery.render();
+      pathsBetweenQueryView.render();
     });
 
     $("#collapse-selected,#collapse-selected-icon").click(function (e) {
@@ -201,7 +201,7 @@ module.exports = function () {
       if (appUtilities.getLayoutProperties().animate == 'during') {
         delete preferences.animate;
       }
-      sbgnLayoutProp.applyLayout(preferences);
+      layoutPropertiesView.applyLayout(preferences);
     });
 
     $("#undo-last-action, #undo-icon").click(function (e) {

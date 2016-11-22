@@ -1,19 +1,19 @@
 var appUtilities = {
   sbgnNetworkContainer: undefined,
-  sbgnLayoutProp: undefined,
-  sbgnProperties: undefined,
-  pathsBetweenQuery: undefined,
+  layoutPropertiesView: undefined,
+  generalPropertiesView: undefined,
+  pathsBetweenQueryView: undefined,
   getLayoutProperties: function() {
-    if (this.sbgnLayoutProp === undefined) {
+    if (this.layoutPropertiesView === undefined) {
       return undefined;
     }
-    return this.sbgnLayoutProp.currentLayoutProperties;
+    return this.layoutPropertiesView.currentLayoutProperties;
   },
   getSbgnProperties: function() {
-    if (this.sbgnProperties === undefined) {
+    if (this.generalPropertiesView === undefined) {
       return undefined;
     }
-    return this.sbgnProperties.currentSBGNProperties;
+    return this.generalPropertiesView.currentSBGNProperties;
   },
   setFileContent: function (fileName) {
     var span = document.getElementById('file-name');
@@ -30,11 +30,11 @@ var appUtilities = {
       animate: this.getLayoutProperties().animateOnDrawingChanges ? 'end' : false,
       fit: false
     };
-    if (this.sbgnLayoutProp.currentLayoutProperties.animate === 'during') {
+    if (this.layoutPropertiesView.currentLayoutProperties.animate === 'during') {
       delete preferences.animate;
     }
 
-    this.sbgnLayoutProp.applyLayout(preferences, true); // layout must not be undoable
+    this.layoutPropertiesView.applyLayout(preferences, true); // layout must not be undoable
   },
   getExpandCollapseOptions: function () {
     var self = this;
