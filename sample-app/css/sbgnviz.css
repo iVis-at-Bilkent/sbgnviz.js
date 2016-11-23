@@ -175,23 +175,6 @@ body {
     cursor: url(../../sampleapp-images/drag-target.cur), pointer!important;
 }
 
-#sbgn-inspector-and-canvas {
-    margin: auto;
-    overflow: auto !important;
-}
-
-#sbgn-inspector {
-    margin: auto;
-    border: 1px solid #ddd;
-    height: 680px;
-    width: 200px;
-    overflow: auto !important;
-    border-radius: 0.25em;
-    /*padding-left: 2px;*/
-    padding-right: 2px;
-    /*float: right;*/
-}
-
 .inside-menu {
     border: 1px solid #ddd;
     border-radius: 0.25em;
@@ -289,42 +272,6 @@ body {
     font-size: 12px !important; 
 }
 
-.selectedType {
-    /*box-shadow: 10px 10px 5px #888888;*/
-    border-style: solid;
-    border-color: #0B9BCD;
-    border-width: 2px;
-    border-radius: 5px;
-}
-
-.selectedTypeSustainable > .btn-selectedTypeSustainable {
-  background-color: #cccccc;
-  *background-color: #bfbfbf;
-  background-image: -moz-linear-gradient(top, #d9d9d9, #cccccc);
-  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#d9d9d9), to(#cccccc));
-  background-image: -webkit-linear-gradient(top, #d9d9d9, #cccccc);
-  background-image: -o-linear-gradient(top, #d9d9d9, #cccccc);
-  background-image: linear-gradient(to bottom, #d9d9d9, #cccccc);
-  background-repeat: repeat-x;
-}
-
-.selectedMenuItem {
-    background-color: gray;
-}
-
-.selectedDDItem {
-    background-color: gray;
-}
-
-.sbgn-select-img {
-    margin-left: 2px;
-    margin-right: 5px;
-}
-
-.hidden-element {
-    display:none !important;
-}
-
 .sbgn-toolbar-element {
     margin-left: 4px;
     margin-right: 0px;
@@ -342,55 +289,6 @@ img.sbgn-toolbar-element {
 img.sbgn-toolbar-element:hover {
     opacity: 1.0;
     filter: alpha(opacity=100);
-}
-
-#node-list-set-mode-btn:focus {
-    outline: none;
-}
-
-#edge-list-set-mode-btn:focus {
-    outline: none;
-}
-
-#node-list-dd-button:focus {
-    outline: none;
-}
-
-#edge-list-dd-button:focus {
-    outline: none;
-}
-
-#align-button:focus {
-    outline: none;
-}
-
-#align-dd-button:focus {
-    outline: none;
-}
-
-#node-label-textbox {
-    position: absolute;
-    top: 150px;
-    left: 150px;
-    z-index: 100;
-    display: none;
-    width: 100px;
-}
-
-.dd-list-href {
-    padding-left: 0px !important; 
-}
-
-#node-list-menu {
-    width: 180px;
-}
-
-#edge-list-menu {
-    width: 185px;
-}
-
-#align-menu {
-    width: 200px;
 }
 
 .menu-break-small {
@@ -455,12 +353,6 @@ menu:not([title]):before{
     content:"\2630";
 }
 
-.inspector-input-box{
-    padding-bottom: 0.5px !important;
-    padding-top: 0.5px !important;
-    margin-bottom: 2px !important;
-}
-
 .dialog-table * {
     margin-bottom: 0px !important;
     padding-bottom: 2px !important;
@@ -487,20 +379,4 @@ menu:not([title]):before{
 .accordion-toggle.collapsed:after {
     /* symbol for "collapsed" panels */
     content:"\25BD";
-}
-
-hr.inspector-divider {
-    padding: 0px !important;
-    margin-top: 5px !important;
-    margin-bottom: 5px !important;
-    width: 100% !important;
-}
-
-.sbgn-label-font {
-    font-size: 11px !important;
-    /*font-weight: bold;*/
-}
-
-#biogene-template-div th {
-    text-align: right;
 }

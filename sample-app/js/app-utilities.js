@@ -63,8 +63,8 @@ var appUtilities = {
     var canvasHeight = 680;
     if (windowWidth > canvasWidth)
     {
-      $("#sbgn-network-container").width(windowWidth * 0.9);
-      var w = $("#sbgn-inspector-and-canvas").width();
+      var w = windowWidth * 0.9;
+      $("#sbgn-network-container").width(w);
       $(".nav-menu").width(w);
       $(".navbar").width(w);
       $("#sbgn-toolbar").width(w);
@@ -73,7 +73,6 @@ var appUtilities = {
     if (windowHeight > canvasHeight)
     {
       $("#sbgn-network-container").height(windowHeight * 0.85);
-      $("#sbgn-inspector").height(windowHeight * 0.85);
     }
   },
   nodeQtipFunction: function (node) {
