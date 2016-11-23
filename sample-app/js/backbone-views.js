@@ -235,7 +235,7 @@ var LayoutPropertiesView = Backbone.View.extend({
     self.template = self.template(self.currentLayoutProperties);
     $(self.el).html(self.template);
 
-    sbgnviz.openDialog(self.el);
+    $(self.el).modal('show');
 
     $(document).off("click", "#save-layout").on("click", "#save-layout", function (evt) {
       self.currentLayoutProperties.nodeRepulsion = Number(document.getElementById("node-repulsion").value);
@@ -293,7 +293,7 @@ var GeneralPropertiesView = Backbone.View.extend({
     self.template = self.template(self.currentSBGNProperties);
     $(self.el).html(self.template);
 
-    sbgnviz.openDialog(self.el);
+    $(self.el).modal('show');
 
     $(document).off("click", "#save-sbgn").on("click", "#save-sbgn", function (evt) {
       self.currentSBGNProperties.compoundPadding = Number(document.getElementById("compound-padding").value);
@@ -343,6 +343,8 @@ var PathsBetweenQueryView = Backbone.View.extend({
     self.template = self.template(self.currentQueryParameters);
     $(self.el).html(self.template);
 
+    $(self.el).modal('show');
+    
     $("#query-pathsbetween-enable-shortest-k-alteration").change(function (e) {
       if (document.getElementById("query-pathsbetween-enable-shortest-k-alteration").checked) {
         $("#query-pathsbetween-shortest-k").prop("disabled", false);
@@ -350,8 +352,6 @@ var PathsBetweenQueryView = Backbone.View.extend({
         $("#query-pathsbetween-shortest-k").prop("disabled", true);
       }
     });
-
-    sbgnviz.openDialog(self.el, {width: 'auto'});
 
     $(document).off("click", "#save-query-pathsbetween").on("click", "#save-query-pathsbetween", function (evt) {
 

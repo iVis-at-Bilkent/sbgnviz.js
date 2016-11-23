@@ -23,10 +23,8 @@
   "dependencies": {
     "express": "4.14.0",
     "jquery": "2.2.4",
-    "jquery.browser": "0.1.0",
     "qtip2": "~3.0.2",
     "bootstrap": "3.3.7",
-    "jquery-ui-bundle": "1.11.4",
     "jquery-expander": "1.7.0",
     "cytoscape-panzoom": "~2.4.0",
     "cytoscape-qtip": "~2.3.0",

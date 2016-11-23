@@ -149,7 +149,7 @@ body {
 }
 
 .ui-cytoscape-panzoom {
-    z-index: 1000;
+    z-index: -100;
 }
 
 .ui-widget-header {
@@ -423,7 +423,7 @@ input {
     font-size: 12px !important;
 }
 
-button {
+button:not(.close) {
     font-size: 12px !important;
 }
 

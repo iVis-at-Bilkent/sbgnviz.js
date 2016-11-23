@@ -53,38 +53,22 @@ module.exports = function () {
 
     $("#node-legend").click(function (e) {
       e.preventDefault();
-      sbgnviz.openFancybox($("#node-legend-template"), {
-        'autoDimensions': false,
-        'width': 504,
-        'height': 325
-      });
+      $("#node_legend_modal").modal('show');
     });
 
     $("#edge-legend").click(function (e) {
       e.preventDefault();
-      sbgnviz.openFancybox($("#edge-legend-template"), {
-        'autoDimensions': false,
-        'width': 325,
-        'height': 285
-      });
+      $("#edge_legend_modal").modal('show');
     });
 
     $("#quick-help").click(function (e) {
       e.preventDefault();
-      sbgnviz.openFancybox($("#quick-help-template"), {
-        'autoDimensions': false,
-        'width': 420,
-        'height': "auto"
-      });
+      $("#quick_help_modal").modal('show');
     });
 
     $("#about").click(function (e) {
       e.preventDefault();
-      sbgnviz.openFancybox($("#about-template"), {
-        'autoDimensions': false,
-        'width': 300,
-        'height': 320
-      });
+      $("#about_modal").modal('show');
     });
 
     var selectorToSampleFileName = {
