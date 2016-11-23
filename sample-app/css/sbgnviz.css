@@ -152,24 +152,6 @@ body {
     z-index: -100;
 }
 
-.ui-widget-header {
-    background: #0B9BCD;
-    border: 1px solid #0B9BCD !important;
-}
-
-.ui-dialog {
-    z-index : 2000 !important;
-    border: 2px solid #0B9BCD !important;
-}
-
-.ui-widget-header .ui-icon {
-    background-image: url(images/ui-icons_0B9BCD_256x240.png);
-}
-
-#fancybox-wrap {
-    z-index : 4000 !important;
-}
-
 .qtip-bootstrap .qtip-titlebar{
     background-color: #F7CAA9;
 }
@@ -425,18 +407,6 @@ input {
 
 button:not(.close) {
     font-size: 12px !important;
-}
-
-.ui-datepicker .ui-datepicker-title select {
-    font-size: 12px;
-}
-
-.ui-widget .ui-widget {
-    font-size: 12px;
-}
-
-.ui-widget button {
-    font-size: 12px;
 }
 
 option {

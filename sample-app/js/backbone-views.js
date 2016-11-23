@@ -391,11 +391,11 @@ var PathsBetweenQueryView = Backbone.View.extend({
         }
       });
 
-      $(self.el).dialog('close');
+      $(self.el).modal('toggle');
     });
 
     $(document).off("click", "#cancel-query-pathsbetween").on("click", "#cancel-query-pathsbetween", function (evt) {
-      $(self.el).dialog('close');
+      $(self.el).modal('toggle');
     });
 
     return this;
