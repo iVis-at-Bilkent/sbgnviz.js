@@ -9,6 +9,8 @@ var sbgnmlToJson = require('./sbgnml-to-json-converter');
 var optionUtilities = require('./option-utilities');
 
 var options = optionUtilities.getOptions();
+var libs = require('./lib-utilities').getLibs();
+var jQuery = $ = libs.jQuery;
 
 // Helpers start
 function beforePerformLayout() {

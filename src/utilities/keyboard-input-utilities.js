@@ -4,6 +4,9 @@
 var optionUtilities = require('./option-utilities');
 var options = optionUtilities.getOptions();
 
+var libs = require('./lib-utilities').getLibs();
+var jQuery = $ = libs.jQuery;
+
 var keyboardInputUtilities = {
   isNumberKey: function(e) {
     return ( e.keyCode >= 48 && e.keyCode <= 57 ) || ( e.keyCode >= 96 && e.keyCode <= 105 );

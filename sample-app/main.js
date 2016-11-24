@@ -1,4 +1,19 @@
 var sbgnviz = require('../sbgnviz');
+var filesaverjs = require('filesaverjs');
+//window.saveAs = filesaverjs.saveAs;
+window.jQuery = window.$ = require('jQuery'); // jQuery should be global because jQuery.qtip extension is not compatible with commonjs
+
+//var cytoscape = window.cytoscape = require('../lib/js/cytoscape');
+//window.cyVariables = cytoscape.cyVariables;
+
+//var jQuery = $ = require('jQuery');
+var cytoscape = require('../lib/js/cytoscape');
+
+require('jquery-expander')($);
+require('bootstrap');
+window._ = require('underscore');
+window.Backbone = require('backbone');
+
 var appUtilities = require('./js/app-utilities');
 var appCy = require('./js/app-cy');
 var appMenu = require('./js/app-menu');
@@ -26,10 +41,13 @@ cyEdgeBendEditing( cytoscape, $ );
 cyViewUtilities( cytoscape, $ );
 
 // Libraries to pass sbgnviz
-//var libs = {};
+var libs = {};
+
+libs.filesaverjs = filesaverjs;
+libs.jQuery = jQuery;
+libs.cytoscape = cytoscape;
 
 sbgnviz({
-//  libs: libs,
   networkContainerSelector: '#sbgn-network-container',
   imgPath: 'src/img',
   // whether to fit label to nodes
@@ -45,7 +63,7 @@ sbgnviz({
     return appUtilities.getSbgnProperties().compoundPadding;
   },
   undoable: true
-});
+}, libs);
 
 appCy();
 appMenu();

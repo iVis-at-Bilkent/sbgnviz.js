@@ -1,5 +1,15 @@
 (function(){
-  var sbgnviz = window.sbgnviz = function(_options) {
+  var sbgnviz = window.sbgnviz = function(_options, _libs) {
+    var libs = {};
+    libs.jQuery = _libs.jQuery || jQuery;
+    libs.cytoscape = _libs.cytoscape || cytoscape;
+    libs.cyVariables = libs.cytoscape.cyVariables;
+    libs.saveAs = _libs.filesaverjs ? _libs.filesaverjs.saveAs : saveAs;
+    
+    // Set the libraries to access them from any file
+    var libUtilities = require('./utilities/lib-utilities');
+    libUtilities.setLibs(libs);
+    
     var optionUtilities = require('./utilities/option-utilities');
     var options = optionUtilities.extendOptions(_options);
     
@@ -15,8 +25,6 @@
     // Utilities to be exposed as is
     var sbgnElementUtilities = require('./utilities/sbgn-element-utilities');
     var undoRedoActionFunctions = require('./utilities/undo-redo-action-functions');
-    
-//    var libs = options.libs;
     
     sbgnRenderer();
     sbgnCyInstance();

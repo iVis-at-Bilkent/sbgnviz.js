@@ -1,3 +1,6 @@
+//var jQuery = $ = require('jQuery');
+//var _ = require('underscore');
+
 /*
  * Copyright 2013 Memorial-Sloan Kettering Cancer Center.
  *

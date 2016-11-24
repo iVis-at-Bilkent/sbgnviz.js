@@ -1,3 +1,5 @@
+//var jQuery = $ = require('jQuery');
+
 var appUtilities = {
   sbgnNetworkContainer: undefined,
   layoutPropertiesView: undefined,

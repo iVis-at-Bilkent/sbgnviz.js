@@ -3,6 +3,10 @@ var sbgnGraphUtilities = require('../utilities/sbgn-graph-utilities');
 var undoRedoActionFunctions = require('../utilities/undo-redo-action-functions');
 var refreshPaddings = sbgnGraphUtilities.refreshPaddings.bind(sbgnGraphUtilities);
 
+var libs = require('../utilities/lib-utilities').getLibs();
+var jQuery = $ = libs.jQuery;
+var cytoscape = libs.cytoscape;
+
 var optionUtilities = require('../utilities/option-utilities');
 var options = optionUtilities.getOptions();
 

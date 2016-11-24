@@ -1,5 +1,7 @@
 // Handle sbgnviz menu functions which are to be triggered on events
 module.exports = function () {
+//  var jQuery = $ = require('jQuery');
+  
   var BackboneViews = require('./backbone-views');
   var appUtilities = require('./app-utilities');
   
@@ -205,7 +207,7 @@ module.exports = function () {
     });
 
     //TODO: could simply keep/store original input SBGN-ML data and use it here instead of converting from JSON
-    $("#save-as-sbgnml", "#save-icon").click(function (evt) {
+    $("#save-as-sbgnml, #save-icon").click(function (evt) {
       var filename = document.getElementById('file-name').innerHTML;
       sbgnviz.saveAsSbgnml(filename);
     });

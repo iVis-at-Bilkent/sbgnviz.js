@@ -5,6 +5,8 @@
 var truncateText = require('./text-utilities').truncateText;
 var optionUtilities = require('./option-utilities');
 var options = optionUtilities.getOptions();
+var libs = require('./lib-utilities').getLibs();
+var jQuery = $ = libs.jQuery;
 
 var sbgnElementUtilities = {
     //the list of the element classes handled by the tool

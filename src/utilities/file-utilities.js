@@ -8,6 +8,10 @@ var uiUtilities = require('./ui-utilities');
 var sbgnGraphUtilities = require('./sbgn-graph-utilities');
 var sbgnvizUpdate = sbgnGraphUtilities.sbgnvizUpdate.bind(sbgnGraphUtilities);
 
+var libs = require('./lib-utilities').getLibs();
+var jQuery = $ = libs.jQuery;
+var saveAs = libs.saveAs;
+
 // Helper functions Start
 // see http://stackoverflow.com/questions/16245767/creating-a-blob-from-a-base64-string-in-javascript
 function b64toBlob(b64Data, contentType, sliceSize) {

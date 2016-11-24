@@ -1,4 +1,6 @@
 module.exports = function () {
+//  var jQuery = $ = require('jQuery');
+  
   var appUtilities = require('./app-utilities');
   var bioGeneQtip = require('./biogene-qtip');
   
@@ -9,7 +11,7 @@ module.exports = function () {
   $(document).ready(function ()
   {
     appUtilities.sbgnNetworkContainer = $('#sbgn-network-container');
-    // create and init cytoscape:
+    // register extensions and bind events when cy is ready
     cy.ready(function () {
       cytoscapeExtensionsAndContextMenu();
       bindCyEvents();

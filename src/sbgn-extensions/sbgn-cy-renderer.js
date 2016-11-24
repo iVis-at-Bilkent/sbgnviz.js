@@ -2,9 +2,14 @@
  * Render sbgn specific shapes which are not supported by cytoscape.js core
  */
 
+var truncateText = require('../utilities/text-utilities').truncateText;
+var libs = require('../utilities/lib-utilities').getLibs();
+var jQuery = $ = libs.jQuery;
+var cytoscape = libs.cytoscape;
+var cyVariables = cytoscape.cyVariables;
+
 module.exports = function () {
   var $$ = cytoscape;
-  var truncateText = require('../utilities/text-utilities').truncateText;
   
   var sbgnShapes = $$.sbgnShapes = {
     'source and sink': true,

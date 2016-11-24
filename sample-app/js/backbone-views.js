@@ -1,5 +1,8 @@
-var appUtilities = require('./app-utilities');
+//var jQuery = $ = require('jQuery');
+//var _ = require('underscore');
+//var Backbone = require('backbone');
 
+var appUtilities = require('./app-utilities');
 var setFileContent = appUtilities.setFileContent.bind(appUtilities);
 
 /**

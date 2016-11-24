@@ -1,4 +1,6 @@
 var sbgnElementUtilities = require('./sbgn-element-utilities');
+var libs = require('./lib-utilities').getLibs();
+var jQuery = $ = libs.jQuery;
 
 var sbgnmlToJson = {
   insertedNodes: {},

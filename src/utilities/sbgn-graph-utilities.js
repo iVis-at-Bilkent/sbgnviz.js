@@ -5,6 +5,9 @@
 
 var optionUtilities = require('./option-utilities');
 var options = optionUtilities.getOptions();
+var libs = require('./lib-utilities').getLibs();
+var jQuery = $ = libs.jQuery;
+
 /*
  * Graph utilities for sbgn
  */
