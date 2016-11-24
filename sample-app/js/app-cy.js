@@ -1,5 +1,5 @@
 module.exports = function () {
-//  var jQuery = $ = require('jQuery');
+  var jQuery = $ = require('jQuery');
   
   var appUtilities = require('./app-utilities');
   var bioGeneQtip = require('./biogene-qtip');

@@ -1,6 +1,6 @@
 // Handle sbgnviz menu functions which are to be triggered on events
 module.exports = function () {
-//  var jQuery = $ = require('jQuery');
+  var jQuery = $ = require('jQuery');
   
   var BackboneViews = require('./backbone-views');
   var appUtilities = require('./app-utilities');

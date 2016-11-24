@@ -11,8 +11,8 @@ var cytoscape = require('../lib/js/cytoscape');
 
 require('jquery-expander')($);
 require('bootstrap');
-window._ = require('underscore');
-window.Backbone = require('backbone');
+//window._ = require('underscore');
+//window.Backbone = require('backbone');
 
 var appUtilities = require('./js/app-utilities');
 var appCy = require('./js/app-cy');
