@@ -1,10 +1,9 @@
+var jQuery = $ = require('jQuery');
+var BackboneViews = require('./backbone-views');
+var appUtilities = require('./app-utilities');
+
 // Handle sbgnviz menu functions which are to be triggered on events
 module.exports = function () {
-  var jQuery = $ = require('jQuery');
-  
-  var BackboneViews = require('./backbone-views');
-  var appUtilities = require('./app-utilities');
-  
   var dynamicResize = appUtilities.dynamicResize.bind(appUtilities);
   
   var layoutPropertiesView, generalPropertiesView, pathsBetweenQueryView;

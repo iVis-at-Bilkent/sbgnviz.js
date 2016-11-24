@@ -1,9 +1,8 @@
+var jQuery = $ = require('jQuery');
+var appUtilities = require('./app-utilities');
+var bioGeneQtip = require('./biogene-qtip');
+
 module.exports = function () {
-  var jQuery = $ = require('jQuery');
-  
-  var appUtilities = require('./app-utilities');
-  var bioGeneQtip = require('./biogene-qtip');
-  
   var getExpandCollapseOptions = appUtilities.getExpandCollapseOptions.bind(appUtilities);
   var nodeQtipFunction = appUtilities.nodeQtipFunction.bind(appUtilities);
   var refreshUndoRedoButtonsStatus = appUtilities.refreshUndoRedoButtonsStatus.bind(appUtilities);
