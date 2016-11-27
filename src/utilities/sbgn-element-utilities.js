@@ -305,9 +305,6 @@ var sbgnElementUtilities = {
         else if (sbgnclass == 'uncertain process') {
             content = '?';
         }
-        else if (sbgnclass == 'dissociation') {
-            content = 'O';
-        }
 
         var textWidth = ele.css('width') ? parseFloat(ele.css('width')) : ele.data('sbgnbbox').w;
 

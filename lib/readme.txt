@@ -100,25 +100,6 @@ if(!segments){
     }
 to the end of 'else if( lines )'
 
-In 'CRp.drawEdgePath' add after 'if( canvasCxt.setLineDash )' ends
-
-if (type === 'consumption' || type === 'production') {
-
-    if (!pathCacheHit) {
-      if (context.beginPath) {
-        context.beginPath();
-      }
-      if (rs.edgeType != 'segments' && pts.length == 3 * 2) {
-        cytoscape.sbgn.drawQuadraticLineCardinality(context, edge, pts, type);
-      } else {
-        cytoscape.sbgn.drawStraightLineCardinality(context, edge, pts, type);
-      }
-    }
-
-    context = canvasCxt;
-    context.stroke();
-  }
-
 change dx and dy while calculating vectorNorm as the following
 
 "var dy = ( tgtPos.y - srcPos.y );

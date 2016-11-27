@@ -6,12 +6,17 @@ var truncateText = require('../utilities/text-utilities').truncateText;
 var libs = require('../utilities/lib-utilities').getLibs();
 var jQuery = $ = libs.jQuery;
 var cytoscape = libs.cytoscape;
-var cyVariables = cytoscape.cyVariables;
+
+var cyMath = cytoscape.math;
+var cyBaseNodeShapes = cytoscape.baseNodeShapes;
+var cyStyleProperties = cytoscape.styleProperties;
+var cyDrawingShapes = cytoscape.drawingShapes;
+var cyBaseArrowShapes = cytoscape.baseArrowShapes;
 
 module.exports = function () {
   var $$ = cytoscape;
   
-  var sbgnShapes = $$.sbgnShapes = {
+  var sbgnShapes = $$.sbgn.sbgnShapes = {
     'source and sink': true,
     'nucleic acid feature': true,
     'complex': true,
@@ -26,7 +31,7 @@ module.exports = function () {
     'association': true
   };
 
-  var totallyOverridenNodeShapes = $$.totallyOverridenNodeShapes = {
+  var totallyOverridenNodeShapes = $$.sbgn.totallyOverridenNodeShapes = {
     'macromolecule': true,
     'nucleic acid feature': true,
     'simple chemical': true,
@@ -37,9 +42,6 @@ module.exports = function () {
     'omitted process': true,
     'dissociation': true,
     'association': true
-  };
-
-  $$.sbgn = {
   };
 
   $$.sbgn.addPortReplacementIfAny = function (node, edgePort) {
@@ -70,7 +72,7 @@ module.exports = function () {
       var port = node._private.data.ports[i];
       var portX = port.x * width / 100 + centerX;
       var portY = port.y * height / 100 + centerY;
-      var closestPoint = cyVariables.cyMath.polygonIntersectLine(portX, portY,
+      var closestPoint = cyMath.polygonIntersectLine(portX, portY,
               points, centerX, centerY, width / 2, height / 2, padding);
       context.beginPath();
       context.moveTo(portX, portY);
@@ -120,7 +122,7 @@ module.exports = function () {
             'width': stateWidth, 'height': stateHeight};
 
           if (state.clazz == "state variable") {//draw ellipse
-            cyVariables.cyRenderer.drawRoundRectanglePath(context,
+            cyDrawingShapes.drawRoundRectanglePath(context,
                     stateCenterX, stateCenterY,
                     stateWidth, stateHeight, Math.min(stateWidth / 2, stateHeight / 2, stateVarRadius));
             context.fill();
@@ -128,7 +130,7 @@ module.exports = function () {
             textProp.state = state.state;
             $$.sbgn.drawStateText(context, textProp);
           } else if (state.clazz == "unit of information") {//draw rectangle
-            cyVariables.cyRenderer.drawRoundRectanglePath(context,
+            cyDrawingShapes.drawRoundRectanglePath(context,
                     stateCenterX, stateCenterY,
                     stateWidth, stateHeight,
                     Math.min(stateWidth / 2, stateHeight / 2, unitOfInfoRadius));
@@ -149,7 +151,7 @@ module.exports = function () {
             'width': stateWidth, 'height': stateHeight};
 
           if (state.clazz == "state variable") {//draw ellipse
-            cyVariables.cyRenderer.drawRoundRectanglePath(context,
+            cyDrawingShapes.drawRoundRectanglePath(context,
                     stateCenterX, stateCenterY,
                     stateWidth, stateHeight, Math.min(stateWidth / 2, stateHeight / 2, stateVarRadius));
             context.fill();
@@ -157,7 +159,7 @@ module.exports = function () {
             textProp.state = state.state;
             $$.sbgn.drawStateText(context, textProp);
           } else if (state.clazz == "unit of information") {//draw rectangle
-            cyVariables.cyRenderer.drawRoundRectanglePath(context,
+            cyDrawingShapes.drawRoundRectanglePath(context,
                     stateCenterX, stateCenterY,
                     stateWidth, stateHeight,
                     Math.min(stateWidth / 2, stateHeight / 2, unitOfInfoRadius));
@@ -229,7 +231,7 @@ module.exports = function () {
     //context.stroke();
   };
 
-  cyVariables.cyMath.calculateDistance = function (point1, point2) {
+  cyMath.calculateDistance = function (point1, point2) {
     var distance = Math.pow(point1[0] - point2[0], 2) + Math.pow(point1[1] - point2[1], 2);
     return Math.sqrt(distance);
   };
@@ -257,7 +259,7 @@ module.exports = function () {
 
       if (state.clazz == "state variable") {//draw ellipse
         //var stateLabel = state.state.value;
-        cyVariables.cyRenderer.drawRoundRectanglePath(context, stateCenterX, stateCenterY,
+        cyDrawingShapes.drawRoundRectanglePath(context, stateCenterX, stateCenterY,
                 stateWidth, stateHeight, Math.min(stateWidth / 2, stateHeight / 2, stateVarRadius));
 
         context.fill();
@@ -267,7 +269,7 @@ module.exports = function () {
         context.stroke();
 
       } else if (state.clazz == "unit of information") {//draw rectangle
-        cyVariables.cyRenderer.drawRoundRectanglePath(context,
+        cyDrawingShapes.drawRoundRectanglePath(context,
                 stateCenterX, stateCenterY,
                 stateWidth, stateHeight,
                 Math.min(stateWidth / 2, stateHeight / 2, unitOfInfoRadius));
@@ -290,14 +292,14 @@ module.exports = function () {
     var padding = parseInt(node.css('border-width')) / 2;
 
     //check rectangle at top
-    if (cyVariables.cyMath.pointInsidePolygon(x, y, points,
+    if (cyMath.pointInsidePolygon(x, y, points,
             centerX, centerY - cornerRadius / 2, width, height - cornerRadius / 3, [0, -1],
             padding)) {
       return true;
     }
 
     //check rectangle at bottom
-    if (cyVariables.cyMath.pointInsidePolygon(x, y, points,
+    if (cyMath.pointInsidePolygon(x, y, points,
             centerX, centerY + height / 2 - cornerRadius / 2, width - 2 * cornerRadius, cornerRadius, [0, -1],
             padding)) {
       return true;
@@ -449,7 +451,7 @@ module.exports = function () {
   };
 
   $$.sbgn.drawEllipsePath = function (context, x, y, width, height) {
-    cyVariables.cyNodeShapes['ellipse'].drawPath(context, x, y, width, height);
+    cyBaseNodeShapes['ellipse'].drawPath(context, x, y, width, height);
   };
 
   $$.sbgn.drawNucAcidFeature = function (context, width, height,
@@ -503,7 +505,7 @@ module.exports = function () {
       var port = node._private.data.ports[i];
       var portX = port.x * width / 100 + centerX;
       var portY = port.y * height / 100 + centerY;
-      var closestPoint = cyVariables.cyMath.intersectLineEllipse(
+      var closestPoint = cyMath.intersectLineEllipse(
               portX, portY, centerX, centerY, width / 2, height / 2);
       context.moveTo(portX, portY);
       context.lineTo(closestPoint[0], closestPoint[1]);
@@ -518,36 +520,34 @@ module.exports = function () {
     }
   };
 
-  cyVariables.cyStyfn.types.nodeShape.enums.push('source and sink');
-  cyVariables.cyStyfn.types.nodeShape.enums.push('nucleic acid feature');
-  cyVariables.cyStyfn.types.nodeShape.enums.push('complex');
-  cyVariables.cyStyfn.types.nodeShape.enums.push('dissociation');
-  cyVariables.cyStyfn.types.nodeShape.enums.push('macromolecule');
-  cyVariables.cyStyfn.types.nodeShape.enums.push('simple chemical');
-  cyVariables.cyStyfn.types.nodeShape.enums.push('unspecified entity');
-  cyVariables.cyStyfn.types.nodeShape.enums.push('process');
-  cyVariables.cyStyfn.types.nodeShape.enums.push('omitted process');
-  cyVariables.cyStyfn.types.nodeShape.enums.push('uncertain process');
-  cyVariables.cyStyfn.types.nodeShape.enums.push('association');
+  cyStyleProperties.types.nodeShape.enums.push('source and sink');
+  cyStyleProperties.types.nodeShape.enums.push('nucleic acid feature');
+  cyStyleProperties.types.nodeShape.enums.push('complex');
+  cyStyleProperties.types.nodeShape.enums.push('dissociation');
+  cyStyleProperties.types.nodeShape.enums.push('macromolecule');
+  cyStyleProperties.types.nodeShape.enums.push('simple chemical');
+  cyStyleProperties.types.nodeShape.enums.push('unspecified entity');
+  cyStyleProperties.types.nodeShape.enums.push('process');
+  cyStyleProperties.types.nodeShape.enums.push('omitted process');
+  cyStyleProperties.types.nodeShape.enums.push('uncertain process');
+  cyStyleProperties.types.nodeShape.enums.push('association');
 
-  cyVariables.cyStyfn.types.lineStyle.enums.push('consumption');
-  cyVariables.cyStyfn.types.lineStyle.enums.push('production');
+  cyStyleProperties.types.lineStyle.enums.push('consumption');
+  cyStyleProperties.types.lineStyle.enums.push('production');
 
-  cyVariables.cyStyfn.types.arrowShape.enums.push('necessary stimulation');
+  cyStyleProperties.types.arrowShape.enums.push('necessary stimulation');
 
   $$.sbgn.registerSbgnArrowShapes = function () {
-    cyVariables.cyArrowShapes['necessary stimulation'] = jQuery.extend({}, cyVariables.cyArrowShapes['triangle-tee']);
-    cyVariables.cyArrowShapes['necessary stimulation'].pointsTee = [
+    cyBaseArrowShapes['necessary stimulation'] = jQuery.extend({}, cyBaseArrowShapes['triangle-tee']);
+    cyBaseArrowShapes['necessary stimulation'].pointsTee = [
       -0.18, -0.43,
       0.18, -0.43
     ];
   };
 
   $$.sbgn.registerSbgnNodeShapes = function () {
-    cyVariables.cyArrowShapes['necessary stimulation'] = cyVariables.cyArrowShapes['triangle-tee'];
-
-    cyVariables.cyNodeShapes['process'] = {
-      points: cyVariables.cyMath.generateUnitNgonPointsFitToSquare(4, 0),
+    cyBaseNodeShapes['process'] = {
+      points: cyMath.generateUnitNgonPointsFitToSquare(4, 0),
       label: '',
       draw: function (context, node) {
         var width = node.width();
@@ -556,10 +556,10 @@ module.exports = function () {
         var centerY = node._private.position.y;
         var padding = parseInt(node.css('border-width')) / 2;
 
-        cyVariables.cyRenderer.drawPolygonPath(context,
+        cyDrawingShapes.drawPolygonPath(context,
                 centerX, centerY,
                 width, height,
-                cyVariables.cyNodeShapes['process'].points);
+                cyBaseNodeShapes['process'].points);
         context.fill();
 
         context.stroke();
@@ -578,9 +578,9 @@ module.exports = function () {
           return portIntersection;
         }
 
-        return cyVariables.cyMath.polygonIntersectLine(
+        return cyMath.polygonIntersectLine(
                 x, y,
-                cyVariables.cyNodeShapes['process'].points,
+                cyBaseNodeShapes['process'].points,
                 nodeX,
                 nodeY,
                 width / 2, height / 2,
@@ -593,18 +593,18 @@ module.exports = function () {
         var height = node.height();
         var padding = parseInt(node.css('border-width')) / 2;
 
-        return cyVariables.cyMath.pointInsidePolygon(x, y, cyVariables.cyNodeShapes['process'].points,
+        return cyMath.pointInsidePolygon(x, y, cyBaseNodeShapes['process'].points,
                 centerX, centerY, width, height, [0, -1], padding);
       }
     };
 
-    cyVariables.cyNodeShapes['omitted process'] = jQuery.extend(true, {}, cyVariables.cyNodeShapes['process']);
-    cyVariables.cyNodeShapes['omitted process'].label = '\\\\';
+    cyBaseNodeShapes['omitted process'] = jQuery.extend(true, {}, cyBaseNodeShapes['process']);
+    cyBaseNodeShapes['omitted process'].label = '\\\\';
 
-    cyVariables.cyNodeShapes['uncertain process'] = jQuery.extend(true, {}, cyVariables.cyNodeShapes['process']);
-    cyVariables.cyNodeShapes['uncertain process'].label = '?';
+    cyBaseNodeShapes['uncertain process'] = jQuery.extend(true, {}, cyBaseNodeShapes['process']);
+    cyBaseNodeShapes['uncertain process'].label = '?';
 
-    cyVariables.cyNodeShapes["unspecified entity"] = {
+    cyBaseNodeShapes["unspecified entity"] = {
       draw: function (context, node) {
         var centerX = node._private.position.x;
         var centerY = node._private.position.y;
@@ -642,7 +642,7 @@ module.exports = function () {
         var stateAndInfoIntersectLines = $$.sbgn.intersectLineStateAndInfoBoxes(
                 node, x, y);
 
-        var nodeIntersectLines = cyVariables.cyNodeShapes["ellipse"].intersectLine(centerX, centerY, width,
+        var nodeIntersectLines = cyBaseNodeShapes["ellipse"].intersectLine(centerX, centerY, width,
                 height, x, y, padding);
 
         var intersections = stateAndInfoIntersectLines.concat(nodeIntersectLines);
@@ -657,7 +657,7 @@ module.exports = function () {
         var height = node.height();
         var padding = parseInt(node.css('border-width')) / 2;
 
-        var nodeCheckPoint = cyVariables.cyNodeShapes["ellipse"].checkPoint(x, y,
+        var nodeCheckPoint = cyBaseNodeShapes["ellipse"].checkPoint(x, y,
                 padding, width, height,
                 centerX, centerY);
 
@@ -668,7 +668,7 @@ module.exports = function () {
       }
     };
 
-    cyVariables.cyNodeShapes["simple chemical"] = {
+    cyBaseNodeShapes["simple chemical"] = {
       multimerPadding: 5,
       draw: function (context, node) {
         var centerX = node._private.position.x;
@@ -676,7 +676,7 @@ module.exports = function () {
 
         var width = node.width();
         var height = node.height();
-        var multimerPadding = cyVariables.cyNodeShapes["simple chemical"].multimerPadding;
+        var multimerPadding = cyBaseNodeShapes["simple chemical"].multimerPadding;
         var label = node._private.data.sbgnlabel;
         var padding = parseInt(node.css('border-width'));
         var cloneMarker = node._private.data.sbgnclonemarker;
@@ -722,7 +722,7 @@ module.exports = function () {
         var width = node.width();
         var height = node.height();
         var padding = parseInt(node.css('border-width'));
-        var multimerPadding = cyVariables.cyNodeShapes["simple chemical"].multimerPadding;
+        var multimerPadding = cyBaseNodeShapes["simple chemical"].multimerPadding;
 
         var portIntersection = $$.sbgn.intersectLinePorts(node, x, y, portId);
         if (portIntersection.length > 0) {
@@ -732,13 +732,13 @@ module.exports = function () {
         var stateAndInfoIntersectLines = $$.sbgn.intersectLineStateAndInfoBoxes(
                 node, x, y);
 
-        var nodeIntersectLines = cyVariables.cyNodeShapes["ellipse"].intersectLine(
+        var nodeIntersectLines = cyBaseNodeShapes["ellipse"].intersectLine(
                 centerX, centerY, width, height, x, y, padding);
 
         //check whether sbgn class includes multimer substring or not
         var multimerIntersectionLines = [];
         if ($$.sbgn.isMultimer(node)) {
-          multimerIntersectionLines = cyVariables.cyNodeShapes["ellipse"].intersectLine(
+          multimerIntersectionLines = cyBaseNodeShapes["ellipse"].intersectLine(
                   centerX + multimerPadding, centerY + multimerPadding, width,
                   height, x, y, padding);
         }
@@ -754,9 +754,9 @@ module.exports = function () {
         var width = node.width();
         var height = node.height();
         var padding = parseInt(node.css('border-width')) / 2;
-        var multimerPadding = cyVariables.cyNodeShapes["simple chemical"].multimerPadding;
+        var multimerPadding = cyBaseNodeShapes["simple chemical"].multimerPadding;
 
-        var nodeCheckPoint = cyVariables.cyNodeShapes["roundrectangle"].checkPoint(x, y,
+        var nodeCheckPoint = cyBaseNodeShapes["roundrectangle"].checkPoint(x, y,
                 padding, width, height,
                 centerX, centerY);
 
@@ -766,7 +766,7 @@ module.exports = function () {
         //check whether sbgn class includes multimer substring or not
         var multimerCheckPoint = false;
         if ($$.sbgn.isMultimer(node)) {
-          multimerCheckPoint = cyVariables.cyNodeShapes["ellipse"].checkPoint(x, y,
+          multimerCheckPoint = cyBaseNodeShapes["ellipse"].checkPoint(x, y,
                   padding, width, height,
                   centerX + multimerPadding, centerY + multimerPadding);
         }
@@ -775,8 +775,8 @@ module.exports = function () {
       }
     };
 
-    cyVariables.cyNodeShapes["macromolecule"] = {
-      points: cyVariables.cyMath.generateUnitNgonPoints(4, 0),
+    cyBaseNodeShapes["macromolecule"] = {
+      points: cyMath.generateUnitNgonPoints(4, 0),
       multimerPadding: 5,
       draw: function (context, node) {
         var width = node.width();
@@ -784,14 +784,14 @@ module.exports = function () {
         var centerX = node._private.position.x;
         var centerY = node._private.position.y;
         var label = node._private.data.sbgnlabel;
-        var multimerPadding = cyVariables.cyNodeShapes["macromolecule"].multimerPadding;
+        var multimerPadding = cyBaseNodeShapes["macromolecule"].multimerPadding;
         var cloneMarker = node._private.data.sbgnclonemarker;
         var padding = parseInt(node.css('border-width'));
 
         //check whether sbgn class includes multimer substring or not
         if ($$.sbgn.isMultimer(node)) {
           //add multimer shape
-          cyVariables.cyRenderer.drawRoundRectanglePath(context,
+          cyDrawingShapes.drawRoundRectanglePath(context,
                   centerX + multimerPadding, centerY + multimerPadding,
                   width, height);
 
@@ -806,7 +806,7 @@ module.exports = function () {
           //context.stroke();
         }
 
-        cyVariables.cyRenderer.drawRoundRectanglePath(context,
+        cyDrawingShapes.drawRoundRectanglePath(context,
                 centerX, centerY,
                 width, height);
         context.fill();
@@ -831,8 +831,8 @@ module.exports = function () {
         var width = node.width();
         var height = node.height();
         var padding = parseInt(node.css('border-width')) / 2;
-        var multimerPadding = cyVariables.cyNodeShapes["macromolecule"].multimerPadding;
-        var cornerRadius = cyVariables.cyMath.getRoundRectangleRadius(width, height);
+        var multimerPadding = cyBaseNodeShapes["macromolecule"].multimerPadding;
+        var cornerRadius = cyMath.getRoundRectangleRadius(width, height);
 
         var portIntersection = $$.sbgn.intersectLinePorts(node, x, y, portId);
         if (portIntersection.length > 0) {
@@ -870,9 +870,9 @@ module.exports = function () {
         var width = node.width() + threshold;
         var height = node.height() + threshold;
         var padding = parseInt(node.css('border-width')) / 2;
-        var multimerPadding = cyVariables.cyNodeShapes["macromolecule"].multimerPadding;
+        var multimerPadding = cyBaseNodeShapes["macromolecule"].multimerPadding;
 
-        var nodeCheckPoint = cyVariables.cyNodeShapes["roundrectangle"].checkPoint(x, y, padding,
+        var nodeCheckPoint = cyBaseNodeShapes["roundrectangle"].checkPoint(x, y, padding,
                 width, height, centerX, centerY);
         var stateAndInfoCheckPoint = $$.sbgn.checkPointStateAndInfoBoxes(x, y, node,
                 threshold);
@@ -880,7 +880,7 @@ module.exports = function () {
         //check whether sbgn class includes multimer substring or not
         var multimerCheckPoint = false;
         if ($$.sbgn.isMultimer(node)) {
-          multimerCheckPoint = cyVariables.cyNodeShapes["roundrectangle"].checkPoint(x, y, padding,
+          multimerCheckPoint = cyBaseNodeShapes["roundrectangle"].checkPoint(x, y, padding,
                   width, height, centerX + multimerPadding, centerY + multimerPadding);
         }
 
@@ -888,7 +888,7 @@ module.exports = function () {
       }
     };
 
-    cyVariables.cyNodeShapes['association'] = {
+    cyBaseNodeShapes['association'] = {
       draw: function (context, node) {
         var centerX = node._private.position.x;
         var centerY = node._private.position.y;
@@ -896,7 +896,7 @@ module.exports = function () {
         var height = node.height();
         var padding = parseInt(node.css('border-width'));
 
-        cyVariables.cyNodeShapes['ellipse'].draw(context, centerX, centerY, width, height);
+        cyBaseNodeShapes['ellipse'].draw(context, centerX, centerY, width, height);
         context.fill();
         context.stroke();
 
@@ -914,7 +914,7 @@ module.exports = function () {
           return portIntersection;
         }
 
-        var intersect = cyVariables.cyMath.intersectLineEllipse(
+        var intersect = cyMath.intersectLineEllipse(
                 x, y,
                 centerX,
                 centerY,
@@ -940,7 +940,7 @@ module.exports = function () {
       }
     };
 
-    cyVariables.cyNodeShapes["dissociation"] = {
+    cyBaseNodeShapes["dissociation"] = {
       draw: function (context, node) {
         var centerX = node._private.position.x;
         var centerY = node._private.position.y;
@@ -984,7 +984,7 @@ module.exports = function () {
           return portIntersection;
         }
 
-        return cyVariables.cyMath.intersectLineEllipse(
+        return cyMath.intersectLineEllipse(
                 x, y,
                 nodeX,
                 nodeY,
@@ -1008,7 +1008,7 @@ module.exports = function () {
       }
     };
 
-    cyVariables.cyNodeShapes["complex"] = {
+    cyBaseNodeShapes["complex"] = {
       points: [],
       multimerPadding: 5,
       cornerLength: 12,
@@ -1020,19 +1020,19 @@ module.exports = function () {
         var centerY = node._private.position.y;
         var stateAndInfos = node._private.data.sbgnstatesandinfos;
         var label = node._private.data.sbgnlabel;
-        var cornerLength = cyVariables.cyNodeShapes["complex"].cornerLength;
-        var multimerPadding = cyVariables.cyNodeShapes["complex"].multimerPadding;
+        var cornerLength = cyBaseNodeShapes["complex"].cornerLength;
+        var multimerPadding = cyBaseNodeShapes["complex"].multimerPadding;
         var cloneMarker = node._private.data.sbgnclonemarker;
 
-        cyVariables.cyNodeShapes["complex"].points = $$.sbgn.generateComplexShapePoints(cornerLength,
+        cyBaseNodeShapes["complex"].points = $$.sbgn.generateComplexShapePoints(cornerLength,
                 width, height);
 
         //check whether sbgn class includes multimer substring or not
         if ($$.sbgn.isMultimer(node)) {
           //add multimer shape
-          cyVariables.cyRenderer.drawPolygonPath(context,
+          cyDrawingShapes.drawPolygonPath(context,
                   centerX + multimerPadding, centerY + multimerPadding,
-                  width, height, cyVariables.cyNodeShapes["complex"].points);
+                  width, height, cyBaseNodeShapes["complex"].points);
           context.fill();
 
           context.stroke();
@@ -1045,9 +1045,9 @@ module.exports = function () {
           //context.stroke();
         }
 
-        cyVariables.cyRenderer.drawPolygonPath(context,
+        cyDrawingShapes.drawPolygonPath(context,
                 centerX, centerY,
-                width, height, cyVariables.cyNodeShapes["complex"].points);
+                width, height, cyBaseNodeShapes["complex"].points);
         context.fill();
 
         context.stroke();
@@ -1061,8 +1061,8 @@ module.exports = function () {
         $$.sbgn.drawComplexStateAndInfo(context, node, stateAndInfos, centerX, centerY, width, height);
         context.fillStyle = oldStyle;
       },
-//      intersectLine: cyVariables.cyNodeShapes["roundrectangle"].intersectLine,
-//      checkPoint: cyVariables.cyNodeShapes["roundrectangle"].checkPoint
+//      intersectLine: cyBaseNodeShapes["roundrectangle"].intersectLine,
+//      checkPoint: cyBaseNodeShapes["roundrectangle"].checkPoint
       intersectLine: function (node, x, y, portId) {
         var centerX = node._private.position.x;
         var centerY = node._private.position.y;
@@ -1070,23 +1070,23 @@ module.exports = function () {
         var width = hasChildren ? node.outerWidth() : node.width();
         var height = hasChildren ? node.outerHeight() : node.height();
         var padding = parseInt(node.css('border-width')) / 2;
-        var multimerPadding = cyVariables.cyNodeShapes["complex"].multimerPadding;
-        var cornerLength = cyVariables.cyNodeShapes["complex"].cornerLength;
+        var multimerPadding = cyBaseNodeShapes["complex"].multimerPadding;
+        var cornerLength = cyBaseNodeShapes["complex"].cornerLength;
 
         var portIntersection = $$.sbgn.intersectLinePorts(node, x, y, portId);
         if (portIntersection.length > 0) {
           return portIntersection;
         }
 
-        cyVariables.cyNodeShapes["complex"].points = $$.sbgn.generateComplexShapePoints(cornerLength,
+        cyBaseNodeShapes["complex"].points = $$.sbgn.generateComplexShapePoints(cornerLength,
                 width, height);
 
         var stateAndInfoIntersectLines = $$.sbgn.intersectLineStateAndInfoBoxes(
                 node, x, y);
 
-        var nodeIntersectLines = cyVariables.cyMath.polygonIntersectLine(
+        var nodeIntersectLines = cyMath.polygonIntersectLine(
                 x, y,
-                cyVariables.cyNodeShapes["complex"].points,
+                cyBaseNodeShapes["complex"].points,
                 centerX,
                 centerY,
                 width / 2, height / 2,
@@ -1095,9 +1095,9 @@ module.exports = function () {
         //check whether sbgn class includes multimer substring or not
         var multimerIntersectionLines = [];
         if ($$.sbgn.isMultimer(node)) {
-          multimerIntersectionLines = cyVariables.cyMath.polygonIntersectLine(
+          multimerIntersectionLines = cyMath.polygonIntersectLine(
                   x, y,
-                  cyVariables.cyNodeShapes["complex"].points,
+                  cyBaseNodeShapes["complex"].points,
                   centerX + multimerPadding,
                   centerY + multimerPadding,
                   width / 2, height / 2,
@@ -1115,13 +1115,13 @@ module.exports = function () {
         var width = (hasChildren ? node.outerWidth() : node.width()) + threshold;
         var height = (hasChildren ? node.outerHeight() : node.height()) + threshold;
         var padding = parseInt(node.css('border-width')) / 2;
-        var multimerPadding = cyVariables.cyNodeShapes["complex"].multimerPadding;
-        var cornerLength = cyVariables.cyNodeShapes["complex"].cornerLength;
+        var multimerPadding = cyBaseNodeShapes["complex"].multimerPadding;
+        var cornerLength = cyBaseNodeShapes["complex"].cornerLength;
 
-        cyVariables.cyNodeShapes["complex"].points = $$.sbgn.generateComplexShapePoints(cornerLength,
+        cyBaseNodeShapes["complex"].points = $$.sbgn.generateComplexShapePoints(cornerLength,
                 width, height);
 
-        var nodeCheckPoint = cyVariables.cyMath.pointInsidePolygon(x, y, cyVariables.cyNodeShapes["complex"].points,
+        var nodeCheckPoint = cyMath.pointInsidePolygon(x, y, cyBaseNodeShapes["complex"].points,
                 centerX, centerY, width, height, [0, -1], padding);
 
         var stateAndInfoCheckPoint = $$.sbgn.checkPointStateAndInfoBoxes(x, y, node,
@@ -1130,8 +1130,8 @@ module.exports = function () {
         //check whether sbgn class includes multimer substring or not
         var multimerCheckPoint = false;
         if ($$.sbgn.isMultimer(node)) {
-          multimerCheckPoint = cyVariables.cyMath.pointInsidePolygon(x, y,
-                  cyVariables.cyNodeShapes["complex"].points,
+          multimerCheckPoint = cyMath.pointInsidePolygon(x, y,
+                  cyBaseNodeShapes["complex"].points,
                   centerX + multimerPadding, centerY + multimerPadding,
                   width, height, [0, -1], padding);
 
@@ -1141,8 +1141,8 @@ module.exports = function () {
       }
     };
 
-    cyVariables.cyNodeShapes["nucleic acid feature"] = {
-      points: cyVariables.cyMath.generateUnitNgonPointsFitToSquare(4, 0),
+    cyBaseNodeShapes["nucleic acid feature"] = {
+      points: cyMath.generateUnitNgonPointsFitToSquare(4, 0),
       multimerPadding: 5,
       draw: function (context, node) {
         var centerX = node._private.position.x;
@@ -1151,8 +1151,8 @@ module.exports = function () {
         var width = node.width();
         var height = node.height();
         var label = node._private.data.sbgnlabel;
-        var cornerRadius = cyVariables.cyMath.getRoundRectangleRadius(width, height);
-        var multimerPadding = cyVariables.cyNodeShapes["nucleic acid feature"].multimerPadding;
+        var cornerRadius = cyMath.getRoundRectangleRadius(width, height);
+        var multimerPadding = cyBaseNodeShapes["nucleic acid feature"].multimerPadding;
         var cloneMarker = node._private.data.sbgnclonemarker;
 
         //check whether sbgn class includes multimer substring or not
@@ -1196,10 +1196,10 @@ module.exports = function () {
       intersectLine: function (node, x, y, portId) {
         var centerX = node._private.position.x;
         var centerY = node._private.position.y;
-        var multimerPadding = cyVariables.cyNodeShapes["nucleic acid feature"].multimerPadding;
+        var multimerPadding = cyBaseNodeShapes["nucleic acid feature"].multimerPadding;
         var width = node.width();
         var height = node.height();
-        var cornerRadius = cyVariables.cyMath.getRoundRectangleRadius(width, height);
+        var cornerRadius = cyMath.getRoundRectangleRadius(width, height);
 
         var portIntersection = $$.sbgn.intersectLinePorts(node, x, y, portId);
         if (portIntersection.length > 0) {
@@ -1228,10 +1228,10 @@ module.exports = function () {
       checkPoint: function (x, y, node, threshold) {
         var centerX = node._private.position.x;
         var centerY = node._private.position.y;
-        var multimerPadding = cyVariables.cyNodeShapes["nucleic acid feature"].multimerPadding;
+        var multimerPadding = cyBaseNodeShapes["nucleic acid feature"].multimerPadding;
         var width = node.width();
         var height = node.height();
-        var cornerRadius = cyVariables.cyMath.getRoundRectangleRadius(width, height);
+        var cornerRadius = cyMath.getRoundRectangleRadius(width, height);
 
         var nodeCheckPoint = $$.sbgn.nucleicAcidCheckPoint(x, y, centerX, centerY,
                 node, threshold, this.points, cornerRadius);
@@ -1249,8 +1249,8 @@ module.exports = function () {
         return nodeCheckPoint || stateAndInfoCheckPoint || multimerCheckPoint;
       }
     };
-    cyVariables.cyNodeShapes["source and sink"] = {
-      points: cyVariables.cyMath.generateUnitNgonPoints(4, 0),
+    cyBaseNodeShapes["source and sink"] = {
+      points: cyMath.generateUnitNgonPoints(4, 0),
       draw: function (context, node) {
         var centerX = node._private.position.x;
         var centerY = node._private.position.y;
@@ -1258,7 +1258,7 @@ module.exports = function () {
         var width = node.width();
         var height = node.height();
         var label = node._private.data.sbgnlabel;
-        var pts = cyVariables.cyNodeShapes["source and sink"].points;
+        var pts = cyBaseNodeShapes["source and sink"].points;
         var cloneMarker = node._private.data.sbgnclonemarker;
 
         $$.sbgn.drawEllipse(context, centerX, centerY,
@@ -1284,15 +1284,15 @@ module.exports = function () {
                 node.css('background-opacity'));
 
       },
-      intersectLine: cyVariables.cyNodeShapes["ellipse"].intersectLine,
-      checkPoint: cyVariables.cyNodeShapes["ellipse"].checkPoint
+      intersectLine: cyBaseNodeShapes["ellipse"].intersectLine,
+      checkPoint: cyBaseNodeShapes["ellipse"].checkPoint
     };
   };
 
   $$.sbgn.drawEllipse = function (context, x, y, width, height) {
     //$$.sbgn.drawEllipsePath(context, x, y, width, height);
     //context.fill();
-    cyVariables.cyNodeShapes['ellipse'].draw(context, x, y, width, height);
+    cyBaseNodeShapes['ellipse'].draw(context, x, y, width, height);
   };
 
   $$.sbgn.cloneMarker = {
@@ -1352,13 +1352,13 @@ module.exports = function () {
         var oldGlobalAlpha = context.globalAlpha;
         context.globalAlpha = opacity;
 
-        var recPoints = cyVariables.cyMath.generateUnitNgonPointsFitToSquare(4, 0);
+        var recPoints = cyMath.generateUnitNgonPointsFitToSquare(4, 0);
         var cloneX = centerX;
         var cloneY = centerY + 3 / 4 * cornerRadius;
         var cloneWidth = width - 2 * cornerRadius;
         var cloneHeight = cornerRadius / 2;
 
-        cyVariables.cyRenderer.drawPolygonPath(context, cloneX, cloneY, cloneWidth, cloneHeight, recPoints);
+        cyDrawingShapes.drawPolygonPath(context, cloneX, cloneY, cloneWidth, cloneHeight, recPoints);
         context.fill();
         context.fillStyle = oldStyle;
         context.globalAlpha = oldGlobalAlpha;
@@ -1403,7 +1403,7 @@ module.exports = function () {
         var oldGlobalAlpha = context.globalAlpha;
         context.globalAlpha = opacity;
 
-        var cornerRadius = cyVariables.cyMath.getRoundRectangleRadius(width, height);
+        var cornerRadius = cyMath.getRoundRectangleRadius(width, height);
 
         $$.sbgn.drawNucAcidFeature(context, cloneWidth, cloneHeight,
                 cloneX, cloneY, cornerRadius, opacity);
@@ -1435,7 +1435,7 @@ module.exports = function () {
         var oldGlobalAlpha = context.globalAlpha;
         context.globalAlpha = opacity;
 
-        cyVariables.cyRenderer.drawPolygonPath(context,
+        cyDrawingShapes.drawPolygonPath(context,
                 cloneX, cloneY,
                 cloneWidth, cloneHeight, markerPoints);
         context.fill();
@@ -1462,7 +1462,7 @@ module.exports = function () {
     for (var i = 0; i < node._private.data.ports.length; i++) {
       var port = node._private.data.ports[i];
       if (portId == port.id) {
-        return cyVariables.cyMath.intersectLineEllipse(
+        return cyMath.intersectLineEllipse(
                 x, y, port.x * width / 100 + nodeX, port.y * height / 100 + nodeY, 1, 1);
       }
     }
@@ -1478,7 +1478,7 @@ module.exports = function () {
 
     for (var i = 0; i < intersections.length; i = i + 2) {
       var checkPoint = [intersections[i], intersections[i + 1]];
-      var distance = cyVariables.cyMath.calculateDistance(point, checkPoint);
+      var distance = cyMath.calculateDistance(point, checkPoint);
 
       if (distance < minDistance) {
         minDistance = distance;
@@ -1508,7 +1508,7 @@ module.exports = function () {
       var topEndX = nodeX + halfWidth + padding;
       var topEndY = topStartY;
 
-      straightLineIntersections = cyVariables.cyMath.finiteLinesIntersect(
+      straightLineIntersections = cyMath.finiteLinesIntersect(
               x, y, nodeX, nodeY, topStartX, topStartY, topEndX, topEndY, false);
 
       if (straightLineIntersections.length > 0) {
@@ -1523,7 +1523,7 @@ module.exports = function () {
       var rightEndX = rightStartX;
       var rightEndY = nodeY + halfHeight - cornerRadius + padding;
 
-      straightLineIntersections = cyVariables.cyMath.finiteLinesIntersect(
+      straightLineIntersections = cyMath.finiteLinesIntersect(
               x, y, nodeX, nodeY, rightStartX, rightStartY, rightEndX, rightEndY, false);
 
       if (straightLineIntersections.length > 0) {
@@ -1538,7 +1538,7 @@ module.exports = function () {
       var bottomEndX = nodeX + halfWidth - cornerRadius + padding;
       var bottomEndY = bottomStartY;
 
-      straightLineIntersections = cyVariables.cyMath.finiteLinesIntersect(
+      straightLineIntersections = cyMath.finiteLinesIntersect(
               x, y, nodeX, nodeY, bottomStartX, bottomStartY, bottomEndX, bottomEndY, false);
 
       if (straightLineIntersections.length > 0) {
@@ -1553,7 +1553,7 @@ module.exports = function () {
       var leftEndX = leftStartX;
       var leftEndY = nodeY + halfHeight - cornerRadius + padding;
 
-      straightLineIntersections = cyVariables.cyMath.finiteLinesIntersect(
+      straightLineIntersections = cyMath.finiteLinesIntersect(
               x, y, nodeX, nodeY, leftStartX, leftStartY, leftEndX, leftEndY, false);
 
       if (straightLineIntersections.length > 0) {
@@ -1569,7 +1569,7 @@ module.exports = function () {
     {
       var bottomRightCenterX = nodeX + halfWidth - cornerRadius;
       var bottomRightCenterY = nodeY + halfHeight - cornerRadius
-      arcIntersections = cyVariables.cyMath.intersectLineCircle(
+      arcIntersections = cyMath.intersectLineCircle(
               x, y, nodeX, nodeY,
               bottomRightCenterX, bottomRightCenterY, cornerRadius + padding);
 
@@ -1585,7 +1585,7 @@ module.exports = function () {
     {
       var bottomLeftCenterX = nodeX - halfWidth + cornerRadius;
       var bottomLeftCenterY = nodeY + halfHeight - cornerRadius
-      arcIntersections = cyVariables.cyMath.intersectLineCircle(
+      arcIntersections = cyMath.intersectLineCircle(
               x, y, nodeX, nodeY,
               bottomLeftCenterX, bottomLeftCenterY, cornerRadius + padding);
 
@@ -1616,7 +1616,7 @@ module.exports = function () {
       var topEndX = nodeX + halfWidth - cornerRadius + padding;
       var topEndY = topStartY;
 
-      var intersection = cyVariables.cyMath.finiteLinesIntersect(
+      var intersection = cyMath.finiteLinesIntersect(
               x1, y1, x2, y2, topStartX, topStartY, topEndX, topEndY, false);
 
       if (intersection.length > 0) {
@@ -1631,7 +1631,7 @@ module.exports = function () {
       var rightEndX = rightStartX;
       var rightEndY = nodeY + halfHeight - cornerRadius + padding;
 
-      var intersection = cyVariables.cyMath.finiteLinesIntersect(
+      var intersection = cyMath.finiteLinesIntersect(
               x1, y1, x2, y2, rightStartX, rightStartY, rightEndX, rightEndY, false);
 
       if (intersection.length > 0) {
@@ -1646,7 +1646,7 @@ module.exports = function () {
       var bottomEndX = nodeX + halfWidth - cornerRadius + padding;
       var bottomEndY = bottomStartY;
 
-      var intersection = cyVariables.cyMath.finiteLinesIntersect(
+      var intersection = cyMath.finiteLinesIntersect(
               x1, y1, x2, y2, bottomStartX, bottomStartY, bottomEndX, bottomEndY, false);
 
       if (intersection.length > 0) {
@@ -1661,7 +1661,7 @@ module.exports = function () {
       var leftEndX = leftStartX;
       var leftEndY = nodeY + halfHeight - cornerRadius + padding;
 
-      var intersection = cyVariables.cyMath.finiteLinesIntersect(
+      var intersection = cyMath.finiteLinesIntersect(
               x1, y1, x2, y2, leftStartX, leftStartY, leftEndX, leftEndY, false);
 
       if (intersection.length > 0) {
@@ -1676,7 +1676,7 @@ module.exports = function () {
     {
       var topLeftCenterX = nodeX - halfWidth + cornerRadius;
       var topLeftCenterY = nodeY - halfHeight + cornerRadius
-      arcIntersections = cyVariables.cyMath.intersectLineCircle(
+      arcIntersections = cyMath.intersectLineCircle(
               x1, y1, x2, y2,
               topLeftCenterX, topLeftCenterY, cornerRadius + padding);
 
@@ -1692,7 +1692,7 @@ module.exports = function () {
     {
       var topRightCenterX = nodeX + halfWidth - cornerRadius;
       var topRightCenterY = nodeY - halfHeight + cornerRadius
-      arcIntersections = cyVariables.cyMath.intersectLineCircle(
+      arcIntersections = cyMath.intersectLineCircle(
               x1, y1, x2, y2,
               topRightCenterX, topRightCenterY, cornerRadius + padding);
 
@@ -1708,7 +1708,7 @@ module.exports = function () {
     {
       var bottomRightCenterX = nodeX + halfWidth - cornerRadius;
       var bottomRightCenterY = nodeY + halfHeight - cornerRadius
-      arcIntersections = cyVariables.cyMath.intersectLineCircle(
+      arcIntersections = cyMath.intersectLineCircle(
               x1, y1, x2, y2,
               bottomRightCenterX, bottomRightCenterY, cornerRadius + padding);
 
@@ -1724,7 +1724,7 @@ module.exports = function () {
     {
       var bottomLeftCenterX = nodeX - halfWidth + cornerRadius;
       var bottomLeftCenterY = nodeY + halfHeight - cornerRadius
-      arcIntersections = cyVariables.cyMath.intersectLineCircle(
+      arcIntersections = cyMath.intersectLineCircle(
               x1, y1, x2, y2,
               bottomLeftCenterX, bottomLeftCenterY, cornerRadius + padding);
 
@@ -1835,7 +1835,7 @@ module.exports = function () {
       var stateCenterY = state.bbox.y * node.height() / 100 + centerY;
 
       if (state.clazz == "state variable" && stateCount < 2) {//draw ellipse
-        var stateCheckPoint = cyVariables.cyNodeShapes["ellipse"].checkPoint(
+        var stateCheckPoint = cyBaseNodeShapes["ellipse"].checkPoint(
                 x, y, padding, stateWidth, stateHeight, stateCenterX, stateCenterY);
 
         if (stateCheckPoint == true)
@@ -1843,7 +1843,7 @@ module.exports = function () {
 
         stateCount++;
       } else if (state.clazz == "unit of information" && infoCount < 2) {//draw rectangle
-        var infoCheckPoint = cyVariables.cyNodeShapes["roundrectangle"].checkPoint(
+        var infoCheckPoint = cyBaseNodeShapes["roundrectangle"].checkPoint(
                 x, y, padding, stateWidth, stateHeight, stateCenterX, stateCenterY);
 
         if (infoCheckPoint == true)
@@ -1855,25 +1855,6 @@ module.exports = function () {
     }
     return false;
   };
-
-//  $$.sbgn.intersetLineSelection = function (render, node, x, y, portId) {
-//    //TODO: do it for all classes in sbgn, create a sbgn class array to check
-//    if (tempSbgnShapes[render.getNodeShape(node)]) {
-//      return cyVariables.cyNodeShapes[render.getNodeShape(node)].intersectLine(
-//          node, x, y, portId);
-//    }
-//    else {
-//      return cyVariables.cyNodeShapes[render.getNodeShape(node)].intersectLine(
-//          node._private.position.x,
-//          node._private.position.y,
-//          node.outerWidth(),
-//          node.outerHeight(),
-//          x, //halfPointX,
-//          y, //halfPointY
-//          node._private.style["border-width"].pxValue / 2
-//          );
-//    }
-//  };
 
   $$.sbgn.isNodeShapeTotallyOverriden = function (render, node) {
     if (totallyOverridenNodeShapes[render.getNodeShape(node)]) {
