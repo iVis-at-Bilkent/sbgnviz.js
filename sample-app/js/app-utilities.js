@@ -78,9 +78,15 @@ var appUtilities = {
     }
   },
   nodeQtipFunction: function (node) {
+    var qtipContent = sbgnviz.getQtipContent(node);
+    
+    if (!qtipContent) {
+      return;
+    }
+    
     node.qtip({
       content: function () {
-        return sbgnviz.getQtipContent(node);
+        return qtipContent;
       },
       show: {
         ready: true
