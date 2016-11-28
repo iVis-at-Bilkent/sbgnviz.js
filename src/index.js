@@ -3,7 +3,6 @@
     var libs = {};
     libs.jQuery = _libs.jQuery || jQuery;
     libs.cytoscape = _libs.cytoscape || cytoscape;
-    libs.cyVariables = libs.cytoscape.cyVariables;
     libs.saveAs = _libs.filesaverjs ? _libs.filesaverjs.saveAs : saveAs;
     
     // Set the libraries to access them from any file

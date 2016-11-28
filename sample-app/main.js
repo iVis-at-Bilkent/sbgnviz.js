@@ -1,18 +1,10 @@
 var sbgnviz = require('../sbgnviz');
 var filesaverjs = require('filesaverjs');
-//window.saveAs = filesaverjs.saveAs;
 window.jQuery = window.$ = require('jQuery'); // jQuery should be global because jQuery.qtip extension is not compatible with commonjs
-
-//var cytoscape = window.cytoscape = require('../lib/js/cytoscape');
-//window.cyVariables = cytoscape.cyVariables;
-
-//var jQuery = $ = require('jQuery');
-var cytoscape = require('../lib/js/cytoscape');
+var cytoscape = require('cytoscape-for-sbgnviz');
 
 require('jquery-expander')($);
 require('bootstrap');
-//window._ = require('underscore');
-//window.Backbone = require('backbone');
 
 var appUtilities = require('./js/app-utilities');
 var appCy = require('./js/app-cy');
