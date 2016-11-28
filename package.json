@@ -3,14 +3,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build-sbgnviz-js": "gulp build",
-    "build-app-js": "browserify sample-app/main.js -o sample-app/app.js --debug",
-    "watch-sampleapp-js": "nodemon -e js --watch sample-app --ignore sample-app/app.js -x \"npm run build-app-js\"",
-    "watch-src-js": "nodemon -e js --watch src -x \"npm run build-sbgnviz-js\"",
-    "watch-sbgnviz-js": "nodemon -e js --watch sbgnviz.js -x \"npm run build-app-js\"",
-    "watch-js": "parallelshell \"npm run watch-sampleapp-js\" \"npm run watch-src-js\" \"npm run watch-sbgnviz-js\"",
-    "watch-server": "nodemon server.js",
-    "release-build": "npm run build-sbgnviz-js && npm run build-app-js",
-    "debug-build": "parallelshell \"npm run watch-js\" \"npm run watch-server\""
+    "debug-js": "nodemon -e js --watch src -x \"npm run build-sbgnviz-js\""
   },
   "repository": {
     "type": "git",
@@ -20,25 +13,10 @@
     "url": "https://github.com/iVis-at-Bilkent/sbgnviz-js/issues"
   },
   "homepage": "https://github.com/iVis-at-Bilkent/sbgnviz-js/",
-  "dependencies": {
-    "express": "4.14.0",
+  "peer-dependencies": {
     "jquery": "^2.2.4",
-    "qtip2": "~3.0.2",
-    "bootstrap": "3.3.7",
-    "jquery-expander": "1.7.0",
-    "cytoscape-panzoom": "~2.4.0",
-    "cytoscape-qtip": "~2.3.0",
     "filesaverjs": "~0.2.2",
-    "backbone": "1.3.3",
-    "underscore": "1.8.3",
-    "cytoscape-for-sbgnviz": "^2.7.11.2",
-    "cytoscape-cose-bilkent": "latest",
-    "cytoscape-undo-redo": "latest",
-    "cytoscape-expand-collapse": "latest",
-    "cytoscape-clipboard": "latest",
-    "cytoscape-edge-bend-editing": "latest",
-    "cytoscape-view-utilities": "latest",
-    "cytoscape-context-menus": "latest"
+    "cytoscape-for-sbgnviz": "^2.7.11.2"
   },
   "devDependencies": {
     "browserify": "^11.2.0",
@@ -49,7 +27,6 @@
     "run-sequence": "^1.1.4",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0",
-    "nodemon": "1.11.0",
-    "parallelshell": "^2.0.0"
+    "nodemon": "1.11.0"
   }
 }
