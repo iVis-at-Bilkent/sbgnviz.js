@@ -1,5 +1,5 @@
 /*
- * Common utilities for sbgn elements 
+ * Common utilities for elements includes both general utilities and sbgn specific utilities 
  */
 
 var truncateText = require('./text-utilities').truncateText;
@@ -8,7 +8,7 @@ var options = optionUtilities.getOptions();
 var libs = require('./lib-utilities').getLibs();
 var jQuery = $ = libs.jQuery;
 
-var sbgnElementUtilities = {
+var elementUtilities = {
     //the list of the element classes handled by the tool
     handledElements: {
         'unspecified entity': true,
@@ -120,6 +120,7 @@ var sbgnElementUtilities = {
     // Section Start
     // Element Filtering Utilities
     
+    // SBGN specific utilities
     getProcessesOfSelected: function(){
         var selectedEles = cy.elements(":selected");
         selectedEles = this.extendNodeList(selectedEles);
@@ -179,6 +180,7 @@ var sbgnElementUtilities = {
         nodesToShow = this.extendNodeList(nodesToShow);
         return nodesToShow;
     },
+    // general utilities
     noneIsNotHighlighted: function(){
         var notHighlightedNodes = cy.nodes(":visible").nodes(".unhighlighted");
         var notHighlightedEdges = cy.edges(":visible").edges(".unhighlighted");
@@ -192,21 +194,22 @@ var sbgnElementUtilities = {
     // Section Start
     // Add remove utilities
 
-    
-    restoreEles: function (eles) {
-        eles.restore();
-        return eles;
-    },
-    deleteElesSimple: function (eles) {
-      cy.elements().unselect();
-      return eles.remove();
-    },
+    // SBGN specific utilities
     deleteElesSmart: function (eles) {
       var allNodes = cy.nodes();
       cy.elements().unselect();
       var nodesToKeep = this.extendRemainingNodes(eles, allNodes);
       var nodesNotToKeep = allNodes.not(nodesToKeep);
       return nodesNotToKeep.remove();
+    },
+    deleteElesSimple: function (eles) {
+      cy.elements().unselect();
+      return eles.remove();
+    },
+    // general utilities
+    restoreEles: function (eles) {
+        eles.restore();
+        return eles;
     },
     
     // Section End
@@ -215,6 +218,7 @@ var sbgnElementUtilities = {
     // Section Start
     // Stylesheet helpers
     
+    // SBGN specific utilities
     getCyShape: function(ele) {
         var shape = ele.data('sbgnclass');
         if (shape.endsWith(' multimer')) {
@@ -338,27 +342,6 @@ var sbgnElementUtilities = {
 
       return this.getDynamicLabelTextSize(ele);
     },
-    getDynamicLabelTextSize: function (ele, dynamicLabelSizeCoefficient) {
-      var dynamicLabelSize = options.dynamicLabelSize;
-      dynamicLabelSize = typeof dynamicLabelSize === 'function' ? dynamicLabelSize.call() : dynamicLabelSize;
-
-      if (dynamicLabelSizeCoefficient === undefined) {
-        if (dynamicLabelSize == 'small') {
-          dynamicLabelSizeCoefficient = 0.75;
-        }
-        else if (dynamicLabelSize == 'regular') {
-          dynamicLabelSizeCoefficient = 1;
-        }
-        else if (dynamicLabelSize == 'large') {
-          dynamicLabelSizeCoefficient = 1.25;
-        }
-      }
-      
-      var h = ele.height();
-      var textHeight = parseInt(h / 2.45) * dynamicLabelSizeCoefficient;
-
-      return textHeight;
-    },
     getCardinalityDistance: function (ele) {
       var srcPos = ele.source().position();
       var tgtPos = ele.target().position();
@@ -437,10 +420,32 @@ var sbgnElementUtilities = {
         }
       }
       return contentHtml;
-    }
+    },
+    // general utilities
+    getDynamicLabelTextSize: function (ele, dynamicLabelSizeCoefficient) {
+      var dynamicLabelSize = options.dynamicLabelSize;
+      dynamicLabelSize = typeof dynamicLabelSize === 'function' ? dynamicLabelSize.call() : dynamicLabelSize;
+
+      if (dynamicLabelSizeCoefficient === undefined) {
+        if (dynamicLabelSize == 'small') {
+          dynamicLabelSizeCoefficient = 0.75;
+        }
+        else if (dynamicLabelSize == 'regular') {
+          dynamicLabelSizeCoefficient = 1;
+        }
+        else if (dynamicLabelSize == 'large') {
+          dynamicLabelSizeCoefficient = 1.25;
+        }
+      }
+      
+      var h = ele.height();
+      var textHeight = parseInt(h / 2.45) * dynamicLabelSizeCoefficient;
+
+      return textHeight;
+    },
     
     // Section End
     // Stylesheet helpers
 };
 
-module.exports = sbgnElementUtilities;
+module.exports = elementUtilities;

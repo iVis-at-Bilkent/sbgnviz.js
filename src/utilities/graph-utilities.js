@@ -1,5 +1,4 @@
 /*
- * 
  * Common utilities for sbgnviz graphs
  */
 
@@ -8,12 +7,9 @@ var options = optionUtilities.getOptions();
 var libs = require('./lib-utilities').getLibs();
 var jQuery = $ = libs.jQuery;
 
-/*
- * Graph utilities for sbgn
- */
-function sbgnGraphUtilities() {}
+function graphUtilities() {}
 
-sbgnGraphUtilities.sbgnvizUpdate = function(cyGraph) {
+graphUtilities.sbgnvizUpdate = function(cyGraph) {
   console.log('cy update called');
   $( document ).trigger( "sbgnvizUpdateStart" );
   // Reset undo/redo stack and buttons when a new graph is loaded
@@ -51,7 +47,7 @@ sbgnGraphUtilities.sbgnvizUpdate = function(cyGraph) {
   $( document ).trigger( "sbgnvizUpdateEnd" );
 };
 
-sbgnGraphUtilities.calculatePaddings = function(paddingPercent) {
+graphUtilities.calculatePaddings = function(paddingPercent) {
   //As default use the compound padding value
   if (!paddingPercent) {
     var compoundPadding = options.compoundPadding;
@@ -78,7 +74,7 @@ sbgnGraphUtilities.calculatePaddings = function(paddingPercent) {
   return calc_padding;
 };
 
-sbgnGraphUtilities.refreshPaddings = function() {
+graphUtilities.refreshPaddings = function() {
   var calc_padding = this.calculatePaddings();
   var nodes = cy.nodes();
   var compounds = nodes.filter('$node > node');
@@ -90,4 +86,4 @@ sbgnGraphUtilities.refreshPaddings = function() {
   cy.endBatch();
 };
 
-module.exports = sbgnGraphUtilities;
+module.exports = graphUtilities;

@@ -5,8 +5,8 @@
 var sbgnmlToJson = require('./sbgnml-to-json-converter');
 var jsonToSbgnml = require('./json-to-sbgnml-converter');
 var uiUtilities = require('./ui-utilities');
-var sbgnGraphUtilities = require('./sbgn-graph-utilities');
-var sbgnvizUpdate = sbgnGraphUtilities.sbgnvizUpdate.bind(sbgnGraphUtilities);
+var graphUtilities = require('./graph-utilities');
+var sbgnvizUpdate = graphUtilities.sbgnvizUpdate.bind(graphUtilities);
 
 var libs = require('./lib-utilities').getLibs();
 var jQuery = $ = libs.jQuery;

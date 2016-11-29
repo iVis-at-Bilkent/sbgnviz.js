@@ -18,19 +18,19 @@
     // Utilities whose functions will be exposed seperately
     var uiUtilities = require('./utilities/ui-utilities');
     var fileUtilities = require('./utilities/file-utilities');
-    var sbgnGraphUtilities = require('./utilities/sbgn-graph-utilities');
+    var graphUtilities = require('./utilities/graph-utilities');
     var mainUtilities = require('./utilities/main-utilities');
     require('./utilities/keyboard-input-utilities'); // require keybord input utilities
     // Utilities to be exposed as is
-    var sbgnElementUtilities = require('./utilities/sbgn-element-utilities');
+    var elementUtilities = require('./utilities/element-utilities');
     var undoRedoActionFunctions = require('./utilities/undo-redo-action-functions');
     
     sbgnRenderer();
     sbgnCyInstance();
     
     // Expose the api
-    // Expose sbgnElementUtilities and undoRedoActionFunctions as is, most users will not need these
-    sbgnviz.sbgnElementUtilities = sbgnElementUtilities;
+    // Expose elementUtilities and undoRedoActionFunctions as is, most users will not need these
+    sbgnviz.elementUtilities = elementUtilities;
     sbgnviz.undoRedoActionFunctions = undoRedoActionFunctions;
     
     // Expose each main utility seperately
@@ -49,8 +49,8 @@
     }
     
     // Expose each sbgn graph utility seperately
-    for (var prop in sbgnGraphUtilities) {
-      sbgnviz[prop] = sbgnGraphUtilities[prop];
+    for (var prop in graphUtilities) {
+      sbgnviz[prop] = graphUtilities[prop];
     }
   };
   

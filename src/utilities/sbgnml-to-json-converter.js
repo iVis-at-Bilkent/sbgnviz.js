@@ -1,4 +1,4 @@
-var sbgnElementUtilities = require('./sbgn-element-utilities');
+var elementUtilities = require('./element-utilities');
 var libs = require('./lib-utilities').getLibs();
 var jQuery = $ = libs.jQuery;
 
@@ -172,7 +172,7 @@ var sbgnmlToJson = {
     jsonArray.push(cytoscapeJsNode);
   },
   traverseNodes: function (ele, jsonArray, parent, compartments) {
-    if (!sbgnElementUtilities.handledElements[$(ele).attr('class')]) {
+    if (!elementUtilities.handledElements[$(ele).attr('class')]) {
       return;
     }
     this.insertedNodes[$(ele).attr('id')] = true;
@@ -244,7 +244,7 @@ var sbgnmlToJson = {
     return bendPointPositions;
   },
   addCytoscapeJsEdge: function (ele, jsonArray, xmlObject) {
-    if (!sbgnElementUtilities.handledElements[$(ele).attr('class')]) {
+    if (!elementUtilities.handledElements[$(ele).attr('class')]) {
       return;
     }
 

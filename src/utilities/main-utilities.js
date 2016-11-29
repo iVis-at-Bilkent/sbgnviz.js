@@ -3,7 +3,7 @@
  * Idealy, this file is just required by index.js
  */
 
-var sbgnElementUtilities = require('./sbgn-element-utilities');
+var elementUtilities = require('./element-utilities');
 var jsonToSbgnml = require('./json-to-sbgnml-converter');
 var sbgnmlToJson = require('./sbgnml-to-json-converter');
 var optionUtilities = require('./option-utilities');
@@ -194,12 +194,12 @@ mainUtilities.deleteElesSmart = function(eles) {
     });
   }
   else {
-    sbgnElementUtilities.deleteElesSmart(eles);
+    elementUtilities.deleteElesSmart(eles);
   }
 };
 
 mainUtilities.highlightNeighbours = function(eles) {
-  var elesToHighlight = sbgnElementUtilities.getNeighboursOfEles(eles);
+  var elesToHighlight = elementUtilities.getNeighboursOfEles(eles);
   if (elesToHighlight.length === 0) {
     return;
   }
@@ -233,7 +233,7 @@ mainUtilities.searchByLabel = function(label) {
     return;
   }
 
-  nodesToHighlight = sbgnElementUtilities.extendNodeList(nodesToHighlight);
+  nodesToHighlight = elementUtilities.extendNodeList(nodesToHighlight);
   
   if (options.undoable) {
     cy.undoRedo().do("highlight", nodesToHighlight);
@@ -244,7 +244,7 @@ mainUtilities.searchByLabel = function(label) {
 };
 
 mainUtilities.highlightProcesses = function(eles) {
-  var elesToHighlight = sbgnElementUtilities.extendNodeList(eles);
+  var elesToHighlight = elementUtilities.extendNodeList(eles);
   if (elesToHighlight.length === 0) {
     return;
   }
@@ -263,7 +263,7 @@ mainUtilities.highlightProcesses = function(eles) {
 };
 
 mainUtilities.removeHighlights = function() {
-  if (sbgnElementUtilities.noneIsNotHighlighted()) {
+  if (elementUtilities.noneIsNotHighlighted()) {
     return;
   }
   
@@ -299,7 +299,7 @@ mainUtilities.convertSbgnmlToJson = function(data) {
 };
 
 mainUtilities.getQtipContent = function(node) {
-  return sbgnElementUtilities.getQtipContent(node);
+  return elementUtilities.getQtipContent(node);
 };
 
 module.exports = mainUtilities;

@@ -1,7 +1,7 @@
-var sbgnElementUtilities = require('../utilities/sbgn-element-utilities');
-var sbgnGraphUtilities = require('../utilities/sbgn-graph-utilities');
+var elementUtilities = require('../utilities/element-utilities');
+var graphUtilities = require('../utilities/graph-utilities');
 var undoRedoActionFunctions = require('../utilities/undo-redo-action-functions');
-var refreshPaddings = sbgnGraphUtilities.refreshPaddings.bind(sbgnGraphUtilities);
+var refreshPaddings = graphUtilities.refreshPaddings.bind(graphUtilities);
 
 var libs = require('../utilities/lib-utilities').getLibs();
 var jQuery = $ = libs.jQuery;
@@ -58,7 +58,7 @@ module.exports = function () {
       //The children info of complex nodes should be shown when they are collapsed
       if (node._private.data.sbgnclass == "complex") {
         //The node is being collapsed store infolabel to use it later
-        var infoLabel = sbgnElementUtilities.getInfoLabel(node);
+        var infoLabel = elementUtilities.getInfoLabel(node);
         node._private.data.infoLabel = infoLabel;
       }
 
@@ -106,10 +106,10 @@ module.exports = function () {
           .selector("node")
           .css({
             'content': function (ele) {
-              return sbgnElementUtilities.getElementContent(ele);
+              return elementUtilities.getElementContent(ele);
             },
             'font-size': function (ele) {
-              return sbgnElementUtilities.getLabelTextSize(ele);
+              return elementUtilities.getLabelTextSize(ele);
             },
             'text-valign': 'center',
             'text-halign': 'center',
@@ -138,7 +138,7 @@ module.exports = function () {
           .selector("node[sbgnclass]")
           .css({
             'shape': function (ele) {
-              return sbgnElementUtilities.getCyShape(ele);
+              return elementUtilities.getCyShape(ele);
             }
           })
           .selector("node[sbgnclass='perturbing agent']")
@@ -237,7 +237,7 @@ module.exports = function () {
             },
             'source-text-margin-y': '-10',
             'source-text-offset': function (ele) {
-              return sbgnElementUtilities.getCardinalityDistance(ele);
+              return elementUtilities.getCardinalityDistance(ele);
             }
           })
           .selector("edge[sbgnclass='production'][sbgncardinality > 0]")
@@ -247,13 +247,13 @@ module.exports = function () {
             },
             'target-text-margin-y': '-10',
             'target-text-offset': function (ele) {
-              return sbgnElementUtilities.getCardinalityDistance(ele);
+              return elementUtilities.getCardinalityDistance(ele);
             }
           })
           .selector("edge[sbgnclass]")
           .css({
             'target-arrow-shape': function (ele) {
-              return sbgnElementUtilities.getCyArrowShape(ele);
+              return elementUtilities.getCyArrowShape(ele);
             },
             'source-arrow-shape': 'none'
           })
