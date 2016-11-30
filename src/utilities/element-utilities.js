@@ -310,7 +310,7 @@ var elementUtilities = {
             content = '?';
         }
 
-        var textWidth = ele.css('width') ? parseFloat(ele.css('width')) : ele.data('bbox').w;
+        var textWidth = ele.width() || ele.data('bbox').w;
 
         var textProp = {
             label: content,
