@@ -33,7 +33,9 @@ graphUtilities.sbgnvizUpdate = function(cyGraph) {
 
   cy.layout({
     name: 'preset',
-    positions: positionMap
+    positions: positionMap,
+    fit: true,
+    padding: 50
   });
 
   this.refreshPaddings();
