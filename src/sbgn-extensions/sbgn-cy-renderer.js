@@ -10,11 +10,55 @@ var cytoscape = libs.cytoscape;
 var cyMath = cytoscape.math;
 var cyBaseNodeShapes = cytoscape.baseNodeShapes;
 var cyStyleProperties = cytoscape.styleProperties;
-var cyDrawingShapes = cytoscape.drawingShapes;
 var cyBaseArrowShapes = cytoscape.baseArrowShapes;
 
 module.exports = function () {
   var $$ = cytoscape;
+  
+  // Taken from cytoscape.js and modified
+  var drawRoundRectanglePath = function(
+    context, x, y, width, height, radius ){
+
+    var halfWidth = width / 2;
+    var halfHeight = height / 2;
+    var cornerRadius = radius || cyMath.getRoundRectangleRadius( width, height );
+
+    if( context.beginPath ){ context.beginPath(); }
+
+    // Start at top middle
+    context.moveTo( x, y - halfHeight );
+    // Arc from middle top to right side
+    context.arcTo( x + halfWidth, y - halfHeight, x + halfWidth, y, cornerRadius );
+    // Arc from right side to bottom
+    context.arcTo( x + halfWidth, y + halfHeight, x, y + halfHeight, cornerRadius );
+    // Arc from bottom to left side
+    context.arcTo( x - halfWidth, y + halfHeight, x - halfWidth, y, cornerRadius );
+    // Arc from left side to topBorder
+    context.arcTo( x - halfWidth, y - halfHeight, x, y - halfHeight, cornerRadius );
+    // Join line
+    context.lineTo( x, y - halfHeight );
+
+
+    context.closePath();
+  };
+  
+  // Taken from cytoscape.js
+  var drawPolygonPath = function(
+    context, x, y, width, height, points ){
+
+    var halfW = width / 2;
+    var halfH = height / 2;
+
+    if( context.beginPath ){ context.beginPath(); }
+
+    context.moveTo( x + halfW * points[0], y + halfH * points[1] );
+
+    for( var i = 1; i < points.length / 2; i++ ){
+      context.lineTo( x + halfW * points[ i * 2], y + halfH * points[ i * 2 + 1] );
+    }
+
+    context.closePath();
+  };
   
   var sbgnShapes = $$.sbgn.sbgnShapes = {
     'source and sink': true,
@@ -122,7 +166,7 @@ module.exports = function () {
             'width': stateWidth, 'height': stateHeight};
 
           if (state.clazz == "state variable") {//draw ellipse
-            cyDrawingShapes.drawRoundRectanglePath(context,
+            drawRoundRectanglePath(context,
                     stateCenterX, stateCenterY,
                     stateWidth, stateHeight, Math.min(stateWidth / 2, stateHeight / 2, stateVarRadius));
             context.fill();
@@ -130,7 +174,7 @@ module.exports = function () {
             textProp.state = state.state;
             $$.sbgn.drawStateText(context, textProp);
           } else if (state.clazz == "unit of information") {//draw rectangle
-            cyDrawingShapes.drawRoundRectanglePath(context,
+            drawRoundRectanglePath(context,
                     stateCenterX, stateCenterY,
                     stateWidth, stateHeight,
                     Math.min(stateWidth / 2, stateHeight / 2, unitOfInfoRadius));
@@ -151,7 +195,7 @@ module.exports = function () {
             'width': stateWidth, 'height': stateHeight};
 
           if (state.clazz == "state variable") {//draw ellipse
-            cyDrawingShapes.drawRoundRectanglePath(context,
+            drawRoundRectanglePath(context,
                     stateCenterX, stateCenterY,
                     stateWidth, stateHeight, Math.min(stateWidth / 2, stateHeight / 2, stateVarRadius));
             context.fill();
@@ -159,7 +203,7 @@ module.exports = function () {
             textProp.state = state.state;
             $$.sbgn.drawStateText(context, textProp);
           } else if (state.clazz == "unit of information") {//draw rectangle
-            cyDrawingShapes.drawRoundRectanglePath(context,
+            drawRoundRectanglePath(context,
                     stateCenterX, stateCenterY,
                     stateWidth, stateHeight,
                     Math.min(stateWidth / 2, stateHeight / 2, unitOfInfoRadius));
@@ -259,7 +303,7 @@ module.exports = function () {
 
       if (state.clazz == "state variable") {//draw ellipse
         //var stateLabel = state.state.value;
-        cyDrawingShapes.drawRoundRectanglePath(context, stateCenterX, stateCenterY,
+        drawRoundRectanglePath(context, stateCenterX, stateCenterY,
                 stateWidth, stateHeight, Math.min(stateWidth / 2, stateHeight / 2, stateVarRadius));
 
         context.fill();
@@ -269,7 +313,7 @@ module.exports = function () {
         context.stroke();
 
       } else if (state.clazz == "unit of information") {//draw rectangle
-        cyDrawingShapes.drawRoundRectanglePath(context,
+        drawRoundRectanglePath(context,
                 stateCenterX, stateCenterY,
                 stateWidth, stateHeight,
                 Math.min(stateWidth / 2, stateHeight / 2, unitOfInfoRadius));
@@ -556,7 +600,7 @@ module.exports = function () {
         var centerY = node._private.position.y;
         var padding = parseInt(node.css('border-width')) / 2;
 
-        cyDrawingShapes.drawPolygonPath(context,
+        drawPolygonPath(context,
                 centerX, centerY,
                 width, height,
                 cyBaseNodeShapes['process'].points);
@@ -791,7 +835,7 @@ module.exports = function () {
         //check whether sbgn class includes multimer substring or not
         if ($$.sbgn.isMultimer(node)) {
           //add multimer shape
-          cyDrawingShapes.drawRoundRectanglePath(context,
+          drawRoundRectanglePath(context,
                   centerX + multimerPadding, centerY + multimerPadding,
                   width, height);
 
@@ -806,7 +850,7 @@ module.exports = function () {
           //context.stroke();
         }
 
-        cyDrawingShapes.drawRoundRectanglePath(context,
+        drawRoundRectanglePath(context,
                 centerX, centerY,
                 width, height);
         context.fill();
@@ -1030,7 +1074,7 @@ module.exports = function () {
         //check whether sbgn class includes multimer substring or not
         if ($$.sbgn.isMultimer(node)) {
           //add multimer shape
-          cyDrawingShapes.drawPolygonPath(context,
+          drawPolygonPath(context,
                   centerX + multimerPadding, centerY + multimerPadding,
                   width, height, cyBaseNodeShapes["complex"].points);
           context.fill();
@@ -1045,7 +1089,7 @@ module.exports = function () {
           //context.stroke();
         }
 
-        cyDrawingShapes.drawPolygonPath(context,
+        drawPolygonPath(context,
                 centerX, centerY,
                 width, height, cyBaseNodeShapes["complex"].points);
         context.fill();
@@ -1358,7 +1402,7 @@ module.exports = function () {
         var cloneWidth = width - 2 * cornerRadius;
         var cloneHeight = cornerRadius / 2;
 
-        cyDrawingShapes.drawPolygonPath(context, cloneX, cloneY, cloneWidth, cloneHeight, recPoints);
+        drawPolygonPath(context, cloneX, cloneY, cloneWidth, cloneHeight, recPoints);
         context.fill();
         context.fillStyle = oldStyle;
         context.globalAlpha = oldGlobalAlpha;
@@ -1435,7 +1479,7 @@ module.exports = function () {
         var oldGlobalAlpha = context.globalAlpha;
         context.globalAlpha = opacity;
 
-        cyDrawingShapes.drawPolygonPath(context,
+        drawPolygonPath(context,
                 cloneX, cloneY,
                 cloneWidth, cloneHeight, markerPoints);
         context.fill();
