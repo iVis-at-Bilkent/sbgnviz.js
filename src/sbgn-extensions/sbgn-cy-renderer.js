@@ -244,7 +244,7 @@ module.exports = function () {
 
 
   $$.sbgn.drawStateAndInfos = function (node, context, centerX, centerY) {
-    var stateAndInfos = node._private.data.sbgnstatesandinfos;
+    var stateAndInfos = node._private.data.statesandinfos;
 
     for (var i = 0; i < stateAndInfos.length && i < 4; i++) {
       var state = stateAndInfos[i];
@@ -475,7 +475,7 @@ module.exports = function () {
   };
 
   $$.sbgn.isMultimer = function (node) {
-    var sbgnClass = node._private.data.sbgnclass;
+    var sbgnClass = node._private.data.class;
     if (sbgnClass && sbgnClass.indexOf("multimer") != -1)
       return true;
     return false;
@@ -611,9 +611,9 @@ module.exports = function () {
 
         var width = node.width();
         var height = node.height();
-        var sbgnClass = node._private.data.sbgnclass;
-        var label = node._private.data.sbgnlabel;
-        var cloneMarker = node._private.data.sbgnclonemarker;
+        var sbgnClass = node._private.data.class;
+        var label = node._private.data.label;
+        var cloneMarker = node._private.data.clonemarker;
 
         $$.sbgn.drawEllipse(context, centerX, centerY, width, height);
 
@@ -677,9 +677,9 @@ module.exports = function () {
         var width = node.width();
         var height = node.height();
         var multimerPadding = cyBaseNodeShapes["simple chemical"].multimerPadding;
-        var label = node._private.data.sbgnlabel;
+        var label = node._private.data.label;
         var padding = parseInt(node.css('border-width'));
-        var cloneMarker = node._private.data.sbgnclonemarker;
+        var cloneMarker = node._private.data.clonemarker;
 
         if ($$.sbgn.isMultimer(node)) {
           //add multimer shape
@@ -783,9 +783,9 @@ module.exports = function () {
         var height = node.height();
         var centerX = node._private.position.x;
         var centerY = node._private.position.y;
-        var label = node._private.data.sbgnlabel;
+        var label = node._private.data.label;
         var multimerPadding = cyBaseNodeShapes["macromolecule"].multimerPadding;
-        var cloneMarker = node._private.data.sbgnclonemarker;
+        var cloneMarker = node._private.data.clonemarker;
         var padding = parseInt(node.css('border-width'));
 
         //check whether sbgn class includes multimer substring or not
@@ -1018,11 +1018,11 @@ module.exports = function () {
         var height = hasChildren ? node.outerHeight() : node.height();
         var centerX = node._private.position.x;
         var centerY = node._private.position.y;
-        var stateAndInfos = node._private.data.sbgnstatesandinfos;
-        var label = node._private.data.sbgnlabel;
+        var stateAndInfos = node._private.data.statesandinfos;
+        var label = node._private.data.label;
         var cornerLength = cyBaseNodeShapes["complex"].cornerLength;
         var multimerPadding = cyBaseNodeShapes["complex"].multimerPadding;
-        var cloneMarker = node._private.data.sbgnclonemarker;
+        var cloneMarker = node._private.data.clonemarker;
 
         cyBaseNodeShapes["complex"].points = $$.sbgn.generateComplexShapePoints(cornerLength,
                 width, height);
@@ -1150,10 +1150,10 @@ module.exports = function () {
         ;
         var width = node.width();
         var height = node.height();
-        var label = node._private.data.sbgnlabel;
+        var label = node._private.data.label;
         var cornerRadius = cyMath.getRoundRectangleRadius(width, height);
         var multimerPadding = cyBaseNodeShapes["nucleic acid feature"].multimerPadding;
-        var cloneMarker = node._private.data.sbgnclonemarker;
+        var cloneMarker = node._private.data.clonemarker;
 
         //check whether sbgn class includes multimer substring or not
         if ($$.sbgn.isMultimer(node)) {
@@ -1257,9 +1257,9 @@ module.exports = function () {
 
         var width = node.width();
         var height = node.height();
-        var label = node._private.data.sbgnlabel;
+        var label = node._private.data.label;
         var pts = cyBaseNodeShapes["source and sink"].points;
-        var cloneMarker = node._private.data.sbgnclonemarker;
+        var cloneMarker = node._private.data.clonemarker;
 
         $$.sbgn.drawEllipse(context, centerX, centerY,
                 width, height);
@@ -1781,7 +1781,7 @@ module.exports = function () {
     var centerY = node._private.position.y;
     var padding = parseInt(node.css('border-width')) / 2;
 
-    var stateAndInfos = node._private.data.sbgnstatesandinfos;
+    var stateAndInfos = node._private.data.statesandinfos;
 
     var stateCount = 0, infoCount = 0;
 
@@ -1822,7 +1822,7 @@ module.exports = function () {
     var centerX = node._private.position.x;
     var centerY = node._private.position.y;
     var padding =parseInt(node.css('border-width')) / 2;
-    var stateAndInfos = node._private.data.sbgnstatesandinfos;
+    var stateAndInfos = node._private.data.statesandinfos;
 
     var stateCount = 0, infoCount = 0;
 //    threshold = parseFloat(threshold);

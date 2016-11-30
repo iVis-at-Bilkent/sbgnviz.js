@@ -65,7 +65,7 @@ mainUtilities.collapseNodes = function(nodes) {
 };
 
 mainUtilities.collapseComplexes = function() {
-  var complexes = cy.nodes("[sbgnclass='complex']");
+  var complexes = cy.nodes("[class='complex']");
   if (complexes.collapsibleNodes().length == 0) {
     return;
   }
@@ -81,7 +81,7 @@ mainUtilities.collapseComplexes = function() {
 };
 
 mainUtilities.expandComplexes = function() {
-  var nodes = cy.nodes(":selected").filter("[sbgnclass='complex'][expanded-collapsed='collapsed']");
+  var nodes = cy.nodes(":selected").filter("[class='complex'][expanded-collapsed='collapsed']");
   if (nodes.expandableNodes().length == 0) {
     return;
   }
@@ -223,7 +223,7 @@ mainUtilities.searchByLabel = function(label) {
   }
   
   var nodesToHighlight = cy.nodes(":visible").filter(function (i, ele) {
-    if (ele.data("sbgnlabel") && ele.data("sbgnlabel").toLowerCase().indexOf(label) >= 0) {
+    if (ele.data("label") && ele.data("label").toLowerCase().indexOf(label) >= 0) {
       return true;
     }
     return false;

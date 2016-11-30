@@ -29,7 +29,7 @@ var jsonToSbgnml = {
         var self = this;
         var sbgnmlText = "";
 
-        if(node._private.data.sbgnclass === "compartment"){
+        if(node._private.data.class === "compartment"){
             sbgnmlText = sbgnmlText +
                 "<glyph id='" + node._private.data.id + "' class='compartment' ";
 
@@ -48,13 +48,13 @@ var jsonToSbgnml = {
                 sbgnmlText = sbgnmlText + self.getGlyphSbgnml(this);
             });
         }
-        else if(node._private.data.sbgnclass === "complex" || node._private.data.sbgnclass === "submap"){
+        else if(node._private.data.class === "complex" || node._private.data.class === "submap"){
             sbgnmlText = sbgnmlText +
-                "<glyph id='" + node._private.data.id + "' class='" + node._private.data.sbgnclass + "' ";
+                "<glyph id='" + node._private.data.id + "' class='" + node._private.data.class + "' ";
 
             if(node.parent().isParent()){
                 var parent = node.parent()[0];
-                if(parent._private.data.sbgnclass == "compartment")
+                if(parent._private.data.class == "compartment")
                     sbgnmlText = sbgnmlText + " compartmentRef='" + parent._private.data.id + "'";
             }
             sbgnmlText = sbgnmlText + " >\n";
@@ -69,11 +69,11 @@ var jsonToSbgnml = {
         }
         else{//it is a simple node
             sbgnmlText = sbgnmlText +
-                "<glyph id='" + node._private.data.id + "' class='" + node._private.data.sbgnclass + "'";
+                "<glyph id='" + node._private.data.id + "' class='" + node._private.data.class + "'";
 
             if(node.parent().isParent()){
                 var parent = node.parent()[0];
-                if(parent._private.data.sbgnclass == "compartment")
+                if(parent._private.data.class == "compartment")
                     sbgnmlText = sbgnmlText + " compartmentRef='" + parent._private.data.id + "'";
             }
 
@@ -106,7 +106,7 @@ var jsonToSbgnml = {
 
     addClone : function(node){
         var sbgnmlText = "";
-        if(typeof node._private.data.sbgnclonemarker != 'undefined')
+        if(typeof node._private.data.clonemarker != 'undefined')
             sbgnmlText = sbgnmlText + "<clone/>\n";
         return sbgnmlText;
     },
@@ -114,8 +114,8 @@ var jsonToSbgnml = {
     getStateAndInfoSbgnml : function(node){
         var sbgnmlText = "";
 
-        for(var i = 0 ; i < node._private.data.sbgnstatesandinfos.length ; i++){
-            var boxGlyph = node._private.data.sbgnstatesandinfos[i];
+        for(var i = 0 ; i < node._private.data.statesandinfos.length ; i++){
+            var boxGlyph = node._private.data.statesandinfos[i];
             if(boxGlyph.clazz === "state variable"){
                 sbgnmlText = sbgnmlText + this.addStateBoxGlyph(boxGlyph, node);
             }
@@ -144,7 +144,7 @@ var jsonToSbgnml = {
         sbgnmlText = sbgnmlText + "<arc id='" + arcId +
             "' target='" + arcTarget +
             "' source='" + arcSource + "' class='" +
-            edge._private.data.sbgnclass + "'>\n";
+            edge._private.data.class + "'>\n";
 
         sbgnmlText = sbgnmlText + "<start y='" + edge._private.rscratch.startY + "' x='" +
             edge._private.rscratch.startX + "'/>\n";
@@ -203,7 +203,7 @@ var jsonToSbgnml = {
     },
 
     addLabel : function(node){
-        var label = node._private.data.sbgnlabel;
+        var label = node._private.data.label;
 
         if(typeof label != 'undefined')
             return "<label text='" + label + "' />\n";

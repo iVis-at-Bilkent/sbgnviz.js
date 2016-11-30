@@ -26,8 +26,8 @@ graphUtilities.sbgnvizUpdate = function(cyGraph) {
   //add position information to data for preset layout
   var positionMap = {};
   for (var i = 0; i < cyGraph.nodes.length; i++) {
-    var xPos = cyGraph.nodes[i].data.sbgnbbox.x;
-    var yPos = cyGraph.nodes[i].data.sbgnbbox.y;
+    var xPos = cyGraph.nodes[i].data.bbox.x;
+    var yPos = cyGraph.nodes[i].data.bbox.y;
     positionMap[cyGraph.nodes[i].data.id] = {'x': xPos, 'y': yPos};
   }
 

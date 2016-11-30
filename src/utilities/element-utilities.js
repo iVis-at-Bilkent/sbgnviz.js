@@ -133,7 +133,7 @@ var elementUtilities = {
     },
     getNeighboursOfEles: function(_eles){
         var eles = _eles;
-        eles = eles.add(eles.parents("node[sbgnclass='complex']"));
+        eles = eles.add(eles.parents("node[class='complex']"));
         eles = eles.add(eles.descendants());
         var neighborhoodEles = eles.neighborhood();
         var elesToReturn = eles.add(neighborhoodEles);
@@ -147,20 +147,20 @@ var elementUtilities = {
         //add parents
         nodesToShow = nodesToShow.add(nodesToShow.parents());
         //add complex children
-        nodesToShow = nodesToShow.add(nodesToShow.nodes("node[sbgnclass='complex']").descendants());
+        nodesToShow = nodesToShow.add(nodesToShow.nodes("node[class='complex']").descendants());
 
-        // var processes = nodesToShow.nodes("node[sbgnclass='process']");
-        // var nonProcesses = nodesToShow.nodes("node[sbgnclass!='process']");
-        // var neighborProcesses = nonProcesses.neighborhood("node[sbgnclass='process']");
+        // var processes = nodesToShow.nodes("node[class='process']");
+        // var nonProcesses = nodesToShow.nodes("node[class!='process']");
+        // var neighborProcesses = nonProcesses.neighborhood("node[class='process']");
 
         var processes = nodesToShow.filter(function(){
-            return $.inArray(this._private.data.sbgnclass, self.processTypes) >= 0;
+            return $.inArray(this._private.data.class, self.processTypes) >= 0;
         });
         var nonProcesses = nodesToShow.filter(function(){
-            return $.inArray(this._private.data.sbgnclass, self.processTypes) === -1;
+            return $.inArray(this._private.data.class, self.processTypes) === -1;
         });
         var neighborProcesses = nonProcesses.neighborhood().filter(function(){
-            return $.inArray(this._private.data.sbgnclass, self.processTypes) >= 0;
+            return $.inArray(this._private.data.class, self.processTypes) >= 0;
         });
 
         nodesToShow = nodesToShow.add(processes.neighborhood());
@@ -170,7 +170,7 @@ var elementUtilities = {
         //add parents
         nodesToShow = nodesToShow.add(nodesToShow.nodes().parents());
         //add children
-        nodesToShow = nodesToShow.add(nodesToShow.nodes("node[sbgnclass='complex']").descendants());
+        nodesToShow = nodesToShow.add(nodesToShow.nodes("node[class='complex']").descendants());
 
         return nodesToShow;
     },
@@ -220,68 +220,68 @@ var elementUtilities = {
     
     // SBGN specific utilities
     getCyShape: function(ele) {
-        var shape = ele.data('sbgnclass');
-        if (shape.endsWith(' multimer')) {
-            shape = shape.replace(' multimer', '');
+        var _class = ele.data('class');
+        if (_class.endsWith(' multimer')) {
+            _class = _class.replace(' multimer', '');
         }
 
-        if (shape == 'compartment') {
+        if (_class == 'compartment') {
             return 'roundrectangle';
         }
-        if (shape == 'phenotype') {
+        if (_class == 'phenotype') {
             return 'hexagon';
         }
-        if (shape == 'perturbing agent' || shape == 'tag') {
+        if (_class == 'perturbing agent' || _class == 'tag') {
             return 'polygon';
         }
-        if (shape == 'source and sink' || shape == 'nucleic acid feature' || shape == 'dissociation'
-            || shape == 'macromolecule' || shape == 'simple chemical' || shape == 'complex'
-            || shape == 'unspecified entity' || shape == 'process' || shape == 'omitted process'
-            || shape == 'uncertain process' || shape == 'association') {
-            return shape;
+        if (_class == 'source and sink' || _class == 'nucleic acid feature' || _class == 'dissociation'
+            || _class == 'macromolecule' || _class == 'simple chemical' || _class == 'complex'
+            || _class == 'unspecified entity' || _class == 'process' || _class == 'omitted process'
+            || _class == 'uncertain process' || _class == 'association') {
+            return _class;
         }
         return 'ellipse';
     },
     getCyArrowShape: function(ele) {
-        var sbgnclass = ele.data('sbgnclass');
-        if (sbgnclass == 'necessary stimulation') {
+        var _class = ele.data('class');
+        if (_class == 'necessary stimulation') {
             return 'necessary stimulation';
         }
-        if (sbgnclass == 'inhibition') {
+        if (_class == 'inhibition') {
             return 'tee';
         }
-        if (sbgnclass == 'catalysis') {
+        if (_class == 'catalysis') {
             return 'circle';
         }
-        if (sbgnclass == 'stimulation' || sbgnclass == 'production') {
+        if (_class == 'stimulation' || _class == 'production') {
             return 'triangle';
         }
-        if (sbgnclass == 'modulation') {
+        if (_class == 'modulation') {
             return 'diamond';
         }
         return 'none';
     },
     getElementContent: function(ele) {
-        var sbgnclass = ele.data('sbgnclass');
+        var _class = ele.data('class');
 
-        if (sbgnclass.endsWith(' multimer')) {
-            sbgnclass = sbgnclass.replace(' multimer', '');
+        if (_class.endsWith(' multimer')) {
+            _class = _class.replace(' multimer', '');
         }
 
         var content = "";
-        if (sbgnclass == 'macromolecule' || sbgnclass == 'simple chemical'
-            || sbgnclass == 'phenotype'
-            || sbgnclass == 'unspecified entity' || sbgnclass == 'nucleic acid feature'
-            || sbgnclass == 'perturbing agent' || sbgnclass == 'tag') {
-            content = ele.data('sbgnlabel') ? ele.data('sbgnlabel') : "";
+        if (_class == 'macromolecule' || _class == 'simple chemical'
+            || _class == 'phenotype'
+            || _class == 'unspecified entity' || _class == 'nucleic acid feature'
+            || _class == 'perturbing agent' || _class == 'tag') {
+            content = ele.data('label') ? ele.data('label') : "";
         }
-        else if(sbgnclass == 'compartment'){
-            content = ele.data('sbgnlabel') ? ele.data('sbgnlabel') : "";
+        else if(_class == 'compartment'){
+            content = ele.data('label') ? ele.data('label') : "";
         }
-        else if(sbgnclass == 'complex'){
+        else if(_class == 'complex'){
             if(ele.children().length == 0){
-                if(ele.data('sbgnlabel')){
-                    content = ele.data('sbgnlabel');
+                if(ele.data('label')){
+                    content = ele.data('label');
                 }
                 else if(ele.data('infoLabel')){
                     content = ele.data('infoLabel');
@@ -294,49 +294,49 @@ var elementUtilities = {
                 content = '';
             }
         }
-        else if (sbgnclass == 'and') {
+        else if (_class == 'and') {
             content = 'AND';
         }
-        else if (sbgnclass == 'or') {
+        else if (_class == 'or') {
             content = 'OR';
         }
-        else if (sbgnclass == 'not') {
+        else if (_class == 'not') {
             content = 'NOT';
         }
-        else if (sbgnclass == 'omitted process') {
+        else if (_class == 'omitted process') {
             content = '\\\\';
         }
-        else if (sbgnclass == 'uncertain process') {
+        else if (_class == 'uncertain process') {
             content = '?';
         }
 
-        var textWidth = ele.css('width') ? parseFloat(ele.css('width')) : ele.data('sbgnbbox').w;
+        var textWidth = ele.css('width') ? parseFloat(ele.css('width')) : ele.data('bbox').w;
 
         var textProp = {
             label: content,
-            width: ( sbgnclass==('complex') || sbgnclass==('compartment') )?textWidth * 2:textWidth
+            width: ( _class==('complex') || _class==('compartment') )?textWidth * 2:textWidth
         };
 
         var font = this.getLabelTextSize(ele) + "px Arial";
         return truncateText(textProp, font); //func. in the cytoscape.renderer.canvas.sbgn-renderer.js
     },
     getLabelTextSize: function (ele) {
-      var sbgnclass = ele.data('sbgnclass');
+      var _class = ele.data('class');
 
       // These types of nodes cannot have label but this is statement is needed as a workaround
-      if (sbgnclass === 'association' || sbgnclass === 'dissociation') {
+      if (_class === 'association' || _class === 'dissociation') {
         return 20;
       }
 
-      if (sbgnclass === 'and' || sbgnclass === 'or' || sbgnclass === 'not') {
+      if (_class === 'and' || _class === 'or' || _class === 'not') {
         return this.getDynamicLabelTextSize(ele, 1);
       }
 
-      if (sbgnclass.endsWith('process')) {
+      if (_class.endsWith('process')) {
         return this.getDynamicLabelTextSize(ele, 1.5);
       }
 
-      if (sbgnclass === 'complex' || sbgnclass === 'compartment') {
+      if (_class === 'complex' || _class === 'compartment') {
         return 16;
       }
 
@@ -358,10 +358,10 @@ var elementUtilities = {
       }
 
       /*
-       * If the node is simple then it's infolabel is equal to it's sbgnlabel
+       * If the node is simple then it's infolabel is equal to it's label
        */
       if (node.children() == null || node.children().length == 0) {
-        return node._private.data.sbgnlabel;
+        return node._private.data.label;
       }
 
       var children = node.children();
@@ -386,10 +386,10 @@ var elementUtilities = {
       return infoLabel;
     },
     getQtipContent: function(node) {
-      /* Check the sbgnlabel of the node if it is not valid
+      /* Check the label of the node if it is not valid
       * then check the infolabel if it is also not valid do not show qtip
       */
-      var label = node.data('sbgnlabel');
+      var label = node.data('label');
       if (label == null || label == "") {
         label = this.getInfoLabel(node);
       }
@@ -398,9 +398,9 @@ var elementUtilities = {
       }
       
       var contentHtml = "<b style='text-align:center;font-size:16px;'>" + label + "</b>";
-      var sbgnstatesandinfos = node._private.data.sbgnstatesandinfos;
-      for (var i = 0; i < sbgnstatesandinfos.length; i++) {
-        var sbgnstateandinfo = sbgnstatesandinfos[i];
+      var statesandinfos = node._private.data.statesandinfos;
+      for (var i = 0; i < statesandinfos.length; i++) {
+        var sbgnstateandinfo = statesandinfos[i];
         if (sbgnstateandinfo.clazz == "state variable") {
           var value = sbgnstateandinfo.state.value;
           var variable = sbgnstateandinfo.state.variable;

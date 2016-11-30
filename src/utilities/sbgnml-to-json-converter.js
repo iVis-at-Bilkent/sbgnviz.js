@@ -41,39 +41,39 @@ var sbgnmlToJson = {
     return false;
   },
   bboxProp: function (ele) {
-    var sbgnbbox = {};
+    var bbox = {};
     var bbox = ele.querySelector('bbox');
 
-    sbgnbbox.x = bbox.getAttribute('x');
-    sbgnbbox.y = bbox.getAttribute('y');
-    sbgnbbox.w = bbox.getAttribute('w');
-    sbgnbbox.h = bbox.getAttribute('h');
+    bbox.x = bbox.getAttribute('x');
+    bbox.y = bbox.getAttribute('y');
+    bbox.w = bbox.getAttribute('w');
+    bbox.h = bbox.getAttribute('h');
     // set positions as center
-    sbgnbbox.x = parseFloat(sbgnbbox.x) + parseFloat(sbgnbbox.w) / 2;
-    sbgnbbox.y = parseFloat(sbgnbbox.y) + parseFloat(sbgnbbox.h) / 2;
+    bbox.x = parseFloat(bbox.x) + parseFloat(bbox.w) / 2;
+    bbox.y = parseFloat(bbox.y) + parseFloat(bbox.h) / 2;
 
-    return sbgnbbox;
+    return bbox;
   },
   stateAndInfoBboxProp: function (ele, parentBbox) {
     var xPos = parseFloat(parentBbox.x);
     var yPos = parseFloat(parentBbox.y);
 
-    var sbgnbbox = {};
+    var bbox = {};
     var bbox = ele.querySelector('bbox');
 
-    sbgnbbox.x = bbox.getAttribute('x');
-    sbgnbbox.y = bbox.getAttribute('y');
-    sbgnbbox.w = bbox.getAttribute('w');
-    sbgnbbox.h = bbox.getAttribute('h');
+    bbox.x = bbox.getAttribute('x');
+    bbox.y = bbox.getAttribute('y');
+    bbox.w = bbox.getAttribute('w');
+    bbox.h = bbox.getAttribute('h');
 
     // set positions as center
-    sbgnbbox.x = parseFloat(sbgnbbox.x) + parseFloat(sbgnbbox.w) / 2 - xPos;
-    sbgnbbox.y = parseFloat(sbgnbbox.y) + parseFloat(sbgnbbox.h) / 2 - yPos;
+    bbox.x = parseFloat(bbox.x) + parseFloat(bbox.w) / 2 - xPos;
+    bbox.y = parseFloat(bbox.y) + parseFloat(bbox.h) / 2 - yPos;
 
-    sbgnbbox.x = sbgnbbox.x / parseFloat(parentBbox.w) * 100;
-    sbgnbbox.y = sbgnbbox.y / parseFloat(parentBbox.h) * 100;
+    bbox.x = bbox.x / parseFloat(parentBbox.w) * 100;
+    bbox.y = bbox.y / parseFloat(parentBbox.h) * 100;
 
-    return sbgnbbox;
+    return bbox;
   },
   findChildNodes: function (ele, childTagName) {
     // find child nodes at depth level of 1 relative to the element
@@ -165,23 +165,23 @@ var sbgnmlToJson = {
     // add id information
     nodeObj.id = ele.getAttribute('id');
     // add node bounding box information
-    nodeObj.sbgnbbox = self.bboxProp(ele);
+    nodeObj.bbox = self.bboxProp(ele);
     // add class information
-    nodeObj.sbgnclass = ele.className;
+    nodeObj.class = ele.className;
     // add label information
     var label = self.findChildNode(ele, 'label');
-    nodeObj.sbgnlabel = (label && label.getAttribute('text')) || undefined;
+    nodeObj.label = (label && label.getAttribute('text')) || undefined;
     // add state and info box information
-    nodeObj.sbgnstatesandinfos = self.stateAndInfoProp(ele, nodeObj.sbgnbbox);
+    nodeObj.statesandinfos = self.stateAndInfoProp(ele, nodeObj.bbox);
     // adding parent information
     self.addParentInfoToNode(ele, nodeObj, parent, compartments);
 
     // add clone information
     var cloneMarkers = self.findChildNodes(ele, 'clone');
     if (cloneMarkers.length > 0) {
-      nodeObj.sbgnclonemarker = true;
+      nodeObj.clonemarker = true;
     } else {
-      nodeObj.sbgnclonemarker = undefined;
+      nodeObj.clonemarker = undefined;
     }
 
     // add port information
@@ -191,11 +191,11 @@ var sbgnmlToJson = {
     for (var i = 0; i < portElements.length; i++) {
       var portEl = portElements[i];
       var id = portEl.getAttribute('id');
-      var relativeXPos = parseFloat(portEl.getAttribute('x')) - nodeObj.sbgnbbox.x;
-      var relativeYPos = parseFloat(portEl.getAttribute('y')) - nodeObj.sbgnbbox.y;
+      var relativeXPos = parseFloat(portEl.getAttribute('x')) - nodeObj.bbox.x;
+      var relativeYPos = parseFloat(portEl.getAttribute('y')) - nodeObj.bbox.y;
 
-      relativeXPos = relativeXPos / parseFloat(nodeObj.sbgnbbox.w) * 100;
-      relativeYPos = relativeYPos / parseFloat(nodeObj.sbgnbbox.h) * 100;
+      relativeXPos = relativeXPos / parseFloat(nodeObj.bbox.w) * 100;
+      relativeYPos = relativeYPos / parseFloat(nodeObj.bbox.h) * 100;
 
       ports.push({
         id: id,
@@ -337,18 +337,18 @@ var sbgnmlToJson = {
     var bendPointPositions = self.getArcBendPointPositions(ele);
 
     edgeObj.id = ele.getAttribute('id') || undefined;
-    edgeObj.sbgnclass = ele.className;
+    edgeObj.class = ele.className;
     edgeObj.bendPointPositions = bendPointPositions;
 
     var glyphChildren = self.findChildNodes(ele, 'glyph');
     var glyphDescendents = ele.querySelectorAll('glyph');
     if (glyphDescendents.length <= 0) {
-      edgeObj.sbgncardinality = 0;
+      edgeObj.cardinality = 0;
     } else {
       for (var i = 0; i < glyphChildren.length; i++) {
         if (glyphChildren[i].className === 'cardinality') {
           var label = glyphChildren[i].querySelector('label');
-          edgeObj.sbgncardinality = label.getAttribute('text') || undefined;
+          edgeObj.cardinality = label.getAttribute('text') || undefined;
         }
       }
     }

@@ -56,7 +56,7 @@ module.exports = function () {
     cy.on("beforeCollapse", "node", function (event) {
       var node = this;
       //The children info of complex nodes should be shown when they are collapsed
-      if (node._private.data.sbgnclass == "complex") {
+      if (node._private.data.class == "complex") {
         //The node is being collapsed store infolabel to use it later
         var infoLabel = elementUtilities.getInfoLabel(node);
         node._private.data.infoLabel = infoLabel;
@@ -80,7 +80,7 @@ module.exports = function () {
       var node = this;
       refreshPaddings();
 
-      if (node._private.data.sbgnclass == "complex") {
+      if (node._private.data.class == "complex") {
         node.addClass('changeContent');
       }
     });
@@ -94,7 +94,7 @@ module.exports = function () {
       var node = this;
       cy.nodes().updateCompoundBounds();
       //Don't show children info when the complex node is expanded
-      if (node._private.data.sbgnclass == "complex") {
+      if (node._private.data.class == "complex") {
         node.removeStyle('content');
       }
       
@@ -120,7 +120,7 @@ module.exports = function () {
             'text-opacity': 1,
             'opacity': 1
           })
-          .selector("node[?sbgnclonemarker][sbgnclass='perturbing agent']")
+          .selector("node[?clonemarker][class='perturbing agent']")
           .css({
             'background-image': imgPath + '/clone_bg.png',
             'background-position-x': '50%',
@@ -129,37 +129,37 @@ module.exports = function () {
             'background-height': '25%',
             'background-fit': 'none',
             'background-image-opacity': function (ele) {
-              if (!ele.data('sbgnclonemarker')) {
+              if (!ele.data('clonemarker')) {
                 return 0;
               }
               return ele.css('background-opacity');
             }
           })
-          .selector("node[sbgnclass]")
+          .selector("node[class]")
           .css({
             'shape': function (ele) {
               return elementUtilities.getCyShape(ele);
             }
           })
-          .selector("node[sbgnclass='perturbing agent']")
+          .selector("node[class='perturbing agent']")
           .css({
             'shape-polygon-points': '-1, -1,   -0.5, 0,  -1, 1,   1, 1,   0.5, 0, 1, -1'
           })
-          .selector("node[sbgnclass='tag']")
+          .selector("node[class='tag']")
           .css({
             'shape-polygon-points': '-1, -1,   0.25, -1,   1, 0,    0.25, 1,    -1, 1'
           })
-          .selector("node[sbgnclass='association']")
+          .selector("node[class='association']")
           .css({
             'background-color': '#6B6B6B'
           })
-          .selector("node[sbgnclass='complex']")
+          .selector("node[class='complex']")
           .css({
             'background-color': '#F4F3EE',
             'text-valign': 'bottom',
             'text-halign': 'center'
           })
-          .selector("node[sbgnclass='compartment']")
+          .selector("node[class='compartment']")
           .css({
             'border-width': 3.75,
             'background-opacity': 0,
@@ -167,10 +167,10 @@ module.exports = function () {
             'text-valign': 'bottom',
             'text-halign': 'center'
           })
-          .selector("node[sbgnbbox][sbgnclass][sbgnclass!='complex'][sbgnclass!='compartment'][sbgnclass!='submap']")
+          .selector("node[bbox][class][class!='complex'][class!='compartment'][class!='submap']")
           .css({
-            'width': 'data(sbgnbbox.w)',
-            'height': 'data(sbgnbbox.h)'
+            'width': 'data(bbox.w)',
+            'height': 'data(bbox.h)'
           })
           .selector("node[expanded-collapsed='collapsed']")
           .css({
@@ -221,7 +221,7 @@ module.exports = function () {
             'background-opacity': 0.7, 'overlay-color': '#d67614',
             'overlay-padding': '8'
           })
-          .selector("edge[sbgncardinality > 0]")
+          .selector("edge[cardinality > 0]")
           .css({
             'text-rotation': 'autorotate',
             'text-background-shape': 'rectangle',
@@ -230,38 +230,38 @@ module.exports = function () {
             'text-background-color': 'white',
             'text-background-opacity': '1'
           })
-          .selector("edge[sbgnclass='consumption'][sbgncardinality > 0]")
+          .selector("edge[class='consumption'][cardinality > 0]")
           .css({
             'source-label': function (ele) {
-              return '' + ele.data('sbgncardinality');
+              return '' + ele.data('cardinality');
             },
             'source-text-margin-y': '-10',
             'source-text-offset': function (ele) {
               return elementUtilities.getCardinalityDistance(ele);
             }
           })
-          .selector("edge[sbgnclass='production'][sbgncardinality > 0]")
+          .selector("edge[class='production'][cardinality > 0]")
           .css({
             'target-label': function (ele) {
-              return '' + ele.data('sbgncardinality');
+              return '' + ele.data('cardinality');
             },
             'target-text-margin-y': '-10',
             'target-text-offset': function (ele) {
               return elementUtilities.getCardinalityDistance(ele);
             }
           })
-          .selector("edge[sbgnclass]")
+          .selector("edge[class]")
           .css({
             'target-arrow-shape': function (ele) {
               return elementUtilities.getCyArrowShape(ele);
             },
             'source-arrow-shape': 'none'
           })
-          .selector("edge[sbgnclass='inhibition']")
+          .selector("edge[class='inhibition']")
           .css({
             'target-arrow-fill': 'filled'
           })
-          .selector("edge[sbgnclass='production']")
+          .selector("edge[class='production']")
           .css({
             'target-arrow-fill': 'filled'
           })
