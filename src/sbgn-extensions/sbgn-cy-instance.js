@@ -78,11 +78,13 @@ module.exports = function () {
 
     cy.on("afterCollapse", "node", function (event) {
       var node = this;
-      refreshPaddings();
-
-      if (node._private.data.class == "complex") {
-        node.addClass('changeContent');
-      }
+      // Normally simple nodes are expected to have no paddings but interestingly they have
+      // This problem may be caused by that we are not using original cytoscape.js the following
+      // lines should be removed when the problem is fixed.
+      node.css('padding-left', 0);
+      node.css('padding-right', 0);
+      node.css('padding-top', 0);
+      node.css('padding-bottom', 0);
     });
 
     cy.on("beforeExpand", "node", function (event) {
@@ -97,8 +99,8 @@ module.exports = function () {
       if (node._private.data.class == "complex") {
         node.removeStyle('content');
       }
-      
-      refreshPaddings();
+      // refresh the padding of node
+      refreshPaddings(false, node); 
     });
   }
 

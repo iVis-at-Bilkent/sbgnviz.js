@@ -38,7 +38,7 @@ graphUtilities.sbgnvizUpdate = function(cyGraph) {
     padding: 50
   });
 
-  this.refreshPaddings();
+  this.refreshPaddings(true);
   cy.endBatch();
 
   // Update the style
@@ -72,14 +72,22 @@ graphUtilities.calculatePaddings = function(paddingPercent) {
   if (calc_padding < 5) {
     calc_padding = 5;
   }
+  
+  this.calculatedPaddings = calc_padding;
 
   return calc_padding;
 };
 
-graphUtilities.refreshPaddings = function() {
-  var calc_padding = this.calculatePaddings();
-  var nodes = cy.nodes();
+graphUtilities.refreshPaddings = function(recalculatePaddings, nodes) {
+  // If it is not forced do not recalculate paddings
+  var calc_padding = recalculatePaddings ? this.calculatePaddings() : this.calculatedPaddings;
+  // Consider all nodes by default
+  if (!nodes) {
+    nodes = cy.nodes();
+  }
+  
   var compounds = nodes.filter('$node > node');
+  
   cy.startBatch();
   compounds.css('padding-left', calc_padding);
   compounds.css('padding-right', calc_padding);

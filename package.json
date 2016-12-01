@@ -1,5 +1,5 @@
 {
-  "name": "sbgnviz-js",
+  "name": "sbgnviz",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build-sbgnviz-js": "gulp build",
@@ -7,12 +7,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/iVis-at-Bilkent/sbgnviz-js.git"
+    "url": "https://github.com/iVis-at-Bilkent/sbgnviz.js.git"
   },
   "bugs": {
-    "url": "https://github.com/iVis-at-Bilkent/sbgnviz-js/issues"
+    "url": "https://github.com/iVis-at-Bilkent/sbgnviz.js/issues"
   },
-  "homepage": "https://github.com/iVis-at-Bilkent/sbgnviz-js/",
+  "homepage": "https://github.com/iVis-at-Bilkent/sbgnviz.js/",
   "peer-dependencies": {
     "jquery": "^2.2.4",
     "filesaverjs": "~0.2.2",
