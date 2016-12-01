@@ -6,7 +6,8 @@ SBGNViz is built by extending an open-source javascript graph theory library for
 
 ## Software
 
-<font color="#B3A31D">**A sample application using SBGNViz can be found [here](https://github.com/iVis-at-Bilkent/sbgnviz.js-sample-app)**</font>
+<font color="#B3A31D">**A sample application using SBGNViz can be found [here](http://www.cs.bilkent.edu.tr/~ivis/SBGNViz.js/sample-app/).**</font>
+<font color="#B3A31D">**The sample application source codes are available [here](https://github.com/iVis-at-Bilkent/sbgnviz.js-sample-app)**</font>
 
 SBGNViz is distributed under [GNU Lesser General Public License](http://www.gnu.org/licenses/lgpl.html). 
 
@@ -108,17 +109,13 @@ spinner will have. The default classname is 'default-class'. Requires 'fontaweso
 Ends any spinner having a css class with the given name. Requires 'fontawesome.css'.
 
 ## Events
-Triggered when a sample is being loaded
-`$(document).on('sbgnvizLoadSample', function(event, filename) { ... });`
+`$(document).on('sbgnvizLoadSample', function(event, filename) { ... });` Triggered when a sample is being loaded
 
-Triggered when an external sbgnml file is being loaded
-`$(document).on('sbgnvizLoadFile', function(event, filename) { ... });`
+`$(document).on('sbgnvizLoadFile', function(event, filename) { ... });` Triggered when an external sbgnml file is being loaded
 
-Triggered when the graph update is just started
-`$(document).on('updateGraphStart', function(event) { ... });`
+`$(document).on('updateGraphStart', function(event) { ... });` Triggered when the graph update is just started
 
-Triggered when the graph update is ended
-`$(document).on('updateGraphEnd', function(event) { ... });`
+`$(document).on('updateGraphEnd', function(event) { ... });` Triggered when the graph update is ended
 
 ## Default Options
 ```javascript
