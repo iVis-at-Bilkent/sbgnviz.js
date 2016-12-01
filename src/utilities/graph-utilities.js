@@ -9,9 +9,9 @@ var jQuery = $ = libs.jQuery;
 
 function graphUtilities() {}
 
-graphUtilities.sbgnvizUpdate = function(cyGraph) {
+graphUtilities.updateGraph = function(cyGraph) {
   console.log('cy update called');
-  $( document ).trigger( "sbgnvizUpdateStart" );
+  $( document ).trigger( "updateGraphStart" );
   // Reset undo/redo stack and buttons when a new graph is loaded
   if (options.undoable) {
     cy.undoRedo().reset();
@@ -46,7 +46,7 @@ graphUtilities.sbgnvizUpdate = function(cyGraph) {
   // Initilize the bend points once the elements are created
   cy.edgeBendEditing('get').initBendPoints(cy.edges());
   
-  $( document ).trigger( "sbgnvizUpdateEnd" );
+  $( document ).trigger( "updateGraphEnd" );
 };
 
 graphUtilities.calculatePaddings = function(paddingPercent) {

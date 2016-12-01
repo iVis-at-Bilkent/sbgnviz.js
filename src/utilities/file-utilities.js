@@ -6,7 +6,7 @@ var sbgnmlToJson = require('./sbgnml-to-json-converter');
 var jsonToSbgnml = require('./json-to-sbgnml-converter');
 var uiUtilities = require('./ui-utilities');
 var graphUtilities = require('./graph-utilities');
-var sbgnvizUpdate = graphUtilities.sbgnvizUpdate.bind(graphUtilities);
+var updateGraph = graphUtilities.updateGraph.bind(graphUtilities);
 
 var libs = require('./lib-utilities').getLibs();
 var jQuery = $ = libs.jQuery;
@@ -37,6 +37,31 @@ function b64toBlob(b64Data, contentType, sliceSize) {
   var blob = new Blob(byteArrays, {type: contentType});
   return blob;
 }
+
+function loadXMLDoc(fullFilePath) {
+  if (window.XMLHttpRequest) {
+    xhttp = new XMLHttpRequest();
+  }
+  else {
+    xhttp = new ActiveXObject("Microsoft.XMLHTTP");
+  }
+  xhttp.open("GET", fullFilePath, false);
+  xhttp.send();
+  return xhttp.responseXML;
+}
+
+// Should this be exposed or should this be moved to the helper functions section?
+function textToXmlObject(text) {
+  if (window.ActiveXObject) {
+    var doc = new ActiveXObject('Microsoft.XMLDOM');
+    doc.async = 'false';
+    doc.loadXML(text);
+  } else {
+    var parser = new DOMParser();
+    var doc = parser.parseFromString(text, 'text/xml');
+  }
+  return doc;
+}
 // Helper functions End
 
 function fileUtilities() {}
@@ -57,42 +82,17 @@ fileUtilities.saveAsJpg = function(filename) {
   saveAs(b64toBlob(b64data, "image/jpg"), filename || "network.jpg");
 };
 
-fileUtilities.loadXMLDoc = function(fullFilePath) {
-  if (window.XMLHttpRequest) {
-    xhttp = new XMLHttpRequest();
-  }
-  else {
-    xhttp = new ActiveXObject("Microsoft.XMLHTTP");
-  }
-  xhttp.open("GET", fullFilePath, false);
-  xhttp.send();
-  return xhttp.responseXML;
-};
-
-// Should this be exposed or should this be moved to the helper functions section?
-fileUtilities.textToXmlObject = function(text) {
-  if (window.ActiveXObject) {
-    var doc = new ActiveXObject('Microsoft.XMLDOM');
-    doc.async = 'false';
-    doc.loadXML(text);
-  } else {
-    var parser = new DOMParser();
-    var doc = parser.parseFromString(text, 'text/xml');
-  }
-  return doc;
-};
-
 fileUtilities.loadSample = function(filename, folderpath) {
   uiUtilities.startSpinner("load-spinner");
   // load xml document use default folder path if it is not specified
-  var xmlObject = this.loadXMLDoc((folderpath || 'sample-app/samples/') + filename);
+  var xmlObject = loadXMLDoc((folderpath || 'sample-app/samples/') + filename);
   
   // Users may want to do customized things while a sample is being loaded
   // Trigger an event for this purpose and specify the 'filename' as an event parameter
   $( document ).trigger( "sbgnvizLoadSample", [ filename ] ); //setFileContent(filename.replace('xml', 'sbgnml'));
   
   setTimeout(function () {
-    sbgnvizUpdate(sbgnmlToJson.convert(xmlObject));
+    updateGraph(sbgnmlToJson.convert(xmlObject));
     uiUtilities.endSpinner("load-spinner");
   }, 0);
 };
@@ -109,7 +109,7 @@ fileUtilities.loadSBGNMLFile = function(file) {
     var text = this.result;
 
     setTimeout(function () {
-      sbgnvizUpdate(sbgnmlToJson.convert(self.textToXmlObject(text)));
+      updateGraph(sbgnmlToJson.convert(textToXmlObject(text)));
       uiUtilities.endSpinner("load-file-spinner");
     }, 0);
   };
