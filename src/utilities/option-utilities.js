@@ -4,8 +4,8 @@
 
 // default options
 var defaults = {
-  // The path of core library images when sbgnviz is required from npm and located 
-  // in node_modules using default option is enough
+  // The path of core library images when sbgnviz is required from npm and the index html 
+  // file and node_modules are under the same folder then using the default value is fine
   imgPath: 'node_modules/sbgnviz/src/img',
   // Whether to fit labels to nodes
   fitLabelsToNodes: function () {

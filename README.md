@@ -6,100 +6,172 @@ SBGNViz is built by extending an open-source javascript graph theory library for
 
 ## Software
 
-<font color="#B3A31D">**A sample application using SBGNViz can be found [here (master branch)](http://www.cs.bilkent.edu.tr/~ivis/SBGNViz.js/sample-app/) or [here (unstable branch fork)](http://beta.pathwaycommons.org/sbgnviz/).**</font>
+<font color="#B3A31D">**A sample application using SBGNViz can be found [here](https://github.com/iVis-at-Bilkent/sbgnviz.js-sample-app)**</font>
 
-SBGNViz is distributed under [GNU Lesser General Public License](http://www.gnu.org/licenses/lgpl.html). Instructions for obtaining a working copy of the project can be found [here](https://github.com/PathwayCommons/sbgnviz-js/wiki/Obtaining-A-Working-Copy). SBGNViz works on every platform that have Javascript support including mobile devices.
+SBGNViz is distributed under [GNU Lesser General Public License](http://www.gnu.org/licenses/lgpl.html). 
 
-## Highlights
+## API
 
-Below are some sample screenshots from SBGNViz.js, illustrating some of its capabilities. Please click on a figure to see it in full size. 
+`sbgnviz.expandNodes(nodes)`
+Expands the given nodes. Considers 'undoable' option.
 
-<table border="1" align="left">
-	<tr>
-		<td>
-			<a href="http://cs.bilkent.edu.tr/~ivis/sbgnviz-js/samples/mapk-cascade.png">
-				<img src="http://cs.bilkent.edu.tr/~ivis/sbgnviz-js/samples/mapk-cascade-s.png"/>
-			</a>
-                        <p align="center"> <b> Mapk cascade pathway visualized in SBGNViz.js </b> </p>
-		</td>
-		<td>     	
-			<a href="http://cs.bilkent.edu.tr/~ivis/sbgnviz-js/samples/highlight-processes.png">
-				<img src="http://cs.bilkent.edu.tr/~ivis/sbgnviz-js/samples/highlight-processes-s.png"/>
-			</a>
-                        <p align="center"> <b> Highlighting processes of selected node group </b> </p>
-		</td>
-	</tr>
-	<tr>
-		<td>
-			<a href="http://cs.bilkent.edu.tr/~ivis/sbgnviz-js/samples/hide-selected.png">
-				<img src="http://cs.bilkent.edu.tr/~ivis/sbgnviz-js/samples/hide-selected-s.png"/>
-			</a>
-                        <p align="center"> <b> Hiding selected node group </b> </p>
-		</td>
-		<td>     	
-			<a href="http://cs.bilkent.edu.tr/~ivis/sbgnviz-js/samples/after-hide-selected.png">
-				<img src="http://cs.bilkent.edu.tr/~ivis/sbgnviz-js/samples/after-hide-selected-s.png"/>
-			</a>
-                        <p align="center"> <b> Same graph after applying hiding on selected node group </b> </p>
-		</td>
-	</tr>
-	<tr>
-		<td>
-			<a href="http://cs.bilkent.edu.tr/~ivis/sbgnviz-js/samples/show-selected.png">
-				<img src="http://cs.bilkent.edu.tr/~ivis/sbgnviz-js/samples/show-selected-s.png"/>
-			</a>
-                        <p align="center"> <b> Showing only selected node group </b> </p>
-		</td>
-		<td>     	
-			<a href="http://cs.bilkent.edu.tr/~ivis/sbgnviz-js/samples/after-show-selected.png">
-				<img src="http://cs.bilkent.edu.tr/~ivis/sbgnviz-js/samples/after-show-selected-s.png"/>
-			</a>
-                        <p align="center"> <b> Same graph after showing only selected node group </b> </p>
-		</td>
-	</tr>
-	<tr>
-		<td>			
-            <a href="http://cs.bilkent.edu.tr/~ivis/sbgnviz-js/samples/highlight-neighbors.png">
-				<img src="http://cs.bilkent.edu.tr/~ivis/sbgnviz-js/samples/highlight-neighbors-s.png"/>
-			</a>
-			<p align="center"><b> Highlighting neighbors of selected node group </b></p>		
-		</td>
-		<td>			
-			<a href="http://cs.bilkent.edu.tr/~ivis/sbgnviz-js/samples/before-load.png">
-				<img src="http://cs.bilkent.edu.tr/~ivis/sbgnviz-js/samples/before-load-s.png"/>
-			</a>
-			<p align="center"><b> Load SBGN-PD diagram from an sbgn-ml file </b></p>	
-		</td>
-	</tr>
-	<tr>
-		<td>			
-              <a href="http://cs.bilkent.edu.tr/~ivis/sbgnviz-js/samples/load.png">
-				<img src="http://cs.bilkent.edu.tr/~ivis/sbgnviz-js/samples/load-s.png"/>
-		      </a>
-                      <p align="center"> <b> Loading an sbgnml file from file explorer </b>  </p>
-		</td>
-		<td>
-			<a href="http://cs.bilkent.edu.tr/~ivis/sbgnviz-js/samples/after-load.png">
-				<img src="http://cs.bilkent.edu.tr/~ivis/sbgnviz-js/samples/after-load-s.png"/>
-			</a>
-            <p align="center"> <b> SBGN diagram visualization of Glycolysis after loading its sbgnml file </b>  </p>
-		</td>
-	</tr>
-	<tr>
-		<td>
-            <a href="http://cs.bilkent.edu.tr/~ivis/sbgnviz-js/samples/save.png">
-				<img src="http://cs.bilkent.edu.tr/~ivis/sbgnviz-js/samples/save-s.png"/>
-			</a>
-            <p align="center"> <b> Saving current SBGN process description diagram as an sbgnml file </b>  </p>
-		</td>
-		<td>
-			<a href="http://cs.bilkent.edu.tr/~ivis/sbgnviz-js/samples/save-png.png">
-				<img src="http://cs.bilkent.edu.tr/~ivis/sbgnviz-js/samples/save-png-s.png"/>
-			</a>
-            <p align="center"> <b> Saving current SBGN process description diagram as a png file  </b>  </p>
-		</td>
-	</tr>
-</table>
+`sbgnviz.collapseNodes(nodes)`
+Collapses the given nodes. Considers 'undoable' option.
+
+`sbgnviz.expandComplexes()`
+Expands the complex nodes in the map recursively. Considers 'undoable' option.
+
+`sbgnviz.collapseComplexes()`
+Collapses the complex nodes in the map recursively. Considers 'undoable' option.
+
+`sbgnviz.collapseAll()`
+Collapses all nodes in the map recursively. Considers 'undoable' option.
+
+`sbgnviz.expandAll()`
+Expands all nodes in the map recursively. Considers 'undoable' option.
+
+`sbgnviz.hideEles(eles)`
+Hides the given elements. Considers 'undoable' option.
+
+`sbgnviz.showEles(eles)`
+Unhides the given elements hides others. Considers 'undoable' option.
+
+`sbgnviz.showAll()`
+Unhides all elements. Considers 'undoable' option.
+
+`sbgnviz.deleteElesSimple(eles)`
+Removes the given elements in a simple way. Considers 'undoable' option.
+
+`sbgnviz.deleteElesSmart(eles)`
+Extends the list of elements in a smart way and removes them. Considers 'undoable' option.
+
+`sbgnviz.highlightNeighbours(eles)`
+Highlights neighbours of the given elements. Considers 'undoable' option.
+
+`sbgnviz.highlightProcesses(eles)`
+Highlights processes of the given elements. Considers 'undoable' option.
+
+`sbgnviz.searchByLabel(label)`
+Finds the elements whose label includes the given label and highlights processes of those elements.
+Considers 'undoable' option.
+
+`sbgnviz.removeHighlights()`
+Unhighlights any highlighted element. Considers 'undoable' option.
+
+`sbgnviz.performLayout(layoutOptions, notUndoable)`
+Performs layout by given layoutOptions. Considers 'undoable' option. However, by setting notUndoable parameter
+to a truthy value you can force an undable layout operation independant of 'undoable' option.
+
+`sbgnviz.createSbgnml()`
+Creates an sbgnml file content from the exising graph and returns it.
+
+`sbgnviz.convertSbgnmlToJson(data)`
+Converts given sbgnml data to a json object and returns it.
+
+`sbgnviz.getQtipContent(node)`
+Create the qtip contents of the given node and returns it.
+
+`sbgnviz.updateGraph(cyGraph)`
+Update the graph by given cyGraph data which is a json object in special format of cytoscape.js.
+
+`sbgnviz.calculatePaddings(paddingPercent)`
+Calculates the paddings for compounds based on dimensions of simple nodes and a specific percentadge.
+As this percentadge takes the given paddingPercent or compoundPadding option.
+
+`sbgnviz.refreshPaddings(recalculatePaddings, nodes)`
+If nodes parameter is set refreshes the paddings of given nodes, else refreshes the paddings of whole graph.
+If recalculatePaddings parameter is set to a truthy value recalculates the paddings before refreshing, else uses
+the last calculated value for the paddings. 
+
+`sbgnviz.saveAsPng(filename)`
+Exports the current graph to a png file. The name of the file is determined by the filename parameter which is 
+'network.png' by default.
+
+`sbgnviz.saveAsJpg(filename)`
+Exports the current graph to a jpg file. The name of the file is determined by the filename parameter which is 
+'network.jpg' by default.
+
+`sbgnviz.loadSample(filename, folderpath)`
+Loads a sample file whose name and path of containing folder is given.
+
+`sbgnviz.loadSBGNMLFile(file)`
+Loads the given sbgnml file.
+
+`sbgnviz.saveAsSbgnml(filename)`
+Exports the current graph to an sbgnml file with the given filename.
+
+`sbgnviz.startSpinner(classname)`
+Starts a spinner at the middle of network container element. You can specify a css class that the 
+spinner will have. The default classname is 'default-class'. Requires 'fontawesome.css'.
+
+`sbgnviz.endSpinner(classname)`
+Ends any spinner having a css class with the given name. Requires 'fontawesome.css'.
+
+## Events
+Triggered when a sample is being loaded
+`$(document).on('sbgnvizLoadSample', function(event, filename) { ... });`
+
+Triggered when an external sbgnml file is being loaded
+`$(document).on('sbgnvizLoadFile', function(event, filename) { ... });`
+
+Triggered when the graph update is just started
+`$(document).on('updateGraphStart', function(event) { ... });`
+
+Triggered when the graph update is ended
+`$(document).on('updateGraphEnd', function(event) { ... });`
+
+## Default Options
+```javascript
+    var options = {
+      // The path of core library images when sbgnviz is required from npm and the index html 
+      // file and node_modules are under the same folder then using the default value is fine
+      imgPath: 'node_modules/sbgnviz/src/img',
+      // Whether to fit labels to nodes
+      fitLabelsToNodes: function () {
+        return false;
+      },
+      // dynamic label size it may be 'small', 'regular', 'large'
+      dynamicLabelSize: function () {
+        return 'regular';
+      },
+      // percentage used to calculate compound paddings
+      compoundPadding: function () {
+        return 10;
+      },
+      // The selector of the component containing the sbgn network
+      networkContainerSelector: '#sbgn-network-container',
+      // Whether the actions are undoable, requires cytoscape-undo-redo extension
+      undoable: true
+    };
+```
+
+## Usage instructions
+Download the library:
+ * via npm: `npm install cytoscape-expand-collapse` or
+ * via direct download in the repository (probably from a tag).
+
+`require()` the library as appropriate for your project:
+
+CommonJS:
+```js
+var sbgnviz = require('sbgnviz');
+var cytoscape = require('cytoscape-for-sbgnviz');
+var jQuery = require('jQuery');
+var filesaverjs = require('filesaverjs');
+
+var options = {
+};
+
+var libs = {
+    cytoscape: cytoscape,
+    jQuery: jQuery,
+    filesaverjs: filesaverjs
+};
+
+sbgnviz( options, libs );
+```
+
+In plain JS you do not need to require the libraries you just need to register sbgnviz with the options.
 
 ## Credits
 
