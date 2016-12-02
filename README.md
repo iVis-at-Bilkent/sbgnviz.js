@@ -7,6 +7,7 @@ SBGNViz is built by extending an open-source javascript graph theory library for
 ## Software
 
 <font color="#B3A31D">**A sample application using SBGNViz can be found [here](http://www.cs.bilkent.edu.tr/~ivis/SBGNViz.js/sample-app/).**</font>
+
 <font color="#B3A31D">**The sample application source codes are available [here](https://github.com/iVis-at-Bilkent/sbgnviz.js-sample-app)**</font>
 
 SBGNViz is distributed under [GNU Lesser General Public License](http://www.gnu.org/licenses/lgpl.html). 
