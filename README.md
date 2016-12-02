@@ -12,6 +12,31 @@ SBGNViz is built by extending an open-source javascript graph theory library for
 
 SBGNViz is distributed under [GNU Lesser General Public License](http://www.gnu.org/licenses/lgpl.html). 
 
+## Default Options
+```javascript
+    var options = {
+      // The path of core library images when sbgnviz is required from npm and the index html 
+      // file and node_modules are under the same folder then using the default value is fine
+      imgPath: 'node_modules/sbgnviz/src/img',
+      // Whether to fit labels to nodes
+      fitLabelsToNodes: function () {
+        return false;
+      },
+      // dynamic label size it may be 'small', 'regular', 'large'
+      dynamicLabelSize: function () {
+        return 'regular';
+      },
+      // percentage used to calculate compound paddings
+      compoundPadding: function () {
+        return 10;
+      },
+      // The selector of the component containing the sbgn network
+      networkContainerSelector: '#sbgn-network-container',
+      // Whether the actions are undoable, requires cytoscape-undo-redo extension
+      undoable: true
+    };
+```
+
 ## API
 
 `sbgnviz.expandNodes(nodes)`
@@ -126,31 +151,6 @@ an extension library of sbgnviz. Most users will not need to use this. For furth
 `$(document).on('updateGraphStart', function(event) { ... });` Triggered when the graph update is just started
 
 `$(document).on('updateGraphEnd', function(event) { ... });` Triggered when the graph update is ended
-
-## Default Options
-```javascript
-    var options = {
-      // The path of core library images when sbgnviz is required from npm and the index html 
-      // file and node_modules are under the same folder then using the default value is fine
-      imgPath: 'node_modules/sbgnviz/src/img',
-      // Whether to fit labels to nodes
-      fitLabelsToNodes: function () {
-        return false;
-      },
-      // dynamic label size it may be 'small', 'regular', 'large'
-      dynamicLabelSize: function () {
-        return 'regular';
-      },
-      // percentage used to calculate compound paddings
-      compoundPadding: function () {
-        return 10;
-      },
-      // The selector of the component containing the sbgn network
-      networkContainerSelector: '#sbgn-network-container',
-      // Whether the actions are undoable, requires cytoscape-undo-redo extension
-      undoable: true
-    };
-```
 
 ## Usage instructions
 Download the library:
