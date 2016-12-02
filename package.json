@@ -1,29 +1,38 @@
 {
-  "name": "SBGNViz-js",
+  "name": "sbgnviz",
+  "version": "snapshot-98e5a9bdc3-1480683091556",
+  "licence": "LGPL-3.0",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build-sbgnviz-js": "gulp build",
+    "debug-js": "nodemon -e js --watch src -x \"npm run build-sbgnviz-js\""
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/iVis-at-Bilkent/sbgnviz-js.git"
+    "url": "https://github.com/iVis-at-Bilkent/sbgnviz.js.git"
   },
   "bugs": {
-    "url": "https://github.com/iVis-at-Bilkent/sbgnviz-js/issues"
+    "url": "https://github.com/iVis-at-Bilkent/sbgnviz.js/issues"
   },
-  "homepage": "https://github.com/iVis-at-Bilkent/sbgnviz-js/",
-  "dependencies": {
-    "qtip2": "~3.0.2",
-    "cytoscape-panzoom": "~2.4.0",
-    "cytoscape-qtip": "~2.3.0",
+  "homepage": "https://github.com/iVis-at-Bilkent/sbgnviz.js/",
+  "peer-dependencies": {
+    "jquery": "^2.2.4",
     "filesaverjs": "~0.2.2",
-    "jQuery": "1.7.4",
-    "backbone": "0.9.10",
-    "cytoscape-cose-bilkent": "latest",
-    "cytoscape-undo-redo": "latest",
-    "cytoscape-expand-collapse": "latest",
-    "cytoscape-clipboard": "latest",
-    "cytoscape-edge-bend-editing": "latest",
-    "cytoscape-view-utilities": "latest",
-    "cytoscape-context-menus": "latest"
+    "cytoscape-for-sbgnviz": "^2.7.11.2"
+  },
+  "devDependencies": {
+    "browserify": "^11.2.0",
+    "gulp": "^3.9.0",
+    "gulp-derequire": "^2.1.0",
+    "gulp-jshint": "^1.11.2",
+    "gulp-prompt": "^0.1.2",
+    "gulp-replace": "^0.5.4",
+    "gulp-shell": "^0.5.0",
+    "gulp-util": "^3.0.6",
+    "jshint-stylish": "^2.0.1",
+    "node-notifier": "^4.3.1",
+    "run-sequence": "^1.1.4",
+    "vinyl-buffer": "^1.0.0",
+    "vinyl-source-stream": "^1.1.0"
   }
 }
