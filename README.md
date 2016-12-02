@@ -21,16 +21,16 @@ Expands the given nodes. Considers 'undoable' option.
 Collapses the given nodes. Considers 'undoable' option.
 
 `sbgnviz.expandComplexes()`
-Expands the complex nodes in the map recursively. Considers 'undoable' option.
+Expands the complex nodes in the graph recursively. Considers 'undoable' option.
 
 `sbgnviz.collapseComplexes()`
-Collapses the complex nodes in the map recursively. Considers 'undoable' option.
+Collapses the complex nodes in the graph recursively. Considers 'undoable' option.
 
 `sbgnviz.collapseAll()`
-Collapses all nodes in the map recursively. Considers 'undoable' option.
+Collapses all nodes in the graph recursively. Considers 'undoable' option.
 
 `sbgnviz.expandAll()`
-Expands all nodes in the map recursively. Considers 'undoable' option.
+Expands all nodes in the graph recursively. Considers 'undoable' option.
 
 `sbgnviz.hideEles(eles)`
 Hides the given elements. Considers 'undoable' option.
