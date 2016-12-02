@@ -38,6 +38,7 @@ gulp.task('build', function(){
     .pipe( gulp.dest('.') )
 });
 
+/*This task is copied from slush-cytoscape-extension*/
 gulp.task('publish', [], function( next ){
   runSequence('confver', 'pkgver', 'push', 'tag', 'npm', next);
 });
