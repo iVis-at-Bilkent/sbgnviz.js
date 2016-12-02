@@ -1,6 +1,6 @@
 {
   "name": "sbgnviz",
-  "version": "snapshot-98e5a9bdc3-1480683091556",
+  "version": "0.0.0",
   "licence": "LGPL-3.0",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
