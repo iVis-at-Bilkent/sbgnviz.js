@@ -1,5 +1,6 @@
 {
   "name": "sbgnviz",
+  "version": "snapshot-98e5a9bdc3-1480683091556",
   "licence": "LGPL-3.0",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -23,11 +24,15 @@
     "browserify": "^11.2.0",
     "gulp": "^3.9.0",
     "gulp-derequire": "^2.1.0",
+    "gulp-jshint": "^1.11.2",
+    "gulp-prompt": "^0.1.2",
+    "gulp-replace": "^0.5.4",
+    "gulp-shell": "^0.5.0",
     "gulp-util": "^3.0.6",
+    "jshint-stylish": "^2.0.1",
     "node-notifier": "^4.3.1",
     "run-sequence": "^1.1.4",
     "vinyl-buffer": "^1.0.0",
-    "vinyl-source-stream": "^1.1.0",
-    "nodemon": "1.11.0"
+    "vinyl-source-stream": "^1.1.0"
   }
 }
