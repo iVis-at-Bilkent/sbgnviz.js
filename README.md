@@ -180,6 +180,13 @@ sbgnviz( options, libs );
 
 In plain JS you do not need to require the libraries you just need to register sbgnviz with the options.
 
+## Publishing instructions
+
+This project is set up to automatically be published to npm.  To publish:
+
+1. Set the version number environment variable: `export VERSION=1.2.3`
+2. Publish: `gulp publish`
+
 ## Credits
 
 Please cite the following when you use SBGNViz.js:
