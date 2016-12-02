@@ -81,7 +81,7 @@ mainUtilities.collapseComplexes = function() {
 };
 
 mainUtilities.expandComplexes = function() {
-  var nodes = cy.nodes(":selected").filter("[class='complex'][expanded-collapsed='collapsed']");
+  var nodes = cy.nodes().filter("[class='complex'][expanded-collapsed='collapsed']");
   if (nodes.expandableNodes().length == 0) {
     return;
   }
