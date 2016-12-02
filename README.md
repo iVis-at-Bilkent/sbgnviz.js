@@ -68,13 +68,14 @@ to a truthy value you can force an undable layout operation independant of 'undo
 Creates an sbgnml file content from the exising graph and returns it.
 
 `sbgnviz.convertSbgnmlToJson(data)`
-Converts given sbgnml data to a json object and returns it.
+Converts given sbgnml data to a json object in a special format (http://js.cytoscape.org/#notation/elements-json) and returns it.
 
 `sbgnviz.getQtipContent(node)`
 Create the qtip contents of the given node and returns it.
 
 `sbgnviz.updateGraph(cyGraph)`
-Update the graph by given cyGraph data which is a json object in special format of cytoscape.js.
+Update the graph by given cyGraph parameter which is a json object including data of cytoscape elements 
+in a special format (http://js.cytoscape.org/#notation/elements-json).
 
 `sbgnviz.calculatePaddings(paddingPercent)`
 Calculates the paddings for compounds based on dimensions of simple nodes and a specific percentadge.
