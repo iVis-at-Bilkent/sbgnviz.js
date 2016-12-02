@@ -108,6 +108,14 @@ spinner will have. The default classname is 'default-class'. Requires 'fontaweso
 `sbgnviz.endSpinner(classname)`
 Ends any spinner having a css class with the given name. Requires 'fontawesome.css'.
 
+`sbgnviz.elementUtilities`
+General and sbgn specific utilities for cytoscape elements. These are exposed for the users who builds an extension
+library of sbgnviz. Most users will not need to use this. For further details please see 'src/utilities/element-utilities.js'
+
+`sbgnviz.undoRedoActionFunctions`
+Functions to be utilized in defining new actions for cytoscape.js-undo-redo extension. These are exposed for the users who builds
+an extension library of sbgnviz. Most users will not need to use this. For further details please see 'src/utilities/undo-redo-action-functions.js'
+
 ## Events
 `$(document).on('sbgnvizLoadSample', function(event, filename) { ... });` Triggered when a sample is being loaded
 
