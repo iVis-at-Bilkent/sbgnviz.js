@@ -1,4 +1,4 @@
-# SBGNViz version 2.0: Cytoscape.js based visualization tool for process description diagrams in SBGN-ML
+# SBGNViz version 3.0: Cytoscape.js based visualization tool for process description diagrams in SBGN-ML
 
 SBGNViz is a web application based on [cytoscape.js](http://cytoscape.github.io/cytoscape.js/) to visualize pathway models represented by [SBGN Process Description Notation](http://www.sbgn.org/Image:Refcard-PD.png). It accepts the pathway models represented in [SBGN-ML](http://sourceforge.net/apps/mediawiki/libsbgn/index.php?title=Exchange_Format) format.
 
@@ -6,7 +6,7 @@ SBGNViz is built by extending an open-source javascript graph theory library for
 
 ## Software
 
-<font color="#B3A31D">**A sample application using SBGNViz can be found [here](http://www.cs.bilkent.edu.tr/~ivis/SBGNViz.js/sample-app/).**</font>
+<font color="#B3A31D">**A sample application using SBGNViz can be found [here](http://cs.bilkent.edu.tr/~ivis/SBGNViz_sample_app/).**</font>
 
 <font color="#B3A31D">**The sample application source codes are available [here](https://github.com/iVis-at-Bilkent/sbgnviz.js-sample-app)**</font>
 
@@ -152,6 +152,12 @@ an extension library of sbgnviz. Most users will not need to use this. For furth
 
 `$(document).on('updateGraphEnd', function(event) { ... });` Triggered when the graph update is ended
 
+## Dependencies
+
+ * cytoscape-for-sbgnviz ^2.7.12
+ * jQuery ^2.2.4
+ * filesaverjs ~0.2.2
+
 ## Usage instructions
 Download the library:
  * via npm: `npm install cytoscape-expand-collapse` or
@@ -192,16 +198,6 @@ This project is set up to automatically be published to npm.  To publish:
 Please cite the following when you use SBGNViz.js:
 
 M. Sari, I. Bahceci, U. Dogrusoz, S.O. Sumer, B.A. Aksoy, O. Babur, E. Demir, "[SBGNViz: a tool for visualization and complexity management of SBGN process description maps](http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0128985)", PLoS ONE, 10(6), e0128985, 2015.
-
-Icons made by [Freepik](http://www.freepik.com), 
-[Daniel Bruce](http://www.flaticon.com/authors/daniel-bruce), 
-[TutsPlus](http://www.flaticon.com/authors/tutsplus),
-[Robin Kylander](http://www.flaticon.com/authors/robin-kylander),
-[Catalin Fertu](http://www.flaticon.com/authors/catalin-fertu),
-[Yannick](http://www.flaticon.com/authors/yannick),
-[Icon Works](http://www.flaticon.com/authors/icon-works),
-[Flaticon](http://www.flaticon.com) and licensed with 
-[Creative Commons BY 3.0](http://creativecommons.org/licenses/by/3.0/)
 
 Thanks to JetBrains for an [Open Source License](https://www.jetbrains.com/buy/opensource/)
 
