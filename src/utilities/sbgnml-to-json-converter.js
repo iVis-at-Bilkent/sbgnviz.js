@@ -41,7 +41,6 @@ var sbgnmlToJson = {
     return false;
   },
   bboxProp: function (ele) {
-    var bbox = {};
     var bbox = ele.querySelector('bbox');
 
     bbox.x = bbox.getAttribute('x');
@@ -58,7 +57,6 @@ var sbgnmlToJson = {
     var xPos = parseFloat(parentBbox.x);
     var yPos = parseFloat(parentBbox.y);
 
-    var bbox = {};
     var bbox = ele.querySelector('bbox');
 
     bbox.x = bbox.getAttribute('x');

@@ -107,12 +107,6 @@ module.exports = function () {
   var sbgnStyleSheet = cytoscape.stylesheet()
           .selector("node")
           .css({
-            'content': function (ele) {
-              return elementUtilities.getElementContent(ele);
-            },
-            'font-size': function (ele) {
-              return elementUtilities.getLabelTextSize(ele);
-            },
             'text-valign': 'center',
             'text-halign': 'center',
             'border-width': 1.5,
@@ -141,7 +135,13 @@ module.exports = function () {
           .css({
             'shape': function (ele) {
               return elementUtilities.getCyShape(ele);
-            }
+            },
+            'content': function (ele) {
+              return elementUtilities.getElementContent(ele);
+            },
+            'font-size': function (ele) {
+              return elementUtilities.getLabelTextSize(ele);
+            },
           })
           .selector("node[class='perturbing agent']")
           .css({
