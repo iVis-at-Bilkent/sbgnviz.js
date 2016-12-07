@@ -14,9 +14,9 @@ var undoRedoActionFunctions = {
     param.eles = elementUtilities.restoreEles(eles);
     return param;
   },
-  deleteElesSmart: function (param) {
+  deleteNodesSmart: function (param) {
     if (param.firstTime) {
-      return elementUtilities.deleteElesSmart(param.eles);
+      return elementUtilities.deleteNodesSmart(param.eles);
     }
     return elementUtilities.deleteElesSimple(param.eles);
   },

@@ -57,11 +57,11 @@ Collapses all nodes in the graph recursively. Considers 'undoable' option.
 `sbgnviz.expandAll()`
 Expands all nodes in the graph recursively. Considers 'undoable' option.
 
-`sbgnviz.hideEles(eles)`
-Hides the given elements. Considers 'undoable' option.
+`sbgnviz.hideNodesSmart(nodes)`
+Extends the given nodes list in a smart way and hides the resulting list. Considers 'undoable' option.
 
-`sbgnviz.showEles(eles)`
-Unhides the given elements hides others. Considers 'undoable' option.
+`sbgnviz.showNodesSmart(nodes)`
+Extends the given nodes list in a smart way. Then unhides the resulting list and hides others. Considers 'undoable' option.
 
 `sbgnviz.showAll()`
 Unhides all elements. Considers 'undoable' option.
@@ -69,14 +69,14 @@ Unhides all elements. Considers 'undoable' option.
 `sbgnviz.deleteElesSimple(eles)`
 Removes the given elements in a simple way. Considers 'undoable' option.
 
-`sbgnviz.deleteElesSmart(eles)`
-Extends the list of elements in a smart way and removes them. Considers 'undoable' option.
+`sbgnviz.deleteNodesSmart(nodes)`
+Extends the given nodes list in a smart way and removes the resulting list. Considers 'undoable' option.
 
-`sbgnviz.highlightNeighbours(eles)`
-Highlights neighbours of the given elements. Considers 'undoable' option.
+`sbgnviz.highlightNeighbours(nodes)`
+Highlights neighbours of the given nodes. Considers 'undoable' option.
 
-`sbgnviz.highlightProcesses(eles)`
-Highlights processes of the given elements. Considers 'undoable' option.
+`sbgnviz.highlightProcesses(nodes)`
+Highlights processes of the given nodes. Considers 'undoable' option.
 
 `sbgnviz.searchByLabel(label)`
 Finds the elements whose label includes the given label and highlights processes of those elements.
