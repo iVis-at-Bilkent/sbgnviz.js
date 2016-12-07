@@ -128,29 +128,41 @@ mainUtilities.expandAll = function() {
   }
 };
 
-mainUtilities.hideEles = function(eles) {
-  if (eles.length === 0) {
+mainUtilities.hideNodesSmart = function(_nodes) {
+  var nodes = _nodes.nodes(); // Ensure that nodes list just include nodes
+  
+  var allNodes = cy.nodes(":visible");
+  var nodesToShow = elementUtilities.extendRemainingNodes(nodes, allNodes);
+  var nodesToHide = allNodes.not(nodesToShow);
+
+  if (nodesToHide.length === 0) {
     return;
   }
   
   if(options.undoable) {
-    cy.undoRedo().do("hide", eles);
+    cy.undoRedo().do("hide", nodesToHide);
   }
   else {
-    eles.hideEles();
+    nodesToHide.hideEles();
   }
 };
 
-mainUtilities.showEles = function(eles) {
-  if (eles.length === cy.elements(':visible').length) {
+mainUtilities.showNodesSmart = function(_nodes) {
+  var nodes = _nodes.nodes(); // Ensure that nodes list just include nodes
+  
+  var allNodes = cy.elements();
+  var nodesToShow = elementUtilities.extendNodeList(nodes);
+  var nodesToHide = allNodes.not(nodesToShow);
+  
+  if (nodesToHide.length === 0) {
     return;
   }
   
   if(options.undoable) {
-    cy.undoRedo().do("show", eles);
+    cy.undoRedo().do("hide", nodesToHide);
   }
   else {
-    eles.showEles();
+    nodesToHide.hideEles();
   }
 };
 
@@ -182,24 +194,26 @@ mainUtilities.deleteElesSimple = function(eles) {
   }
 };
 
-mainUtilities.deleteElesSmart = function(eles) {
-  if (eles.length == 0) {
+mainUtilities.deleteNodesSmart = function(_nodes) {
+  var nodes = _nodes.nodes();
+  if (nodes.length == 0) {
     return;
   }
   
   if(options.undoable) {
-    cy.undoRedo().do("deleteElesSmart", {
+    cy.undoRedo().do("deleteNodesSmart", {
       firstTime: true,
-      eles: eles
+      eles: nodes
     });
   }
   else {
-    elementUtilities.deleteElesSmart(eles);
+    elementUtilities.deleteNodesSmart(nodes);
   }
 };
 
-mainUtilities.highlightNeighbours = function(eles) {
-  var elesToHighlight = elementUtilities.getNeighboursOfEles(eles);
+mainUtilities.highlightNeighbours = function(_nodes) {
+  var nodes = _nodes.nodes(); // Ensure that nodes list just include nodes
+  var elesToHighlight = elementUtilities.getNeighboursOfNodes(nodes);
   if (elesToHighlight.length === 0) {
     return;
   }
@@ -243,8 +257,9 @@ mainUtilities.searchByLabel = function(label) {
   }
 };
 
-mainUtilities.highlightProcesses = function(eles) {
-  var elesToHighlight = elementUtilities.extendNodeList(eles);
+mainUtilities.highlightProcesses = function(_nodes) {
+  var nodes = _nodes.nodes(); // Ensure that nodes list just include nodes
+  var elesToHighlight = elementUtilities.extendNodeList(nodes);
   if (elesToHighlight.length === 0) {
     return;
   }
@@ -271,7 +286,7 @@ mainUtilities.removeHighlights = function() {
     cy.undoRedo().do("removeHighlights");
   }
   else {
-    cy.removeHighlights()
+    cy.removeHighlights();
   }
 };
 

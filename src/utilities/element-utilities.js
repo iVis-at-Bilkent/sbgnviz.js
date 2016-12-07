@@ -128,15 +128,15 @@ var elementUtilities = {
     },
     getNeighboursOfSelected: function(){
         var selectedEles = cy.elements(":selected");
-        var elesToHighlight = this.getNeighboursOfEles(selectedEles);
+        var elesToHighlight = this.getNeighboursOfNodes(selectedEles);
         return elesToHighlight;
     },
-    getNeighboursOfEles: function(_eles){
-        var eles = _eles;
-        eles = eles.add(eles.parents("node[class='complex']"));
-        eles = eles.add(eles.descendants());
-        var neighborhoodEles = eles.neighborhood();
-        var elesToReturn = eles.add(neighborhoodEles);
+    getNeighboursOfNodes: function(_nodes){
+        var nodes = _nodes.nodes(); // Ensure that nodes list just include nodes
+        nodes = nodes.add(nodes.parents("node[class='complex']"));
+        nodes = nodes.add(nodes.descendants());
+        var neighborhoodEles = nodes.neighborhood();
+        var elesToReturn = nodes.add(neighborhoodEles);
         elesToReturn = elesToReturn.add(elesToReturn.descendants());
         return elesToReturn;
     },
@@ -195,10 +195,12 @@ var elementUtilities = {
     // Add remove utilities
 
     // SBGN specific utilities
-    deleteElesSmart: function (eles) {
+    deleteNodesSmart: function (_nodes) {
+      var nodes = _nodes.nodes(); // Ensure that nodes list just include nodes
+      
       var allNodes = cy.nodes();
       cy.elements().unselect();
-      var nodesToKeep = this.extendRemainingNodes(eles, allNodes);
+      var nodesToKeep = this.extendRemainingNodes(nodes, allNodes);
       var nodesNotToKeep = allNodes.not(nodesToKeep);
       return nodesNotToKeep.remove();
     },
