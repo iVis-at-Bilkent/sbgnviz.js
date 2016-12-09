@@ -154,7 +154,7 @@ an extension library of sbgnviz. Most users will not need to use this. For furth
 
 ## Dependencies
 
- * cytoscape-for-sbgnviz ^2.7.12
+ * cytoscape (iVis-at-Bilkent/cytoscape.js#unstable)
  * jQuery ^2.2.4
  * filesaverjs ~0.2.2
 
