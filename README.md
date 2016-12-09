@@ -1,4 +1,4 @@
-# SBGNViz version 3.0
+# SBGNViz version 3
 
 SBGNViz is a web application based on [Cytoscape.js](http://cytoscape.github.io/cytoscape.js/) to visualize pathway models represented by [SBGN Process Description Notation](http://sbgn.github.io/sbgn/specifications). It accepts the pathway models represented in [SBGN-ML](https://github.com/sbgn/sbgn/wiki/LibSBGN) format.
 
@@ -58,10 +58,10 @@ Collapses all nodes in the graph recursively. Considers 'undoable' option.
 Expands all nodes in the graph recursively. Considers 'undoable' option.
 
 `sbgnviz.hideNodesSmart(nodes)`
-Extends the given nodes list in a smart way and hides the resulting list. Considers 'undoable' option.
+Extends the given nodes list in a smart way to leave the map intact and hides the resulting list. Considers 'undoable' option.
 
 `sbgnviz.showNodesSmart(nodes)`
-Extends the given nodes list in a smart way. Then unhides the resulting list and hides others. Considers 'undoable' option.
+Extends the given nodes list in a smart way to leave the map intact. Then unhides the resulting list and hides others. Considers 'undoable' option.
 
 `sbgnviz.showAll()`
 Unhides all elements. Considers 'undoable' option.
@@ -70,7 +70,7 @@ Unhides all elements. Considers 'undoable' option.
 Removes the given elements in a simple way. Considers 'undoable' option.
 
 `sbgnviz.deleteNodesSmart(nodes)`
-Extends the given nodes list in a smart way and removes the resulting list. Considers 'undoable' option.
+Extends the given nodes list in a smart way to leave the map intact and removes the resulting list. Considers 'undoable' option.
 
 `sbgnviz.highlightNeighbours(nodes)`
 Highlights neighbours of the given nodes. Considers 'undoable' option.
