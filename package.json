@@ -1,6 +1,6 @@
 {
   "name": "sbgnviz",
-  "version": "3.1.0",
+  "version": "3.2.0",
   "description": "SBGNPD visualization library",
   "main": "sbgnviz.js",
   "licence": "LGPL-3.0",
