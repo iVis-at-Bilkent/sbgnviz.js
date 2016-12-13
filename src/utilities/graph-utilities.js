@@ -44,7 +44,9 @@ graphUtilities.updateGraph = function(cyGraph) {
   // Update the style
   cy.style().update();
   // Initilize the bend points once the elements are created
-  cy.edgeBendEditing('get').initBendPoints(cy.edges());
+  if (cy.edgeBendEditing && cy.edgeBendEditing('initialized')) {
+    cy.edgeBendEditing('get').initBendPoints(cy.edges());
+  }
   
   $( document ).trigger( "updateGraphEnd" );
 };
