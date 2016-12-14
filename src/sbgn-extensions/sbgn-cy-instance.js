@@ -174,10 +174,11 @@ module.exports = function () {
             'width': 'data(bbox.w)',
             'height': 'data(bbox.h)'
           })
-          .selector("node[expanded-collapsed='collapsed']")
+          .selector("node.cy-expand-collapse-collapsed-node")
           .css({
             'width': 36,
-            'height': 36
+            'height': 36,
+            'border-style': 'dashed'
           })
           .selector("node:selected")
           .css({
@@ -211,6 +212,12 @@ module.exports = function () {
               }
               return ele.css('line-color');
             }
+          })
+          .selector("edge.cy-expand-collapse-meta-edge")
+          .css({
+            'line-color': '#C4C4C4',
+            'source-arrow-color': '#C4C4C4',
+            'target-arrow-color': '#C4C4C4'
           })
           .selector("edge:selected")
           .css({

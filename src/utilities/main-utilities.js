@@ -35,8 +35,8 @@ function beforePerformLayout() {
 function mainUtilities() {}
 
 mainUtilities.expandNodes = function(nodes) {
-  var nodesToExpand = nodes.filter("[expanded-collapsed='collapsed']");
-  if (nodesToExpand.expandableNodes().length == 0) {
+  var nodesToExpand = nodes.expandableNodes();
+  if (nodesToExpand.length == 0) {
     return;
   }
   if(options.undoable) {
@@ -81,8 +81,8 @@ mainUtilities.collapseComplexes = function() {
 };
 
 mainUtilities.expandComplexes = function() {
-  var nodes = cy.nodes().filter("[class='complex'][expanded-collapsed='collapsed']");
-  if (nodes.expandableNodes().length == 0) {
+  var nodes = cy.nodes().filter("[class='complex']").expandableNodes();
+  if (nodes.length == 0) {
     return;
   }
   
@@ -113,8 +113,8 @@ mainUtilities.collapseAll = function() {
 };
 
 mainUtilities.expandAll = function() {
-  var nodes = cy.nodes(':visible').filter("[expanded-collapsed='collapsed']");
-  if (nodes.expandableNodes().length == 0) {
+  var nodes = cy.nodes(':visible').expandableNodes();
+  if (nodes.length == 0) {
     return;
   }
   
