@@ -129,6 +129,8 @@ mainUtilities.expandAll = function() {
 };
 
 mainUtilities.hideNodesSmart = function(_nodes) {
+  // If this function is being called we can assume that view utilities extension is on use
+  var viewUtilities = cy.viewUtilities('get');
   var nodes = _nodes.nodes(); // Ensure that nodes list just include nodes
   
   var allNodes = cy.nodes(":visible");
@@ -143,11 +145,13 @@ mainUtilities.hideNodesSmart = function(_nodes) {
     cy.undoRedo().do("hide", nodesToHide);
   }
   else {
-    nodesToHide.hideEles();
+    viewUtilities.hide(nodesToHide);
   }
 };
 
 mainUtilities.showNodesSmart = function(_nodes) {
+  // If this function is being called we can assume that view utilities extension is on use
+  var viewUtilities = cy.viewUtilities('get');
   var nodes = _nodes.nodes(); // Ensure that nodes list just include nodes
   
   var allNodes = cy.elements();
@@ -162,11 +166,14 @@ mainUtilities.showNodesSmart = function(_nodes) {
     cy.undoRedo().do("hide", nodesToHide);
   }
   else {
-    nodesToHide.hideEles();
+    viewUtilities.hide(nodesToHide);
   }
 };
 
 mainUtilities.showAll = function() {
+  // If this function is being called we can assume that view utilities extension is on use
+  var viewUtilities = cy.viewUtilities('get');
+  
   if (cy.elements().length === cy.elements(':visible').length) {
     return;
   }
@@ -175,7 +182,7 @@ mainUtilities.showAll = function() {
     cy.undoRedo().do("show", cy.elements());
   }
   else {
-    cy.elements().showEles();
+    viewUtilities.show(cy.elements());
   }
 };
 
