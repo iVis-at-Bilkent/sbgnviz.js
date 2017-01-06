@@ -53,7 +53,7 @@ module.exports = function () {
       cy.style().update();
     });
     
-    cy.on("beforeCollapse", "node", function (event) {
+    cy.on("expandcollapse.beforecollapse", "node", function (event) {
       var node = this;
       //The children info of complex nodes should be shown when they are collapsed
       if (node._private.data.class == "complex") {
@@ -76,7 +76,7 @@ module.exports = function () {
       edges.scratch('cyedgebendeditingDistances', []);
     });
 
-    cy.on("afterCollapse", "node", function (event) {
+    cy.on("expandcollapse.aftercollapse", "node", function (event) {
       var node = this;
       // Normally simple nodes are expected to have no paddings but interestingly they have
       // This problem may be caused by that we are not using original cytoscape.js the following
@@ -87,12 +87,12 @@ module.exports = function () {
       node.css('padding-bottom', 0);
     });
 
-    cy.on("beforeExpand", "node", function (event) {
+    cy.on("expandcollapse.beforeexpand", "node", function (event) {
       var node = this;
       node.removeData("infoLabel");
     });
 
-    cy.on("afterExpand", "node", function (event) {
+    cy.on("expandcollapse.afterexpand", "node", function (event) {
       var node = this;
       cy.nodes().updateCompoundBounds();
       //Don't show children info when the complex node is expanded

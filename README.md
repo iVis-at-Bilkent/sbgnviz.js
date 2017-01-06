@@ -40,31 +40,31 @@ M. Sari, I. Bahceci, U. Dogrusoz, S.O. Sumer, B.A. Aksoy, O. Babur, E. Demir, "[
 ## API
 
 `sbgnviz.expandNodes(nodes)`
-Expands the given nodes. Considers 'undoable' option.
+Expand given nodes. Requires expandCollapse extension and considers undoable option.
 
 `sbgnviz.collapseNodes(nodes)`
-Collapses the given nodes. Considers 'undoable' option.
+Collapse given nodes. Requires expandCollapse extension and considers undoable option.
 
 `sbgnviz.expandComplexes()`
-Expands the complex nodes in the graph recursively. Considers 'undoable' option.
+Expands the complex nodes in the graph recursively. Requires expandCollapse extension and considers undoable option.
 
 `sbgnviz.collapseComplexes()`
-Collapses the complex nodes in the graph recursively. Considers 'undoable' option.
+Collapses the complex nodes in the graph recursively. Requires expandCollapse extension and considers undoable option.
 
 `sbgnviz.collapseAll()`
-Collapses all nodes in the graph recursively. Considers 'undoable' option.
+Collapses all nodes in the graph recursively. Requires expandCollapse extension and considers undoable option.
 
 `sbgnviz.expandAll()`
-Expands all nodes in the graph recursively. Considers 'undoable' option.
+Expands all nodes in the graph recursively. Requires expandCollapse extension and considers undoable option.
 
 `sbgnviz.hideNodesSmart(nodes)`
-Extends the given nodes list in a smart way to leave the map intact and hides the resulting list. Considers 'undoable' option.
+Extends the given nodes list in a smart way to leave the map intact and hides the resulting list. Requires viewUtilities extension and considers 'undoable' option.
 
 `sbgnviz.showNodesSmart(nodes)`
-Extends the given nodes list in a smart way to leave the map intact. Then unhides the resulting list and hides others. Considers 'undoable' option.
+Extends the given nodes list in a smart way to leave the map intact. Then unhides the resulting list and hides others. Requires viewUtilities extension and considers 'undoable' option.
 
 `sbgnviz.showAll()`
-Unhides all elements. Considers 'undoable' option.
+Unhides all elements. Requires viewUtilities extension and considers 'undoable' option.
 
 `sbgnviz.deleteElesSimple(eles)`
 Removes the given elements in a simple way. Considers 'undoable' option.
@@ -73,17 +73,17 @@ Removes the given elements in a simple way. Considers 'undoable' option.
 Extends the given nodes list in a smart way to leave the map intact and removes the resulting list. Considers 'undoable' option.
 
 `sbgnviz.highlightNeighbours(nodes)`
-Highlights neighbours of the given nodes. Considers 'undoable' option.
+Highlights neighbours of the given nodes. Requires viewUtilities extension and considers 'undoable' option.
 
 `sbgnviz.highlightProcesses(nodes)`
-Highlights processes of the given nodes. Considers 'undoable' option.
+Highlights processes of the given nodes. Requires viewUtilities extension and considers 'undoable' option.
 
 `sbgnviz.searchByLabel(label)`
 Finds the elements whose label includes the given label and highlights processes of those elements.
-Considers 'undoable' option.
+Requires viewUtilities extension and considers 'undoable' option.
 
 `sbgnviz.removeHighlights()`
-Unhighlights any highlighted element. Considers 'undoable' option.
+Unhighlights any highlighted element. Requires viewUtilities extension and considers 'undoable' option.
 
 `sbgnviz.performLayout(layoutOptions, notUndoable)`
 Performs layout by given layoutOptions. Considers 'undoable' option. However, by setting notUndoable parameter
@@ -157,6 +157,14 @@ an extension library of sbgnviz. Most users will not need to use this. For furth
  * cytoscape (iVis-at-Bilkent/cytoscape.js#unstable)
  * jQuery ^2.2.4
  * filesaverjs ~0.2.2
+
+## Optional Dependencies
+The following extensions are used by this library if they are registered.
+ * cytoscape-undo-redo ^1.2.1
+ * cytoscape-expand-collapse ^3.0.0
+ * cytoscape-edge-bend-editing ^1.4.0
+ * cytoscape-view-utilities ^2.0.0
+
 
 ## Usage instructions
 Download the library:

@@ -34,8 +34,12 @@ function beforePerformLayout() {
 
 function mainUtilities() {}
 
+// Expand given nodes. Requires expandCollapse extension and considers undoable option.
 mainUtilities.expandNodes = function(nodes) {
-  var nodesToExpand = nodes.expandableNodes();
+  // Get expandCollapse api
+  var expandCollapse = cy.expandCollapse('get');
+  
+  var nodesToExpand = expandCollapse.expandableNodes(nodes);
   if (nodesToExpand.length == 0) {
     return;
   }
@@ -45,12 +49,16 @@ mainUtilities.expandNodes = function(nodes) {
     });
   }
   else {
-    nodes.expand();
+    expandCollapse.expand(nodes);
   }
 };
 
+// Collapse given nodes. Requires expandCollapse extension and considers undoable option.
 mainUtilities.collapseNodes = function(nodes) {
-  if (nodes.collapsibleNodes().length == 0) {
+  // Get expandCollapse api
+  var expandCollapse = cy.expandCollapse('get');
+  
+  if (expandCollapse.collapsibleNodes(nodes).length == 0) {
     return;
   }
   
@@ -60,13 +68,17 @@ mainUtilities.collapseNodes = function(nodes) {
     });
   }
   else {
-    nodes.collapse();
+    expandCollapse.collapse(nodes);
   }
 };
 
+// Collapse all complexes recursively. Requires expandCollapse extension and considers undoable option.
 mainUtilities.collapseComplexes = function() {
+  // Get expandCollapse api
+  var expandCollapse = cy.expandCollapse('get');
+  
   var complexes = cy.nodes("[class='complex']");
-  if (complexes.collapsibleNodes().length == 0) {
+  if (expandCollapse.collapsibleNodes(complexes).length == 0) {
     return;
   }
   
@@ -76,12 +88,16 @@ mainUtilities.collapseComplexes = function() {
     });
   }
   else {
-    complexes.collapseRecursively();
+    expandCollapse.collapseRecursively(complexes);
   }
 };
 
+// Expand all complexes recursively. Requires expandCollapse extension and considers undoable option.
 mainUtilities.expandComplexes = function() {
-  var nodes = cy.nodes().filter("[class='complex']").expandableNodes();
+  // Get expandCollapse api
+  var expandCollapse = cy.expandCollapse('get');
+  
+  var nodes = expandCollapse.expandableNodes(cy.nodes().filter("[class='complex']"));
   if (nodes.length == 0) {
     return;
   }
@@ -92,13 +108,17 @@ mainUtilities.expandComplexes = function() {
     });
   }
   else {
-    nodes.expandRecursively();
+    expandCollapse.expandRecursively(nodes);
   }
 };
 
+// Collapse all nodes recursively. Requires expandCollapse extension and considers undoable option.
 mainUtilities.collapseAll = function() {
+  // Get expandCollapse api
+  var expandCollapse = cy.expandCollapse('get');
+  
   var nodes = cy.nodes(':visible');
-  if (nodes.collapsibleNodes().length == 0) {
+  if (expandCollapse.collapsibleNodes(nodes).length == 0) {
     return;
   }
   
@@ -108,12 +128,16 @@ mainUtilities.collapseAll = function() {
     });
   }
   else {
-    nodes.collapseRecursively();
+    expandCollapse.collapseRecursively(nodes);
   }
 };
 
+// Expand all nodes recursively. Requires expandCollapse extension and considers undoable option.
 mainUtilities.expandAll = function() {
-  var nodes = cy.nodes(':visible').expandableNodes();
+  // Get expandCollapse api
+  var expandCollapse = cy.expandCollapse('get');
+  
+  var nodes = expandCollapse.expandableNodes(cy.nodes(':visible'));
   if (nodes.length == 0) {
     return;
   }
@@ -124,10 +148,12 @@ mainUtilities.expandAll = function() {
     });
   }
   else {
-    nodes.expandRecursively();
+    expandCollapse.expandRecursively(nodes);
   }
 };
 
+// Extends the given nodes list in a smart way to leave the map intact and hides the resulting list. 
+// Requires viewUtilities extension and considers 'undoable' option.
 mainUtilities.hideNodesSmart = function(_nodes) {
   // If this function is being called we can assume that view utilities extension is on use
   var viewUtilities = cy.viewUtilities('get');
@@ -149,6 +175,8 @@ mainUtilities.hideNodesSmart = function(_nodes) {
   }
 };
 
+// Extends the given nodes list in a smart way to leave the map intact. 
+// Then unhides the resulting list and hides others. Requires viewUtilities extension and considers 'undoable' option.
 mainUtilities.showNodesSmart = function(_nodes) {
   // If this function is being called we can assume that view utilities extension is on use
   var viewUtilities = cy.viewUtilities('get');
@@ -170,6 +198,7 @@ mainUtilities.showNodesSmart = function(_nodes) {
   }
 };
 
+// Unhides all elements. Requires viewUtilities extension and considers 'undoable' option.
 mainUtilities.showAll = function() {
   // If this function is being called we can assume that view utilities extension is on use
   var viewUtilities = cy.viewUtilities('get');
@@ -186,6 +215,7 @@ mainUtilities.showAll = function() {
   }
 };
 
+// Removes the given elements in a simple way. Considers 'undoable' option.
 mainUtilities.deleteElesSimple = function(eles) {
   if (eles.length == 0) {
     return;
@@ -201,6 +231,8 @@ mainUtilities.deleteElesSimple = function(eles) {
   }
 };
 
+// Extends the given nodes list in a smart way to leave the map intact and removes the resulting list. 
+// Considers 'undoable' option.
 mainUtilities.deleteNodesSmart = function(_nodes) {
   var nodes = _nodes.nodes();
   if (nodes.length == 0) {
@@ -218,7 +250,11 @@ mainUtilities.deleteNodesSmart = function(_nodes) {
   }
 };
 
+// Highlights neighbours of the given nodes. Requires viewUtilities extension and considers 'undoable' option.
 mainUtilities.highlightNeighbours = function(_nodes) {
+  // If this function is being called we can assume that view utilities extension is on use
+  var viewUtilities = cy.viewUtilities('get');
+  
   var nodes = _nodes.nodes(); // Ensure that nodes list just include nodes
   var elesToHighlight = elementUtilities.getNeighboursOfNodes(nodes);
   if (elesToHighlight.length === 0) {
@@ -234,10 +270,12 @@ mainUtilities.highlightNeighbours = function(_nodes) {
     cy.undoRedo().do("highlight", elesToHighlight);
   }
   else {
-    elesToHighlight.highlight();
+    viewUtilities.highlight(elesToHighlight);
   }
 };
 
+// Finds the elements whose label includes the given label and highlights processes of those elements.
+// Requires viewUtilities extension and considers 'undoable' option.
 mainUtilities.searchByLabel = function(label) {
   if (label.length == 0) {
     return;
@@ -253,6 +291,9 @@ mainUtilities.searchByLabel = function(label) {
   if (nodesToHighlight.length == 0) {
     return;
   }
+  
+  // If this function is being called we can assume that view utilities extension is on use
+  var viewUtilities = cy.viewUtilities('get');
 
   nodesToHighlight = elementUtilities.extendNodeList(nodesToHighlight);
   
@@ -260,10 +301,11 @@ mainUtilities.searchByLabel = function(label) {
     cy.undoRedo().do("highlight", nodesToHighlight);
   }
   else {
-    nodesToHighlight.highlight();
+    viewUtilities.highlight(nodesToHighlight);
   }
 };
 
+// Highlights processes of the given nodes. Requires viewUtilities extension and considers 'undoable' option.
 mainUtilities.highlightProcesses = function(_nodes) {
   var nodes = _nodes.nodes(); // Ensure that nodes list just include nodes
   var elesToHighlight = elementUtilities.extendNodeList(nodes);
@@ -276,27 +318,36 @@ mainUtilities.highlightProcesses = function(_nodes) {
     return;
   }
   
+  // If this function is being called we can assume that view utilities extension is on use
+  var viewUtilities = cy.viewUtilities('get');
+  
   if (options.undoable) {
     cy.undoRedo().do("highlight", elesToHighlight);
   }
   else {
-    elesToHighlight.highlight();
+    viewUtilities.highlight(elesToHighlight);
   }
 };
 
+// Unhighlights any highlighted element. Requires viewUtilities extension and considers 'undoable' option.
 mainUtilities.removeHighlights = function() {
   if (elementUtilities.noneIsNotHighlighted()) {
     return;
   }
   
+  // If this function is being called we can assume that view utilities extension is on use
+  var viewUtilities = cy.viewUtilities('get');
+  
   if (options.undoable) {
     cy.undoRedo().do("removeHighlights");
   }
   else {
-    cy.removeHighlights();
+    viewUtilities.removeHighlights();
   }
 };
 
+// Performs layout by given layoutOptions. Considers 'undoable' option. However, by setting notUndoable parameter
+// to a truthy value you can force an undable layout operation independant of 'undoable' option.
 mainUtilities.performLayout = function(layoutOptions, notUndoable) {
   // Things to do before performing layout
   beforePerformLayout();
@@ -312,14 +363,18 @@ mainUtilities.performLayout = function(layoutOptions, notUndoable) {
   }
 };
 
+// Creates an sbgnml file content from the exising graph and returns it.
 mainUtilities.createSbgnml = function() {
   return jsonToSbgnml.createSbgnml();
 };
 
+// Converts given sbgnml data to a json object in a special format 
+// (http://js.cytoscape.org/#notation/elements-json) and returns it.
 mainUtilities.convertSbgnmlToJson = function(data) {
   return sbgnmlToJson.convert(data);
 };
 
+// Create the qtip contents of the given node and returns it.
 mainUtilities.getQtipContent = function(node) {
   return elementUtilities.getQtipContent(node);
 };
