@@ -137,11 +137,28 @@ Ends any spinner having a css class with the given name. Requires 'fontawesome.c
 
 `sbgnviz.elementUtilities`
 General and sbgn specific utilities for cytoscape elements. These are exposed for the users who builds an extension
-library of sbgnviz. Most users will not need to use this. For further details please see 'src/utilities/element-utilities.js'
+library of sbgnviz. Most users will not need to use this. It includes the followings.
+
+ * `getTopMostNodes(nodes)` This method returns the nodes non of whose ancestors is not in given nodes.
+ * `allHaveTheSameParent(nodes)` This method checks if all of the given nodes have the same parent assuming that the size of  nodes is not 0.
+ * `moveNodes(positionDiff, nodes)` This method moves given nodes by the given position difference.
+ * `convertToModelPosition(renderedPosition)` This method calculates the modal position of the given rendered position by considering current the pan and zoom level of the graph.
+ * `getProcessesOfSelected()` Returns the processes of the selected nodes.
+ * `getNeighboursOfSelected()` Returns the neighbours of the selected nodes.
+ * `getNeighboursOfNodes(nodes)` Returns the neighbours of the given nodes.
+ * `extendNodeList(nodes)` Extends the given nodes list in a smart way to leave the map intact and returns the resulting list.
+ * `noneIsNotHighlighted()` Returns true if there is no element having 'unhighlighted' class.
+ * `deleteNodesSmart(nodes)` Extends the given nodes list in a smart way to leave the map intact and removes the resulting list.
+ * `deleteElesSimple` Removes the given elements in a simple way.
+ 
 
 `sbgnviz.undoRedoActionFunctions`
 Functions to be utilized in defining new actions for cytoscape.js-undo-redo extension. These are exposed for the users who builds
-an extension library of sbgnviz. Most users will not need to use this. For further details please see 'src/utilities/undo-redo-action-functions.js'
+an extension library of sbgnviz.
+
+ * `deleteElesSimple(param)` Do/Redo function for 'deleteElesSimple' undo redo command.
+ * `deleteNodesSmart(param)` Do/Redo function for 'deleteNodesSmart' undo redo command.
+ * `restoreEles(eles)` Undo function for 'deleteElesSimple' and 'deleteNodesSmart' undo redo commands.
 
 ## Events
 `$(document).on('sbgnvizLoadSample', function(event, filename) { ... });` Triggered when a sample is being loaded
