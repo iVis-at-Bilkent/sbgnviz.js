@@ -81,14 +81,20 @@ graphUtilities.calculatePaddings = function(paddingPercent) {
 };
 
 graphUtilities.refreshPaddings = function(recalculatePaddings, nodes) {
-  // If it is not forced do not recalculate paddings
-  var calc_padding = recalculatePaddings ? this.calculatePaddings() : this.calculatedPaddings;
   // Consider all nodes by default
   if (!nodes) {
     nodes = cy.nodes();
   }
   
   var compounds = nodes.filter('$node > node');
+  
+  // If there is no compound return directly
+  if (compounds.length === 0) {
+    return;
+  }
+  
+  // If it is not forced do not recalculate paddings
+  var calc_padding = recalculatePaddings ? this.calculatePaddings() : this.calculatedPaddings;
   
   cy.startBatch();
   compounds.css('padding-left', calc_padding);
