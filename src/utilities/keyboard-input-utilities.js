@@ -86,19 +86,6 @@ $(document).ready(function () {
     
     $(this).val("" + value);
   });
-  
-  $(document).keydown(function (e) {
-    if (options.undoable) { // Listen undo redo shortcuts if 'undoable'
-      if (keyboardInputUtilities.isCtrlOrCommandPressed(e) && e.target.nodeName === 'BODY') {
-        if (e.which === 90) { // ctrl + z
-          cy.undoRedo().undo();
-        }
-        else if (e.which === 89) { // ctrl + y
-          cy.undoRedo().redo();
-        }
-      }
-    }
-  });
 });
 
 module.exports = keyboardInputUtilities;
