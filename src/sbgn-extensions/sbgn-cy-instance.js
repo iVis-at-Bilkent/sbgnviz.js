@@ -111,7 +111,7 @@ module.exports = function () {
             'text-halign': 'center',
             'border-width': 1.5,
             'border-color': '#555',
-            'background-color': '#f6f6f6',
+            'background-color': '#ffffff',
             'background-opacity': 0.5,
             'text-opacity': 1,
             'opacity': 1
@@ -151,13 +151,8 @@ module.exports = function () {
           .css({
             'shape-polygon-points': '-1, -1,   0.25, -1,   1, 0,    0.25, 1,    -1, 1'
           })
-          .selector("node[class='association']")
-          .css({
-            'background-color': '#6B6B6B'
-          })
           .selector("node[class='complex']")
           .css({
-            'background-color': '#F4F3EE',
             'text-valign': 'bottom',
             'text-halign': 'center'
           })
@@ -165,7 +160,6 @@ module.exports = function () {
           .css({
             'border-width': 3.75,
             'background-opacity': 0,
-            'background-color': '#FFFFFF',
             'text-valign': 'bottom',
             'text-halign': 'center'
           })
