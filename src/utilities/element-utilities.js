@@ -180,6 +180,9 @@ var elementUtilities = {
         nodesToShow = this.extendNodeList(nodesToShow);
         return nodesToShow;
     },
+    getProcessesOfNodes: function(nodes) {
+      return this.extendNodeList(nodes);
+    },
     // general utilities
     noneIsNotHighlighted: function(){
         var notHighlightedNodes = cy.nodes(":visible").nodes(".unhighlighted");
