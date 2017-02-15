@@ -146,7 +146,7 @@ library of sbgnviz. Most users will not need to use this. It includes the follow
  * `getProcessesOfSelected()` Returns the processes of the selected nodes.
  * `getNeighboursOfSelected()` Returns the neighbours of the selected nodes.
  * `getNeighboursOfNodes(nodes)` Returns the neighbours of the given nodes.
- * `extendNodeList(nodes)` Extends the given nodes list in a smart way to leave the map intact and returns the resulting list.
+ * `getProcessesOfNodes(nodes)` Extends the given nodes list in a smart way to leave the map intact and returns the resulting list. Aliases `extendNodeList`.
  * `noneIsNotHighlighted()` Returns true if there is no element having 'unhighlighted' class.
  * `deleteNodesSmart(nodes)` Extends the given nodes list in a smart way to leave the map intact and removes the resulting list.
  * `deleteElesSimple` Removes the given elements in a simple way.
