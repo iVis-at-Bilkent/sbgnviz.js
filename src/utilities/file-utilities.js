@@ -94,6 +94,7 @@ fileUtilities.loadSample = function(filename, folderpath) {
   setTimeout(function () {
     updateGraph(sbgnmlToJson.convert(xmlObject));
     uiUtilities.endSpinner("load-spinner");
+    $( document ).trigger( "sbgnvizLoadSampleEnd" )
   }, 0);
 };
 
@@ -111,6 +112,7 @@ fileUtilities.loadSBGNMLFile = function(file) {
     setTimeout(function () {
       updateGraph(sbgnmlToJson.convert(textToXmlObject(text)));
       uiUtilities.endSpinner("load-file-spinner");
+      $( document ).trigger( "sbgnvizLoadFileEnd" );
     }, 0);
   };
 
