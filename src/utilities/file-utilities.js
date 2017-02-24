@@ -84,22 +84,30 @@ fileUtilities.saveAsJpg = function(filename) {
 
 fileUtilities.loadSample = function(filename, folderpath) {
   uiUtilities.startSpinner("load-spinner");
-  // load xml document use default folder path if it is not specified
-  var xmlObject = loadXMLDoc((folderpath || 'sample-app/samples/') + filename);
   
   // Users may want to do customized things while a sample is being loaded
   // Trigger an event for this purpose and specify the 'filename' as an event parameter
-  $( document ).trigger( "sbgnvizLoadSample", [ filename ] ); //setFileContent(filename.replace('xml', 'sbgnml'));
+  $( document ).trigger( "sbgnvizLoadSample", [ filename ] ); // Aliases for sbgnvizLoadSampleStart
+  $( document ).trigger( "sbgnvizLoadSampleStart", [ filename ] );
+  
+  // load xml document use default folder path if it is not specified
+  var xmlObject = loadXMLDoc((folderpath || 'sample-app/samples/') + filename);
   
   setTimeout(function () {
     updateGraph(sbgnmlToJson.convert(xmlObject));
     uiUtilities.endSpinner("load-spinner");
+    $( document ).trigger( "sbgnvizLoadSampleEnd", [ filename ] ); // Trigger an event signaling that a sample is loaded
   }, 0);
 };
 
 fileUtilities.loadSBGNMLFile = function(file) {
   var self = this;
   uiUtilities.startSpinner("load-file-spinner");
+  
+  // Users may want to do customized things while an external file is being loaded
+  // Trigger an event for this purpose and specify the 'filename' as an event parameter
+  $( document ).trigger( "sbgnvizLoadFile", [ file.name ] ); // Aliases for sbgnvizLoadFileStart
+  $( document ).trigger( "sbgnvizLoadFileStart", [ file.name ] ); 
   
   var textType = /text.*/;
 
@@ -111,14 +119,11 @@ fileUtilities.loadSBGNMLFile = function(file) {
     setTimeout(function () {
       updateGraph(sbgnmlToJson.convert(textToXmlObject(text)));
       uiUtilities.endSpinner("load-file-spinner");
+      $( document ).trigger( "sbgnvizLoadFileEnd", [ file.name ] ); // Trigger an event signaling that a file is loaded
     }, 0);
   };
 
   reader.readAsText(file);
-
-  // Users may want to do customized things while an external file is being loaded
-  // Trigger an event for this purpose and specify the 'filename' as an event parameter
-  $( document ).trigger( "sbgnvizLoadFile", [ file.name ] ); //setFileContent(file.name);
 };
 
 fileUtilities.saveAsSbgnml = function(filename) {

@@ -190,9 +190,13 @@ an extension library of sbgnviz.
  * `restoreEles(eles)` Undo function for 'deleteElesSimple' and 'deleteNodesSmart' undo redo commands.
 
 ## Events
-`$(document).on('sbgnvizLoadSample', function(event, filename) { ... });` Triggered when a sample is being loaded
+`$(document).on('sbgnvizLoadSampleStart', function(event, filename) { ... });` Triggered when a sample is being loaded. Aliases `sbgnvizLoadSample`.
 
-`$(document).on('sbgnvizLoadFile', function(event, filename) { ... });` Triggered when an external sbgnml file is being loaded
+`$(document).on('sbgnvizLoadFileStart', function(event, filename) { ... });` Triggered when an external sbgnml file is being loaded. Aliases `sbgnvizLoadFile`.
+
+`$(document).on('sbgnvizLoadSampleEnd', function(event, filename) { ... });` Triggered when a sample is loaded
+
+`$(document).on('sbgnvizLoadFileEnd', function(event, filename) { ... });` Triggered when an external sbgnml file is loaded
 
 `$(document).on('updateGraphStart', function(event) { ... });` Triggered when the graph update is just started
 
