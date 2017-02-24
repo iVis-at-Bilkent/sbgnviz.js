@@ -37,6 +37,35 @@ M. Sari, I. Bahceci, U. Dogrusoz, S.O. Sumer, B.A. Aksoy, O. Babur, E. Demir, "[
     };
 ```
 
+## SBGNViz Specific Data
+```javascript
+// Nodes specific data.
+node.data('id'); // Id of a node. (Specific to cytoscape.js)
+node.data('label'); // Label of a node.
+node.data('parent'); // Parent id of a node. (Specific to cytoscape.js)
+node.data('class'); // SBGN specific class of a node. If it ends with 'multimer' it means that this node is a multimer.
+node.data('clonemarker'); // Whether the node is cloned.
+node.data('bbox'); // Bounding box of a node includes bbox.x, bbox.y, bbox.w, bbox.h
+node.data('ports'); // Ports list of a node. A node port includes port.id, port.x, port.y where port.x and port.y are percentages relative to node position and size.
+node.data('statesandinfos'); // Includes state and information boxes list of a node.
+// A stateorinfobox includes the followings.
+var stateorinfobox = node.data('statesandinfos')[i];
+stateorinfobox.id; // Id of that box.
+stateorinfobox.clazz; // See whether that box is related to a 'unit of information' or a 'state variable'.
+stateorinfobox.bbox; // Bbox of that box. Includes bbox.x, bbox.y, bbox.w, bbox.h where bbox.x and bbox.y are percentages relative to node position and size.
+stateorinfobox.state; // Just included in state variables. Includes state.value and state.variable.
+stateorinfobox.label; // Just included in units of information includes label.text.
+// Edges specific data.
+edge.data('id'); // Id of an edge. (Specific to cytoscape.js)
+edge.data('source'); // Id of source node. (Specific to cytoscape.js)
+edge.data('target'); // Id of target node. (Specific to cytoscape.js)
+edge.data('class'); // SBGN specific class of an edge.
+edge.data('cardinality'); // SBGN cardinality of an edge.
+edge.data('portsource'); // This is set if the edge is connected to its source node by a specific port of that node.
+edge.data('porttarget'); // This is set if the edge is connected to its target node by a specific port of that node.
+edge.data('bendPointPositions'); // Bend point positions of an edge. Includes x and y coordinates. This data is to be passed to edgeBendEditing extension.
+```
+
 ## API
 
 `sbgnviz.expandNodes(nodes)`
@@ -161,9 +190,13 @@ an extension library of sbgnviz.
  * `restoreEles(eles)` Undo function for 'deleteElesSimple' and 'deleteNodesSmart' undo redo commands.
 
 ## Events
-`$(document).on('sbgnvizLoadSample', function(event, filename) { ... });` Triggered when a sample is being loaded
+`$(document).on('sbgnvizLoadSampleStart', function(event, filename) { ... });` Triggered when a sample is being loaded. Aliases `sbgnvizLoadSample`.
 
-`$(document).on('sbgnvizLoadFile', function(event, filename) { ... });` Triggered when an external sbgnml file is being loaded
+`$(document).on('sbgnvizLoadFileStart', function(event, filename) { ... });` Triggered when an external sbgnml file is being loaded. Aliases `sbgnvizLoadFile`.
+
+`$(document).on('sbgnvizLoadSampleEnd', function(event, filename) { ... });` Triggered when a sample is loaded
+
+`$(document).on('sbgnvizLoadFileEnd', function(event, filename) { ... });` Triggered when an external sbgnml file is loaded
 
 `$(document).on('updateGraphStart', function(event) { ... });` Triggered when the graph update is just started
 
