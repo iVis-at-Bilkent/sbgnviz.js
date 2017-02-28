@@ -234,7 +234,7 @@ module.exports = function () {
             ? "@" + stateVariable
             : "");
 
-    var fontSize = parseInt(textProp.height / 1.5);
+    var fontSize = 9; // parseInt(textProp.height / 1.5);
 
     textProp.font = fontSize + "px Arial";
     textProp.label = stateLabel;
@@ -243,7 +243,7 @@ module.exports = function () {
   };
 
   $$.sbgn.drawInfoText = function (context, textProp) {
-    var fontSize = parseInt(textProp.height / 1.5);
+    var fontSize = 9; // parseInt(textProp.height / 1.5);
     textProp.font = fontSize + "px Arial";
     textProp.color = "#0f0f0f";
     $$.sbgn.drawText(context, textProp);
