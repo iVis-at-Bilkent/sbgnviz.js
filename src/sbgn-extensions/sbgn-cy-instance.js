@@ -109,7 +109,7 @@ module.exports = function () {
           .css({
             'text-valign': 'center',
             'text-halign': 'center',
-            'border-width': 1.5,
+            'border-width': 1.25,
             'border-color': '#555',
             'background-color': '#ffffff',
             'background-opacity': 0.5,
@@ -158,7 +158,7 @@ module.exports = function () {
           })
           .selector("node[class='compartment']")
           .css({
-            'border-width': 3.75,
+            'border-width': 3.25,
             'background-opacity': 0,
             'text-valign': 'bottom',
             'text-halign': 'center'
@@ -191,7 +191,7 @@ module.exports = function () {
             'line-color': '#555',
             'target-arrow-fill': 'hollow',
             'source-arrow-fill': 'hollow',
-            'width': 1.5,
+            'width': 1.25,
             'target-arrow-color': '#555',
             'source-arrow-color': '#555',
             'text-border-color': function (ele) {
