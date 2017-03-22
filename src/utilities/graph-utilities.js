@@ -38,7 +38,7 @@ graphUtilities.updateGraph = function(cyGraph) {
     padding: 50
   });
 
-  this.refreshPaddings(true);
+  this.refreshPaddings(); // Recalculates/refreshes the compound paddings
   cy.endBatch();
 
   // Update the style
@@ -74,34 +74,15 @@ graphUtilities.calculatePaddings = function(paddingPercent) {
   if (calc_padding < 5) {
     calc_padding = 5;
   }
-  
-  this.calculatedPaddings = calc_padding;
 
   return calc_padding;
 };
 
-graphUtilities.refreshPaddings = function(recalculatePaddings, nodes) {
-  // Consider all nodes by default
-  if (!nodes) {
-    nodes = cy.nodes();
-  }
-  
-  var compounds = nodes.filter('$node > node');
-  
-  // If there is no compound return directly
-  if (compounds.length === 0) {
-    return;
-  }
-  
-  // If it is not forced do not recalculate paddings
-  var calc_padding = recalculatePaddings ? this.calculatePaddings() : this.calculatedPaddings;
-  
-  cy.startBatch();
-  compounds.css('padding-left', calc_padding);
-  compounds.css('padding-right', calc_padding);
-  compounds.css('padding-top', calc_padding);
-  compounds.css('padding-bottom', calc_padding);
-  cy.endBatch();
+graphUtilities.recalculatePaddings = graphUtilities.refreshPaddings = function() {
+  // this.calculatedPaddings is not working here 
+  // TODO: replace this reference with this.calculatedPaddings once the reason is figured out
+  graphUtilities.calculatedPaddings = this.calculatePaddings();
+  return graphUtilities.calculatedPaddings;
 };
 
 module.exports = graphUtilities;

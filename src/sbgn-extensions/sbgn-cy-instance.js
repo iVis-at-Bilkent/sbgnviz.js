@@ -10,6 +10,11 @@ var cytoscape = libs.cytoscape;
 var optionUtilities = require('../utilities/option-utilities');
 var options = optionUtilities.getOptions();
 
+var getCompoundPaddings = function() {
+  // Return calculated paddings in case of that data is invalid return 5
+  return graphUtilities.calculatedPaddings || 5;
+};
+
 module.exports = function () {
   var containerSelector = options.networkContainerSelector;
   var imgPath = options.imgPath;
@@ -76,17 +81,6 @@ module.exports = function () {
       edges.scratch('cyedgebendeditingDistances', []);
     });
 
-    cy.on("expandcollapse.aftercollapse", "node", function (event) {
-      var node = this;
-      // Normally simple nodes are expected to have no paddings but interestingly they have
-      // This problem may be caused by that we are not using original cytoscape.js the following
-      // lines should be removed when the problem is fixed.
-      node.css('padding-left', 0);
-      node.css('padding-right', 0);
-      node.css('padding-top', 0);
-      node.css('padding-bottom', 0);
-    });
-
     cy.on("expandcollapse.beforeexpand", "node", function (event) {
       var node = this;
       node.removeData("infoLabel");
@@ -99,8 +93,6 @@ module.exports = function () {
       if (node._private.data.class == "complex") {
         node.removeStyle('content');
       }
-      // refresh the padding of node
-      refreshPaddings(false, node); 
     });
   }
 
@@ -114,7 +106,18 @@ module.exports = function () {
             'background-color': '#ffffff',
             'background-opacity': 0.5,
             'text-opacity': 1,
-            'opacity': 1
+            'opacity': 1,
+            'padding-left': 0,
+            'padding-right': 0,
+            'padding-top': 0,
+            'padding-bottom': 0
+          })
+          .selector("node:parent")
+          .css({
+            'padding-left': getCompoundPaddings,
+            'padding-right': getCompoundPaddings,
+            'padding-top': getCompoundPaddings,
+            'padding-bottom': getCompoundPaddings
           })
           .selector("node[?clonemarker][class='perturbing agent']")
           .css({

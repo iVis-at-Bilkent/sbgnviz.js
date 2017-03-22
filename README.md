@@ -135,10 +135,8 @@ in a special format (http://js.cytoscape.org/#notation/elements-json).
 Calculates the paddings for compounds based on dimensions of simple nodes and a specific percentadge.
 As this percentadge takes the given paddingPercent or compoundPadding option.
 
-`sbgnviz.refreshPaddings(recalculatePaddings, nodes)`
-If nodes parameter is set refreshes the paddings of given nodes, else refreshes the paddings of whole graph.
-If recalculatePaddings parameter is set to a truthy value recalculates the paddings before refreshing, else uses
-the last calculated value for the paddings. 
+`sbgnviz.recalculatePaddings()`
+Recalculates/refreshes the compound paddings. Aliases `sbgnviz.refreshPaddings()`.
 
 `sbgnviz.saveAsPng(filename)`
 Exports the current graph to a png file. The name of the file is determined by the filename parameter which is 
