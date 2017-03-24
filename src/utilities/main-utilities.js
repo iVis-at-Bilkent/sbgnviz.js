@@ -281,7 +281,10 @@ mainUtilities.searchByLabel = function(label) {
     return;
   }
   
-  var nodesToHighlight = cy.nodes(":visible").filter(function (i, ele) {
+  var nodesToHighlight = cy.nodes(":visible").filter(function (ele, i) {
+    if(typeof ele === "number") {
+      ele = i;
+    }
     if (ele.data("label") && ele.data("label").toLowerCase().indexOf(label) >= 0) {
       return true;
     }
