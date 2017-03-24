@@ -125,6 +125,13 @@ fileUtilities.loadSBGNMLFile = function(file) {
 
   reader.readAsText(file);
 };
+fileUtilities.loadSBGNMLText = function(textData){
+    setTimeout(function () {
+        updateGraph(sbgnmlToJson.convert(textToXmlObject(textData)));
+        uiUtilities.endSpinner("load-file-spinner");
+    }, 0);
+
+};
 
 fileUtilities.saveAsSbgnml = function(filename) {
   var sbgnmlText = jsonToSbgnml.createSbgnml();
