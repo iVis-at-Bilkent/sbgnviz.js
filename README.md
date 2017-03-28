@@ -152,6 +152,9 @@ Loads a sample file whose name and path of containing folder is given.
 `sbgnviz.loadSBGNMLFile(file)`
 Loads the given sbgnml file.
 
+`loadSBGNMLText(textData)`
+Loads a graph from the given text data in sbgnml format.
+
 `sbgnviz.saveAsSbgnml(filename)`
 Exports the current graph to an sbgnml file with the given filename.
 
