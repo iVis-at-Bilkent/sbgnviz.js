@@ -65,6 +65,7 @@ function textToXmlObject(text) {
 // Helper functions End
 
 function fileUtilities() {}
+fileUtilities.loadXMLDoc = loadXMLDoc;
 
 fileUtilities.saveAsPng = function(filename) {
   var pngContent = cy.png({scale: 3, full: true});
