@@ -93,12 +93,13 @@ var jsonToSbgnml = {
     addCommonGlyphProperties : function(node){
         var sbgnmlText = "";
 
+        // order matters here for the validation of an xsd:sequence
         //add label information
         sbgnmlText = sbgnmlText + this.addLabel(node);
-        //add bbox information
-        sbgnmlText = sbgnmlText + this.addGlyphBbox(node);
         //add clone information
         sbgnmlText = sbgnmlText + this.addClone(node);
+        //add bbox information
+        sbgnmlText = sbgnmlText + this.addGlyphBbox(node);
         //add port information
         sbgnmlText = sbgnmlText + this.addPort(node);
         //add state and info box information
