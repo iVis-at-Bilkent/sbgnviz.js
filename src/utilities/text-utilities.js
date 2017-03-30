@@ -28,7 +28,30 @@ var textUtilities = {
       text = text.substring(0, len) + ellipsis;
     }
     return text;
+  },
+
+  // ensure that returned string follows xsd:ID standard
+  // should follow r'^[a-zA-Z_][\w.-]*$'
+  getXMLValidId: function(originalId) {
+    var newId = "";
+    var xmlValidRegex = /^[a-zA-Z_][\w.-]*$/;
+    if (! xmlValidRegex.test(originalId)) { // doesn't comply
+      newId = originalId;
+      newId.replace(/[^\w.-]/, "");
+      if (! xmlValidRegex.test(newId)) { // still doesn't comply
+        newId = "_" + newId;
+        if (! xmlValidRegex.test(newId)) { // normally we should never enter this
+          // if for some obscure reason we still don't comply, throw error.
+          throw new Error("Can't make identifer comply to xsd:ID requirements");
+        }
+      }
+      return newId;
+    }
+    else {
+      return originalId;
+    }
   }
+
 };
 
 module.exports = textUtilities;

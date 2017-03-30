@@ -141,7 +141,7 @@ fileUtilities.loadSBGNMLText = function(textData){
 };
 
 fileUtilities.saveAsSbgnml = function(filename) {
-  var sbgnmlText = jsonToSbgnml.createSbgnml();
+  var sbgnmlText = jsonToSbgnml.createSbgnml(filename);
 
   var blob = new Blob([sbgnmlText], {
     type: "text/plain;charset=utf-8;",

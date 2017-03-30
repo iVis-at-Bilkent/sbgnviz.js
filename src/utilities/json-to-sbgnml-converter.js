@@ -1,12 +1,15 @@
+var txtUtil = require('./text-utilities');
+
 var jsonToSbgnml = {
-    createSbgnml : function(){
+    createSbgnml : function(filename){
         var self = this;
         var sbgnmlText = "";
+        var mapID = txtUtil.getXMLValidId(filename);
 
         //add headers
         sbgnmlText = sbgnmlText + "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>\n";
-        sbgnmlText = sbgnmlText + "<sbgn xmlns='http://sbgn.org/libsbgn/0.2'>\n";
-        sbgnmlText = sbgnmlText + "<map language='process description'>\n";
+        sbgnmlText = sbgnmlText + "<sbgn xmlns='http://sbgn.org/libsbgn/0.3'>\n";
+        sbgnmlText = sbgnmlText + "<map language='process description' id='"+mapID+"'>\n";
 
         //adding glyph sbgnml
         cy.nodes(":visible").each(function(){
@@ -31,11 +34,11 @@ var jsonToSbgnml = {
 
         if(node._private.data.class === "compartment"){
             sbgnmlText = sbgnmlText +
-                "<glyph id='" + node._private.data.id + "' class='compartment' ";
+                "<glyph id='" + txtUtil.getXMLValidId(node._private.data.id) + "' class='compartment' ";
 
             if(node.parent().isParent()){
                 var parent = node.parent();
-                sbgnmlText = sbgnmlText + " compartmentRef='" + node._private.data.parent + "'";
+                sbgnmlText = sbgnmlText + " compartmentRef='" + txtUtil.getXMLValidId(node._private.data.parent) + "'";
             }
 
             sbgnmlText = sbgnmlText + " >\n";
@@ -50,12 +53,12 @@ var jsonToSbgnml = {
         }
         else if(node._private.data.class === "complex" || node._private.data.class === "submap"){
             sbgnmlText = sbgnmlText +
-                "<glyph id='" + node._private.data.id + "' class='" + node._private.data.class + "' ";
+                "<glyph id='" + txtUtil.getXMLValidId(node._private.data.id) + "' class='" + node._private.data.class + "' ";
 
             if(node.parent().isParent()){
                 var parent = node.parent()[0];
                 if(parent._private.data.class == "compartment")
-                    sbgnmlText = sbgnmlText + " compartmentRef='" + parent._private.data.id + "'";
+                    sbgnmlText = sbgnmlText + " compartmentRef='" + txtUtil.getXMLValidId(parent._private.data.id) + "'";
             }
             sbgnmlText = sbgnmlText + " >\n";
 
@@ -69,12 +72,12 @@ var jsonToSbgnml = {
         }
         else{//it is a simple node
             sbgnmlText = sbgnmlText +
-                "<glyph id='" + node._private.data.id + "' class='" + node._private.data.class + "'";
+                "<glyph id='" + txtUtil.getXMLValidId(node._private.data.id) + "' class='" + node._private.data.class + "'";
 
             if(node.parent().isParent()){
                 var parent = node.parent()[0];
                 if(parent._private.data.class == "compartment")
-                    sbgnmlText = sbgnmlText + " compartmentRef='" + parent._private.data.id + "'";
+                    sbgnmlText = sbgnmlText + " compartmentRef='" + txtUtil.getXMLValidId(parent._private.data.id) + "'";
             }
 
             sbgnmlText = sbgnmlText + " >\n";
@@ -116,11 +119,12 @@ var jsonToSbgnml = {
 
         for(var i = 0 ; i < node._private.data.statesandinfos.length ; i++){
             var boxGlyph = node._private.data.statesandinfos[i];
+            var statesandinfosId = txtUtil.getXMLValidId(node._private.data.id)+"_"+i;
             if(boxGlyph.clazz === "state variable"){
-                sbgnmlText = sbgnmlText + this.addStateBoxGlyph(boxGlyph, node);
+                sbgnmlText = sbgnmlText + this.addStateBoxGlyph(boxGlyph, statesandinfosId, node);
             }
             else if(boxGlyph.clazz === "unit of information"){
-                sbgnmlText = sbgnmlText + this.addInfoBoxGlyph(boxGlyph, node);
+                sbgnmlText = sbgnmlText + this.addInfoBoxGlyph(boxGlyph, statesandinfosId, node);
             }
         }
         return sbgnmlText;
@@ -141,9 +145,9 @@ var jsonToSbgnml = {
 
         var arcId = arcSource + "-" + arcTarget;
 
-        sbgnmlText = sbgnmlText + "<arc id='" + arcId +
-            "' target='" + arcTarget +
-            "' source='" + arcSource + "' class='" +
+        sbgnmlText = sbgnmlText + "<arc id='" + txtUtil.getXMLValidId(arcId) +
+            "' target='" + txtUtil.getXMLValidId(arcTarget) +
+            "' source='" + txtUtil.getXMLValidId(arcSource) + "' class='" +
             edge._private.data.class + "'>\n";
 
         sbgnmlText = sbgnmlText + "<start y='" + edge._private.rscratch.startY + "' x='" +
@@ -199,7 +203,7 @@ var jsonToSbgnml = {
             var x = node._private.position.x + ports[i].x * node.width() / 100;
             var y = node._private.position.y + ports[i].y * node.height() / 100;
 
-            sbgnmlText = sbgnmlText + "<port id='" + ports[i].id +
+            sbgnmlText = sbgnmlText + "<port id='" + txtUtil.getXMLValidId(ports[i].id)+
                 "' y='" + y + "' x='" + x + "' />\n";
         }
         return sbgnmlText;
@@ -213,10 +217,10 @@ var jsonToSbgnml = {
         return "";
     },
 
-    addStateBoxGlyph : function(node, mainGlyph){
+    addStateBoxGlyph : function(node, id, mainGlyph){
         var sbgnmlText = "";
 
-        sbgnmlText = sbgnmlText + "<glyph id='" + node.id + "' class='state variable'>\n";
+        sbgnmlText = sbgnmlText + "<glyph id='" + id + "' class='state variable'>\n";
         sbgnmlText = sbgnmlText + "<state ";
 
         if(typeof node.state.value != 'undefined')
@@ -231,10 +235,10 @@ var jsonToSbgnml = {
         return sbgnmlText;
     },
 
-    addInfoBoxGlyph : function(node, mainGlyph){
+    addInfoBoxGlyph : function(node, id, mainGlyph){
         var sbgnmlText = "";
-
-        sbgnmlText = sbgnmlText + "<glyph id='" + node.id + "' class='unit of information'>\n";
+        console.log(node);
+        sbgnmlText = sbgnmlText + "<glyph id='" + id + "' class='unit of information'>\n";
         sbgnmlText = sbgnmlText + "<label ";
 
         if(typeof node.label.text != 'undefined')
