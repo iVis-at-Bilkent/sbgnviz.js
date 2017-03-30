@@ -149,8 +149,8 @@ Exports the current graph to a jpg file. The name of the file is determined by t
 `sbgnviz.loadSample(filename, folderpath)`
 Loads a sample file whose name and path of containing folder is given.
 
-`sbgnviz.loadSBGNMLFile(file)`
-Loads the given sbgnml file.
+`sbgnviz.loadSBGNMLFile(file[, callback])`
+Loads the given sbgnml file. Optionally apply a callback function upon loading. Callback accepts the file as an xml string as argument.
 
 `loadSBGNMLText(textData)`
 Loads a graph from the given text data in sbgnml format.

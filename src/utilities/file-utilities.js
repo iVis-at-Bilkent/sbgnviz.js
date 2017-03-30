@@ -101,7 +101,12 @@ fileUtilities.loadSample = function(filename, folderpath) {
   }, 0);
 };
 
-fileUtilities.loadSBGNMLFile = function(file) {
+/*
+  callback is a function remotely defined to add specific behavior that isn't implemented here.
+  it is completely optional.
+  signature: callback(textXml)
+*/
+fileUtilities.loadSBGNMLFile = function(file, callback) {
   var self = this;
   uiUtilities.startSpinner("load-file-spinner");
   
@@ -117,6 +122,7 @@ fileUtilities.loadSBGNMLFile = function(file) {
   reader.onload = function (e) {
     var text = this.result;
 
+    if (typeof callback !== 'undefined') callback(text);
     setTimeout(function () {
       updateGraph(sbgnmlToJson.convert(textToXmlObject(text)));
       uiUtilities.endSpinner("load-file-spinner");
