@@ -37,7 +37,7 @@ var textUtilities = {
     var xmlValidRegex = /^[a-zA-Z_][\w.-]*$/;
     if (! xmlValidRegex.test(originalId)) { // doesn't comply
       newId = originalId;
-      newId.replace(/[^\w.-]/, "");
+      newId = newId.replace(/[^\w.-]/, "");
       if (! xmlValidRegex.test(newId)) { // still doesn't comply
         newId = "_" + newId;
         if (! xmlValidRegex.test(newId)) { // normally we should never enter this
