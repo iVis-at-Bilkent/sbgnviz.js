@@ -21,22 +21,19 @@ var jsonToSbgnml = {
             sbgnmlText = sbgnmlText + "<extension>\n";
         }
         if (hasRenderExtension) {
-            console.log(renderInfo);
             //var colorDefList = new renderExtension.ListOfColorDefinitions(renderInfo.colorDef.colorList);
             var renderInformation = new renderExtension.RenderInformation('renderInformation', 
-                                                                            undefined, renderInfo.colorDef.backgroundColor);
+                                                                            undefined, renderInfo.background);
             var listOfColorDefinitions = new renderExtension.ListOfColorDefinitions();
-            for (var i=0; i<renderInfo.colorDef.colorList.length; i++) {
-                var color = renderInfo.colorDef.colorList[i];
-                var colorDefinition = new renderExtension.ColorDefinition(txtUtil.getXMLValidId(color), color);
+            for (var color in renderInfo.colors) {
+                var colorDefinition = new renderExtension.ColorDefinition(renderInfo.colors[color], color);
                 listOfColorDefinitions.addColorDefinition(colorDefinition);
             }
             renderInformation.setListOfColorDefinition(listOfColorDefinitions);
 
             var listOfStyles = new renderExtension.ListOfStyles();
-            for (var key in renderInfo.styleDef) {
-                var style = renderInfo.styleDef[key];
-                console.log(style, key, renderInfo);
+            for (var key in renderInfo.styles) {
+                var style = renderInfo.styles[key];
                 var xmlStyle = new renderExtension.Style(txtUtil.getXMLValidId(key), 
                                                         undefined, style.idList.map(txtUtil.getXMLValidId));
                 var g = new renderExtension.RenderGroup({
@@ -58,7 +55,6 @@ var jsonToSbgnml = {
         if (hasExtension) {
             sbgnmlText = sbgnmlText + "</extension>\n";
         }
-        console.log(sbgnmlText);
 
         //adding glyph sbgnml
         cy.nodes(":visible").each(function(){
