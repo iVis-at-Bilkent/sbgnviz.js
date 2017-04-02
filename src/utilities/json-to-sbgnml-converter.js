@@ -1,15 +1,64 @@
 var txtUtil = require('./text-utilities');
+var renderExtension = require('./sbgnml-render');
 
 var jsonToSbgnml = {
-    createSbgnml : function(filename){
+    createSbgnml : function(filename, renderInfo){
         var self = this;
         var sbgnmlText = "";
         var mapID = txtUtil.getXMLValidId(filename);
+        var hasExtension = false;
+        var hasRenderExtension = false;
+        if (typeof renderInfo !== 'undefined') {
+            hasExtension = true;
+            hasRenderExtension = true;
+        }
 
         //add headers
         sbgnmlText = sbgnmlText + "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>\n";
         sbgnmlText = sbgnmlText + "<sbgn xmlns='http://sbgn.org/libsbgn/0.3'>\n";
         sbgnmlText = sbgnmlText + "<map language='process description' id='"+mapID+"'>\n";
+        if (hasExtension) { // extension is there
+            sbgnmlText = sbgnmlText + "<extension>\n";
+        }
+        if (hasRenderExtension) {
+            console.log(renderInfo);
+            //var colorDefList = new renderExtension.ListOfColorDefinitions(renderInfo.colorDef.colorList);
+            var renderInformation = new renderExtension.RenderInformation('renderInformation', 
+                                                                            undefined, renderInfo.colorDef.backgroundColor);
+            var listOfColorDefinitions = new renderExtension.ListOfColorDefinitions();
+            for (var i=0; i<renderInfo.colorDef.colorList.length; i++) {
+                var color = renderInfo.colorDef.colorList[i];
+                var colorDefinition = new renderExtension.ColorDefinition(txtUtil.getXMLValidId(color), color);
+                listOfColorDefinitions.addColorDefinition(colorDefinition);
+            }
+            renderInformation.setListOfColorDefinition(listOfColorDefinitions);
+
+            var listOfStyles = new renderExtension.ListOfStyles();
+            for (var key in renderInfo.styleDef) {
+                var style = renderInfo.styleDef[key];
+                console.log(style, key, renderInfo);
+                var xmlStyle = new renderExtension.Style(txtUtil.getXMLValidId(key), 
+                                                        undefined, style.idList.map(txtUtil.getXMLValidId));
+                var g = new renderExtension.RenderGroup({
+                    fontSize: style.properties.fontSize,
+                    fontFamily: style.properties.fontFamily,
+                    fontWeight: style.properties.fontWeight,
+                    fontStyle: style.properties.fontStyle,
+                    fill: style.properties.fill, // fill color
+                    stroke: style.properties.stroke, // stroke color
+                    strokeWidth: style.properties.strokeWidth
+                });
+                xmlStyle.setRenderGroup(g);
+                listOfStyles.addStyle(xmlStyle);
+            }
+
+            renderInformation.setListOfStyles(listOfStyles);
+            sbgnmlText =  sbgnmlText + renderInformation.toXML();
+        }
+        if (hasExtension) {
+            sbgnmlText = sbgnmlText + "</extension>\n";
+        }
+        console.log(sbgnmlText);
 
         //adding glyph sbgnml
         cy.nodes(":visible").each(function(){
@@ -238,7 +287,7 @@ var jsonToSbgnml = {
 
     addInfoBoxGlyph : function(node, id, mainGlyph){
         var sbgnmlText = "";
-        console.log(node);
+
         sbgnmlText = sbgnmlText + "<glyph id='" + id + "' class='unit of information'>\n";
         sbgnmlText = sbgnmlText + "<label ";
 
