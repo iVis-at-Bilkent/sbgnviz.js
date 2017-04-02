@@ -37,12 +37,12 @@ var textUtilities = {
     var xmlValidRegex = /^[a-zA-Z_][\w.-]*$/;
     if (! xmlValidRegex.test(originalId)) { // doesn't comply
       newId = originalId;
-      newId = newId.replace(/[^\w.-]/, "");
+      newId = newId.replace(/[^\w.-]/g, "");
       if (! xmlValidRegex.test(newId)) { // still doesn't comply
         newId = "_" + newId;
         if (! xmlValidRegex.test(newId)) { // normally we should never enter this
           // if for some obscure reason we still don't comply, throw error.
-          throw new Error("Can't make identifer comply to xsd:ID requirements");
+          throw new Error("Can't make identifer comply to xsd:ID requirements: "+newId);
         }
       }
       return newId;
