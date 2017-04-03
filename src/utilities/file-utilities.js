@@ -122,8 +122,8 @@ fileUtilities.loadSBGNMLFile = function(file, callback) {
   reader.onload = function (e) {
     var text = this.result;
 
-    if (typeof callback !== 'undefined') callback(text);
     setTimeout(function () {
+      if (typeof callback !== 'undefined') callback(text);
       updateGraph(sbgnmlToJson.convert(textToXmlObject(text)));
       uiUtilities.endSpinner("load-file-spinner");
       $( document ).trigger( "sbgnvizLoadFileEnd", [ file.name ] ); // Trigger an event signaling that a file is loaded

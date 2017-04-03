@@ -1,4 +1,5 @@
 var elementUtilities = require('./element-utilities');
+var renderExtension = require('./sbgnml-render');
 
 var sbgnmlToJson = {
   insertedNodes: {},
@@ -360,6 +361,123 @@ var sbgnmlToJson = {
     var cytoscapeJsEdge = {data: edgeObj};
     jsonArray.push(cytoscapeJsEdge);
   },
+  applyStyle: function (xmlRenderExt, nodes, edges) {
+    // parse the render extension
+    var renderInformation = renderExtension.RenderInformation.fromXML(xmlRenderExt);
+
+    // get all color id references to their value
+    var colorList = renderInformation.listOfColorDefinitions.colorList;
+    var colorIDToValue = {};
+    for (var i=0; i < colorList.length; i++) {
+      colorIDToValue[colorList[i].id] = colorList[i].value;
+    }
+
+    // convert style list to elementId-indexed object pointing to style
+    // also convert color references to color values
+    var styleList = renderInformation.listOfStyles.styleList;
+    var elementIDToStyle = {};
+    for (var i=0; i < styleList.length; i++) {
+      var style = styleList[i];
+      var renderGroup = style.renderGroup;
+
+      // convert color references
+      if (renderGroup.stroke != null) {
+        renderGroup.stroke = colorIDToValue[renderGroup.stroke];
+      }
+      if (renderGroup.fill != null) {
+        renderGroup.fill = colorIDToValue[renderGroup.fill];
+      }
+
+      for (var j=0; j < style.idList.length; j++) {
+        var id = style.idList[j];
+        elementIDToStyle[id] = renderGroup;
+      }
+    }
+
+    function hexToDecimal (hex) {
+      return Math.round(parseInt('0x'+hex) / 255 * 100) / 100;
+    }
+
+    function convertHexColor (hex) {
+      if (hex.length == 7) { // no opacity provided
+        return {opacity: null, color: hex};
+      }
+      else { // length of 9
+        var color = hex.slice(0,7);
+        var opacity = hexToDecimal(hex.slice(-2));
+        return {opacity: opacity, color: color};
+      }
+    }
+
+    // apply the style to nodes and overwrite the default style
+    for (var i=0; i < nodes.length; i++) {
+      var node = nodes[i];
+      // special case for color properties, we need to check opacity
+      var bgColor = elementIDToStyle[node.data['id']].fill;
+      if (bgColor) {
+        var res = convertHexColor(bgColor);
+        node.data['background-color'] = res.color;
+        node.data['background-opacity'] = res.opacity;
+      }
+
+      var borderColor = elementIDToStyle[node.data['id']].stroke;
+      if (borderColor) {
+        var res = convertHexColor(borderColor);
+        node.data['border-color'] = res.color;
+      }
+
+      var borderWidth = elementIDToStyle[node.data['id']].strokeWidth;
+      if (borderWidth) {
+        node.data['border-width'] = borderWidth;
+      }
+
+      var fontSize = elementIDToStyle[node.data['id']].fontSize;
+      if (fontSize) {
+        node.data['font-size'] = fontSize;
+      }
+
+      var fontFamily = elementIDToStyle[node.data['id']].fontFamily;
+      if (fontFamily) {
+        node.data['font-family'] = fontFamily;
+      }
+
+      var fontStyle = elementIDToStyle[node.data['id']].fontStyle;
+      if (fontStyle) {
+        node.data['font-style'] = fontStyle;
+      }
+
+      var fontWeight = elementIDToStyle[node.data['id']].fontWeight;
+      if (fontWeight) {
+        node.data['font-weight'] = fontWeight;
+      }
+
+      var textAnchor = elementIDToStyle[node.data['id']].textAnchor;
+      if (textAnchor) {
+        node.data['text-halign'] = textAnchor;
+      }
+
+      var vtextAnchor = elementIDToStyle[node.data['id']].vtextAnchor;
+      if (vtextAnchor) {
+        node.data['text-valign'] = vtextAnchor;
+      }
+    }
+
+    // do the same for edges
+    for (var i=0; i < edges.length; i++) {
+      var edge = edges[i];
+
+      var lineColor = elementIDToStyle[edge.data['id']].stroke;
+      if (lineColor) {
+        var res = convertHexColor(lineColor);
+        edge.data['line-color'] = res.color;
+      }
+
+      var width = elementIDToStyle[edge.data['id']].strokeWidth;
+      if (width) {
+        edge.data['width'] = width;
+      }
+    }
+  },
   convert: function (xmlObject) {
     var self = this;
     var cytoscapeJsNodes = [];
@@ -367,6 +485,11 @@ var sbgnmlToJson = {
 
     var compartments = self.getAllCompartments(xmlObject);
 
+    var extension = xmlObject.querySelector('extension'); // may not be here
+    var renderInformation;
+    if (extension) {
+      renderInformation = self.findChildNode(extension, 'renderInformation');
+    }
     var glyphs = self.findChildNodes(xmlObject.querySelector('map'), 'glyph');
     var arcs = self.findChildNodes(xmlObject.querySelector('map'), 'arc');
 
@@ -379,6 +502,10 @@ var sbgnmlToJson = {
     for (i = 0; i < arcs.length; i++) {
       var arc = arcs[i];
       self.addCytoscapeJsEdge(arc, cytoscapeJsEdges, xmlObject);
+    }
+
+    if (renderInformation) { // render extension was found
+      self.applyStyle(renderInformation, cytoscapeJsNodes, cytoscapeJsEdges);
     }
 
     var cytoscapeJsGraph = {};
