@@ -2,6 +2,29 @@ var txtUtil = require('./text-utilities');
 var renderExtension = require('./sbgnml-render');
 
 var jsonToSbgnml = {
+    /*
+        takes renderInfo as an optional argument. It contains all the information needed to save
+        the style and colors to the render extension. See newt/app-utilities getAllStyles()
+        Structure: {
+            background: the map background color,
+            colors: {
+              validXmlValue: color_id
+              ...
+            },
+            styles: {
+                styleKey1: {
+                    idList: list of the nodes ids that have this style
+                    properties: {
+                        fontSize: ...
+                        fill: ...
+                        ...
+                    }
+                }
+                styleKey2: ...
+                ...
+            }
+        }
+    */
     createSbgnml : function(filename, renderInfo){
         var self = this;
         var sbgnmlText = "";
@@ -21,36 +44,7 @@ var jsonToSbgnml = {
             sbgnmlText = sbgnmlText + "<extension>\n";
         }
         if (hasRenderExtension) {
-            //var colorDefList = new renderExtension.ListOfColorDefinitions(renderInfo.colorDef.colorList);
-            var renderInformation = new renderExtension.RenderInformation('renderInformation', 
-                                                                            undefined, renderInfo.background);
-            var listOfColorDefinitions = new renderExtension.ListOfColorDefinitions();
-            for (var color in renderInfo.colors) {
-                var colorDefinition = new renderExtension.ColorDefinition(renderInfo.colors[color], color);
-                listOfColorDefinitions.addColorDefinition(colorDefinition);
-            }
-            renderInformation.setListOfColorDefinition(listOfColorDefinitions);
-
-            var listOfStyles = new renderExtension.ListOfStyles();
-            for (var key in renderInfo.styles) {
-                var style = renderInfo.styles[key];
-                var xmlStyle = new renderExtension.Style(txtUtil.getXMLValidId(key), 
-                                                        undefined, style.idList.map(txtUtil.getXMLValidId));
-                var g = new renderExtension.RenderGroup({
-                    fontSize: style.properties.fontSize,
-                    fontFamily: style.properties.fontFamily,
-                    fontWeight: style.properties.fontWeight,
-                    fontStyle: style.properties.fontStyle,
-                    fill: style.properties.fill, // fill color
-                    stroke: style.properties.stroke, // stroke color
-                    strokeWidth: style.properties.strokeWidth
-                });
-                xmlStyle.setRenderGroup(g);
-                listOfStyles.addStyle(xmlStyle);
-            }
-
-            renderInformation.setListOfStyles(listOfStyles);
-            sbgnmlText =  sbgnmlText + renderInformation.toXML();
+            sbgnmlText =  sbgnmlText + self.getRenderExtensionSbgnml(renderInfo);
         }
         if (hasExtension) {
             sbgnmlText = sbgnmlText + "</extension>\n";
@@ -71,6 +65,43 @@ var jsonToSbgnml = {
         sbgnmlText = sbgnmlText + "</sbgn>\n";
 
         return sbgnmlText;
+    },
+
+    // see createSbgnml for info on the structure of renderInfo
+    getRenderExtensionSbgnml : function(renderInfo) {
+        // initialize the main container
+        var renderInformation = new renderExtension.RenderInformation('renderInformation', 
+                                                                            undefined, renderInfo.background);
+
+        // populate list of colors
+        var listOfColorDefinitions = new renderExtension.ListOfColorDefinitions();
+        for (var color in renderInfo.colors) {
+            var colorDefinition = new renderExtension.ColorDefinition(renderInfo.colors[color], color);
+            listOfColorDefinitions.addColorDefinition(colorDefinition);
+        }
+        renderInformation.setListOfColorDefinition(listOfColorDefinitions);
+
+        // populates styles
+        var listOfStyles = new renderExtension.ListOfStyles();
+        for (var key in renderInfo.styles) {
+            var style = renderInfo.styles[key];
+            var xmlStyle = new renderExtension.Style(txtUtil.getXMLValidId(key), 
+                                                    undefined, style.idList.map(txtUtil.getXMLValidId));
+            var g = new renderExtension.RenderGroup({
+                fontSize: style.properties.fontSize,
+                fontFamily: style.properties.fontFamily,
+                fontWeight: style.properties.fontWeight,
+                fontStyle: style.properties.fontStyle,
+                fill: style.properties.fill, // fill color
+                stroke: style.properties.stroke, // stroke color
+                strokeWidth: style.properties.strokeWidth
+            });
+            xmlStyle.setRenderGroup(g);
+            listOfStyles.addStyle(xmlStyle);
+        }
+        renderInformation.setListOfStyles(listOfStyles);
+
+        return renderInformation.toXML();
     },
 
     getGlyphSbgnml : function(node){
