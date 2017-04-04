@@ -220,7 +220,7 @@ var jsonToSbgnml = {
         if (arcTarget == null || arcTarget.length === 0)
             arcTarget = edge._private.data.target;
 
-        var arcId = arcSource + "-" + arcTarget;
+        var arcId = edge._private.data.id; //arcSource + "-" + arcTarget;
 
         sbgnmlText = sbgnmlText + "<arc id='" + txtUtil.getXMLValidId(arcId) +
             "' target='" + txtUtil.getXMLValidId(arcTarget) +
