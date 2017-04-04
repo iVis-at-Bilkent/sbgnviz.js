@@ -86,7 +86,7 @@ var jsonToSbgnml = {
         for (var key in renderInfo.styles) {
             var style = renderInfo.styles[key];
             var xmlStyle = new renderExtension.Style(txtUtil.getXMLValidId(key), 
-                                                    undefined, style.idList.map(txtUtil.getXMLValidId));
+                                                    undefined, style.idList);
             var g = new renderExtension.RenderGroup({
                 fontSize: style.properties.fontSize,
                 fontFamily: style.properties.fontFamily,
@@ -110,11 +110,11 @@ var jsonToSbgnml = {
 
         if(node._private.data.class === "compartment"){
             sbgnmlText = sbgnmlText +
-                "<glyph id='" + txtUtil.getXMLValidId(node._private.data.id) + "' class='compartment' ";
+                "<glyph id='" + node._private.data.id + "' class='compartment' ";
 
             if(node.parent().isParent()){
                 var parent = node.parent();
-                sbgnmlText = sbgnmlText + " compartmentRef='" + txtUtil.getXMLValidId(node._private.data.parent) + "'";
+                sbgnmlText = sbgnmlText + " compartmentRef='" + node._private.data.parent + "'";
             }
 
             sbgnmlText = sbgnmlText + " >\n";
@@ -129,12 +129,12 @@ var jsonToSbgnml = {
         }
         else if(node._private.data.class === "complex" || node._private.data.class === "submap"){
             sbgnmlText = sbgnmlText +
-                "<glyph id='" + txtUtil.getXMLValidId(node._private.data.id) + "' class='" + node._private.data.class + "' ";
+                "<glyph id='" + node._private.data.id + "' class='" + node._private.data.class + "' ";
 
             if(node.parent().isParent()){
                 var parent = node.parent()[0];
                 if(parent._private.data.class == "compartment")
-                    sbgnmlText = sbgnmlText + " compartmentRef='" + txtUtil.getXMLValidId(parent._private.data.id) + "'";
+                    sbgnmlText = sbgnmlText + " compartmentRef='" + parent._private.data.id + "'";
             }
             sbgnmlText = sbgnmlText + " >\n";
 
@@ -148,12 +148,12 @@ var jsonToSbgnml = {
         }
         else{//it is a simple node
             sbgnmlText = sbgnmlText +
-                "<glyph id='" + txtUtil.getXMLValidId(node._private.data.id) + "' class='" + node._private.data.class + "'";
+                "<glyph id='" + node._private.data.id + "' class='" + node._private.data.class + "'";
 
             if(node.parent().isParent()){
                 var parent = node.parent()[0];
                 if(parent._private.data.class == "compartment")
-                    sbgnmlText = sbgnmlText + " compartmentRef='" + txtUtil.getXMLValidId(parent._private.data.id) + "'";
+                    sbgnmlText = sbgnmlText + " compartmentRef='" + parent._private.data.id + "'";
             }
 
             sbgnmlText = sbgnmlText + " >\n";
@@ -196,7 +196,7 @@ var jsonToSbgnml = {
 
         for(var i = 0 ; i < node._private.data.statesandinfos.length ; i++){
             var boxGlyph = node._private.data.statesandinfos[i];
-            var statesandinfosId = txtUtil.getXMLValidId(node._private.data.id)+"_"+i;
+            var statesandinfosId = node._private.data.id+"_"+i;
             if(boxGlyph.clazz === "state variable"){
                 sbgnmlText = sbgnmlText + this.addStateBoxGlyph(boxGlyph, statesandinfosId, node);
             }
@@ -222,9 +222,9 @@ var jsonToSbgnml = {
 
         var arcId = edge._private.data.id; //arcSource + "-" + arcTarget;
 
-        sbgnmlText = sbgnmlText + "<arc id='" + txtUtil.getXMLValidId(arcId) +
-            "' target='" + txtUtil.getXMLValidId(arcTarget) +
-            "' source='" + txtUtil.getXMLValidId(arcSource) + "' class='" +
+        sbgnmlText = sbgnmlText + "<arc id='" + arcId +
+            "' target='" + arcTarget +
+            "' source='" + arcSource + "' class='" +
             edge._private.data.class + "'>\n";
 
         sbgnmlText = sbgnmlText + "<start y='" + edge._private.rscratch.startY + "' x='" +
@@ -280,7 +280,7 @@ var jsonToSbgnml = {
             var x = node._private.position.x + ports[i].x * node.width() / 100;
             var y = node._private.position.y + ports[i].y * node.height() / 100;
 
-            sbgnmlText = sbgnmlText + "<port id='" + txtUtil.getXMLValidId(ports[i].id)+
+            sbgnmlText = sbgnmlText + "<port id='" + ports[i].id+
                 "' y='" + y + "' x='" + x + "' />\n";
         }
         return sbgnmlText;
