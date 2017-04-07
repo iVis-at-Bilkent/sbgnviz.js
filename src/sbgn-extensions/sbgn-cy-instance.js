@@ -157,14 +157,20 @@ module.exports = function () {
           .selector("node[class='complex']")
           .css({
             'text-valign': 'bottom',
-            'text-halign': 'center'
+            'text-halign': 'center',
           })
           .selector("node[class='compartment']")
           .css({
             'border-width': 3.25,
             'background-opacity': 0,
             'text-valign': 'bottom',
-            'text-halign': 'center'
+            'text-halign': 'center',
+            'text-margin-y' : -1 * options.extraCompartmentPadding
+          })
+          .selector("node:parent[class='compartment']")
+          .css({
+            'padding-top': getCompoundPaddings() + options.extraCompartmentPadding,
+            'padding-bottom': getCompoundPaddings() + options.extraCompartmentPadding
           })
           .selector("node[bbox][class][class!='complex'][class!='compartment'][class!='submap']")
           .css({

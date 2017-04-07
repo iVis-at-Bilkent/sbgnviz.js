@@ -19,6 +19,8 @@ var defaults = {
   compoundPadding: function () {
     return 10;
   },
+  // extra padding for compartment
+  extraCompartmentPadding: 10,
   // The selector of the component containing the sbgn network
   networkContainerSelector: '#sbgn-network-container',
   // Whether the actions are undoable, requires cytoscape-undo-redo extension
