@@ -147,5 +147,12 @@ fileUtilities.saveAsSbgnml = function(filename, renderInfo) {
   });
   saveAs(blob, filename);
 };
+fileUtilities.getSbgnmlToJson = function(){
+    return sbgnmlToJson;
+};
+
+fileUtilities.getJsonToSbgnml = function(){
+    return jsonToSbgnml;
+};
 
 module.exports = fileUtilities;
