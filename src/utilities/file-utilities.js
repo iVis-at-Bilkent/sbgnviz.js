@@ -147,12 +147,14 @@ fileUtilities.saveAsSbgnml = function(filename, renderInfo) {
   });
   saveAs(blob, filename);
 };
-fileUtilities.getSbgnmlToJson = function(){
-    return sbgnmlToJson;
+fileUtilities.convertSbgnmlTextToJson = function(sbgnmlText){
+    return sbgnmlToJson.convert(textToXmlObject(sbgnmlText));
 };
 
-fileUtilities.getJsonToSbgnml = function(){
-    return jsonToSbgnml;
+fileUtilities.createJson = function(json){
+    var sbgnmlText = jsonToSbgnml.createSbgnml();
+    return sbgnmlToJson.convert(textToXmlObject(sbgnmlText));
+
 };
 
 module.exports = fileUtilities;
