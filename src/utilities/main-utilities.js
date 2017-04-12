@@ -356,7 +356,12 @@ mainUtilities.performLayout = function(layoutOptions, notUndoable) {
   beforePerformLayout();
   
   if (!options.undoable || notUndoable) { // 'notUndoable' flag can be used to have composite actions in undo/redo stack
-    cy.elements().filter(':visible').layout(layoutOptions);
+    var layout = cy.elements().filter(':visible').layout(layoutOptions);
+    
+    // Check this for cytoscape.js backward compatibility
+    if (layout && layout.run) {
+      layout.run();
+    }
   }
   else {
     cy.undoRedo().do("layout", {

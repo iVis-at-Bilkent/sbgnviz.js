@@ -31,15 +31,20 @@ graphUtilities.updateGraph = function(cyGraph) {
     positionMap[cyGraph.nodes[i].data.id] = {'x': xPos, 'y': yPos};
   }
 
-  cy.layout({
+  this.refreshPaddings(); // Recalculates/refreshes the compound paddings
+  cy.endBatch();
+  
+  var layout = cy.layout({
     name: 'preset',
     positions: positionMap,
     fit: true,
     padding: 50
   });
-
-  this.refreshPaddings(); // Recalculates/refreshes the compound paddings
-  cy.endBatch();
+  
+  // Check this for cytoscape.js backward compatibility
+  if (layout && layout.run) {
+    layout.run();
+  }
 
   // Update the style
   cy.style().update();
