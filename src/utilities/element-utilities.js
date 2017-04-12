@@ -156,14 +156,23 @@ var elementUtilities = {
         // var nonProcesses = nodesToShow.nodes("node[class!='process']");
         // var neighborProcesses = nonProcesses.neighborhood("node[class='process']");
 
-        var processes = nodesToShow.filter(function(){
-            return $.inArray(this._private.data.class, self.processTypes) >= 0;
+        var processes = nodesToShow.filter(function(ele, i){
+            if(typeof ele === "number") {
+              ele = i;
+            }
+            return $.inArray(ele._private.data.class, self.processTypes) >= 0;
         });
-        var nonProcesses = nodesToShow.filter(function(){
-            return $.inArray(this._private.data.class, self.processTypes) === -1;
+        var nonProcesses = nodesToShow.filter(function(ele, i){
+            if(typeof ele === "number") {
+              ele = i;
+            }
+            return $.inArray(ele._private.data.class, self.processTypes) === -1;
         });
-        var neighborProcesses = nonProcesses.neighborhood().filter(function(){
-            return $.inArray(this._private.data.class, self.processTypes) >= 0;
+        var neighborProcesses = nonProcesses.neighborhood().filter(function(ele, i){
+            if(typeof ele === "number") {
+              ele = i;
+            }
+            return $.inArray(ele._private.data.class, self.processTypes) >= 0;
         });
 
         nodesToShow = nodesToShow.add(processes.neighborhood());
