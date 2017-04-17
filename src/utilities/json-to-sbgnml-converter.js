@@ -51,14 +51,20 @@ var jsonToSbgnml = {
         }
 
         //adding glyph sbgnml
-        cy.nodes(":visible").each(function(){
-            if(!this.isChild())
-                sbgnmlText = sbgnmlText + self.getGlyphSbgnml(this);
+        cy.nodes(":visible").each(function(ele, i){
+            if(typeof ele === "number") {
+              ele = i;
+            }
+            if(!ele.isChild())
+                sbgnmlText = sbgnmlText + self.getGlyphSbgnml(ele);
         });
 
         //adding arc sbgnml
-        cy.edges(":visible").each(function(){
-            sbgnmlText = sbgnmlText + self.getArcSbgnml(this);
+        cy.edges(":visible").each(function(ele, i){
+            if(typeof ele === "number") {
+              ele = i;
+            }
+            sbgnmlText = sbgnmlText + self.getArcSbgnml(ele);
         });
 
         sbgnmlText = sbgnmlText + "</map>\n";
@@ -123,8 +129,11 @@ var jsonToSbgnml = {
 
             sbgnmlText = sbgnmlText + "</glyph>\n";
 
-            node.children().each(function(){
-                sbgnmlText = sbgnmlText + self.getGlyphSbgnml(this);
+            node.children().each(function(ele, i){
+                if(typeof ele === "number") {
+                  ele = i;
+                }
+                sbgnmlText = sbgnmlText + self.getGlyphSbgnml(ele);
             });
         }
         else if(node._private.data.class === "complex" || node._private.data.class === "submap"){
@@ -140,8 +149,11 @@ var jsonToSbgnml = {
 
             sbgnmlText = sbgnmlText + self.addCommonGlyphProperties(node);
 
-            node.children().each(function(){
-                sbgnmlText = sbgnmlText + self.getGlyphSbgnml(this);
+            node.children().each(function(ele, i){
+                if(typeof ele === "number") {
+                  ele = i;
+                }
+                sbgnmlText = sbgnmlText + self.getGlyphSbgnml(ele);
             });
 
             sbgnmlText = sbgnmlText + "</glyph>\n";
