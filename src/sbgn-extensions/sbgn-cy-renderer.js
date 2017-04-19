@@ -10,7 +10,6 @@ var cytoscape = libs.cytoscape;
 var cyMath = cytoscape.math;
 var cyBaseNodeShapes = cytoscape.baseNodeShapes;
 var cyStyleProperties = cytoscape.styleProperties;
-var cyBaseArrowShapes = cytoscape.baseArrowShapes;
 
 module.exports = function () {
   var $$ = cytoscape;
@@ -68,7 +67,6 @@ module.exports = function () {
     'macromolecule': true,
     'simple chemical': true,
     'unspecified entity': true,
-    'necessary stimulation': true,
     'process': true,
     'uncertain process': true,
     'omitted process': true,
@@ -561,16 +559,6 @@ module.exports = function () {
 
   cyStyleProperties.types.lineStyle.enums.push('consumption');
   cyStyleProperties.types.lineStyle.enums.push('production');
-
-  cyStyleProperties.types.arrowShape.enums.push('necessary stimulation');
-
-  $$.sbgn.registerSbgnArrowShapes = function () {
-    cyBaseArrowShapes['necessary stimulation'] = jQuery.extend({}, cyBaseArrowShapes['triangle-tee']);
-    cyBaseArrowShapes['necessary stimulation'].pointsTee = [
-      -0.18, -0.43,
-      0.18, -0.43
-    ];
-  };
 
   $$.sbgn.registerSbgnNodeShapes = function () {
     cyBaseNodeShapes['process'] = {

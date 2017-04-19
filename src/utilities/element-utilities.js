@@ -262,7 +262,7 @@ var elementUtilities = {
     getCyArrowShape: function(ele) {
         var _class = ele.data('class');
         if (_class == 'necessary stimulation') {
-            return 'necessary stimulation';
+            return 'triangle-cross';
         }
         if (_class == 'inhibition') {
             return 'tee';
