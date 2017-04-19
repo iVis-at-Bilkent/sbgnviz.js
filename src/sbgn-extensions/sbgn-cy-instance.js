@@ -263,7 +263,13 @@ module.exports = function () {
             'target-arrow-shape': function (ele) {
               return elementUtilities.getCyArrowShape(ele);
             },
-            'source-arrow-shape': 'none'
+            'source-arrow-shape': 'none',
+            'source-endpoint': function(ele) {
+              return elementUtilities.getEndPoint(ele, 'source');
+            },
+            'target-endpoint': function(ele) {
+              return elementUtilities.getEndPoint(ele, 'target');
+            }
           })
           .selector("edge[class='inhibition']")
           .css({

@@ -579,7 +579,7 @@ module.exports = function () {
 
         context.stroke();
 
-//        $$.sbgn.drawPortsToPolygonShape(context, node, this.points);
+        $$.sbgn.drawPortsToPolygonShape(context, node, this.points);
       },
       intersectLine: function (node, x, y, portId) {
         var nodeX = node._private.position.x;
@@ -895,7 +895,7 @@ module.exports = function () {
         context.fill();
         context.stroke();
 
-//        $$.sbgn.drawPortsToEllipseShape(context, node);
+        $$.sbgn.drawPortsToEllipseShape(context, node);
       },
       intersectLine: function (node, x, y, portId) {
         var centerX = node._private.position.x;
@@ -959,7 +959,7 @@ module.exports = function () {
 
         context.fill();
 
-//        $$.sbgn.drawPortsToEllipseShape(context, node);
+        $$.sbgn.drawPortsToEllipseShape(context, node);
 
       },
       intersectLine: function (node, x, y, portId) {
