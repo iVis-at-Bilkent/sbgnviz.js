@@ -349,7 +349,7 @@ var sbgnmlToJson = {
   },
   applyStyle: function (renderInformation, nodes, edges) {
     // get all color id references to their value
-    var colorList = renderInformation.listOfColorDefinitions.colorList;
+    var colorList = renderInformation.listOfColorDefinitions.colorDefinitions;
     var colorIDToValue = {};
     for (var i=0; i < colorList.length; i++) {
       colorIDToValue[colorList[i].id] = colorList[i].value;
@@ -357,7 +357,7 @@ var sbgnmlToJson = {
 
     // convert style list to elementId-indexed object pointing to style
     // also convert color references to color values
-    var styleList = renderInformation.listOfStyles.styleList;
+    var styleList = renderInformation.listOfStyles.styles;
     var elementIDToStyle = {};
     for (var i=0; i < styleList.length; i++) {
       var style = styleList[i];
