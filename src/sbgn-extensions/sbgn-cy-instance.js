@@ -209,7 +209,8 @@ module.exports = function () {
                 return '#d67614';
               }
               return ele.css('line-color');
-            }
+            },
+            'arrow-scale': 1.5
           })
           .selector("edge.cy-expand-collapse-meta-edge")
           .css({
