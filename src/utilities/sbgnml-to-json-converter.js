@@ -1,23 +1,24 @@
 var elementUtilities = require('./element-utilities');
-var renderExtension = require('./sbgnml-render');
+var libsbgnjs = require('libsbgn-js');
+var renderExtension = libsbgnjs.renderExtension;
 
 var sbgnmlToJson = {
   insertedNodes: {},
-  getAllCompartments: function (xmlObject) {
+  getAllCompartments: function (glyphList) {
     var compartments = [];
 
-    var compartmentEls = xmlObject.querySelectorAll("glyph[class='compartment']");
-
-    for (var i = 0; i < compartmentEls.length; i++) {
-      var compartment = compartmentEls[i];
-      var bbox = this.findChildNode(compartment, 'bbox');
-      compartments.push({
-        'x': parseFloat(bbox.getAttribute('x')),
-        'y': parseFloat(bbox.getAttribute('y')),
-        'w': parseFloat(bbox.getAttribute('w')),
-        'h': parseFloat(bbox.getAttribute('h')),
-        'id': compartment.getAttribute('id')
-      });
+    for (var i = 0; i < glyphList.length; i++) {
+      if (glyphList[i].class_ == 'compartment') {
+        var compartment = glyphList[i];
+        var bbox = compartment.bbox;
+        compartments.push({
+          'x': parseFloat(bbox.x),
+          'y': parseFloat(bbox.y),
+          'w': parseFloat(bbox.w),
+          'h': parseFloat(bbox.h),
+          'id': compartment.id
+        });
+      }
     }
 
     compartments.sort(function (c1, c2) {
@@ -42,12 +43,8 @@ var sbgnmlToJson = {
     return false;
   },
   bboxProp: function (ele) {
-    var bbox = ele.querySelector('bbox');
+    var bbox = ele.bbox;
 
-    bbox.x = bbox.getAttribute('x');
-    bbox.y = bbox.getAttribute('y');
-    bbox.w = bbox.getAttribute('w');
-    bbox.h = bbox.getAttribute('h');
     // set positions as center
     bbox.x = parseFloat(bbox.x) + parseFloat(bbox.w) / 2;
     bbox.y = parseFloat(bbox.y) + parseFloat(bbox.h) / 2;
@@ -58,12 +55,7 @@ var sbgnmlToJson = {
     var xPos = parseFloat(parentBbox.x);
     var yPos = parseFloat(parentBbox.y);
 
-    var bbox = ele.querySelector('bbox');
-
-    bbox.x = bbox.getAttribute('x');
-    bbox.y = bbox.getAttribute('y');
-    bbox.w = bbox.getAttribute('w');
-    bbox.h = bbox.getAttribute('h');
+    var bbox = ele.bbox;
 
     // set positions as center
     bbox.x = parseFloat(bbox.x) + parseFloat(bbox.w) / 2 - xPos;
@@ -93,27 +85,26 @@ var sbgnmlToJson = {
     var self = this;
     var stateAndInfoArray = [];
 
-    var childGlyphs = this.findChildNodes(ele, 'glyph');
+    var childGlyphs = ele.glyphMembers; // this.findChildNodes(ele, 'glyph');
 
     for (var i = 0; i < childGlyphs.length; i++) {
       var glyph = childGlyphs[i];
       var info = {};
 
-      if (glyph.className === 'unit of information') {
-        info.id = glyph.getAttribute('id') || undefined;
-        info.clazz = glyph.className || undefined;
-        var label = glyph.querySelector('label');
+      if (glyph.class_ === 'unit of information') {
+        info.id = glyph.id || undefined;
+        info.clazz = glyph.class_ || undefined;
         info.label = {
-          'text': (label && label.getAttribute('text')) || undefined
+          'text': (glyph.label && glyph.label.text) || undefined
         };
         info.bbox = self.stateAndInfoBboxProp(glyph, parentBbox);
         stateAndInfoArray.push(info);
-      } else if (glyph.className === 'state variable') {
-        info.id = glyph.getAttribute('id') || undefined;
-        info.clazz = glyph.className || undefined;
-        var state = glyph.querySelector('state');
-        var value = (state && state.getAttribute('value')) || undefined;
-        var variable = (state && state.getAttribute('variable')) || undefined;
+      } else if (glyph.class_ === 'state variable') {
+        info.id = glyph.id || undefined;
+        info.clazz = glyph.class_ || undefined;
+        var state = glyph.state;
+        var value = (state && state.value) || undefined;
+        var variable = (state && state.variable) || undefined;
         info.state = {
           'value': value,
           'variable': variable
@@ -128,7 +119,7 @@ var sbgnmlToJson = {
   },
   addParentInfoToNode: function (ele, nodeObj, parent, compartments) {
     var self = this;
-    var compartmentRef = ele.getAttribute('compartmentRef');
+    var compartmentRef = ele.compartmentRef;
 
     if (parent) {
       nodeObj.parent = parent;
@@ -142,13 +133,13 @@ var sbgnmlToJson = {
 
       // add compartment according to geometry
       for (var i = 0; i < compartments.length; i++) {
-        var bboxEl = self.findChildNode(ele, 'bbox');
+        var bboxEl = ele.bbox;
         var bbox = {
-          'x': parseFloat(bboxEl.getAttribute('x')),
-          'y': parseFloat(bboxEl.getAttribute('y')),
-          'w': parseFloat(bboxEl.getAttribute('w')),
-          'h': parseFloat(bboxEl.getAttribute('h')),
-          'id': ele.getAttribute('id')
+          'x': parseFloat(bboxEl.x),
+          'y': parseFloat(bboxEl.y),
+          'w': parseFloat(bboxEl.w),
+          'h': parseFloat(bboxEl.h),
+          'id': ele.id
         };
         if (self.isInBoundingBox(bbox, compartments[i])) {
           nodeObj.parent = compartments[i].id;
@@ -162,22 +153,20 @@ var sbgnmlToJson = {
     var nodeObj = {};
 
     // add id information
-    nodeObj.id = ele.getAttribute('id');
+    nodeObj.id = ele.id;
     // add node bounding box information
     nodeObj.bbox = self.bboxProp(ele);
     // add class information
-    nodeObj.class = ele.className;
+    nodeObj.class = ele.class_;
     // add label information
-    var label = self.findChildNode(ele, 'label');
-    nodeObj.label = (label && label.getAttribute('text')) || undefined;
+    nodeObj.label = (ele.label && ele.label.text) || undefined;
     // add state and info box information
     nodeObj.statesandinfos = self.stateAndInfoProp(ele, nodeObj.bbox);
     // adding parent information
     self.addParentInfoToNode(ele, nodeObj, parent, compartments);
 
     // add clone information
-    var cloneMarkers = self.findChildNodes(ele, 'clone');
-    if (cloneMarkers.length > 0) {
+    if (ele.clone) {
       nodeObj.clonemarker = true;
     } else {
       nodeObj.clonemarker = undefined;
@@ -185,13 +174,13 @@ var sbgnmlToJson = {
 
     // add port information
     var ports = [];
-    var portElements = ele.querySelectorAll('port');
+    var portElements = ele.ports;
 
     for (var i = 0; i < portElements.length; i++) {
       var portEl = portElements[i];
-      var id = portEl.getAttribute('id');
-      var relativeXPos = parseFloat(portEl.getAttribute('x')) - nodeObj.bbox.x;
-      var relativeYPos = parseFloat(portEl.getAttribute('y')) - nodeObj.bbox.y;
+      var id = portEl.id;
+      var relativeXPos = parseFloat(portEl.x) - nodeObj.bbox.x;
+      var relativeYPos = parseFloat(portEl.y) - nodeObj.bbox.y;
 
       relativeXPos = relativeXPos / parseFloat(nodeObj.bbox.w) * 100;
       relativeYPos = relativeYPos / parseFloat(nodeObj.bbox.h) * 100;
@@ -209,23 +198,23 @@ var sbgnmlToJson = {
     jsonArray.push(cytoscapeJsNode);
   },
   traverseNodes: function (ele, jsonArray, parent, compartments) {
-    var elId = ele.getAttribute('id');
-    if (!elementUtilities.handledElements[ele.className]) {
+    var elId = ele.id;
+    if (!elementUtilities.handledElements[ele.class_]) {
       return;
     }
     this.insertedNodes[elId] = true;
     var self = this;
     // add complex nodes here
 
-    var eleClass = ele.className;
+    var eleClass = ele.class_;
 
     if (eleClass === 'complex' || eleClass === 'complex multimer' || eleClass === 'submap') {
       self.addCytoscapeJsNode(ele, jsonArray, parent, compartments);
 
-      var childGlyphs = self.findChildNodes(ele, 'glyph');
+      var childGlyphs = ele.glyphMembers;
       for (var i = 0; i < childGlyphs.length; i++) {
         var glyph = childGlyphs[i];
-        var glyphClass = glyph.className;
+        var glyphClass = glyph.class_;
         if (glyphClass !== 'state variable' && glyphClass !== 'unit of information') {
           self.traverseNodes(glyph, jsonArray, elId, compartments);
         }
@@ -262,8 +251,8 @@ var sbgnmlToJson = {
   },
   getArcSourceAndTarget: function (arc, xmlObject) {
     // source and target can be inside of a port
-    var source = arc.getAttribute('source');
-    var target = arc.getAttribute('target');
+    var source = arc.source;
+    var target = arc.target;
     var sourceNodeId;
     var targetNodeId;
 
@@ -306,11 +295,11 @@ var sbgnmlToJson = {
   getArcBendPointPositions: function (ele) {
     var bendPointPositions = [];
 
-    var children = this.findChildNodes(ele, 'next');
+    var children = ele.nexts;
 
     for (var i = 0; i < children.length; i++) {
-      var posX = children[i].getAttribute('x');
-      var posY = children[i].getAttribute('y');
+      var posX = children[i].x;
+      var posY = children[i].y;
 
       bendPointPositions.push({
         x: posX,
@@ -321,7 +310,7 @@ var sbgnmlToJson = {
     return bendPointPositions;
   },
   addCytoscapeJsEdge: function (ele, jsonArray, xmlObject) {
-    if (!elementUtilities.handledElements[ele.className]) {
+    if (!elementUtilities.handledElements[ele.class_]) {
       return;
     }
 
@@ -335,19 +324,16 @@ var sbgnmlToJson = {
     var edgeObj = {};
     var bendPointPositions = self.getArcBendPointPositions(ele);
 
-    edgeObj.id = ele.getAttribute('id') || undefined;
-    edgeObj.class = ele.className;
+    edgeObj.id = ele.id || undefined;
+    edgeObj.class = ele.class_;
     edgeObj.bendPointPositions = bendPointPositions;
 
-    var glyphChildren = self.findChildNodes(ele, 'glyph');
-    var glyphDescendents = ele.querySelectorAll('glyph');
-    if (glyphDescendents.length <= 0) {
-      edgeObj.cardinality = 0;
-    } else {
-      for (var i = 0; i < glyphChildren.length; i++) {
-        if (glyphChildren[i].className === 'cardinality') {
-          var label = glyphChildren[i].querySelector('label');
-          edgeObj.cardinality = label.getAttribute('text') || undefined;
+    edgeObj.cardinality = 0;
+    if (ele.glyphs.length > 0) {
+      for (var i = 0; i < ele.glyphs.length; i++) {
+        if (ele.glyphs[i].class_ === 'cardinality') {
+          var label = ele.glyphs[i].label;
+          edgeObj.cardinality = label.text || undefined;
         }
       }
     }
@@ -355,16 +341,13 @@ var sbgnmlToJson = {
     edgeObj.source = sourceAndTarget.source;
     edgeObj.target = sourceAndTarget.target;
 
-    edgeObj.portsource = ele.getAttribute('source');
-    edgeObj.porttarget = ele.getAttribute('target');
+    edgeObj.portsource = ele.source;
+    edgeObj.porttarget = ele.target;
 
     var cytoscapeJsEdge = {data: edgeObj};
     jsonArray.push(cytoscapeJsEdge);
   },
-  applyStyle: function (xmlRenderExt, nodes, edges) {
-    // parse the render extension
-    var renderInformation = renderExtension.RenderInformation.fromXML(xmlRenderExt);
-
+  applyStyle: function (renderInformation, nodes, edges) {
     // get all color id references to their value
     var colorList = renderInformation.listOfColorDefinitions.colorList;
     var colorIDToValue = {};
@@ -483,15 +466,11 @@ var sbgnmlToJson = {
     var cytoscapeJsNodes = [];
     var cytoscapeJsEdges = [];
 
-    var compartments = self.getAllCompartments(xmlObject);
+    var sbgn = libsbgnjs.Sbgn.fromXML(xmlObject.querySelector('sbgn'));
+    var compartments = self.getAllCompartments(sbgn.map.glyphs);
 
-    var extension = xmlObject.querySelector('extension'); // may not be here
-    var renderInformation;
-    if (extension) {
-      renderInformation = self.findChildNode(extension, 'renderInformation');
-    }
-    var glyphs = self.findChildNodes(xmlObject.querySelector('map'), 'glyph');
-    var arcs = self.findChildNodes(xmlObject.querySelector('map'), 'arc');
+    var glyphs = sbgn.map.glyphs;
+    var arcs = sbgn.map.arcs;
 
     var i;
     for (i = 0; i < glyphs.length; i++) {
@@ -504,8 +483,8 @@ var sbgnmlToJson = {
       self.addCytoscapeJsEdge(arc, cytoscapeJsEdges, xmlObject);
     }
 
-    if (renderInformation) { // render extension was found
-      self.applyStyle(renderInformation, cytoscapeJsNodes, cytoscapeJsEdges);
+    if (sbgn.map.extension.has('renderInformation')) { // render extension was found
+      self.applyStyle(sbgn.map.extension.get('renderInformation'), cytoscapeJsNodes, cytoscapeJsEdges);
     }
 
     var cytoscapeJsGraph = {};
