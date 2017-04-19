@@ -42,8 +42,6 @@ var jsonToSbgnml = {
         //add headers
         xmlHeader = "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>\n";
         var sbgn = new libsbgnjs.Sbgn({xmlns: 'http://sbgn.org/libsbgn/0.3'});
-        console.log("libsbgnjs", libsbgnjs);
-        console.log("sbgn", sbgn);
         var map = new libsbgnjs.Map({language: 'process description', id: mapID});
         if (hasExtension) { // extension is there
             var extension = new libsbgnjs.Extension();
@@ -116,6 +114,7 @@ var jsonToSbgnml = {
 
         var glyph = new libsbgnjs.Glyph({id: node._private.data.id, class_: nodeClass});
 
+        // assign compartmentRef
         if(node.parent().isParent()){
             if(nodeClass === "compartment"){
                 var parent = node.parent();
@@ -128,6 +127,7 @@ var jsonToSbgnml = {
             }
         }
 
+        // misc information
         var label = node._private.data.label;
         if(typeof label != 'undefined')
             glyph.setLabel(new libsbgnjs.Label({text: label}));
@@ -158,6 +158,7 @@ var jsonToSbgnml = {
             }
         }
 
+        // add glyph members that are not state variables or unit of info: subunits
         if(nodeClass === "complex" || nodeClass === "submap"){
             node.children().each(function(){
                 var glyphMemberList = self.getGlyphSbgnml(this);
@@ -167,8 +168,10 @@ var jsonToSbgnml = {
             });
         }
 
+        // current glyph is done
         glyphList.push(glyph);
 
+        // keep going with all the included glyphs
         if(nodeClass === "compartment"){
             node.children().each(function(){
                 glyphList = glyphList.concat(self.getGlyphSbgnml(this));
@@ -191,7 +194,7 @@ var jsonToSbgnml = {
         if (arcTarget == null || arcTarget.length === 0)
             arcTarget = edge._private.data.target;
 
-        var arcId = edge._private.data.id; //arcSource + "-" + arcTarget;
+        var arcId = edge._private.data.id;
         var arc = new libsbgnjs.Arc({id: arcId, source: arcSource, target: arcTarget, class_: edge._private.data.class});
 
         arc.setStart(new libsbgnjs.StartType({x: edge._private.rscratch.startX, y: edge._private.rscratch.startY}));
@@ -205,12 +208,21 @@ var jsonToSbgnml = {
               var bendY = segpts[i + 1];
 
               arc.addNext(new libsbgnjs.NextType({x: bendX, y: bendY}));
-              //sbgnmlText = sbgnmlText + "<next y='" + bendY + "' x='" + bendX + "'/>\n";
             }
           }
         }
 
         arc.setEnd(new libsbgnjs.EndType({x: edge._private.rscratch.endX, y: edge._private.rscratch.endY}));
+
+        var cardinality = edge._private.data.cardinality;
+        if(typeof cardinality != 'undefined' && cardinality != null) {
+            arc.addGlyph(new libsbgnjs.Glyph({
+                id: arc.id+'_card',
+                class_: 'cardinality',
+                label: new libsbgnjs.Label({text: cardinality}),
+                bbox: new libsbgnjs.Bbox({x: 0, y: 0, w: 0, h: 0}) // dummy bbox, needed for format compliance
+            }));
+        }
 
         return arc;
     },
