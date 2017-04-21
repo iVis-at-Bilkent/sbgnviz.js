@@ -91,7 +91,7 @@ var jsonToSbgnml = {
             var colorDefinition = new renderExtension.ColorDefinition({id: renderInfo.colors[color], value: color});
             listOfColorDefinitions.addColorDefinition(colorDefinition);
         }
-        renderInformation.setListOfColorDefinition(listOfColorDefinitions);
+        renderInformation.setListOfColorDefinitions(listOfColorDefinitions);
 
         // populates styles
         var listOfStyles = new renderExtension.ListOfStyles();
