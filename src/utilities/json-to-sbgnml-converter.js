@@ -97,7 +97,7 @@ var jsonToSbgnml = {
         var listOfStyles = new renderExtension.ListOfStyles();
         for (var key in renderInfo.styles) {
             var style = renderInfo.styles[key];
-            var xmlStyle = new renderExtension.Style({id: txtUtil.getXMLValidId(key), idList: style.idList});
+            var xmlStyle = new renderExtension.Style({id: txtUtil.getXMLValidId(key), idList: style.idList.join(' ')});
             var g = new renderExtension.RenderGroup({
                 fontSize: style.properties.fontSize,
                 fontFamily: style.properties.fontFamily,

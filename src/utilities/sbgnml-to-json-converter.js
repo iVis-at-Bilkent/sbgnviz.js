@@ -371,8 +371,9 @@ var sbgnmlToJson = {
         renderGroup.fill = colorIDToValue[renderGroup.fill];
       }
 
-      for (var j=0; j < style.idList.length; j++) {
-        var id = style.idList[j];
+      var idList = style.idList.split(' ');
+      for (var j=0; j < idList.length; j++) {
+        var id = idList[j];
         elementIDToStyle[id] = renderGroup;
       }
     }
