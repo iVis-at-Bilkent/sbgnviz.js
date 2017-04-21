@@ -156,14 +156,23 @@ var elementUtilities = {
         // var nonProcesses = nodesToShow.nodes("node[class!='process']");
         // var neighborProcesses = nonProcesses.neighborhood("node[class='process']");
 
-        var processes = nodesToShow.filter(function(){
-            return $.inArray(this._private.data.class, self.processTypes) >= 0;
+        var processes = nodesToShow.filter(function(ele, i){
+            if(typeof ele === "number") {
+              ele = i;
+            }
+            return $.inArray(ele._private.data.class, self.processTypes) >= 0;
         });
-        var nonProcesses = nodesToShow.filter(function(){
-            return $.inArray(this._private.data.class, self.processTypes) === -1;
+        var nonProcesses = nodesToShow.filter(function(ele, i){
+            if(typeof ele === "number") {
+              ele = i;
+            }
+            return $.inArray(ele._private.data.class, self.processTypes) === -1;
         });
-        var neighborProcesses = nonProcesses.neighborhood().filter(function(){
-            return $.inArray(this._private.data.class, self.processTypes) >= 0;
+        var neighborProcesses = nonProcesses.neighborhood().filter(function(ele, i){
+            if(typeof ele === "number") {
+              ele = i;
+            }
+            return $.inArray(ele._private.data.class, self.processTypes) >= 0;
         });
 
         nodesToShow = nodesToShow.add(processes.neighborhood());
@@ -253,7 +262,7 @@ var elementUtilities = {
     getCyArrowShape: function(ele) {
         var _class = ele.data('class');
         if (_class == 'necessary stimulation') {
-            return 'necessary stimulation';
+            return 'triangle-cross';
         }
         if (_class == 'inhibition') {
             return 'tee';
@@ -451,6 +460,31 @@ var elementUtilities = {
 
       return textHeight;
     },
+    /*
+    * Get source/target end point of edge in 'x-value% y-value%' format. It returns 'outside-to-node' if there is no source/target port.
+    */
+    getEndPoint: function(edge, sourceOrTarget) {
+      var portId = sourceOrTarget === 'source' ? edge.data('portsource') : edge.data('porttarget');
+
+      if (portId == null) {
+        return 'outside-to-node'; // If there is no portsource return the default value which is 'outside-to-node'
+      }
+
+      var endNode = sourceOrTarget === 'source' ? edge.source() : edge.target();
+      var ports = endNode.data('ports');
+      var port;
+      for (var i = 0; i < ports.length; i++) {
+        if (ports[i].id === portId) {
+          port = ports[i];
+        }
+      }
+
+      if (port === undefined) {
+        return 'outside-to-node'; // If port is not found return the default value which is 'outside-to-node'
+      }
+
+      return '' + port.x + '% ' + port.y + '%';
+    }
     
     // Section End
     // Stylesheet helpers

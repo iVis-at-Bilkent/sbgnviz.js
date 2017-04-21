@@ -107,17 +107,11 @@ module.exports = function () {
             'background-opacity': 0.5,
             'text-opacity': 1,
             'opacity': 1,
-            'padding-left': 0,
-            'padding-right': 0,
-            'padding-top': 0,
-            'padding-bottom': 0
+            'padding': 0
           })
           .selector("node:parent")
           .css({
-            'padding-left': getCompoundPaddings,
-            'padding-right': getCompoundPaddings,
-            'padding-top': getCompoundPaddings,
-            'padding-bottom': getCompoundPaddings
+            'padding': getCompoundPaddings
           })
           .selector("node[?clonemarker][class='perturbing agent']")
           .css({
@@ -169,8 +163,9 @@ module.exports = function () {
           })
           .selector("node:parent[class='compartment']")
           .css({
-            'padding-top': getCompoundPaddings() + options.extraCompartmentPadding,
-            'padding-bottom': getCompoundPaddings() + options.extraCompartmentPadding
+            'padding': function() {
+              return getCompoundPaddings() + options.extraCompartmentPadding;
+            }
           })
           .selector("node[bbox][class][class!='complex'][class!='compartment'][class!='submap']")
           .css({
@@ -214,7 +209,8 @@ module.exports = function () {
                 return '#d67614';
               }
               return ele.css('line-color');
-            }
+            },
+            'arrow-scale': 1.5
           })
           .selector("edge.cy-expand-collapse-meta-edge")
           .css({
@@ -267,7 +263,13 @@ module.exports = function () {
             'target-arrow-shape': function (ele) {
               return elementUtilities.getCyArrowShape(ele);
             },
-            'source-arrow-shape': 'none'
+            'source-arrow-shape': 'none',
+            'source-endpoint': function(ele) {
+              return elementUtilities.getEndPoint(ele, 'source');
+            },
+            'target-endpoint': function(ele) {
+              return elementUtilities.getEndPoint(ele, 'target');
+            }
           })
           .selector("edge[class='inhibition']")
           .css({

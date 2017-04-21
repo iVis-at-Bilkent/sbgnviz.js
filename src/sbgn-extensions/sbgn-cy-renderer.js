@@ -10,7 +10,6 @@ var cytoscape = libs.cytoscape;
 var cyMath = cytoscape.math;
 var cyBaseNodeShapes = cytoscape.baseNodeShapes;
 var cyStyleProperties = cytoscape.styleProperties;
-var cyBaseArrowShapes = cytoscape.baseArrowShapes;
 
 module.exports = function () {
   var $$ = cytoscape;
@@ -68,7 +67,6 @@ module.exports = function () {
     'macromolecule': true,
     'simple chemical': true,
     'unspecified entity': true,
-    'necessary stimulation': true,
     'process': true,
     'uncertain process': true,
     'omitted process': true,
@@ -87,23 +85,6 @@ module.exports = function () {
     'dissociation': true,
     'association': true
   };
-
-  $$.sbgn.addPortReplacementIfAny = function (node, edgePort) {
-    var posX = node.position().x;
-    var posY = node.position().y;
-    if (typeof node._private.data.ports != 'undefined') {
-      for (var i = 0; i < node._private.data.ports.length; i++) {
-        var port = node._private.data.ports[i];
-        if (port.id == edgePort) {
-          posX = posX + port.x * node.width() / 100;
-          posY = posY + port.y * node.height() / 100;
-          break;
-        }
-      }
-    }
-    return {'x': posX, 'y': posY};
-  }
-  ;
 
   $$.sbgn.drawPortsToPolygonShape = function (context, node, points) {
     var width = node.width();
@@ -579,16 +560,6 @@ module.exports = function () {
   cyStyleProperties.types.lineStyle.enums.push('consumption');
   cyStyleProperties.types.lineStyle.enums.push('production');
 
-  cyStyleProperties.types.arrowShape.enums.push('necessary stimulation');
-
-  $$.sbgn.registerSbgnArrowShapes = function () {
-    cyBaseArrowShapes['necessary stimulation'] = jQuery.extend({}, cyBaseArrowShapes['triangle-tee']);
-    cyBaseArrowShapes['necessary stimulation'].pointsTee = [
-      -0.18, -0.43,
-      0.18, -0.43
-    ];
-  };
-
   $$.sbgn.registerSbgnNodeShapes = function () {
     cyBaseNodeShapes['process'] = {
       points: cyMath.generateUnitNgonPointsFitToSquare(4, 0),
@@ -616,11 +587,6 @@ module.exports = function () {
         var width = node.width();
         var height = node.height();
         var padding = parseInt(node.css('border-width')) / 2;
-
-        var portIntersection = $$.sbgn.intersectLinePorts(node, x, y, portId);
-        if (portIntersection.length > 0) {
-          return portIntersection;
-        }
 
         return cyMath.polygonIntersectLine(
                 x, y,
@@ -677,11 +643,6 @@ module.exports = function () {
         var width = node.width();
         var height = node.height();
         var padding = parseInt(node.css('border-width')) / 2;
-
-        var portIntersection = $$.sbgn.intersectLinePorts(node, x, y, portId);
-        if (portIntersection.length > 0) {
-          return portIntersection;
-        }
 
         var stateAndInfoIntersectLines = $$.sbgn.intersectLineStateAndInfoBoxes(
                 node, x, y);
@@ -767,11 +728,6 @@ module.exports = function () {
         var height = node.height();
         var padding = parseInt(node.css('border-width'));
         var multimerPadding = cyBaseNodeShapes["simple chemical"].multimerPadding;
-
-        var portIntersection = $$.sbgn.intersectLinePorts(node, x, y, portId);
-        if (portIntersection.length > 0) {
-          return portIntersection;
-        }
 
         var stateAndInfoIntersectLines = $$.sbgn.intersectLineStateAndInfoBoxes(
                 node, x, y);
@@ -878,11 +834,6 @@ module.exports = function () {
         var multimerPadding = cyBaseNodeShapes["macromolecule"].multimerPadding;
         var cornerRadius = cyMath.getRoundRectangleRadius(width, height);
 
-        var portIntersection = $$.sbgn.intersectLinePorts(node, x, y, portId);
-        if (portIntersection.length > 0) {
-          return portIntersection;
-        }
-
         var stateAndInfoIntersectLines = $$.sbgn.intersectLineStateAndInfoBoxes(
                 node, x, y);
 
@@ -953,11 +904,6 @@ module.exports = function () {
         var height = node.height();
         var padding = parseInt(node.css('border-width')) / 2;
 
-        var portIntersection = $$.sbgn.intersectLinePorts(node, x, y, portId);
-        if (portIntersection.length > 0) {
-          return portIntersection;
-        }
-
         var intersect = cyMath.intersectLineEllipse(
                 x, y,
                 centerX,
@@ -1022,11 +968,6 @@ module.exports = function () {
         var width = node.width();
         var height = node.height();
         var padding = parseInt(node.css('border-width')) / 2;
-
-        var portIntersection = $$.sbgn.intersectLinePorts(node, x, y, portId);
-        if (portIntersection.length > 0) {
-          return portIntersection;
-        }
 
         return cyMath.intersectLineEllipse(
                 x, y,
@@ -1114,11 +1055,6 @@ module.exports = function () {
         var padding = parseInt(node.css('border-width')) / 2;
         var multimerPadding = cyBaseNodeShapes["complex"].multimerPadding;
         var cornerLength = cyBaseNodeShapes["complex"].cornerLength;
-
-        var portIntersection = $$.sbgn.intersectLinePorts(node, x, y, portId);
-        if (portIntersection.length > 0) {
-          return portIntersection;
-        }
 
         cyBaseNodeShapes["complex"].points = $$.sbgn.generateComplexShapePoints(cornerLength,
                 width, height);
@@ -1241,11 +1177,6 @@ module.exports = function () {
         var width = node.width();
         var height = node.height();
         var cornerRadius = cyMath.getRoundRectangleRadius(width, height);
-
-        var portIntersection = $$.sbgn.intersectLinePorts(node, x, y, portId);
-        if (portIntersection.length > 0) {
-          return portIntersection;
-        }
 
         var stateAndInfoIntersectLines = $$.sbgn.intersectLineStateAndInfoBoxes(
                 node, x, y);
@@ -1487,27 +1418,6 @@ module.exports = function () {
 //                context.stroke();
       }
     }
-  };
-
-  $$.sbgn.intersectLinePorts = function (node, x, y, portId) {
-    var ports = node._private.data.ports;
-    if (ports.length < 0)
-      return [];
-
-    var nodeX = node._private.position.x;
-    var nodeY = node._private.position.y;
-    var width = node.width();
-    var height = node.height();
-    var padding = parseInt(node.css('border-width')) / 2;
-
-    for (var i = 0; i < node._private.data.ports.length; i++) {
-      var port = node._private.data.ports[i];
-      if (portId == port.id) {
-        return cyMath.intersectLineEllipse(
-                x, y, port.x * width / 100 + nodeX, port.y * height / 100 + nodeY, 1, 1);
-      }
-    }
-    return [];
   };
 
   $$.sbgn.closestIntersectionPoint = function (point, intersections) {

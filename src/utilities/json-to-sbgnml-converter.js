@@ -51,17 +51,26 @@ var jsonToSbgnml = {
             map.setExtension(extension);
         }
 
+        // get all glyphs
         var glyphList = [];
-        cy.nodes(":visible").each(function(){
-            if(!this.isChild())
-                glyphList = glyphList.concat(self.getGlyphSbgnml(this));
+        cy.nodes(":visible").each(function(ele, i){
+            if(typeof ele === "number") {
+              ele = i;
+            }
+            if(!ele.isChild())
+                glyphList = glyphList.concat(self.getGlyphSbgnml(ele)); // returns potentially more than 1 glyph
         });
+        // add them to the map
         for(var i=0; i<glyphList.length; i++) {
             map.addGlyph(glyphList[i]);
         }
 
-        cy.edges(":visible").each(function(){
-            map.addArc(self.getArcSbgnml(this));
+        // get all arcs
+        cy.edges(":visible").each(function(ele, i){
+            if(typeof ele === "number") {
+              ele = i;
+            }
+            map.addArc(self.getArcSbgnml(ele));
         });
 
         sbgn.setMap(map);
@@ -160,8 +169,11 @@ var jsonToSbgnml = {
 
         // add glyph members that are not state variables or unit of info: subunits
         if(nodeClass === "complex" || nodeClass === "submap"){
-            node.children().each(function(){
-                var glyphMemberList = self.getGlyphSbgnml(this);
+            node.children().each(function(ele, i){
+                if(typeof ele === "number") {
+                  ele = i;
+                }
+                var glyphMemberList = self.getGlyphSbgnml(ele);
                 for (var i=0; i < glyphMemberList.length; i++) {
                     glyph.addGlyphMember(glyphMemberList[i]);
                 }
@@ -173,8 +185,11 @@ var jsonToSbgnml = {
 
         // keep going with all the included glyphs
         if(nodeClass === "compartment"){
-            node.children().each(function(){
-                glyphList = glyphList.concat(self.getGlyphSbgnml(this));
+            node.children().each(function(ele, i){
+                if(typeof ele === "number") {
+                  ele = i;
+                }
+                glyphList = glyphList.concat(self.getGlyphSbgnml(ele));
             });
         }
 
