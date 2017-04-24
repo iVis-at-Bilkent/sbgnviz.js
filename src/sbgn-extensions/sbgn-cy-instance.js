@@ -210,7 +210,7 @@ module.exports = function () {
               }
               return ele.css('line-color');
             },
-            'arrow-scale': 1.5
+            'arrow-scale': 1.25
           })
           .selector("edge.cy-expand-collapse-meta-edge")
           .css({
