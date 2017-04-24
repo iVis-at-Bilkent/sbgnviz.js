@@ -22,6 +22,9 @@
     "filesaverjs": "~0.2.2",
     "cytoscape": "iVis-at-Bilkent/cytoscape.js#unstable"
   },
+  "dependencies": {
+    "libsbgn.js": "git://github.com/eisbm/libsbgn.js"
+  },
   "devDependencies": {
     "browserify": "^11.2.0",
     "gulp": "^3.9.0",

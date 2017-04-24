@@ -1,5 +1,5 @@
 var elementUtilities = require('./element-utilities');
-var libsbgnjs = require('libsbgn-js');
+var libsbgnjs = require('libsbgn.js');
 var renderExtension = libsbgnjs.renderExtension;
 
 var sbgnmlToJson = {

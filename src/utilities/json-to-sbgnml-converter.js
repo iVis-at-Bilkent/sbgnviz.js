@@ -1,5 +1,5 @@
 var txtUtil = require('./text-utilities');
-var libsbgnjs = require('libsbgn-js');
+var libsbgnjs = require('libsbgn.js');
 var renderExtension = libsbgnjs.renderExtension;
 var pkgVersion = require('../../package.json').version; // need info about sbgnviz to put in xml
 var pkgName = require('../../package.json').name;
