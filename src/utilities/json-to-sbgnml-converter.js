@@ -3,6 +3,7 @@ var libsbgnjs = require('libsbgn.js');
 var renderExtension = libsbgnjs.renderExtension;
 var pkgVersion = require('../../package.json').version; // need info about sbgnviz to put in xml
 var pkgName = require('../../package.json').name;
+var prettyprint = require('pretty-data').pd;
 
 var jsonToSbgnml = {
     /*
@@ -74,7 +75,7 @@ var jsonToSbgnml = {
         });
 
         sbgn.setMap(map);
-        return xmlHeader + sbgn.toXML();
+        return prettyprint.xml(xmlHeader + sbgn.toXML());
     },
 
     // see createSbgnml for info on the structure of renderInfo

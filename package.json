@@ -23,7 +23,8 @@
     "cytoscape": "iVis-at-Bilkent/cytoscape.js#unstable"
   },
   "dependencies": {
-    "libsbgn.js": "git://github.com/eisbm/libsbgn.js"
+    "libsbgn.js": "git://github.com/eisbm/libsbgn.js",
+    "pretty-data": "^0.40.0"
   },
   "devDependencies": {
     "browserify": "^11.2.0",
