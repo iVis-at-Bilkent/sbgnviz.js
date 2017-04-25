@@ -484,7 +484,7 @@ var sbgnmlToJson = {
       self.addCytoscapeJsEdge(arc, cytoscapeJsEdges, xmlObject);
     }
 
-    if (sbgn.map.extension.has('renderInformation')) { // render extension was found
+    if (sbgn.map.extension && sbgn.map.extension.has('renderInformation')) { // render extension was found
       self.applyStyle(sbgn.map.extension.get('renderInformation'), cytoscapeJsNodes, cytoscapeJsEdges);
     }
 
