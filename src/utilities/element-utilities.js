@@ -367,7 +367,6 @@ var elementUtilities = {
       }
 
       if (_class.endsWith('process') ||  _class === 'dissociation' || _class === 'and' || _class === 'or' || _class === 'not') {
-//        var coeff = _class === 'dissociation' ? 2 : 1.5; // The dynamic label size coefficient 
         var coeff = 1; // The dynamic label size coefficient for these pseudo labels, it is 1 for logical operators
         
         // Coeff is supposed to be 2 for dissociation and 1.5 for other processes
