@@ -152,7 +152,7 @@ var jsonToSbgnml = {
             var x = node._private.position.x + ports[i].x * node.width() / 100;
             var y = node._private.position.y + ports[i].y * node.height() / 100;
 
-            glyph.addPort(new libsbgnjs.pPort({id: ports[i].id, x: x, y: y}));
+            glyph.addPort(new libsbgnjs.Port({id: ports[i].id, x: x, y: y}));
             /*sbgnmlText = sbgnmlText + "<port id='" + ports[i].id+
                 "' y='" + y + "' x='" + x + "' />\n";*/
         }
