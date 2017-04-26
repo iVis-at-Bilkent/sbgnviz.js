@@ -149,8 +149,13 @@ var jsonToSbgnml = {
         //add port information
         var ports = node._private.data.ports;
         for(var i = 0 ; i < ports.length ; i++){
-            var x = node._private.position.x + ports[i].x * node.width() / 100;
-            var y = node._private.position.y + ports[i].y * node.height() / 100;
+            var orientation = ports[i].x === 0 ? 'vertical' : 'horizontal';
+            // This is the ratio of the area occupied for ports over the whole shape
+            var ratio = orientation === 'vertical' ? Math.abs(ports[i].y) / 50 : Math.abs(ports[i].x) / 50;
+            
+            // Divide the node sizes by the ratio because that sizes includes ports as well
+            var x = node._private.position.x + ports[i].x * ( node.width() / ratio ) / 100;
+            var y = node._private.position.y + ports[i].y * ( node.height() / ratio ) / 100;
 
             glyph.addPort(new libsbgnjs.Port({id: ports[i].id, x: x, y: y}));
             /*sbgnmlText = sbgnmlText + "<port id='" + ports[i].id+
@@ -246,8 +251,27 @@ var jsonToSbgnml = {
     addGlyphBbox : function(node){
         var width = node.width();
         var height = node.height();
+        
+        var _class = node.data('class');
+        
+        // If the node can have ports and it has exactly 2 ports then it is represented by a bigger bbox.
+        // This is because we represent it as a polygon and so the whole shape including the ports are rendered in the node bbox.
+        if (_class === 'association' || _class === 'dissociation' || _class === 'and' || _class === 'or' || _class === 'not' || _class.endsWith('process')) {
+          if (node.data('ports').length === 2) {
+            // We assume that the ports are symmetric to the node center so using just one of the ports is enough
+            var port = node.data('ports')[0];
+            var orientation = port.x === 0 ? 'vertical' : 'horizontal';
+             // This is the ratio of the area occupied for ports over the whole shape
+            var ratio = orientation === 'vertical' ? Math.abs(port.y) / 50 : Math.abs(port.x) / 50;
+            // Divide the bbox to the calculated ratio to get the bbox of the actual shape discluding the ports
+            width /= ratio;
+            height /= ratio;
+          }
+        }
+        
         var x = node._private.position.x - width/2;
         var y = node._private.position.y - height/2;
+        
         return new libsbgnjs.Bbox({x: x, y: y, w: width, h: height});
     },
 
