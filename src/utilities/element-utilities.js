@@ -344,6 +344,9 @@ var elementUtilities = {
         else if (_class == 'uncertain process') {
             content = '?';
         }
+        else if (_class == 'dissociation') {
+            content = 'o';
+        }
 
         var textWidth = ele.width() || ele.data('bbox').w;
 
@@ -359,7 +362,7 @@ var elementUtilities = {
       var _class = ele.data('class');
 
       // These types of nodes cannot have label but this is statement is needed as a workaround
-      if (_class === 'association' || _class === 'dissociation') {
+      if (_class === 'association') {
         return 20;
       }
 
@@ -369,6 +372,10 @@ var elementUtilities = {
 
       if (_class.endsWith('process')) {
         return this.getDynamicLabelTextSize(ele, 1.5);
+      }
+      
+      if ( _class === 'dissociation' ) {
+        return this.getDynamicLabelTextSize(ele, 2);
       }
 
       if (_class === 'complex' || _class === 'compartment') {
