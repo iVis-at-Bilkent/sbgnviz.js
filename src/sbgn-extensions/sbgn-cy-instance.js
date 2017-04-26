@@ -53,12 +53,13 @@ var generateCircleString = function(centerX, centerY, radius, angleFrom, angleTo
 
 var generateShapeWithPortString = function(lineHW, shapeHW, type, orientation) {
 	var polygonStr;
+    var numOfPoints = 30; // Number of points that both halves of circle will have
 	if (orientation === 'horizontal') {
 		var abovePoints, belowPoints;
 	
 		if (type === 'circle') {
-			abovePoints = generateCircleString(0, 0, shapeHW, 180, 0, 100);
-			belowPoints = generateCircleString(0, 0, shapeHW, 360, 180, 100);
+			abovePoints = generateCircleString(0, 0, shapeHW, 180, 0, numOfPoints);
+			belowPoints = generateCircleString(0, 0, shapeHW, 360, 180, numOfPoints);
 		}
 		else if (type === 'rectangle') {
 			abovePoints = '-' + shapeHW + ' -' + shapeHW + ' ' + shapeHW + ' -' + shapeHW + ' ';
@@ -75,8 +76,8 @@ var generateShapeWithPortString = function(lineHW, shapeHW, type, orientation) {
 		var leftPoints, rightPoints;
 		
 		if (type === 'circle') {
-			leftPoints = generateCircleString(0, 0, shapeHW, 90, 270, 100);
-			rightPoints = generateCircleString(0, 0, shapeHW, -90, 90, 100);
+			leftPoints = generateCircleString(0, 0, shapeHW, 90, 270, numOfPoints);
+			rightPoints = generateCircleString(0, 0, shapeHW, -90, 90, numOfPoints);
 		}
 		else if (type === 'rectangle') {
 			leftPoints = '-' + shapeHW + ' -' + shapeHW + ' -' + shapeHW + ' ' + shapeHW + ' ';
