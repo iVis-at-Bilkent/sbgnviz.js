@@ -366,16 +366,30 @@ var elementUtilities = {
         return 20;
       }
 
-      if (_class === 'and' || _class === 'or' || _class === 'not') {
-        return this.getDynamicLabelTextSize(ele, 1);
-      }
-
-      if (_class.endsWith('process')) {
-        return this.getDynamicLabelTextSize(ele, 1.5);
-      }
-      
-      if ( _class === 'dissociation' ) {
-        return this.getDynamicLabelTextSize(ele, 2);
+      if (_class.endsWith('process') ||  _class === 'dissociation' || _class === 'and' || _class === 'or' || _class === 'not') {
+//        var coeff = _class === 'dissociation' ? 2 : 1.5; // The dynamic label size coefficient 
+        var coeff = 1; // The dynamic label size coefficient for these pseudo labels, it is 1 for logical operators
+        
+        // Coeff is supposed to be 2 for dissociation and 1.5 for other processes
+        if (_class === 'dissociation') {
+          coeff = 2;
+        }
+        else if (_class.endsWith('process')) {
+          coeff = 1.5;
+        }
+        
+        var ports = ele.data('ports');
+        
+        if (ports.length === 2) {
+          // We assume that the ports are symmetric to the node center so using just one of the ports is enough
+          var port = ports[0];
+          var orientation = port.x === 0 ? 'vertical' : 'horizontal';
+          // This is the ratio of the area occupied with ports over without ports
+          var ratio = orientation === 'vertical' ? Math.abs(port.y) / 50 : Math.abs(port.x) / 50;
+          coeff /= ratio; // Divide the coeff by ratio to fit into the bbox of the actual shape (discluding ports)
+        }
+        
+        return this.getDynamicLabelTextSize(ele, coeff);
       }
 
       if (_class === 'complex' || _class === 'compartment') {

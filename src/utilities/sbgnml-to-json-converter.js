@@ -202,7 +202,7 @@ var sbgnmlToJson = {
         // We assume that the ports are symmetric to the node center so using just one of the ports is enough
         var port = ports[0];
         var orientation = port.x === 0 ? 'vertical' : 'horizontal';
-        // This is the ratio of the area occupied for ports over the whole shape
+        // This is the ratio of the area occupied with ports over without ports
         var ratio = orientation === 'vertical' ? Math.abs(port.y) / 50 : Math.abs(port.x) / 50;
         // Multiply the bbox with the calculated ratio
         nodeObj.bbox.w = parseFloat(nodeObj.bbox.w) * ratio;
