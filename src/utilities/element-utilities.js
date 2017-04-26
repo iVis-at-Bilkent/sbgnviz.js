@@ -238,6 +238,7 @@ var elementUtilities = {
     // SBGN specific utilities
     getCyShape: function(ele) {
         var _class = ele.data('class');
+        // Get rid of rectangle postfix to have the actual node class
         if (_class.endsWith(' multimer')) {
             _class = _class.replace(' multimer', '');
         }
@@ -251,12 +252,29 @@ var elementUtilities = {
         if (_class == 'perturbing agent' || _class == 'tag') {
             return 'polygon';
         }
-        if (_class == 'source and sink' || _class == 'nucleic acid feature' || _class == 'dissociation'
-            || _class == 'macromolecule' || _class == 'simple chemical' || _class == 'complex'
-            || _class == 'unspecified entity' || _class == 'process' || _class == 'omitted process'
-            || _class == 'uncertain process' || _class == 'association') {
+        
+        // We need to define new node shapes with their class names for these nodes
+        if (_class == 'source and sink' || _class == 'nucleic acid feature' || _class == 'macromolecule' 
+                || _class == 'simple chemical' || _class == 'complex' || _class == 'unspecified entity' ) {
             return _class;
         }
+        
+        // These shapes can have ports. If they have ports we represent them by polygons, else they are represented by ellipses or rectangles
+        // conditionally.
+        if (_class == 'association' || _class == 'dissociation' || _class == 'process' || _class == 'omitted process'
+                || _class == 'uncertain process' || _class == 'and' || _class == 'or' || _class == 'not' ) {
+          
+          if (ele.data('ports').length === 2) {
+            return 'polygon'; // The node has ports represent it by polygon
+          }
+          else if (_class == 'process' || _class == 'omitted process' || _class == 'uncertain process') {
+            return 'rectangle'; // If node has no port and has one of these classes it should be in a rectangle shape
+          }
+          
+          return 'ellipse'; // Other nodes with no port should be in an ellipse shape
+        }
+        
+        // The remaining nodes are supposed to be in ellipse shape
         return 'ellipse';
     },
     getCyArrowShape: function(ele) {
@@ -482,8 +500,19 @@ var elementUtilities = {
       if (port === undefined) {
         return 'outside-to-node'; // If port is not found return the default value which is 'outside-to-node'
       }
-
-      return '' + port.x + '% ' + port.y + '%';
+      
+      var x, y;
+      // Note that for drawing ports we represent the whole shape by a polygon and ports are always 50% away from the node center
+      if (port.x != 0) {
+        x = Math.sign(port.x) * 50;
+        y = 0;
+      }
+      else {
+        x = 0;
+        y = Math.sign(port.y) * 50;
+      }
+      
+      return '' + x + '% ' + y + '%';
     }
     
     // Section End

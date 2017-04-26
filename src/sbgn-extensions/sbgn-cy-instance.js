@@ -15,6 +15,84 @@ var getCompoundPaddings = function() {
   return graphUtilities.calculatedPaddings || 5;
 };
 
+/*
+ * Returns the coordinates of the point located on the given angle on the circle with the given centeral coordinates and radius.
+ */
+var getPointOnCircle = function(centerX, centerY, radius, angleInDegree) {
+	var angleInRadian = angleInDegree * ( Math.PI / 180 ); // Convert degree to radian
+	return {
+		x: radius * Math.cos(angleInRadian) + centerX,
+		y: -1 * radius * Math.sin(angleInRadian) + centerY // We multiply with -1 here because JS y coordinate sign is the oposite of the Mathamatical coordinates system
+	};
+};
+
+/*
+ * Generates a polygon string approximating a circle with given center, radius, start, end angles and number of points to represent the circle
+ */
+var generateCircleString = function(centerX, centerY, radius, angleFrom, angleTo, numOfPoints) {
+	var circleStr = "";
+	var stepSize = ( angleTo - angleFrom ) / numOfPoints; // We will increment the current angle by step size in each iteration
+	var currentAngle = angleFrom; // current angle will be updated in each iteration
+	
+	for ( var i = 0; i < numOfPoints; i++ ) {
+		var point = getPointOnCircle(centerX, centerY, radius, currentAngle);
+		currentAngle += stepSize;
+		circleStr += point.x + " " + point.y + " ";
+	}
+	
+	return circleStr;
+};
+
+/*
+ *  Generates a string representing processes/logical operators with ports.
+ *  lineHW: Half width of line through the circle to the intersection point
+ *  shapeHW: Half width of the shape discluding the ports (It is radius for the circular shapes)
+ *  type: Type of the shape discluding the ports. Options are 'circle', 'rectangle'
+ *  orientation: Orientation of the ports Options are 'horizontal', 'vertical'
+ */
+
+var generateShapeWithPortString = function(lineHW, shapeHW, type, orientation) {
+	var polygonStr;
+	if (orientation === 'horizontal') {
+		var abovePoints, belowPoints;
+	
+		if (type === 'circle') {
+			abovePoints = generateCircleString(0, 0, shapeHW, 180, 0, 100);
+			belowPoints = generateCircleString(0, 0, shapeHW, 360, 180, 100);
+		}
+		else if (type === 'rectangle') {
+			abovePoints = '-' + shapeHW + ' -' + shapeHW + ' ' + shapeHW + ' -' + shapeHW + ' ';
+			belowPoints = shapeHW + ' ' + shapeHW + ' -' + shapeHW + ' ' + shapeHW + ' ';
+		}
+		
+		polygonStr = "-1 -" + lineHW + " -" + shapeHW + " -" + lineHW + " ";	
+		polygonStr += abovePoints;
+		polygonStr += shapeHW + " -" + lineHW + " 1 -" + lineHW + " 1 " + lineHW + " " + shapeHW + " " + lineHW + " ";
+		polygonStr += belowPoints;
+		polygonStr += "-" + shapeHW + " " + lineHW + " -1 " + lineHW;
+	}
+	else {
+		var leftPoints, rightPoints;
+		
+		if (type === 'circle') {
+			leftPoints = generateCircleString(0, 0, shapeHW, 90, 270, 100);
+			rightPoints = generateCircleString(0, 0, shapeHW, -90, 90, 100);
+		}
+		else if (type === 'rectangle') {
+			leftPoints = '-' + shapeHW + ' -' + shapeHW + ' -' + shapeHW + ' ' + shapeHW + ' ';
+			rightPoints = shapeHW + ' ' + shapeHW + ' ' + shapeHW + ' -' + shapeHW + ' '; 
+		}
+		
+		polygonStr = "-" + lineHW + " -" + 1 + " -" + lineHW + " -" + shapeHW + " ";
+		polygonStr += leftPoints;
+		polygonStr += "-" + lineHW + " " + shapeHW + " -" + lineHW + " 1 " + lineHW + " 1 " + lineHW + " " + shapeHW + " ";
+		polygonStr += rightPoints;
+		polygonStr += lineHW + " -" + shapeHW + " " + lineHW + " -1";
+	}
+	
+	return polygonStr;
+};
+
 module.exports = function () {
   var containerSelector = options.networkContainerSelector;
   var imgPath = options.imgPath;
@@ -139,6 +217,29 @@ module.exports = function () {
             'font-size': function (ele) {
               return elementUtilities.getLabelTextSize(ele);
             },
+          })
+          .selector("node[class='association'],[class='dissociation'],[class='and'],[class='or'],[class='not'],[class='process'],[class='omitted process'],[class='uncertain process']")
+          .css({
+            'shape-polygon-points': function(ele) {
+              if (ele.data('ports').length === 2) {
+                // We assume that the ports of the edge are symetric according to the node center so just checking one port is enough for us
+                var port = ele.data('ports')[0]; 
+                // If the ports are located above/below of the node then the orientation is 'vertical' else it is 'horizontal'
+                var orientation = port.x === 0 ? 'vertical' : 'horizontal';
+                // The half width of the actual shape discluding the ports
+                var shapeHW = orientation === 'vertical' ? 50 / Math.abs(port.y) : 50 / Math.abs(port.x);
+                // Get the class of the node
+                var _class = ele.data('class');
+                // If class is one of process, omitted process or uncertain process then the type of actual shape is 'rectangle' else it is 'circle'
+                var type = _class.endsWith('process') ? 'rectangle' : 'circle';
+                
+                // Generate a polygon string with above parameters and return it
+                return generateShapeWithPortString(0.01, shapeHW, type, orientation);
+              }
+              
+              // This element is not expected to have a poygonial shape (Because it does not have 2 ports) just return a trivial string here not to have a run time bug
+              return '-1 -1 1 1 1 0';
+            }
           })
           .selector("node[class='perturbing agent']")
           .css({
