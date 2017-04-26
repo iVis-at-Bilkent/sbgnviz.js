@@ -250,8 +250,6 @@ var jsonToSbgnml = {
     addGlyphBbox : function(node){
         var width = node.width();
         var height = node.height();
-        var x = node._private.position.x - width/2;
-        var y = node._private.position.y - height/2;
         
         var _class = node.data('class');
         
@@ -269,6 +267,10 @@ var jsonToSbgnml = {
             height /= ratio;
           }
         }
+        
+        var x = node._private.position.x - width/2;
+        var y = node._private.position.y - height/2;
+        
         return new libsbgnjs.Bbox({x: x, y: y, w: width, h: height});
     },
 
