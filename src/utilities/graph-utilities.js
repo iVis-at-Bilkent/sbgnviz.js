@@ -7,56 +7,18 @@ var options = optionUtilities.getOptions();
 var libs = require('./lib-utilities').getLibs();
 var jQuery = $ = libs.jQuery;
 
-var adjustBBoxesForPorts = function(multiply) {
-  var nodes = cy.nodes();
-  cy.startBatch();
-  for (var i = 0; i < nodes.length; i++) {
-    var node = nodes[i];
-    var ports = node.data('ports');
-    if (ports.length !== 2) {
-      continue;
-    }
-    // We assume that the ports are symmetric to the node center so using just one of the ports is enough
-    var port = node.data('ports')[0];
-    var orientation = port.x === 0 ? 'vertical' : 'horizontal';
-    // This is the ratio of the area occupied with ports over without ports
-    var ratio = orientation === 'vertical' ? Math.abs(port.y) / 50 : Math.abs(port.x) / 50;
-    
-    var bbox = node.data('bbox');
-    
-    // If multiply is set multiply bbox by calculated ratio else divide it by that ratio
-    if (multiply) {
-      bbox.w *= ratio;
-      bbox.h *= ratio;
-    }
-    else {
-      bbox.w /= ratio;
-      bbox.h /= ratio;
-    }
-    
-    node.data('bbox', bbox); // Set the node bbox
-  }
-  cy.endBatch();
-};
-
 function graphUtilities() {}
 
 graphUtilities.portsEnabled = true;
 
 graphUtilities.disablePorts = function() {
-  if (graphUtilities.portsEnabled === false) {
-    return;
-  }
   graphUtilities.portsEnabled = false;
-  adjustBBoxesForPorts(false);
+  cy.style().update();
 };
 
 graphUtilities.enablePorts = function() {
-  if (graphUtilities.portsEnabled === true) {
-    return;
-  }
   graphUtilities.portsEnabled = true;
-  adjustBBoxesForPorts(true);
+  cy.style().update();
 };
 
 graphUtilities.arePortsEnabled = function() {
