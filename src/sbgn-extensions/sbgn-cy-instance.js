@@ -222,7 +222,7 @@ module.exports = function () {
           .selector("node[class='association'],[class='dissociation'],[class='and'],[class='or'],[class='not'],[class='process'],[class='omitted process'],[class='uncertain process']")
           .css({
             'shape-polygon-points': function(ele) {
-              if (ele.data('ports').length === 2) {
+              if (graphUtilities.portsEnabled === true && ele.data('ports').length === 2) {
                 // We assume that the ports of the edge are symetric according to the node center so just checking one port is enough for us
                 var port = ele.data('ports')[0]; 
                 // If the ports are located above/below of the node then the orientation is 'vertical' else it is 'horizontal'

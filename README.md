@@ -158,6 +158,15 @@ Loads a graph from the given text data in sbgnml format.
 `sbgnviz.saveAsSbgnml(filename)`
 Exports the current graph to an sbgnml file with the given filename.
 
+`sbgnviz.enablePorts()`
+Enable node ports.
+
+`sbgnviz.disablePorts()`
+Disable node ports.
+
+`sbgnviz.arePortsEnabled()`
+Get if node ports are enabled.
+
 `sbgnviz.startSpinner(classname)`
 Starts a spinner at the middle of network container element. You can specify a css class that the 
 spinner will have. The default classname is 'default-class'. Requires 'fontawesome.css'.

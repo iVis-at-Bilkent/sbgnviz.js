@@ -7,6 +7,7 @@ var elementUtilities = require('./element-utilities');
 var jsonToSbgnml = require('./json-to-sbgnml-converter');
 var sbgnmlToJson = require('./sbgnml-to-json-converter');
 var optionUtilities = require('./option-utilities');
+var graphUtilities = require('./graph-utilities');
 
 var options = optionUtilities.getOptions();
 var libs = require('./lib-utilities').getLibs();
@@ -17,13 +18,7 @@ function beforePerformLayout() {
   var nodes = cy.nodes();
   var edges = cy.edges();
 
-  nodes.removeData("ports");
-  edges.removeData("portsource");
-  edges.removeData("porttarget");
-
-  nodes.data("ports", []);
-  edges.data("portsource", []);
-  edges.data("porttarget", []);
+  graphUtilities.disablePorts();
 
   // TODO do this by using extension API
   cy.$('.edgebendediting-hasbendpoints').removeClass('edgebendediting-hasbendpoints');

@@ -7,6 +7,7 @@ var optionUtilities = require('./option-utilities');
 var options = optionUtilities.getOptions();
 var libs = require('./lib-utilities').getLibs();
 var jQuery = $ = libs.jQuery;
+var graphUtilities = require('./graph-utilities');
 
 var elementUtilities = {
     //the list of the element classes handled by the tool
@@ -264,7 +265,7 @@ var elementUtilities = {
         if (_class == 'association' || _class == 'dissociation' || _class == 'process' || _class == 'omitted process'
                 || _class == 'uncertain process' || _class == 'and' || _class == 'or' || _class == 'not' ) {
           
-          if (ele.data('ports').length === 2) {
+          if (graphUtilities.portsEnabled === true && ele.data('ports').length === 2) {
             return 'polygon'; // The node has ports represent it by polygon
           }
           else if (_class == 'process' || _class == 'omitted process' || _class == 'uncertain process') {
@@ -379,7 +380,7 @@ var elementUtilities = {
         
         var ports = ele.data('ports');
         
-        if (ports.length === 2) {
+        if (graphUtilities.portsEnabled === true && ports.length === 2) {
           // We assume that the ports are symmetric to the node center so using just one of the ports is enough
           var port = ports[0];
           var orientation = port.x === 0 ? 'vertical' : 'horizontal';
