@@ -186,7 +186,8 @@ module.exports = function () {
             'background-opacity': 0.5,
             'text-opacity': 1,
             'opacity': 1,
-            'padding': 0
+            'padding': 0,
+            'text-wrap': 'wrap'
           })
           .selector("node:parent")
           .css({
