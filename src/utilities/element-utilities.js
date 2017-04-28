@@ -534,6 +534,52 @@ var elementUtilities = {
       }
       
       return '' + x + '% ' + y + '%';
+    },
+    /*
+     * Return ordering of ports of a node.
+     * Possible return values are 'L-to-R', 'R-to-L', 'T-to-B', 'B-to-T', 'none'
+     */
+    getPortsOrdering: function(node) {
+      var ports = node.data('ports');
+      if (ports.length !== 2) {
+        return 'none'; // Nodes are supposed to have 2 nodes or none
+      }
+      
+      /*
+       * Retursn if the given portId is porttarget of any of the given edges.
+       * These edges are expected to be the edges connected to the node associated with that port.
+       */
+      var isPortTargetOfAnyEdge = function(edges, portId) {
+        for (var i = 0; i < edges.length; i++) {
+          if (edges[i].data('porttarget') === portId) {
+            return true;
+          }
+        }
+        
+        return false;
+      };
+      
+      // If the ports are located above/below of the node then the orientation is 'vertical' else it is 'horizontal'.
+      var orientation = ports[0].x === 0 ? 'vertical' : 'horizontal';
+      // We need the connected edges of the node to find out if a port is an input port or an output port
+      var connectedEdges = node.connectedEdges();
+      
+      if (orientation === 'horizontal') {
+        var leftPortId = ports[0].x < 0 ? ports[0].id : ports[1].id; // Left port is the port whose x value is negative
+        // If left port is port target for any of connected edges then the ordering is 'L-to-R' else it is 'R-to-L'
+        if (isPortTargetOfAnyEdge(connectedEdges, leftPortId)) {
+          return 'L-to-R';
+        }
+        return 'R-to-L';
+      }
+      else {
+        var topPortId = ports[0].y < 0 ? ports[0].id : ports[1].id; // Top port is the port whose y value is negative
+        // If top  port is port target for any of connected edges then the ordering is 'T-to-B' else it is 'B-to-T'
+        if (isPortTargetOfAnyEdge(connectedEdges, topPortId)) {
+          return 'T-to-B';
+        }
+        return 'B-to-T';
+      }
     }
     
     // Section End
