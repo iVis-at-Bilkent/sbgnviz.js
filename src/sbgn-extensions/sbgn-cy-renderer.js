@@ -63,56 +63,15 @@ module.exports = function () {
     'source and sink': true,
     'nucleic acid feature': true,
     'complex': true,
-    'dissociation': true,
     'macromolecule': true,
-    'simple chemical': true,
-    'unspecified entity': true,
-    'process': true,
-    'uncertain process': true,
-    'omitted process': true,
-    'association': true
+    'simple chemical': true
   };
 
   var totallyOverridenNodeShapes = $$.sbgn.totallyOverridenNodeShapes = {
     'macromolecule': true,
     'nucleic acid feature': true,
     'simple chemical': true,
-    'complex': true,
-    'unspecified entity': true,
-    'process': true,
-    'uncertain process': true,
-    'omitted process': true,
-    'dissociation': true,
-    'association': true
-  };
-
-  $$.sbgn.drawPortsToPolygonShape = function (context, node, points) {
-    var width = node.width();
-    var height = node.height();
-    var centerX = node._private.position.x;
-    var centerY = node._private.position.y;
-    var padding = parseInt(node.css('border-width')) / 2;
-
-    for (var i = 0; i < node._private.data.ports.length; i++) {
-      var port = node._private.data.ports[i];
-      var portX = port.x * width / 100 + centerX;
-      var portY = port.y * height / 100 + centerY;
-      var closestPoint = cyMath.polygonIntersectLine(portX, portY,
-              points, centerX, centerY, width / 2, height / 2, padding);
-      context.beginPath();
-      context.moveTo(portX, portY);
-      context.lineTo(closestPoint[0], closestPoint[1]);
-      context.stroke();
-      context.closePath();
-
-
-      //add a little black circle to ports
-      var oldStyle = context.fillStyle;
-      context.fillStyle = $$.sbgn.colors.port;
-      $$.sbgn.drawEllipse(context, portX, portY, 2, 2);
-      context.fillStyle = oldStyle;
-      context.stroke();
-    }
+    'complex': true
   };
 
   var unitOfInfoRadius = 4;
@@ -262,9 +221,7 @@ module.exports = function () {
   };
 
   $$.sbgn.colors = {
-    clone: "#a9a9a9",
-    association: "#6B6B6B",
-    port: "#6B6B6B"
+    clone: "#a9a9a9"
   };
 
 
@@ -519,159 +476,13 @@ module.exports = function () {
     return complexPoints;
   };
 
-  $$.sbgn.drawPortsToEllipseShape = function (context, node) {
-    var width = node.width();
-    var height = node.height();
-    var centerX = node._private.position.x;
-    var centerY = node._private.position.y;
-    var padding = parseInt(node.css('border-width')) / 2;
-
-    for (var i = 0; i < node._private.data.ports.length; i++) {
-      var port = node._private.data.ports[i];
-      var portX = port.x * width / 100 + centerX;
-      var portY = port.y * height / 100 + centerY;
-      var closestPoint = cyMath.intersectLineEllipse(
-              portX, portY, centerX, centerY, width / 2, height / 2);
-      context.moveTo(portX, portY);
-      context.lineTo(closestPoint[0], closestPoint[1]);
-      context.stroke();
-
-      //add a little black circle to ports
-      var oldStyle = context.fillStyle;
-      context.fillStyle = $$.sbgn.colors.port;
-      $$.sbgn.drawEllipse(context, portX, portY, 2, 2);
-      context.fillStyle = oldStyle;
-      context.stroke();
-    }
-  };
-
   cyStyleProperties.types.nodeShape.enums.push('source and sink');
   cyStyleProperties.types.nodeShape.enums.push('nucleic acid feature');
   cyStyleProperties.types.nodeShape.enums.push('complex');
-  cyStyleProperties.types.nodeShape.enums.push('dissociation');
   cyStyleProperties.types.nodeShape.enums.push('macromolecule');
   cyStyleProperties.types.nodeShape.enums.push('simple chemical');
-  cyStyleProperties.types.nodeShape.enums.push('unspecified entity');
-  cyStyleProperties.types.nodeShape.enums.push('process');
-  cyStyleProperties.types.nodeShape.enums.push('omitted process');
-  cyStyleProperties.types.nodeShape.enums.push('uncertain process');
-  cyStyleProperties.types.nodeShape.enums.push('association');
-
-  cyStyleProperties.types.lineStyle.enums.push('consumption');
-  cyStyleProperties.types.lineStyle.enums.push('production');
 
   $$.sbgn.registerSbgnNodeShapes = function () {
-    cyBaseNodeShapes['process'] = {
-      points: cyMath.generateUnitNgonPointsFitToSquare(4, 0),
-      label: '',
-      draw: function (context, node) {
-        var width = node.width();
-        var height = node.height();
-        var centerX = node._private.position.x;
-        var centerY = node._private.position.y;
-        var padding = parseInt(node.css('border-width')) / 2;
-
-        drawPolygonPath(context,
-                centerX, centerY,
-                width, height,
-                cyBaseNodeShapes['process'].points);
-        context.fill();
-
-        context.stroke();
-
-        $$.sbgn.drawPortsToPolygonShape(context, node, this.points);
-      },
-      intersectLine: function (node, x, y, portId) {
-        var nodeX = node._private.position.x;
-        var nodeY = node._private.position.y;
-        var width = node.width();
-        var height = node.height();
-        var padding = parseInt(node.css('border-width')) / 2;
-
-        return cyMath.polygonIntersectLine(
-                x, y,
-                cyBaseNodeShapes['process'].points,
-                nodeX,
-                nodeY,
-                width / 2, height / 2,
-                padding);
-      },
-      checkPoint: function (x, y, node, threshold) {
-        var centerX = node._private.position.x;
-        var centerY = node._private.position.y;
-        var width = node.width();
-        var height = node.height();
-        var padding = parseInt(node.css('border-width')) / 2;
-
-        return cyMath.pointInsidePolygon(x, y, cyBaseNodeShapes['process'].points,
-                centerX, centerY, width, height, [0, -1], padding);
-      }
-    };
-
-    cyBaseNodeShapes['omitted process'] = jQuery.extend(true, {}, cyBaseNodeShapes['process']);
-    cyBaseNodeShapes['omitted process'].label = '\\\\';
-
-    cyBaseNodeShapes['uncertain process'] = jQuery.extend(true, {}, cyBaseNodeShapes['process']);
-    cyBaseNodeShapes['uncertain process'].label = '?';
-
-    cyBaseNodeShapes["unspecified entity"] = {
-      draw: function (context, node) {
-        var centerX = node._private.position.x;
-        var centerY = node._private.position.y;
-
-        var width = node.width();
-        var height = node.height();
-        var sbgnClass = node._private.data.class;
-        var label = node._private.data.label;
-        var cloneMarker = node._private.data.clonemarker;
-
-        $$.sbgn.drawEllipse(context, centerX, centerY, width, height);
-
-        context.stroke();
-
-        $$.sbgn.cloneMarker.unspecifiedEntity(context, centerX, centerY,
-                width, height, cloneMarker,
-                node.css('background-opacity'));
-
-        $$.sbgn.forceOpacityToOne(node, context);
-        $$.sbgn.drawStateAndInfos(node, context, centerX, centerY);
-      },
-      intersectLine: function (node, x, y, portId) {
-        var centerX = node._private.position.x;
-        var centerY = node._private.position.y;
-
-        var width = node.width();
-        var height = node.height();
-        var padding = parseInt(node.css('border-width')) / 2;
-
-        var stateAndInfoIntersectLines = $$.sbgn.intersectLineStateAndInfoBoxes(
-                node, x, y);
-
-        var nodeIntersectLines = cyBaseNodeShapes["ellipse"].intersectLine(centerX, centerY, width,
-                height, x, y, padding);
-
-        var intersections = stateAndInfoIntersectLines.concat(nodeIntersectLines);
-        return $$.sbgn.closestIntersectionPoint([x, y], intersections);
-
-      },
-      checkPoint: function (x, y, node, threshold) {
-        var centerX = node._private.position.x;
-        var centerY = node._private.position.y;
-
-        var width = node.width();
-        var height = node.height();
-        var padding = parseInt(node.css('border-width')) / 2;
-
-        var nodeCheckPoint = cyBaseNodeShapes["ellipse"].checkPoint(x, y,
-                padding, width, height,
-                centerX, centerY);
-
-        var stateAndInfoCheckPoint = $$.sbgn.checkPointStateAndInfoBoxes(x, y, node,
-                threshold);
-
-        return nodeCheckPoint || stateAndInfoCheckPoint;
-      }
-    };
 
     cyBaseNodeShapes["simple chemical"] = {
       multimerPadding: 5,
@@ -880,116 +691,6 @@ module.exports = function () {
         }
 
         return nodeCheckPoint || stateAndInfoCheckPoint || multimerCheckPoint;
-      }
-    };
-
-    cyBaseNodeShapes['association'] = {
-      draw: function (context, node) {
-        var centerX = node._private.position.x;
-        var centerY = node._private.position.y;
-        var width = node.width();
-        var height = node.height();
-        var padding = parseInt(node.css('border-width'));
-
-        cyBaseNodeShapes['ellipse'].draw(context, centerX, centerY, width, height);
-        context.fill();
-        context.stroke();
-
-        $$.sbgn.drawPortsToEllipseShape(context, node);
-      },
-      intersectLine: function (node, x, y, portId) {
-        var centerX = node._private.position.x;
-        var centerY = node._private.position.y;
-        var width = node.width();
-        var height = node.height();
-        var padding = parseInt(node.css('border-width')) / 2;
-
-        var intersect = cyMath.intersectLineEllipse(
-                x, y,
-                centerX,
-                centerY,
-                width / 2 + padding,
-                height / 2 + padding);
-
-        return intersect;
-      },
-      checkPoint: function (x, y, node, threshold) {
-        var centerX = node._private.position.x;
-        var centerY = node._private.position.y;
-        var width = node.width();
-        var height = node.height();
-        var padding = parseInt(node.css('border-width')) / 2;
-
-        x -= centerX;
-        y -= centerY;
-
-        x /= (width / 2 + padding);
-        y /= (height / 2 + padding);
-
-        return (Math.pow(x, 2) + Math.pow(y, 2) <= 1);
-      }
-    };
-
-    cyBaseNodeShapes["dissociation"] = {
-      draw: function (context, node) {
-        var centerX = node._private.position.x;
-        var centerY = node._private.position.y;
-
-        var width = node.width();
-        var height = node.height();
-
-        context.beginPath();
-        context.translate(centerX, centerY);
-        context.scale(width / 4, height / 4);
-
-        // At origin, radius 1, 0 to 2pi
-        context.arc(0, 0, 1, 0, Math.PI * 2 * 0.999, false); // *0.999 b/c chrome rendering bug on full circle
-
-        context.closePath();
-        context.scale(4 / width, 4 / height);
-        context.translate(-centerX, -centerY);
-
-        $$.sbgn.drawEllipse(context, centerX, centerY, width / 2, height / 2);
-
-        context.stroke();
-
-        $$.sbgn.drawEllipse(context, centerX, centerY, width, height);
-
-        context.stroke();
-
-        context.fill();
-
-        $$.sbgn.drawPortsToEllipseShape(context, node);
-
-      },
-      intersectLine: function (node, x, y, portId) {
-        var nodeX = node._private.position.x;
-        var nodeY = node._private.position.y;
-        var width = node.width();
-        var height = node.height();
-        var padding = parseInt(node.css('border-width')) / 2;
-
-        return cyMath.intersectLineEllipse(
-                x, y,
-                nodeX,
-                nodeY,
-                width / 2 + padding,
-                height / 2 + padding);
-      },
-      checkPoint: function (x, y, node, threshold) {
-        var centerX = node._private.position.x;
-        var centerY = node._private.position.y;
-        var width = node.width();
-        var height = node.height();
-        var padding = parseInt(node.css('border-width')) / 2;
-
-        x -= centerX;
-        y -= centerY;
-
-        x /= (width / 2 + padding);
-        y /= (height / 2 + padding);
-
-        return (Math.pow(x, 2) + Math.pow(y, 2) <= 1);
       }
     };
 
@@ -1251,10 +952,6 @@ module.exports = function () {
 
         context.stroke();
 
-        $$.sbgn.cloneMarker.sourceAndSink(context, centerX, centerY,
-                width, height, cloneMarker,
-                node.css('background-opacity'));
-
       },
       intersectLine: cyBaseNodeShapes["ellipse"].intersectLine,
       checkPoint: cyBaseNodeShapes["ellipse"].checkPoint
@@ -1268,41 +965,6 @@ module.exports = function () {
   };
 
   $$.sbgn.cloneMarker = {
-    unspecifiedEntity: function (context, centerX, centerY,
-            width, height, cloneMarker, opacity) {
-      if (cloneMarker != null) {
-        var oldGlobalAlpha = context.globalAlpha;
-        context.globalAlpha = opacity;
-        var oldStyle = context.fillStyle;
-        context.fillStyle = $$.sbgn.colors.clone;
-
-        context.beginPath();
-        context.translate(centerX, centerY);
-        context.scale(width / 2, height / 2);
-
-        var markerBeginX = -1 * Math.sin(Math.PI / 3);
-        var markerBeginY = Math.cos(Math.PI / 3);
-        var markerEndX = 1 * Math.sin(Math.PI / 3);
-        var markerEndY = markerBeginY;
-
-        context.moveTo(markerBeginX, markerBeginY);
-        context.lineTo(markerEndX, markerEndY);
-        context.arc(0, 0, 1, Math.PI / 6, 5 * Math.PI / 6);
-
-        context.scale(2 / width, 2 / height);
-        context.translate(-centerX, -centerY);
-        context.closePath();
-
-        context.fill();
-        context.fillStyle = oldStyle;
-        context.globalAlpha = oldGlobalAlpha;
-      }
-    },
-    sourceAndSink: function (context, centerX, centerY,
-            width, height, cloneMarker, opacity) {
-      $$.sbgn.cloneMarker.unspecifiedEntity(context, centerX, centerY,
-              width, height, cloneMarker, opacity);
-    },
     simpleChemical: function (context, centerX, centerY,
             width, height, cloneMarker, isMultimer, opacity) {
       if (cloneMarker != null) {
@@ -1334,32 +996,6 @@ module.exports = function () {
         context.fill();
         context.fillStyle = oldStyle;
         context.globalAlpha = oldGlobalAlpha;
-      }
-    },
-    perturbingAgent: function (context, centerX, centerY,
-            width, height, cloneMarker, opacity) {
-      if (cloneMarker != null) {
-        var cloneWidth = width;
-        var cloneHeight = height / 4;
-        var cloneX = centerX;
-        var cloneY = centerY + height / 2 - height / 8;
-
-        var markerPoints = [-5 / 6, -1, 5 / 6, -1, 1, 1, -1, 1];
-
-        var oldStyle = context.fillStyle;
-        context.fillStyle = $$.sbgn.colors.clone;
-        var oldGlobalAlpha = context.globalAlpha;
-        context.globalAlpha = opacity;
-
-        renderer.drawPolygon(context,
-                cloneX, cloneY,
-                cloneWidth, cloneHeight, markerPoints);
-
-        context.fill();
-
-        context.fillStyle = oldStyle;
-        context.globalAlpha = oldGlobalAlpha;
-        //context.stroke();
       }
     },
     nucleicAcidFeature: function (context, centerX, centerY,

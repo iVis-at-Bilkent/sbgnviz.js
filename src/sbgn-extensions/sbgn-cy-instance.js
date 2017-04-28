@@ -192,7 +192,7 @@ module.exports = function () {
           .css({
             'padding': getCompoundPaddings
           })
-          .selector("node[?clonemarker][class='perturbing agent']")
+          .selector("node[?clonemarker][class='perturbing agent'],node[?clonemarker][class='unspecified entity']")
           .css({
             'background-image': imgPath + '/clone_bg.png',
             'background-position-x': '50%',

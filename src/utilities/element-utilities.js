@@ -256,7 +256,7 @@ var elementUtilities = {
         
         // We need to define new node shapes with their class names for these nodes
         if (_class == 'source and sink' || _class == 'nucleic acid feature' || _class == 'macromolecule' 
-                || _class == 'simple chemical' || _class == 'complex' || _class == 'unspecified entity' ) {
+                || _class == 'simple chemical' || _class == 'complex' ) {
             return _class;
         }
         
