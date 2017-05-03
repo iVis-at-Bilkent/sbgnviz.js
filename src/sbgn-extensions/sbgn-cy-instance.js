@@ -270,7 +270,7 @@ module.exports = function () {
               return getCompoundPaddings() + options.extraCompartmentPadding;
             }
           })
-          .selector("node[bbox][class][class!='complex'][class!='compartment'][class!='submap']")
+          .selector("node:childless[bbox]")
           .css({
             'width': 'data(bbox.w)',
             'height': 'data(bbox.h)'
