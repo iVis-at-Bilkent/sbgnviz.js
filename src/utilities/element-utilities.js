@@ -50,6 +50,12 @@ var elementUtilities = {
     //the following were moved here from what used to be utilities/sbgn-filtering.js
     processTypes : ['process', 'omitted process', 'uncertain process',
         'association', 'dissociation', 'phenotype'],
+    
+    // Returns whether the given element or elements with the given class can have ports.
+    canHavePorts : function(ele) {
+      var sbgnclass = typeof ele === 'string' ? ele : ele.data('class');
+      return ($.inArray(sbgnclass, this.processTypes) >= 0 ||  sbgnclass == 'and' || sbgnclass == 'or' || sbgnclass == 'not');
+    },
       
     // Section Start
     // General Element Utilities
@@ -262,8 +268,7 @@ var elementUtilities = {
         
         // These shapes can have ports. If they have ports we represent them by polygons, else they are represented by ellipses or rectangles
         // conditionally.
-        if (_class == 'association' || _class == 'dissociation' || _class == 'process' || _class == 'omitted process'
-                || _class == 'uncertain process' || _class == 'and' || _class == 'or' || _class == 'not' ) {
+        if ( this.canHavePorts(_class) ) {
           
           if (graphUtilities.portsEnabled === true && ele.data('ports').length === 2) {
             return 'polygon'; // The node has ports represent it by polygon
@@ -367,7 +372,7 @@ var elementUtilities = {
         return 20;
       }
 
-      if (_class.endsWith('process') ||  _class === 'dissociation' || _class === 'and' || _class === 'or' || _class === 'not') {
+      if (this.canHavePorts(_class)) {
         var coeff = 1; // The dynamic label size coefficient for these pseudo labels, it is 1 for logical operators
         
         // Coeff is supposed to be 2 for dissociation and 1.5 for other processes

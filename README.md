@@ -190,6 +190,7 @@ library of sbgnviz. Most users will not need to use this. It includes the follow
  * `deleteNodesSmart(nodes)` Extends the given nodes list in a smart way to leave the map intact and removes the resulting list.
  * `deleteElesSimple` Removes the given elements in a simple way.
  * `getPortsOrdering` Return ordering of ports of a node. Possible return values are 'L-to-R', 'R-to-L', 'T-to-B', 'B-to-T', 'none'.
+ * `canHavePorts` Returns whether the given element or elements with the given class can have ports
  
 
 `sbgnviz.undoRedoActionFunctions`

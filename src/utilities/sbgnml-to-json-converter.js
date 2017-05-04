@@ -198,7 +198,7 @@ var sbgnmlToJson = {
     var _class = nodeObj.class;
     // If the node can have ports and it has exactly 2 ports then it should be represented by a bigger bbox.
     // This is because we represent it as a polygon and so the whole shape including the ports are rendered in the node bbox.
-    if (_class === 'association' || _class === 'dissociation' || _class === 'and' || _class === 'or' || _class === 'not' || _class.endsWith('process')) {
+    if (elementUtilities.canHavePorts(_class)) {
       if (graphUtilities.portsEnabled && ports.length === 2) {
         // We assume that the ports are symmetric to the node center so using just one of the ports is enough
         var port = ports[0];

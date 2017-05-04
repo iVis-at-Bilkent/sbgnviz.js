@@ -1,4 +1,5 @@
 var txtUtil = require('./text-utilities');
+var elementUtilities = require('./element-utilities');
 var libsbgnjs = require('libsbgn.js');
 var renderExtension = libsbgnjs.renderExtension;
 var pkgVersion = require('../../package.json').version; // need info about sbgnviz to put in xml
@@ -257,7 +258,7 @@ var jsonToSbgnml = {
         
         // If the node can have ports and it has exactly 2 ports then it is represented by a bigger bbox.
         // This is because we represent it as a polygon and so the whole shape including the ports are rendered in the node bbox.
-        if (_class === 'association' || _class === 'dissociation' || _class === 'and' || _class === 'or' || _class === 'not' || _class.endsWith('process')) {
+        if (elementUtilities.canHavePorts(_class)) {
           if (graphUtilities.portsEnabled === true && node.data('ports').length === 2) {
             // We assume that the ports are symmetric to the node center so using just one of the ports is enough
             var port = node.data('ports')[0];
