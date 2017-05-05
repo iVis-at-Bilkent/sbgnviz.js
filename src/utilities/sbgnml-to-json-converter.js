@@ -1,7 +1,6 @@
 var elementUtilities = require('./element-utilities');
 var graphUtilities = require('./graph-utilities');
 var libsbgnjs = require('libsbgn.js');
-var renderExtension = libsbgnjs.renderExtension;
 
 var sbgnmlToJson = {
   insertedNodes: {},
