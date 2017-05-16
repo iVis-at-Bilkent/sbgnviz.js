@@ -175,6 +175,7 @@ module.exports = function () {
     });
   }
 
+  var selectionColor = '#d67614';
   var sbgnStyleSheet = cytoscape.stylesheet()
           .selector("node")
           .css({
@@ -283,13 +284,13 @@ module.exports = function () {
           })
           .selector("node:selected")
           .css({
-            'border-color': '#d67614',
+            'border-color': selectionColor,
             'target-arrow-color': '#000',
             'text-outline-color': '#000'
           })
           .selector("node:active")
           .css({
-            'background-opacity': 0.7, 'overlay-color': '#d67614',
+            'background-opacity': 0.7, 'overlay-color': selectionColor,
             'overlay-padding': '14'
           })
           .selector("edge")
@@ -303,13 +304,13 @@ module.exports = function () {
             'source-arrow-color': '#555',
             'text-border-color': function (ele) {
               if (ele.selected()) {
-                return '#d67614';
+                return selectionColor;
               }
               return ele.css('line-color');
             },
             'color': function (ele) {
               if (ele.selected()) {
-                return '#d67614';
+                return selectionColor;
               }
               return ele.css('line-color');
             },
@@ -323,13 +324,13 @@ module.exports = function () {
           })
           .selector("edge:selected")
           .css({
-            'line-color': '#d67614',
-            'source-arrow-color': '#d67614',
-            'target-arrow-color': '#d67614'
+            'line-color': selectionColor,
+            'source-arrow-color': selectionColor,
+            'target-arrow-color': selectionColor
           })
           .selector("edge:active")
           .css({
-            'background-opacity': 0.7, 'overlay-color': '#d67614',
+            'background-opacity': 0.7, 'overlay-color': selectionColor,
             'overlay-padding': '8'
           })
           .selector("edge[cardinality > 0]")
@@ -384,7 +385,7 @@ module.exports = function () {
           })
           .selector("core")
           .css({
-            'selection-box-color': '#d67614',
-            'selection-box-opacity': '0.2', 'selection-box-border-color': '#d67614'
+            'selection-box-color': selectionColor,
+            'selection-box-opacity': '0.2', 'selection-box-border-color': selectionColor
           });
 };
