@@ -545,8 +545,14 @@ var elementUtilities = {
      * Possible return values are 'L-to-R', 'R-to-L', 'T-to-B', 'B-to-T', 'none'
      */
     getPortsOrdering: function(node) {
+      // Return the cached portsordering if exists
+      if (node.data('portsordering')) {
+        return node.data('portsordering');
+      }
+      
       var ports = node.data('ports');
       if (ports.length !== 2) {
+        node.data('portsordering', 'none'); // Cache the ports ordering
         return 'none'; // Nodes are supposed to have 2 nodes or none
       }
       
@@ -569,22 +575,31 @@ var elementUtilities = {
       // We need the connected edges of the node to find out if a port is an input port or an output port
       var connectedEdges = node.connectedEdges();
       
+      var portsordering;
       if (orientation === 'horizontal') {
         var leftPortId = ports[0].x < 0 ? ports[0].id : ports[1].id; // Left port is the port whose x value is negative
         // If left port is port target for any of connected edges then the ordering is 'L-to-R' else it is 'R-to-L'
         if (isPortTargetOfAnyEdge(connectedEdges, leftPortId)) {
-          return 'L-to-R';
+          portsordering = 'L-to-R';
         }
-        return 'R-to-L';
+        else {
+          portsordering = 'R-to-L';
+        }
       }
       else {
         var topPortId = ports[0].y < 0 ? ports[0].id : ports[1].id; // Top port is the port whose y value is negative
         // If top  port is port target for any of connected edges then the ordering is 'T-to-B' else it is 'B-to-T'
         if (isPortTargetOfAnyEdge(connectedEdges, topPortId)) {
-          return 'T-to-B';
+          portsordering = 'T-to-B';
         }
-        return 'B-to-T';
+        else {
+          portsordering = 'B-to-T';
+        }
       }
+      
+      // Cache the portsordering and return it.
+      node.data('portsordering', portsordering);
+      return portsordering;
     }
     
     // Section End
