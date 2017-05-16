@@ -2,6 +2,7 @@ var txtUtil = require('./text-utilities');
 var elementUtilities = require('./element-utilities');
 var libsbgnjs = require('libsbgn.js');
 var renderExtension = libsbgnjs.render;
+var annot = libsbgnjs.annot;
 var pkgVersion = require('../../package.json').version; // need info about sbgnviz to put in xml
 var pkgName = require('../../package.json').name;
 var prettyprint = require('pretty-data').pd;
@@ -33,7 +34,6 @@ var jsonToSbgnml = {
     */
     createSbgnml : function(filename, renderInfo){
         var self = this;
-        var sbgnmlText = "";
         var mapID = txtUtil.getXMLValidId(filename);
         var hasExtension = false;
         var hasRenderExtension = false;
@@ -118,9 +118,36 @@ var jsonToSbgnml = {
         return renderInformation;
     },
 
+    getAnnotationExtension: function(cyElement) {
+        var annotations = cyElement.data('annotations');
+        var annotExt = new annot.Annotation();
+        var rdfElement = new annot.RdfElement();
+        for (var annotID in annotations) {
+            var currentAnnot = annotations[annotID];
+
+            // check validity of annotation
+            if(currentAnnot.status != 'validated' || !currentAnnot.selectedDB || !currentAnnot.annotationValue) {
+                continue;
+            }
+
+            // check if uncontrolled vocabulary
+            if(currentAnnot.selectedRelation == "sio:SIO_000223") {
+                var obj = {};
+                obj[currentAnnot.selectedDB] = currentAnnot.annotationValue;
+                rdfElement.addCustomProperty('#'+cyElement.data('id') , obj);
+            }
+            else {
+                var obj = {};
+                obj[currentAnnot.selectedRelation] = currentAnnot.annotationValue;
+                rdfElement.addResource('#'+cyElement.data('id') , obj);
+            }
+        }
+        annotExt.setRdfElement(rdfElement);
+        return annotExt;
+    },
+
     getGlyphSbgnml : function(node){
         var self = this;
-        var sbgnmlText = "";
         var nodeClass = node._private.data.class;
         var glyphList = [];
 
@@ -160,8 +187,6 @@ var jsonToSbgnml = {
             var y = node._private.position.y + ports[i].y * ( node.height() / ratio ) / 100;
 
             glyph.addPort(new libsbgnjs.Port({id: ports[i].id, x: x, y: y}));
-            /*sbgnmlText = sbgnmlText + "<port id='" + ports[i].id+
-                "' y='" + y + "' x='" + x + "' />\n";*/
         }
         //add state and info box information
         for(var i = 0 ; i < node._private.data.statesandinfos.length ; i++){
@@ -173,6 +198,19 @@ var jsonToSbgnml = {
             else if(boxGlyph.clazz === "unit of information"){
                 glyph.addGlyphMember(this.addInfoBoxGlyph(boxGlyph, statesandinfosId, node));
             }
+        }
+        // check for annotations
+        if (node.data('annotations') && !$.isEmptyObject(node.data('annotations'))) {
+            var extension;
+            if(glyph.extension) { // an extension is already there for thise glyph
+                extension = glyph.extension;
+            }
+            else {
+                extension = new libsbgnjs.Extension();
+                glyph.setExtension(extension);
+            }
+            var annotExt = self.getAnnotationExtension(node);
+            extension.add(annotExt);
         }
 
         // add glyph members that are not state variables or unit of info: subunits
@@ -205,8 +243,6 @@ var jsonToSbgnml = {
     },
 
     getArcSbgnml : function(edge){
-        var sbgnmlText = "";
-
         //Temporary hack to resolve "undefined" arc source and targets
         var arcTarget = edge._private.data.porttarget;
         var arcSource = edge._private.data.portsource;
@@ -245,6 +281,19 @@ var jsonToSbgnml = {
                 label: new libsbgnjs.Label({text: cardinality}),
                 bbox: new libsbgnjs.Bbox({x: 0, y: 0, w: 0, h: 0}) // dummy bbox, needed for format compliance
             }));
+        }
+        // check for annotations
+        if (edge.data('annotations') && !$.isEmptyObject(edge.data('annotations'))) {
+            var extension;
+            if(arc.extension) { // an extension is already there for thise arc
+                extension = arc.extension;
+            }
+            else {
+                extension = new libsbgnjs.Extension();
+                arc.setExtension(extension);
+            }
+            var annotExt = this.getAnnotationExtension(edge);
+            extension.add(annotExt);
         }
 
         return arc;

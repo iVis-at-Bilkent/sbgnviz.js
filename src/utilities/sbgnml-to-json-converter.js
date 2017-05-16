@@ -210,8 +210,65 @@ var sbgnmlToJson = {
       }
     }
 
+    if (ele.extension && ele.extension.has('annotation')) { // annotation extension was found
+      var rdfElement = ele.extension.get('annotation').rdfElement;
+      nodeObj = self.handleAnnotations(nodeObj, rdfElement);
+    }
+
     var cytoscapeJsNode = {data: nodeObj};
     jsonArray.push(cytoscapeJsNode);
+  },
+  /**
+   * given a future cy object, and the corresponding element's libsbgnjs' extension, populates the annotations field
+   */
+  handleAnnotations: function(cyObject, rdfElement) {
+    // local utility function
+    function dbFromUrl(url) {
+      var regexp = /^http:\/\/identifiers.org\/(.+?)\/.+$/;
+      return url.replace(regexp, '$1');
+    }
+
+    function fillElementDataAnnotation(cyObject, annotationIndex, status, selectedDB, selectedRelation, annotationValue) {
+      if(!cyObject.annotations) {
+        cyObject.annotations = {};
+      }
+      var annotId = cyObject.id+"-annot-"+annotationIndex;
+
+      cyObject.annotations[annotId] = {
+        // The following may be hazardous. But setting it as unchecked leave the annotation out if the file is saved.
+        // This would lead to the user losing annotations without knowing it.
+        status: status, // <-- we trust that what's been loaded is valid.
+        selectedDB: selectedDB,
+        selectedRelation: selectedRelation,
+        annotationValue: annotationValue
+      };
+      return cyObject;
+    }
+
+    // we assume that the id of the rdf:about field is the one of the current node, and that there's only 1 description
+    var id = rdfElement.getAllIds()[0];
+    var resources = rdfElement.getResourcesOfId(id);
+    var customProperties = rdfElement.getCustomPropertiesOfId(id);
+
+    var globalAnnotIndex = 0;
+    // handle controlled properties
+    for (var fullQualifier in resources) {
+      var relation = libsbgnjs.annot.Util.reducePrefix(fullQualifier);
+      for(var i=0; i<resources[fullQualifier].length; i++) {
+        var value = resources[fullQualifier][i];
+        var selectedDB = dbFromUrl(value);
+        cyObject = fillElementDataAnnotation(cyObject, globalAnnotIndex, "validated", selectedDB, relation, value);
+        globalAnnotIndex++;
+      }
+    }
+    // handle custom properties
+    for (var key in customProperties) {
+      var value = customProperties[key];
+      cyObject = fillElementDataAnnotation(cyObject, globalAnnotIndex, "validated", key, "sio:SIO_000223", value);
+      globalAnnotIndex++;
+    }
+
+    return cyObject;
   },
   traverseNodes: function (ele, jsonArray, parent, compartments) {
     var elId = ele.id;
@@ -359,6 +416,11 @@ var sbgnmlToJson = {
 
     edgeObj.portsource = ele.source;
     edgeObj.porttarget = ele.target;
+
+    if (ele.extension && ele.extension.has('annotation')) { // annotation extension was found
+      var rdfElement = ele.extension.get('annotation').rdfElement;
+      edgeObj = self.handleAnnotations(edgeObj, rdfElement);
+    }
 
     var cytoscapeJsEdge = {data: edgeObj};
     jsonArray.push(cytoscapeJsEdge);
