@@ -101,28 +101,17 @@ module.exports = function () {
           stateCenterX = centerX - beginPosX + boxPadding + upWidth + stateWidth / 2;
           stateCenterY = centerY - beginPosY;
 
-          var textProp = {'centerX': stateCenterX, 'centerY': stateCenterY,
-            'opacity': node.css('text-opacity') * node.css('opacity'),
-            'width': stateWidth, 'height': stateHeight};
-
-          if (state.clazz == "state variable") {//draw ellipse
-            drawRoundRectanglePath(context,
-                    stateCenterX, stateCenterY,
-                    stateWidth, stateHeight, Math.min(stateWidth / 2, stateHeight / 2, stateVarRadius));
-            context.fill();
-
-            textProp.state = state.state;
-            $$.sbgn.drawStateText(context, textProp);
-          } else if (state.clazz == "unit of information") {//draw rectangle
-            drawRoundRectanglePath(context,
-                    stateCenterX, stateCenterY,
-                    stateWidth, stateHeight,
-                    Math.min(stateWidth / 2, stateHeight / 2, unitOfInfoRadius));
-            context.fill();
-
-            textProp.label = state.label.text;
-            $$.sbgn.drawInfoText(context, textProp);
-          }
+          drawStateAndInfosMoreSpecific({
+            context: context,
+            node: node,
+            state: state,
+            centerX: stateCenterX,
+            centerY: stateCenterY,
+            stateWidth: stateWidth,
+            stateHeight: stateHeight,
+            stateVarRadius: stateVarRadius,
+            unitOfInfoRadius: unitOfInfoRadius
+          });
         }
         upWidth = upWidth + width + boxPadding;
       } else if (relativeYPos > 0) {
@@ -130,28 +119,17 @@ module.exports = function () {
           stateCenterX = centerX - beginPosX + boxPadding + downWidth + stateWidth / 2;
           stateCenterY = centerY + beginPosY;
 
-          var textProp = {'centerX': stateCenterX, 'centerY': stateCenterY,
-            'opacity': node.css('text-opacity') * node.css('opacity'),
-            'width': stateWidth, 'height': stateHeight};
-
-          if (state.clazz == "state variable") {//draw ellipse
-            drawRoundRectanglePath(context,
-                    stateCenterX, stateCenterY,
-                    stateWidth, stateHeight, Math.min(stateWidth / 2, stateHeight / 2, stateVarRadius));
-            context.fill();
-
-            textProp.state = state.state;
-            $$.sbgn.drawStateText(context, textProp);
-          } else if (state.clazz == "unit of information") {//draw rectangle
-            drawRoundRectanglePath(context,
-                    stateCenterX, stateCenterY,
-                    stateWidth, stateHeight,
-                    Math.min(stateWidth / 2, stateHeight / 2, unitOfInfoRadius));
-            context.fill();
-
-            textProp.label = state.label.text;
-            $$.sbgn.drawInfoText(context, textProp);
-          }
+          drawStateAndInfosMoreSpecific({
+            context: context,
+            node: node,
+            state: state,
+            centerX: stateCenterX,
+            centerY: stateCenterY,
+            stateWidth: stateWidth,
+            stateHeight: stateHeight,
+            stateVarRadius: stateVarRadius,
+            unitOfInfoRadius: unitOfInfoRadius
+          });
         }
         downWidth = downWidth + width + boxPadding;
       }
@@ -224,6 +202,51 @@ module.exports = function () {
     clone: "#a9a9a9"
   };
 
+  /** result of refactoring, no idea for the name :/ */
+  var drawStateAndInfosMoreSpecific = function(params) {
+    var context = params.context;
+    var node = params.node;
+    var state = params.state;
+    var centerX = params.centerX;
+    var centerY = params.centerY;
+    var stateWidth = params.stateWidth;
+    var stateHeight = params.stateHeight;
+    var stateVarRadius = params.stateVarRadius;
+    var unitOfInfoRadius = params.unitOfInfoRadius;
+    var doStroke = params.doStroke || false;
+
+    var textProp = {'centerX': centerX, 'centerY': centerY,
+      'opacity': node.css('text-opacity') * node.css('opacity'),
+      'width': stateWidth, 'height': stateHeight};
+
+    if (state.clazz == "state variable") {//draw ellipse
+      drawRoundRectanglePath(context,
+              centerX, centerY,
+              stateWidth, stateHeight, Math.min(stateWidth / 2, stateHeight / 2, stateVarRadius));
+      context.fill();
+
+      textProp.state = state.state;
+      $$.sbgn.drawStateText(context, textProp);
+      if (doStroke) {
+        context.stroke();
+      }
+
+
+    } else if (state.clazz == "unit of information") {//draw rectangle
+      drawRoundRectanglePath(context,
+              centerX, centerY,
+              stateWidth, stateHeight,
+              Math.min(stateWidth / 2, stateHeight / 2, unitOfInfoRadius));
+      context.fill();
+
+      textProp.label = state.label.text || ''; // <-- different in original
+      $$.sbgn.drawInfoText(context, textProp);
+      if (doStroke) {
+        context.stroke();
+      }
+    }
+  }
+
 
   $$.sbgn.drawStateAndInfos = function (node, context, centerX, centerY) {
     var stateAndInfos = node._private.data.statesandinfos;
@@ -235,34 +258,18 @@ module.exports = function () {
       var stateCenterX = state.bbox.x * node.width() / 100 + centerX;
       var stateCenterY = state.bbox.y * node.height() / 100 + centerY;
 
-      var textProp = {'centerX': stateCenterX, 'centerY': stateCenterY,
-        'opacity': node.css('text-opacity') * node.css('opacity'),
-        'width': stateWidth, 'height': stateHeight};
-
-      if (state.clazz == "state variable") {//draw ellipse
-        //var stateLabel = state.state.value;
-        drawRoundRectanglePath(context, stateCenterX, stateCenterY,
-                stateWidth, stateHeight, Math.min(stateWidth / 2, stateHeight / 2, stateVarRadius));
-
-        context.fill();
-        textProp.state = state.state;
-        $$.sbgn.drawStateText(context, textProp);
-
-        context.stroke();
-
-      } else if (state.clazz == "unit of information") {//draw rectangle
-        drawRoundRectanglePath(context,
-                stateCenterX, stateCenterY,
-                stateWidth, stateHeight,
-                Math.min(stateWidth / 2, stateHeight / 2, unitOfInfoRadius));
-
-        context.fill();
-
-        textProp.label = state.label.text || '';
-        $$.sbgn.drawInfoText(context, textProp);
-
-        context.stroke();
-      }
+      drawStateAndInfosMoreSpecific({
+        context: context,
+        node: node,
+        state: state,
+        centerX: stateCenterX,
+        centerY: stateCenterY,
+        stateWidth: stateWidth,
+        stateHeight: stateHeight,
+        stateVarRadius: stateVarRadius,
+        unitOfInfoRadius: unitOfInfoRadius,
+        doStroke: true
+      });
     }
     //This is a temporary workaround
     $$.sbgn.drawEllipse(context, centerX, centerY, 0, 0);
