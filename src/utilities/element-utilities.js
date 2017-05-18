@@ -320,7 +320,7 @@ var elementUtilities = {
             content = ele.data('label') ? ele.data('label') : "";
         }
         else if(_class == 'complex'){
-            if(ele.children().length == 0){
+            if(ele.children().length == 0 || options.showComplexName){
                 if(ele.data('label')){
                     content = ele.data('label');
                 }

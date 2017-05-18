@@ -19,8 +19,12 @@ var defaults = {
   compoundPadding: function () {
     return 10;
   },
-  // extra padding for compartment
+  // extra padding for compartment and complexes
   extraCompartmentPadding: 10,
+  extraComplexPadding: 10,
+  // Wether to display the complex's labels, like compartments.
+  // Will also increase the paddings by extraCompoundPadding to make room for the name.
+  showComplexName: false,
   // The selector of the component containing the sbgn network
   networkContainerSelector: '#sbgn-network-container',
   // Whether the actions are undoable, requires cytoscape-undo-redo extension

@@ -131,6 +131,37 @@ module.exports = function () {
     ur.action("deleteElesSimple", undoRedoActionFunctions.deleteElesSimple, undoRedoActionFunctions.restoreEles);
     ur.action("deleteNodesSmart", undoRedoActionFunctions.deleteNodesSmart, undoRedoActionFunctions.restoreEles);
   }
+
+  // used for handling the variable property of complexes
+  function getPadding(ele) {
+    // this property needs to take into account:
+    // - presence of a label
+    // - option to display complex labels
+    // - presence of states and info box
+    var padding = getCompoundPaddings();
+    if (options.showComplexName && elementUtilities.getElementContent(ele)) {
+      padding += options.extraComplexPadding * 0.5;
+      if (ele.data('statesandinfos').length > 0) {
+        padding += options.extraComplexPadding * 0.5;
+      }
+    }
+    return padding;
+  }
+
+  // used for handling the variable property of complexes
+  function getMargin(ele) {
+    // this property needs to take into account:
+    // - presence of a label
+    // - option to display complex labels
+    // - presence of states and info box
+    var margin =  -1 * options.extraComplexPadding;
+    if (options.showComplexName &&
+        elementUtilities.getElementContent(ele) &&
+        ele.data('statesandinfos').length > 0) {
+      margin -= options.extraComplexPadding * 0.5;
+    }
+    return margin;
+  }
   
   function bindCyEvents() {
     cy.on('tapend', 'node', function (event) {
@@ -172,6 +203,14 @@ module.exports = function () {
       if (node._private.data.class == "complex") {
         node.removeStyle('content');
       }
+    });
+
+    /**
+     * Listen to change (for label and stats and info) to adjust paddings
+     */
+    cy.on("data", "node[class='complex']", function (event) {
+      this.style('padding', getPadding(this));
+      this.style('text-margin-y', getMargin(this));
     });
   }
 
@@ -256,6 +295,8 @@ module.exports = function () {
           .css({
             'text-valign': 'bottom',
             'text-halign': 'center',
+            'text-margin-y': getMargin,
+            'padding': getPadding
           })
           .selector("node[class='compartment']")
           .css({
