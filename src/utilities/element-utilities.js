@@ -510,7 +510,7 @@ var elementUtilities = {
     getEndPoint: function(edge, sourceOrTarget) {
       var portId = sourceOrTarget === 'source' ? edge.data('portsource') : edge.data('porttarget');
 
-      if (portId == null) {
+      if (portId == null || !graphUtilities.portsEnabled) {
         return 'outside-to-node'; // If there is no portsource return the default value which is 'outside-to-node'
       }
 
