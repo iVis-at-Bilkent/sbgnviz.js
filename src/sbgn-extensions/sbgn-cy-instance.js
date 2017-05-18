@@ -137,11 +137,11 @@ module.exports = function () {
     // this property needs to take into account:
     // - presence of a label
     // - option to display complex labels
-    // - presence of states and info box
+    // - presence of more than 1 states and info box (leads to have some of them on bottom)
     var padding = getCompoundPaddings();
     if (options.showComplexName && elementUtilities.getElementContent(ele)) {
       padding += options.extraComplexPadding * 0.5;
-      if (ele.data('statesandinfos').length > 0) {
+      if (ele.data('statesandinfos').length > 1) {
         padding += options.extraComplexPadding * 0.5;
       }
     }
@@ -153,11 +153,11 @@ module.exports = function () {
     // this property needs to take into account:
     // - presence of a label
     // - option to display complex labels
-    // - presence of states and info box
+    // - presence of more than 1 states and info box (leads to have some of them on bottom)
     var margin =  -1 * options.extraComplexPadding;
     if (options.showComplexName &&
         elementUtilities.getElementContent(ele) &&
-        ele.data('statesandinfos').length > 0) {
+        ele.data('statesandinfos').length > 1) {
       margin -= options.extraComplexPadding * 0.5;
     }
     return margin;

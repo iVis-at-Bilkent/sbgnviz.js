@@ -382,4 +382,13 @@ mainUtilities.getQtipContent = function(node) {
   return elementUtilities.getQtipContent(node);
 };
 
+// Change option
+mainUtilities.setShowComplexName = function(showComplexName) {
+  options.showComplexName = showComplexName;
+  // make change active by triggering data which will trigger style update
+  cy.nodes('[class="complex"]').forEach(function(ele){
+    ele.trigger("data");
+  });
+};
+
 module.exports = mainUtilities;
