@@ -308,7 +308,7 @@ var jsonToSbgnml = {
         // If the node can have ports and it has exactly 2 ports then it is represented by a bigger bbox.
         // This is because we represent it as a polygon and so the whole shape including the ports are rendered in the node bbox.
         if (elementUtilities.canHavePorts(_class)) {
-          if (graphUtilities.portsEnabled === true && node.data('ports').length === 2) {
+          if (node.data('ports').length === 2) {
             // We assume that the ports are symmetric to the node center so using just one of the ports is enough
             var port = node.data('ports')[0];
             var orientation = port.x === 0 ? 'vertical' : 'horizontal';
