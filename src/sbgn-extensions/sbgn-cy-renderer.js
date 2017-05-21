@@ -78,28 +78,46 @@ module.exports = function () {
   var stateVarRadius = 15;
   $$.sbgn.drawComplexStateAndInfo = function (context, node, stateAndInfos,
           centerX, centerY, width, height) {
+    //console.log("drawComplexStateAndInfo", node.width(), node.height(), width, height, node.outerWidth(), node.outerHeight() );
+    $$.sbgn.drawStateAndInfos(node, context, centerX, centerY, width, height);
+    return;
 
+    /****************  rest of the function is unused now ******************/
+    /** Following code seems to be an experiment to layout boxes from the left, regularly spaced. 
+     * The boxes were not displayed if they go further than the width of the parent element
+     */
+
+    /*
     //This is a temporary workaround
     $$.sbgn.drawEllipse(context, centerX, centerY, 0, 0);
 
+    // the width occupied by statesandinfos on the top and bottom of the complex
     var upWidth = 0, downWidth = 0;
-    var boxPadding = 10, betweenBoxPadding = 5;
+    // outer padding
+    var boxPadding = 10;
+    // padding between each stateandinfo
+    var betweenBoxPadding = 5;
     var beginPosY = height / 2, beginPosX = width / 2;
 
     stateAndInfos.sort($$.sbgn.compareStates);
 
-    for (var i = 0; i < stateAndInfos.length; i++) {
+    var boxCount = stateAndInfos.length > 4 ? 4 : stateAndInfos.length;
+    for (var i = 0; i < boxCount; i++) {
       var state = stateAndInfos[i];
       var stateWidth = state.bbox.w;
       var stateHeight = state.bbox.h;
 //      var stateLabel = state.state.value;
       var relativeYPos = state.bbox.y;
       var stateCenterX, stateCenterY;
-
+      //console.log("info box", i, state, relativeYPos);
+      //console.log("width", upWidth, downWidth, stateWidth, width);
       if (relativeYPos < 0) {
         if (upWidth + stateWidth < width) {
+          //var stateCenterX = state.bbox.x * node.width() / 100 + centerX;
+          //var stateCenterY = state.bbox.y * node.height() / 100 + centerY;
           stateCenterX = centerX - beginPosX + boxPadding + upWidth + stateWidth / 2;
           stateCenterY = centerY - beginPosY;
+          //console.log("center < 0", stateCenterX, stateCenterY);
 
           drawStateAndInfosMoreSpecific({
             context: context,
@@ -113,11 +131,12 @@ module.exports = function () {
             unitOfInfoRadius: unitOfInfoRadius
           });
         }
-        upWidth = upWidth + width + boxPadding;
+        upWidth = upWidth + stateWidth + boxPadding;
       } else if (relativeYPos > 0) {
         if (downWidth + stateWidth < width) {
           stateCenterX = centerX - beginPosX + boxPadding + downWidth + stateWidth / 2;
           stateCenterY = centerY + beginPosY;
+          //console.log("center > 0", stateCenterX, stateCenterY);
 
           drawStateAndInfosMoreSpecific({
             context: context,
@@ -131,8 +150,9 @@ module.exports = function () {
             unitOfInfoRadius: unitOfInfoRadius
           });
         }
-        downWidth = downWidth + width + boxPadding;
+        downWidth = downWidth + stateWidth + boxPadding;
       }
+      //console.log("after 2 if");
       context.stroke();
 
       //This is a temporary workaround
@@ -142,6 +162,7 @@ module.exports = function () {
       state.bbox.x = (stateCenterX - centerX) * 100 / node.width();
       state.bbox.y = (stateCenterY - centerY) * 100 / node.height();
     }
+    */
   };
 
   $$.sbgn.drawStateText = function (context, textProp) {
@@ -227,11 +248,6 @@ module.exports = function () {
 
       textProp.state = state.state;
       $$.sbgn.drawStateText(context, textProp);
-      if (doStroke) {
-        context.stroke();
-      }
-
-
     } else if (state.clazz == "unit of information") {//draw rectangle
       drawRoundRectanglePath(context,
               centerX, centerY,
@@ -239,24 +255,26 @@ module.exports = function () {
               Math.min(stateWidth / 2, stateHeight / 2, unitOfInfoRadius));
       context.fill();
 
-      textProp.label = state.label.text || ''; // <-- different in original
+      textProp.label = state.label.text || '';
       $$.sbgn.drawInfoText(context, textProp);
-      if (doStroke) {
-        context.stroke();
-      }
+    }
+    if (doStroke) {
+      context.stroke();
     }
   }
 
-
-  $$.sbgn.drawStateAndInfos = function (node, context, centerX, centerY) {
+  $$.sbgn.drawStateAndInfos = function (node, context, centerX, centerY, width, height) {
     var stateAndInfos = node._private.data.statesandinfos;
+    var padding = node.style('padding') ? parseInt(node.style('padding')) : 0;
+    var width = width || node.width(); // width and height may be omitted
+    var height = height || node.height();
 
-    for (var i = 0; i < stateAndInfos.length && i < 4; i++) {
+    for (var i = 0; i < stateAndInfos.length; i++) {
       var state = stateAndInfos[i];
       var stateWidth = state.bbox.w;
       var stateHeight = state.bbox.h;
-      var stateCenterX = state.bbox.x * node.width() / 100 + centerX;
-      var stateCenterY = state.bbox.y * node.height() / 100 + centerY;
+      var stateCenterX = state.bbox.x * width / 100 + centerX;
+      var stateCenterY = state.bbox.y * height / 100 + centerY;
 
       drawStateAndInfosMoreSpecific({
         context: context,
