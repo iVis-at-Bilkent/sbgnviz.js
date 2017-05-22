@@ -190,6 +190,18 @@ module.exports = function () {
       edges.scratch('cyedgebendeditingWeights', []);
       edges.scratch('cyedgebendeditingDistances', []);
     });
+    
+    cy.on("expandcollapse.aftercollapse", "node", function (event) {
+      var node = this;
+      // The width and height of just collapsed nodes should be 36, but they are supposed to be resizable. Therefore, we
+      // set their data('bbox') accordingly. We do not store their existing bbox.w and bbox.h because they have no significance for compounds (for now).
+      cy.startBatch();
+      var bbox = node.data('bbox');
+      bbox.w = 36;
+      bbox.h = 36;
+      node.data('bbox', bbox);
+      cy.endBatch();
+    });
 
     cy.on("expandcollapse.beforeexpand", "node", function (event) {
       var node = this;
@@ -319,8 +331,6 @@ module.exports = function () {
           })
           .selector("node.cy-expand-collapse-collapsed-node")
           .css({
-            'width': 36,
-            'height': 36,
             'border-style': 'dashed'
           })
           .selector("node:selected")
