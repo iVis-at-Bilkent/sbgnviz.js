@@ -15,7 +15,7 @@ module.exports = function () {
   var $$ = cytoscape;
   
   // Taken from cytoscape.js and modified
-  var drawRoundRectanglePath = function(
+  var drawRoundRectanglePath = $$.sbgn.drawRoundRectanglePath = function(
     context, x, y, width, height, radius ){
 
     var halfWidth = width / 2;
@@ -74,13 +74,13 @@ module.exports = function () {
     'complex': true
   };
 
-  var unitOfInfoRadius = 4;
+  /*var unitOfInfoRadius = 4;
   var stateVarRadius = 15;
   $$.sbgn.drawComplexStateAndInfo = function (context, node, stateAndInfos,
           centerX, centerY, width, height) {
-    //console.log("drawComplexStateAndInfo", node.width(), node.height(), width, height, node.outerWidth(), node.outerHeight() );
-    $$.sbgn.drawStateAndInfos(node, context, centerX, centerY, width, height);
-    return;
+    console.log("drawComplexStateAndInfo", node.width(), node.height(), width, height, node.outerWidth(), node.outerHeight() );
+    $$.sbgn.drawStateAndInfos(node, context, centerX, centerY, node.outerWidth(), node.outerHeight());
+    return;*/
 
     /****************  rest of the function is unused now ******************/
     /** Following code seems to be an experiment to layout boxes from the left, regularly spaced. 
@@ -163,9 +163,9 @@ module.exports = function () {
       state.bbox.y = (stateCenterY - centerY) * 100 / node.height();
     }
     */
-  };
+  //};
 
-  $$.sbgn.drawStateText = function (context, textProp) {
+  /*$$.sbgn.drawStateText = function (context, textProp) {
     var stateValue = textProp.state.value || '';
     var stateVariable = textProp.state.variable || '';
 
@@ -189,6 +189,7 @@ module.exports = function () {
   };
 
   $$.sbgn.drawText = function (context, textProp, truncate) {
+    console.log("old draw text", context);
     var oldFont = context.font;
     context.font = textProp.font;
     context.textAlign = "center";
@@ -212,7 +213,7 @@ module.exports = function () {
     context.font = oldFont;
     context.globalAlpha = oldOpacity;
     //context.stroke();
-  };
+  };*/
 
   cyMath.calculateDistance = function (point1, point2) {
     var distance = Math.pow(point1[0] - point2[0], 2) + Math.pow(point1[1] - point2[1], 2);
@@ -224,7 +225,7 @@ module.exports = function () {
   };
 
   /** result of refactoring, no idea for the name :/ */
-  var drawStateAndInfosMoreSpecific = function(params) {
+  /*var drawStateAndInfosMoreSpecific = function(params) {
     var context = params.context;
     var node = params.node;
     var state = params.state;
@@ -240,15 +241,15 @@ module.exports = function () {
       'opacity': node.css('text-opacity') * node.css('opacity'),
       'width': stateWidth, 'height': stateHeight};
 
-    if (state.clazz == "state variable") {//draw ellipse
+    if (state.constructor.name == 'StateVariable') {//draw ellipse
       drawRoundRectanglePath(context,
               centerX, centerY,
               stateWidth, stateHeight, Math.min(stateWidth / 2, stateHeight / 2, stateVarRadius));
       context.fill();
 
       textProp.state = state.state;
-      $$.sbgn.drawStateText(context, textProp);
-    } else if (state.clazz == "unit of information") {//draw rectangle
+      //$$.sbgn.drawStateText(context, textProp);
+    } else if (state.constructor.name == 'UnitOfInformation') {//draw rectangle
       drawRoundRectanglePath(context,
               centerX, centerY,
               stateWidth, stateHeight,
@@ -256,27 +257,28 @@ module.exports = function () {
       context.fill();
 
       textProp.label = state.label.text || '';
-      $$.sbgn.drawInfoText(context, textProp);
+      //$$.sbgn.drawInfoText(context, textProp);
     }
+    state.drawText(context, centerX, centerY);
     if (doStroke) {
       context.stroke();
     }
-  }
+  }*/
 
-  $$.sbgn.drawStateAndInfos = function (node, context, centerX, centerY, width, height) {
+  $$.sbgn.drawStateAndInfos = function (node, context, centerX, centerY) {
     var stateAndInfos = node._private.data.statesandinfos;
-    var padding = node.style('padding') ? parseInt(node.style('padding')) : 0;
-    var width = width || node.width(); // width and height may be omitted
-    var height = height || node.height();
+    //var padding = node.style('padding') ? parseInt(node.style('padding')) : 0;
+    //var width = node.outerWidth(); // width and height may be omitted
+    //var height = node.outerHeight();
 
     for (var i = 0; i < stateAndInfos.length; i++) {
       var state = stateAndInfos[i];
-      var stateWidth = state.bbox.w;
-      var stateHeight = state.bbox.h;
-      var stateCenterX = state.bbox.x * width / 100 + centerX;
-      var stateCenterY = state.bbox.y * height / 100 + centerY;
-
-      drawStateAndInfosMoreSpecific({
+      //console.log("old draw statesandinfos", state.bbox);
+      //var stateWidth = state.bbox.w;
+      //var stateHeight = state.bbox.h;
+      var absCoord = state.getAbsoluteCoord();
+      state.draw(context, absCoord.x, absCoord.y);
+      /*drawStateAndInfosMoreSpecific({
         context: context,
         node: node,
         state: state,
@@ -287,10 +289,10 @@ module.exports = function () {
         stateVarRadius: stateVarRadius,
         unitOfInfoRadius: unitOfInfoRadius,
         doStroke: true
-      });
+      });*/
     }
     //This is a temporary workaround
-    $$.sbgn.drawEllipse(context, centerX, centerY, 0, 0);
+    $$.sbgn.drawEllipse(context, centerX, centerY, 0, 0); // ?
   };
 
   $$.sbgn.nucleicAcidCheckPoint = function (x, y, centerX, centerY, node, threshold, points, cornerRadius) {
@@ -768,7 +770,8 @@ module.exports = function () {
 
         var oldStyle = context.fillStyle;
         $$.sbgn.forceOpacityToOne(node, context);
-        $$.sbgn.drawComplexStateAndInfo(context, node, stateAndInfos, centerX, centerY, width, height);
+        //$$.sbgn.drawComplexStateAndInfo(context, node, stateAndInfos, centerX, centerY, width, height);
+        $$.sbgn.drawStateAndInfos(node, context, centerX, centerY);
         context.fillStyle = oldStyle;
       },
 //      intersectLine: cyBaseNodeShapes["roundrectangle"].intersectLine,

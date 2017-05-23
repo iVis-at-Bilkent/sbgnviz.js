@@ -1,5 +1,6 @@
 var elementUtilities = require('../utilities/element-utilities');
 var graphUtilities = require('../utilities/graph-utilities');
+var classes = require('../utilities/classes');
 var undoRedoActionFunctions = require('../utilities/undo-redo-action-functions');
 var refreshPaddings = graphUtilities.refreshPaddings.bind(graphUtilities);
 
@@ -211,6 +212,33 @@ module.exports = function () {
     cy.on("data", "node[class='complex']", function (event) {
       this.style('padding', getPadding(this));
       this.style('text-margin-y', getMargin(this));
+    });
+
+    // list all entitytypes andstore them in the global scratch
+    // only stateful EPN (complex, macromolecule or nucleic acid) are concerned
+    $(document).on('updateGraphEnd', function(event) {
+      var entityHash = {};
+      cy.nodes("[class='complex'], [class='macromolecule'], [class='nucleic acid feature']").forEach(function(node) {
+        // identify an entity by its label AND class
+        var label = node.data('label');
+        var _class = node.data('class');
+        var id=label+'-'+_class;
+        if(!entityHash.hasOwnProperty(id)) { // create entitytype if doesn't already exist
+          entityHash[id] = new classes.EntityType(id);
+        }
+        var currentEntityType = entityHash[id];
+        currentEntityType.EPNs.push(node); // assigne the current element to its corresponding entitytype
+
+        // collect all stateVariables of the current element, we need to assign StateVariableDefinitions to them
+        for(var i=0; i < node.data('statesandinfos').length; i++) {
+          var statesandinfos = node.data('statesandinfos')[i];
+          if(statesandinfos instanceof classes.StateVariable) { // stateVariable found
+            var currentStateVariable = statesandinfos;
+            currentEntityType.assignStateVariable(currentStateVariable);
+          }
+        }
+      });
+      cy.scratch('_newtGlobal', {SBGNEntityTypes: entityHash});
     });
   }
 

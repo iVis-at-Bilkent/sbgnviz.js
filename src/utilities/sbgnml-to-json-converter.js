@@ -1,4 +1,5 @@
 var elementUtilities = require('./element-utilities');
+var classes = require('../utilities/classes');
 var graphUtilities = require('./graph-utilities');
 var libsbgnjs = require('libsbgn.js');
 
@@ -55,7 +56,12 @@ var sbgnmlToJson = {
     var xPos = parseFloat(parentBbox.x);
     var yPos = parseFloat(parentBbox.y);
 
-    var bbox = ele.bbox;
+    // don't copy directly ele.box because it contains other things than x y w h
+    var bbox = {};
+    bbox.x = ele.bbox.x;
+    bbox.y = ele.bbox.y;
+    bbox.w = ele.bbox.w;
+    bbox.h = ele.bbox.h;
 
     // set positions as center
     bbox.x = parseFloat(bbox.x) + parseFloat(bbox.w) / 2 - xPos;
@@ -63,6 +69,14 @@ var sbgnmlToJson = {
 
     bbox.x = bbox.x / parseFloat(parentBbox.w) * 100;
     bbox.y = bbox.y / parseFloat(parentBbox.h) * 100;
+
+    // enforce that y must correspond to the top or bottom line of the element exactly
+    if (bbox.y > 0) {
+      bbox.y = 50;
+    }
+    else {
+      bbox.y = -50;
+    }
 
     return bbox;
   },
@@ -81,8 +95,9 @@ var sbgnmlToJson = {
     var nodes = this.findChildNodes(ele, childTagName);
     return nodes.length > 0 ? nodes[0] : undefined;
   },
-  stateAndInfoProp: function (ele, parentBbox) {
+  stateAndInfoProp: function (ele, parent) {
     var self = this;
+    var parentBbox = parent.bbox;
     var stateAndInfoArray = [];
 
     var childGlyphs = ele.glyphMembers; // this.findChildNodes(ele, 'glyph');
@@ -92,15 +107,22 @@ var sbgnmlToJson = {
       var info = {};
 
       if (glyph.class_ === 'unit of information') {
-        info.id = glyph.id || undefined;
+        /*info.id = glyph.id || undefined;
         info.clazz = glyph.class_ || undefined;
         info.label = {
           'text': (glyph.label && glyph.label.text) || undefined
         };
-        info.bbox = self.stateAndInfoBboxProp(glyph, parentBbox);
-        stateAndInfoArray.push(info);
+        info.bbox = self.stateAndInfoBboxProp(glyph, parentBbox);*/
+        var unitOfInformation = new classes.UnitOfInformation();
+        unitOfInformation.id = glyph.id || undefined;
+        //unitOfInformation.clazz = glyph.class_ || undefined;
+        unitOfInformation.label = {
+          'text': (glyph.label && glyph.label.text) || undefined
+        };
+        unitOfInformation.bbox = self.stateAndInfoBboxProp(glyph, parentBbox);
+        stateAndInfoArray.push(unitOfInformation);
       } else if (glyph.class_ === 'state variable') {
-        info.id = glyph.id || undefined;
+        /*info.id = glyph.id || undefined;
         info.clazz = glyph.class_ || undefined;
         var state = glyph.state;
         var value = (state && state.value) || undefined;
@@ -109,8 +131,16 @@ var sbgnmlToJson = {
           'value': value,
           'variable': variable
         };
-        info.bbox = self.stateAndInfoBboxProp(glyph, parentBbox);
-        stateAndInfoArray.push(info);
+        info.bbox = self.stateAndInfoBboxProp(glyph, parentBbox);*/
+        var stateVariable = new classes.StateVariable();
+        stateVariable.id = glyph.id || undefined;
+        //stateVariable.clazz = glyph.class_ || undefined;
+        var state = glyph.state;
+        stateVariable.value = (state && state.value) || undefined;
+        stateVariable.variable = (state && state.variable) || undefined;
+        stateVariable.bbox = self.stateAndInfoBboxProp(glyph, parentBbox);
+
+        stateAndInfoArray.push(stateVariable);
       }
     }
 
@@ -161,7 +191,7 @@ var sbgnmlToJson = {
     // add label information
     nodeObj.label = (ele.label && ele.label.text) || undefined;
     // add state and info box information
-    nodeObj.statesandinfos = self.stateAndInfoProp(ele, nodeObj.bbox);
+    nodeObj.statesandinfos = self.stateAndInfoProp(ele, nodeObj);
     // adding parent information
     self.addParentInfoToNode(ele, nodeObj, parent, compartments);
 

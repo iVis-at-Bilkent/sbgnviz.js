@@ -11,6 +11,7 @@ var AuxiliaryUnit = function (parent) {
   this.parent = parent;
   this.id = null;
   this.bbox = null;
+  this.coordType = "relativeToCenter";
 };
 
 // draw the auxiliary unit at given position
@@ -27,7 +28,7 @@ AuxiliaryUnit.prototype.draw = function(context, centerX, centerY) {
 // to be implemented by children
 AuxiliaryUnit.prototype.getText = function() {
   throw new Error("Abstract method!");
-}
+};
 
 // draw the statesOrInfo's label at given position
 AuxiliaryUnit.prototype.drawText = function(context, centerX, centerY, truncate) {
@@ -65,7 +66,15 @@ AuxiliaryUnit.prototype.drawText = function(context, centerX, centerY, truncate)
   context.font = oldFont;
   context.globalAlpha = oldOpacity;
   //context.stroke();
-}
+};
+
+AuxiliaryUnit.prototype.getAbsoluteCoord = function() {
+  if(this.coordType == "relativeToCenter") {
+    var absX = this.bbox.x * this.parent.outerWidth() / 100 + this.parent._private.position.x;
+    var absY = this.bbox.y * this.parent.outerHeight() / 100 + this.parent._private.position.y;
+    return {x: absX, y: absY};
+  }
+};
 
 ns.AuxiliaryUnit = AuxiliaryUnit;
 // -------------- END AuxiliaryUnit -------------- //
@@ -90,7 +99,7 @@ StateVariable.prototype.getText = function() {
   var stateVariable = this.variable ? "@" + this.variable : "";
 
   return stateValue + stateVariable;
-}
+};
 
 ns.StateVariable = StateVariable;
 // -------------- END StateVariable -------------- //
@@ -112,7 +121,7 @@ UnitOfInformation.shapeRadius = 4;
 
 UnitOfInformation.prototype.getText = function() {
   return this.label.text;
-}
+};
 
 ns.UnitOfInformation = UnitOfInformation;
 // -------------- END UnitOfInformation -------------- //
@@ -197,8 +206,8 @@ StateVariableDefinition.prototype.matchStateVariable = function(stateVar) {
     // normal sure case. Example:
     // P T134 - undefined T134
     // P undef - P undef
-    if ((matchStateVar.value && stateVar.value && matchStateVar.value == stateVar.value ) 
-        || (matchStateVar.variable && stateVar.variable && matchStateVar.variable == stateVar.variable)) {
+    if (//(matchStateVar.value && stateVar.value && matchStateVar.value == stateVar.value ) ||
+        (matchStateVar.variable && stateVar.variable && matchStateVar.variable == stateVar.variable)) {
       return true;
     }
     // more subtle case, with empty stateVar. Look only at value and discard variable
