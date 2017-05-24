@@ -216,14 +216,6 @@ module.exports = function () {
         node.removeStyle('content');
       }
     });
-
-    /**
-     * Listen to change (for label and stats and info) to adjust paddings
-     */
-    cy.on("data", "node[class='complex']", function (event) {
-      this.style('padding', getPadding(this));
-      this.style('text-margin-y', getMargin(this));
-    });
   }
 
   var selectionColor = '#d67614';
