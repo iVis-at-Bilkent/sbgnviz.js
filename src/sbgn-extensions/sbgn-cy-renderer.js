@@ -265,7 +265,7 @@ module.exports = function () {
     }
   }*/
 
-  $$.sbgn.drawStateAndInfos = function (node, context, centerX, centerY) {
+  $$.sbgn.drawStateAndInfos_backup = function (node, context, centerX, centerY) {
     var stateAndInfos = node._private.data.statesandinfos;
     //var padding = node.style('padding') ? parseInt(node.style('padding')) : 0;
     //var width = node.outerWidth(); // width and height may be omitted
@@ -290,6 +290,18 @@ module.exports = function () {
         unitOfInfoRadius: unitOfInfoRadius,
         doStroke: true
       });*/
+    }
+    //This is a temporary workaround
+    $$.sbgn.drawEllipse(context, centerX, centerY, 0, 0); // ?
+  };
+
+  $$.sbgn.drawStateAndInfos = function (node, context, centerX, centerY) {
+    var layouts = node.data('auxunitlayouts');
+
+    for (var side in layouts) {
+      var layout = layouts[side];
+      console.log("render layout", layout);
+      layout.draw(context, centerX, centerY);
     }
     //This is a temporary workaround
     $$.sbgn.drawEllipse(context, centerX, centerY, 0, 0); // ?
@@ -1406,8 +1418,9 @@ module.exports = function () {
       var state = stateAndInfos[i];
       var stateWidth = state.bbox.w;
       var stateHeight = state.bbox.h;
-      var stateCenterX = state.bbox.x * node.width() / 100 + centerX;
-      var stateCenterY = state.bbox.y * node.height() / 100 + centerY;
+      var coord = state.getAbsoluteCoord();
+      var stateCenterX = coord.x;
+      var stateCenterY = coord.y;
 
       if (state.clazz == "state variable" && stateCount < 2) {//draw ellipse
         var stateIntersectLines = $$.sbgn.intersectLineEllipse(x, y, centerX, centerY,
@@ -1446,8 +1459,9 @@ module.exports = function () {
       var state = stateAndInfos[i];
       var stateWidth = parseFloat(state.bbox.w) + threshold;
       var stateHeight = parseFloat(state.bbox.h) + threshold;
-      var stateCenterX = state.bbox.x * node.width() / 100 + centerX;
-      var stateCenterY = state.bbox.y * node.height() / 100 + centerY;
+      var coord = state.getAbsoluteCoord();
+      var stateCenterX = coord.x;
+      var stateCenterY = coord.y;
 
       if (state.clazz == "state variable" && stateCount < 2) {//draw ellipse
         var stateCheckPoint = cyBaseNodeShapes["ellipse"].checkPoint(

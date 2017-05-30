@@ -71,12 +71,12 @@ var sbgnmlToJson = {
     bbox.y = bbox.y / parseFloat(parentBbox.h) * 100;
 
     // enforce that y must correspond to the top or bottom line of the element exactly
-    if (bbox.y > 0) {
+    /*if (bbox.y > 0) {
       bbox.y = 50;
     }
     else {
       bbox.y = -50;
-    }
+    }*/
 
     return bbox;
   },
@@ -120,6 +120,7 @@ var sbgnmlToJson = {
           'text': (glyph.label && glyph.label.text) || undefined
         };
         unitOfInformation.bbox = self.stateAndInfoBboxProp(glyph, parentBbox);
+        unitOfInformation.setAnchorSide();
         stateAndInfoArray.push(unitOfInformation);
       } else if (glyph.class_ === 'state variable') {
         /*info.id = glyph.id || undefined;
@@ -136,14 +137,13 @@ var sbgnmlToJson = {
         stateVariable.id = glyph.id || undefined;
         //stateVariable.clazz = glyph.class_ || undefined;
         var state = glyph.state;
-        stateVariable.value = (state && state.value) || undefined;
-        stateVariable.variable = (state && state.variable) || undefined;
+        stateVariable.state.value = (state && state.value) || undefined;
+        stateVariable.state.variable = (state && state.variable) || undefined;
         stateVariable.bbox = self.stateAndInfoBboxProp(glyph, parentBbox);
-
+        stateVariable.setAnchorSide();
         stateAndInfoArray.push(stateVariable);
       }
     }
-
 
     return stateAndInfoArray;
   },

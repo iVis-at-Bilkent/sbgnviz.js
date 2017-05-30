@@ -214,9 +214,9 @@ module.exports = function () {
       this.style('text-margin-y', getMargin(this));
     });
 
-    // list all entitytypes andstore them in the global scratch
-    // only stateful EPN (complex, macromolecule or nucleic acid) are concerned
     $(document).on('updateGraphEnd', function(event) {
+      // list all entitytypes andstore them in the global scratch
+      // only stateful EPN (complex, macromolecule or nucleic acid) are concerned
       var entityHash = {};
       cy.nodes("[class='complex'], [class='macromolecule'], [class='nucleic acid feature']").forEach(function(node) {
         // identify an entity by its label AND class
@@ -239,6 +239,26 @@ module.exports = function () {
         }
       });
       cy.scratch('_newtGlobal', {SBGNEntityTypes: entityHash});
+
+      // assign statesandinfos to their layout
+      cy.nodes().forEach(function(node) {
+        node.data('auxunitlayouts', {});
+        // for each statesandinfos
+        for(var i=0; i < node.data('statesandinfos').length; i++) {
+          var statesandinfos = node.data('statesandinfos')[i];
+          var location = statesandinfos.anchorSide; // top bottom right left
+          var layouts = node.data('auxunitlayouts');
+          if(!layouts[location]) { // layout doesn't exist yet for this location
+            layouts[location] = new classes.AuxUnitLayout(node, location);
+          }
+          // populate the layout of this side
+          layouts[location].addAuxUnit(statesandinfos);
+        }
+        // ensure that each layout has statesandinfos in correct order according to their initial positions
+        for(var location in node.data('auxunitlayouts')) {
+          node.data('auxunitlayouts')[location].reorderFromPositions();
+        }
+      });
     });
   }
 

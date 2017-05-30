@@ -12,6 +12,7 @@ var AuxiliaryUnit = function (parent) {
   this.id = null;
   this.bbox = null;
   this.coordType = "relativeToCenter";
+  this.anchorSide = null;
 };
 
 // draw the auxiliary unit at given position
@@ -33,16 +34,13 @@ AuxiliaryUnit.prototype.getText = function() {
 // draw the statesOrInfo's label at given position
 AuxiliaryUnit.prototype.drawText = function(context, centerX, centerY, truncate) {
   var fontSize = 9; // parseInt(textProp.height / 1.5);
-  //textProp.font = 
-  //textProp.color = 
- 
+
   // part of : $$.sbgn.drawText(context, textProp);
   // save style before modification
   var oldFont = context.font;
   var oldStyle = context.fillStyle;
   var oldOpacity = context.globalAlpha;
-  
-  
+
   context.font = fontSize + "px Arial";
   context.textAlign = "center";
   context.textBaseline = "middle";
@@ -50,22 +48,19 @@ AuxiliaryUnit.prototype.drawText = function(context, centerX, centerY, truncate)
   context.globalAlpha = this.parent.css('text-opacity') * this.parent.css('opacity'); // ?
 
   var text = this.getText();
-  
-  //textProp.label = textProp.label || '';
-  
+
   /*if (truncate == false) {
     text = textProp.label;
   } else {
     text = truncateText(textProp, context.font);
   }*/
-  
+
   context.fillText(text, centerX, centerY);
 
   // restore saved style
   context.fillStyle = oldStyle;
   context.font = oldFont;
   context.globalAlpha = oldOpacity;
-  //context.stroke();
 };
 
 AuxiliaryUnit.prototype.getAbsoluteCoord = function() {
@@ -73,6 +68,60 @@ AuxiliaryUnit.prototype.getAbsoluteCoord = function() {
     var absX = this.bbox.x * this.parent.outerWidth() / 100 + this.parent._private.position.x;
     var absY = this.bbox.y * this.parent.outerHeight() / 100 + this.parent._private.position.y;
     return {x: absX, y: absY};
+  }
+  else if(this.coordType == "relativeToSide") {
+    if (this.anchorSide == "top" || this.anchorSide == "bottom") {
+      var absX = this.parent._private.position.x - this.parent.outerWidth() / 2 + this.bbox.x;
+      var absY = this.bbox.y * this.parent.outerHeight() / 100 + this.parent._private.position.y;
+    }
+    else {
+      var absY = this.parent._private.position.y - this.parent.outerHeight() / 2 + this.bbox.y;
+      var absX = this.bbox.x * this.parent.outerWidth() / 100 + this.parent._private.position.x;
+    }
+    return {x: absX, y: absY};
+  }
+};
+
+AuxiliaryUnit.prototype.setAnchorSide = function(parentBbox) {
+  if(this.coordType == "relativeToCenter") {
+    var thisX = this.bbox.x;
+    var thisY = this.bbox.y;
+    if(thisY > 45) {
+      this.anchorSide = "bottom";
+      this.bbox.y = 50;
+    }
+    else if (thisY < -45) {
+      this.anchorSide = "top";
+      this.bbox.y = -50;
+    }
+    else if (thisY => 0) {
+      if (thisX > 45) {
+        this.anchorSide = "right";
+        this.bbox.x = 50;
+      }
+      else if (thisX < -45) {
+        this.anchorSide = "left";
+        this.bbox.x = -50;
+      }
+      else {
+        this.anchorSide = "bottom";
+        this.bbox.y = 50;
+      }
+    }
+    else {
+      if (thisX > 45) {
+        this.anchorSide = "right";
+        this.bbox.x = 50;
+      }
+      else if (thisX < -45) {
+        this.anchorSide = "left";
+        this.bbox.x = -50;
+      }
+      else {
+        this.anchorSide = "top";
+        this.bbox.y = -50;
+      }
+    }
   }
 };
 
@@ -85,8 +134,9 @@ ns.AuxiliaryUnit = AuxiliaryUnit;
  */
 var StateVariable = function (value, stateVariableDefinition, parent) {
   AuxiliaryUnit.call(this, parent);
-  this.value = value;
-  this.variable = null;
+  this.state = {};
+  this.state.value = value;
+  this.state.variable = null;
   this.stateVariableDefinition = stateVariableDefinition;
   this.clazz = "state variable";
 };
@@ -95,8 +145,8 @@ StateVariable.prototype.constructor = StateVariable;
 StateVariable.shapeRadius = 15;
 
 StateVariable.prototype.getText = function() {
-  var stateValue = this.value || '';
-  var stateVariable = this.variable ? "@" + this.variable : "";
+  var stateValue = this.state.value || '';
+  var stateVariable = this.state.variable ? "@" + this.state.variable : "";
 
   return stateValue + stateVariable;
 };
@@ -222,5 +272,128 @@ StateVariableDefinition.prototype.matchStateVariable = function(stateVar) {
 ns.StateVariableDefinition = StateVariableDefinition;
 // -------------- END StateVariableDefinition -------------- //
 
+// -------------- AuxUnitLayout -------------- //
+/**
+ * Responsible for laying out the auxiliary units contained on a same edge
+ */
+var AuxUnitLayout = function (parentNode, location, alignment) {
+  this.units = [];
+  this.location = location;
+  this.alignment = alignment || "left";
+  this.parentNode = parentNode;
+  this.renderLengthCache = [];
+};
+AuxUnitLayout.outerMargin = 10;
+AuxUnitLayout.unitGap = 5;
+
+AuxUnitLayout.prototype.addAuxUnit = function(unit) {
+  this.units.push(unit);
+  this.fillLengthCache();
+};
+
+/**
+ * reorder boxes using their defined positions. From left to right and top to bottom.
+ * this ensures that their order in the layout's list corresponds to the reality of the map.
+ */
+AuxUnitLayout.prototype.reorderFromPositions = function() {
+  var self = this;
+  this.units.sort(function(a, b) {
+    if(self.location == "top" || self.location == "bottom") {
+      if (a.bbox.x < b.bbox.x) {
+        return -1;
+      }
+      if (a.bbox.x > b.bbox.x) {
+        return 1;
+      }
+    }
+    else {
+      if (a.bbox.y < b.bbox.y) {
+        return -1;
+      }
+      if (a.bbox.y > b.bbox.y) {
+        return 1;
+      }
+    }
+    return 0;
+  });
+  console.log("units after reoarder", this.units);
+  this.fillLengthCache();
+};
+
+/**
+ * use a cached list to determine what is the length needed to draw x aux units.
+ * can then be compared against the parent node's dimensions, to decide how many
+ * aux units to draw.
+ */
+AuxUnitLayout.prototype.fillLengthCache = function() {
+  this.renderLengthCache = [0];
+  var previous = AuxUnitLayout.outerMargin;
+  for(var i=0; i < this.units.length; i++) {
+    var currentLength;
+    if(this.location == "bottom" || this.location == "top") {
+      currentLength = this.units[i].bbox.w;
+    }
+    else {
+      currentLength = this.units[i].bbox.h;
+    }
+    this.renderLengthCache.push(previous + currentLength + AuxUnitLayout.outerMargin);
+    previous += currentLength + AuxUnitLayout.unitGap;
+  }
+  console.log("lignethcache", this.renderLengthCache);
+};
+
+/**
+ * Use the cached precomputed lengths to decide how many units we are capable of drawing,
+ * considering the size of the parent node.
+ * The number returned says: we are able to draw the N first units of the lists. 
+ */
+AuxUnitLayout.prototype.getDrawableUnitAmount = function() {
+  var availableSpace;
+  if (this.location == "top" || this.location == "bottom") {
+    availableSpace = this.parentNode.outerWidth();
+  }
+  else {
+    availableSpace = this.parentNode.outerHeight();
+  }
+  for(var i=0; i < this.renderLengthCache.length; i++) {
+    if(this.renderLengthCache[i] > availableSpace) {
+      return i - 1;
+    }
+  }
+  return this.units.length;
+};
+
+AuxUnitLayout.prototype.draw = function (context, parentX, parentY) {
+  // first determine how many units we can draw, given the size of the parent node
+  var drawableAmount = this.getDrawableUnitAmount();
+  console.log("drawableAmount", drawableAmount);
+
+  var lengthUsed = AuxUnitLayout.outerMargin;
+  for(var i=0; i < drawableAmount; i++) {
+    // change the coordinate system of the auxiliary unit according to the chosen layout
+    var auxUnit = this.units[i];
+    if (auxUnit.coordType != "relativeToSide") {
+      if (auxUnit.coordType == "relativeToCenter") {
+        if(this.location == "top" || this.location == "bottom") {
+          //auxUnit.bbox.y = 0;
+          auxUnit.bbox.x = lengthUsed + auxUnit.bbox.w / 2;
+          lengthUsed += auxUnit.bbox.w + AuxUnitLayout.unitGap;
+        }
+        else {
+          //auxUnit.bbox.x = 0;
+          auxUnit.bbox.y = lengthUsed + auxUnit.bbox.h / 2;
+          lengthUsed += auxUnit.bbox.h + AuxUnitLayout.unitGap;
+        }
+      }
+      auxUnit.coordType = "relativeToSide"; 
+    }
+    // make each unit draw itself
+    var coords = auxUnit.getAbsoluteCoord();
+    auxUnit.draw(context, coords.x, coords.y);
+  }
+};
+
+ns.AuxUnitLayout = AuxUnitLayout;
+// -------------- END AuxUnitLayout -------------- //
 
 module.exports = ns;
