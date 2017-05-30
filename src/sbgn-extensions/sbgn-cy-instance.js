@@ -233,10 +233,6 @@ module.exports = function () {
             'padding': 0,
             'text-wrap': 'wrap'
           })
-          .selector("node:parent")
-          .css({
-            'padding': getCompoundPaddings
-          })
           .selector("node[?clonemarker][class='perturbing agent'],node[?clonemarker][class='unspecified entity']")
           .css({
             'background-image': imgPath + '/clone_bg.png',
@@ -295,7 +291,7 @@ module.exports = function () {
           .css({
             'shape-polygon-points': '-1, -1,   0.25, -1,   1, 0,    0.25, 1,    -1, 1'
           })
-          .selector("node[class='complex']")
+          .selector("node:parent[class='complex']")
           .css({
             'text-valign': 'bottom',
             'text-halign': 'center',
