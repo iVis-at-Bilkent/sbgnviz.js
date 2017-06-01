@@ -265,7 +265,7 @@ module.exports = function () {
     }
   }*/
 
-  $$.sbgn.drawStateAndInfos_backup = function (node, context, centerX, centerY) {
+  /*$$.sbgn.drawStateAndInfos = function (node, context, centerX, centerY) {
     var stateAndInfos = node._private.data.statesandinfos;
     //var padding = node.style('padding') ? parseInt(node.style('padding')) : 0;
     //var width = node.outerWidth(); // width and height may be omitted
@@ -278,30 +278,17 @@ module.exports = function () {
       //var stateHeight = state.bbox.h;
       var absCoord = state.getAbsoluteCoord();
       state.draw(context, absCoord.x, absCoord.y);
-      /*drawStateAndInfosMoreSpecific({
-        context: context,
-        node: node,
-        state: state,
-        centerX: stateCenterX,
-        centerY: stateCenterY,
-        stateWidth: stateWidth,
-        stateHeight: stateHeight,
-        stateVarRadius: stateVarRadius,
-        unitOfInfoRadius: unitOfInfoRadius,
-        doStroke: true
-      });*/
     }
     //This is a temporary workaround
     $$.sbgn.drawEllipse(context, centerX, centerY, 0, 0); // ?
-  };
+  };*/
 
   $$.sbgn.drawStateAndInfos = function (node, context, centerX, centerY) {
     var layouts = node.data('auxunitlayouts');
 
     for (var side in layouts) {
       var layout = layouts[side];
-      console.log("render layout", layout);
-      layout.draw(context, centerX, centerY);
+      layout.draw(context);
     }
     //This is a temporary workaround
     $$.sbgn.drawEllipse(context, centerX, centerY, 0, 0); // ?
@@ -1422,7 +1409,7 @@ module.exports = function () {
       var stateCenterX = coord.x;
       var stateCenterY = coord.y;
 
-      if (state.clazz == "state variable" && stateCount < 2) {//draw ellipse
+      if (state.clazz == "state variable" && state.isDisplayed) {//draw ellipse
         var stateIntersectLines = $$.sbgn.intersectLineEllipse(x, y, centerX, centerY,
                 stateCenterX, stateCenterY, stateWidth, stateHeight, padding);
 
@@ -1430,7 +1417,7 @@ module.exports = function () {
           intersections = intersections.concat(stateIntersectLines);
 
         stateCount++;
-      } else if (state.clazz == "unit of information" && infoCount < 2) {//draw rectangle
+      } else if (state.clazz == "unit of information" && state.isDisplayed) {//draw rectangle
         var infoIntersectLines = $$.sbgn.roundRectangleIntersectLine(x, y, centerX, centerY,
                 stateCenterX, stateCenterY, stateWidth, stateHeight, 5, padding);
 
@@ -1463,7 +1450,7 @@ module.exports = function () {
       var stateCenterX = coord.x;
       var stateCenterY = coord.y;
 
-      if (state.clazz == "state variable" && stateCount < 2) {//draw ellipse
+      if (state.clazz == "state variable" && state.isDisplayed) {//draw ellipse
         var stateCheckPoint = cyBaseNodeShapes["ellipse"].checkPoint(
                 x, y, padding, stateWidth, stateHeight, stateCenterX, stateCenterY);
 
@@ -1471,7 +1458,7 @@ module.exports = function () {
           return true;
 
         stateCount++;
-      } else if (state.clazz == "unit of information" && infoCount < 2) {//draw rectangle
+      } else if (state.clazz == "unit of information" && state.isDisplayed) {//draw rectangle
         var infoCheckPoint = cyBaseNodeShapes["roundrectangle"].checkPoint(
                 x, y, padding, stateWidth, stateHeight, stateCenterX, stateCenterY);
 
