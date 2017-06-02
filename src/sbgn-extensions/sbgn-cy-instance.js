@@ -191,6 +191,18 @@ module.exports = function () {
       edges.scratch('cyedgebendeditingWeights', []);
       edges.scratch('cyedgebendeditingDistances', []);
     });
+    
+    cy.on("expandcollapse.aftercollapse", "node", function (event) {
+      var node = this;
+      // The width and height of just collapsed nodes should be 36, but they are supposed to be resizable. Therefore, we
+      // set their data('bbox') accordingly. We do not store their existing bbox.w and bbox.h because they have no significance for compounds (for now).
+      cy.startBatch();
+      var bbox = node.data('bbox');
+      bbox.w = 36;
+      bbox.h = 36;
+      node.data('bbox', bbox);
+      cy.endBatch();
+    });
 
     cy.on("expandcollapse.beforeexpand", "node", function (event) {
       var node = this;
@@ -204,14 +216,6 @@ module.exports = function () {
       if (node._private.data.class == "complex") {
         node.removeStyle('content');
       }
-    });
-
-    /**
-     * Listen to change (for label and stats and info) to adjust paddings
-     */
-    cy.on("data", "node[class='complex']", function (event) {
-      this.style('padding', getPadding(this));
-      this.style('text-margin-y', getMargin(this));
     });
 
     $(document).on('updateGraphEnd', function(event) {
@@ -277,10 +281,6 @@ module.exports = function () {
             'padding': 0,
             'text-wrap': 'wrap'
           })
-          .selector("node:parent")
-          .css({
-            'padding': getCompoundPaddings
-          })
           .selector("node[?clonemarker][class='perturbing agent'],node[?clonemarker][class='unspecified entity']")
           .css({
             'background-image': imgPath + '/clone_bg.png',
@@ -339,7 +339,7 @@ module.exports = function () {
           .css({
             'shape-polygon-points': '-1, -1,   0.25, -1,   1, 0,    0.25, 1,    -1, 1'
           })
-          .selector("node[class='complex']")
+          .selector("node:parent[class='complex']")
           .css({
             'text-valign': 'bottom',
             'text-halign': 'center',
@@ -367,8 +367,6 @@ module.exports = function () {
           })
           .selector("node.cy-expand-collapse-collapsed-node")
           .css({
-            'width': 36,
-            'height': 36,
             'border-style': 'dashed'
           })
           .selector("node:selected")
