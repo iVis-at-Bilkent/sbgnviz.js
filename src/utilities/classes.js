@@ -426,10 +426,13 @@ var AuxUnitLayout = function (parentNode, location, alignment) {
  * alwaysShowAuxUnits: bypasses any limit of units displayed, and prevent units from disappearing,
  * forcing a minimum size for the node
  * maxUnitDisplayed: show at most this amount of units, even when there is enough space
+ *
+ * These options can be defined at the instance level. If it is found in an instance, then it 
+ * takes precedence. If not found, the following class' values are used.
  */
 AuxUnitLayout.outerMargin = 10;
 AuxUnitLayout.unitGap = 5;
-AuxUnitLayout.alwaysShowAuxUnits = true;
+AuxUnitLayout.alwaysShowAuxUnits = false;
 AuxUnitLayout.maxUnitDisplayed = 4;
 
 AuxUnitLayout.prototype.update = function(doForceUpdate) {

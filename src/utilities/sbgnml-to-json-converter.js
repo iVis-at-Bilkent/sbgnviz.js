@@ -44,7 +44,11 @@ var sbgnmlToJson = {
     return false;
   },
   bboxProp: function (ele) {
-    var bbox = ele.bbox;
+    var bbox = {};
+    bbox.x = ele.bbox.x;
+    bbox.y = ele.bbox.y;
+    bbox.w = ele.bbox.w;
+    bbox.h = ele.bbox.h;
 
     // set positions as center
     bbox.x = parseFloat(bbox.x) + parseFloat(bbox.w) / 2;
@@ -69,14 +73,6 @@ var sbgnmlToJson = {
 
     bbox.x = bbox.x / parseFloat(parentBbox.w) * 100;
     bbox.y = bbox.y / parseFloat(parentBbox.h) * 100;
-
-    // enforce that y must correspond to the top or bottom line of the element exactly
-    /*if (bbox.y > 0) {
-      bbox.y = 50;
-    }
-    else {
-      bbox.y = -50;
-    }*/
 
     return bbox;
   },
@@ -107,15 +103,8 @@ var sbgnmlToJson = {
       var info = {};
 
       if (glyph.class_ === 'unit of information') {
-        /*info.id = glyph.id || undefined;
-        info.clazz = glyph.class_ || undefined;
-        info.label = {
-          'text': (glyph.label && glyph.label.text) || undefined
-        };
-        info.bbox = self.stateAndInfoBboxProp(glyph, parentBbox);*/
         var unitOfInformation = new classes.UnitOfInformation();
         unitOfInformation.id = glyph.id || undefined;
-        //unitOfInformation.clazz = glyph.class_ || undefined;
         unitOfInformation.label = {
           'text': (glyph.label && glyph.label.text) || undefined
         };
@@ -123,19 +112,8 @@ var sbgnmlToJson = {
         unitOfInformation.setAnchorSide();
         stateAndInfoArray.push(unitOfInformation);
       } else if (glyph.class_ === 'state variable') {
-        /*info.id = glyph.id || undefined;
-        info.clazz = glyph.class_ || undefined;
-        var state = glyph.state;
-        var value = (state && state.value) || undefined;
-        var variable = (state && state.variable) || undefined;
-        info.state = {
-          'value': value,
-          'variable': variable
-        };
-        info.bbox = self.stateAndInfoBboxProp(glyph, parentBbox);*/
         var stateVariable = new classes.StateVariable();
         stateVariable.id = glyph.id || undefined;
-        //stateVariable.clazz = glyph.class_ || undefined;
         var state = glyph.state;
         stateVariable.state.value = (state && state.value) || undefined;
         stateVariable.state.variable = (state && state.variable) || undefined;
@@ -163,12 +141,11 @@ var sbgnmlToJson = {
 
       // add compartment according to geometry
       for (var i = 0; i < compartments.length; i++) {
-        var bboxEl = ele.bbox;
         var bbox = {
-          'x': parseFloat(bboxEl.x),
-          'y': parseFloat(bboxEl.y),
-          'w': parseFloat(bboxEl.w),
-          'h': parseFloat(bboxEl.h),
+          'x': parseFloat(ele.bbox.x),
+          'y': parseFloat(ele.bbox.y),
+          'w': parseFloat(ele.bbox.w),
+          'h': parseFloat(ele.bbox.h),
           'id': ele.id
         };
         if (self.isInBoundingBox(bbox, compartments[i])) {
