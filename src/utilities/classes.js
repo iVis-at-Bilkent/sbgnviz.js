@@ -412,18 +412,25 @@ ns.StateVariableDefinition = StateVariableDefinition;
 /**
  * Responsible for laying out the auxiliary units contained on a same edge
  */
-alwaysShowAuxUnits = true;
 var AuxUnitLayout = function (parentNode, location, alignment) {
   this.units = [];
   this.location = location;
   this.alignment = alignment || "left";
   this.parentNode = parentNode;
   this.renderLengthCache = [];
-  this.maxUnitDisplayed = 4;
   this.lengthUsed = 0;
 };
+/**
+ * outerMargin: the left and right space left between the side of the node, and the first (and last) box
+ * unitGap: the space between the auxiliary units
+ * alwaysShowAuxUnits: bypasses any limit of units displayed, and prevent units from disappearing,
+ * forcing a minimum size for the node
+ * maxUnitDisplayed: show at most this amount of units, even when there is enough space
+ */
 AuxUnitLayout.outerMargin = 10;
 AuxUnitLayout.unitGap = 5;
+AuxUnitLayout.alwaysShowAuxUnits = true;
+AuxUnitLayout.maxUnitDisplayed = 4;
 
 AuxUnitLayout.prototype.update = function(doForceUpdate) {
   this.precomputeCoords(doForceUpdate);
@@ -441,7 +448,7 @@ AuxUnitLayout.prototype.addAuxUnit = function(unit, position) {
 
   this.updateLengthCache();
   this.update(true);
-  if (alwaysShowAuxUnits) {
+  if (this.getAlwaysShowAuxUnits()) {
     // set a minimum size according to both sides on the same orientation
     this.setParentMinLength();
     // need to resize the parent in case the space was too small
@@ -456,7 +463,7 @@ AuxUnitLayout.prototype.removeAuxUnit = function(unit) {
   this.units.splice(index, 1);
   this.updateLengthCache();
   this.update(true);
-  if (alwaysShowAuxUnits) {
+  if (this.getAlwaysShowAuxUnits()) {
     // set a minimum size according to both sides on the same orientation
     this.setParentMinLength();
   }
@@ -500,7 +507,7 @@ AuxUnitLayout.prototype.reorderFromPositions = function() {
  */
 AuxUnitLayout.prototype.updateLengthCache = function() {
   this.renderLengthCache = [0];
-  var previous = AuxUnitLayout.outerMargin;
+  var previous = this.getOuterMargin();
   for(var i=0; i < this.units.length; i++) {
     var currentLength;
     if(this.isTorB()) {
@@ -509,8 +516,8 @@ AuxUnitLayout.prototype.updateLengthCache = function() {
     else {
       currentLength = this.units[i].bbox.h;
     }
-    this.renderLengthCache.push(previous + currentLength + AuxUnitLayout.outerMargin);
-    previous += currentLength + AuxUnitLayout.unitGap;
+    this.renderLengthCache.push(previous + currentLength + this.getOuterMargin());
+    previous += currentLength + this.getUnitGap();
   }
 };
 
@@ -521,7 +528,7 @@ AuxUnitLayout.prototype.updateLengthCache = function() {
  * Unused for now.
  */
 AuxUnitLayout.prototype.getDrawableUnitAmount = function() {
-  if(alwaysShowAuxUnits) {
+  if(this.getAlwaysShowAuxUnits()) {
     // bypass all this
     return this.units.length;
   }
@@ -556,8 +563,10 @@ AuxUnitLayout.prototype.setDisplayedUnits = function () {
   }
 
   // there is always n+1 elements in the cachedLength for n units
+  var alwaysShowAuxUnits = this.getAlwaysShowAuxUnits();
+  var maxUnitDisplayed = this.getMaxUnitDisplayed();
   for(var i=0; i < this.units.length; i++) {
-    if((this.renderLengthCache[i+1] <= availableSpace && i < this.maxUnitDisplayed) || alwaysShowAuxUnits) {
+    if((this.renderLengthCache[i+1] <= availableSpace && i < maxUnitDisplayed) || alwaysShowAuxUnits) {
       this.units[i].isDisplayed = true;
     }
     else {
@@ -570,8 +579,9 @@ AuxUnitLayout.prototype.setDisplayedUnits = function () {
 AuxUnitLayout.prototype.precomputeCoords = function (doForceUpdate) {
   this.setDisplayedUnits();
 
-  var lengthUsed = AuxUnitLayout.outerMargin;
+  var lengthUsed = this.getOuterMargin();
   var finalLengthUsed = lengthUsed;
+  var unitGap = this.getUnitGap();
   for(var i=0; i < this.units.length; i++) {
     // change the coordinate system of the auxiliary unit according to the chosen layout
     var auxUnit = this.units[i];
@@ -591,11 +601,11 @@ AuxUnitLayout.prototype.precomputeCoords = function (doForceUpdate) {
 
     if(this.isTorB()) {
       //auxUnit.bbox.y = 0;
-      lengthUsed += auxUnit.bbox.w + AuxUnitLayout.unitGap;
+      lengthUsed += auxUnit.bbox.w + unitGap;
     }
     else {
       //auxUnit.bbox.x = 0;
-      lengthUsed += auxUnit.bbox.h + AuxUnitLayout.unitGap;
+      lengthUsed += auxUnit.bbox.h + unitGap;
     }
 
     if(auxUnit.isDisplayed) {
@@ -603,7 +613,7 @@ AuxUnitLayout.prototype.precomputeCoords = function (doForceUpdate) {
     }
   }
   // adjust the length, should be composed of outerMargin on the end, not unitGap
-  finalLengthUsed = finalLengthUsed - AuxUnitLayout.unitGap + AuxUnitLayout.outerMargin;
+  finalLengthUsed = finalLengthUsed - unitGap + this.getOuterMargin();
 
   this.lengthUsed = finalLengthUsed;
 };
@@ -701,6 +711,42 @@ AuxUnitLayout.prototype.setParentMinLength = function () {
     this.parentNode.data('resizeMinHeight', Math.max(this.lengthUsed, compareVal));
   }
 };
+
+AuxUnitLayout.prototype.getOuterMargin = function () {
+  if(typeof this.outerMargin !== "undefined" && this.outerMargin !== null) {
+    return this.outerMargin;
+  }
+  else {
+    return AuxUnitLayout.outerMargin;
+  }
+}
+
+AuxUnitLayout.prototype.getUnitGap = function () {
+  if(typeof this.unitGap !== "undefined" && this.unitGap !== null) {
+    return this.unitGap;
+  }
+  else {
+    return AuxUnitLayout.unitGap;
+  }
+}
+
+AuxUnitLayout.prototype.getAlwaysShowAuxUnits = function () {
+  if(typeof this.alwaysShowAuxUnits !== "undefined" && this.alwaysShowAuxUnits !== null) {
+    return this.alwaysShowAuxUnits;
+  }
+  else {
+    return AuxUnitLayout.alwaysShowAuxUnits;
+  }
+}
+
+AuxUnitLayout.prototype.getMaxUnitDisplayed = function () {
+  if(typeof this.maxUnitDisplayed !== "undefined" && this.maxUnitDisplayed !== null) {
+    return this.maxUnitDisplayed;
+  }
+  else {
+    return AuxUnitLayout.maxUnitDisplayed;
+  }
+}
 
 ns.AuxUnitLayout = AuxUnitLayout;
 // -------------- END AuxUnitLayout -------------- //
