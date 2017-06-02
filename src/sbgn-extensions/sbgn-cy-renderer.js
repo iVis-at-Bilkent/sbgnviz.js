@@ -74,147 +74,6 @@ module.exports = function () {
     'complex': true
   };
 
-  /*var unitOfInfoRadius = 4;
-  var stateVarRadius = 15;
-  $$.sbgn.drawComplexStateAndInfo = function (context, node, stateAndInfos,
-          centerX, centerY, width, height) {
-    console.log("drawComplexStateAndInfo", node.width(), node.height(), width, height, node.outerWidth(), node.outerHeight() );
-    $$.sbgn.drawStateAndInfos(node, context, centerX, centerY, node.outerWidth(), node.outerHeight());
-    return;*/
-
-    /****************  rest of the function is unused now ******************/
-    /** Following code seems to be an experiment to layout boxes from the left, regularly spaced. 
-     * The boxes were not displayed if they go further than the width of the parent element
-     */
-
-    /*
-    //This is a temporary workaround
-    $$.sbgn.drawEllipse(context, centerX, centerY, 0, 0);
-
-    // the width occupied by statesandinfos on the top and bottom of the complex
-    var upWidth = 0, downWidth = 0;
-    // outer padding
-    var boxPadding = 10;
-    // padding between each stateandinfo
-    var betweenBoxPadding = 5;
-    var beginPosY = height / 2, beginPosX = width / 2;
-
-    stateAndInfos.sort($$.sbgn.compareStates);
-
-    var boxCount = stateAndInfos.length > 4 ? 4 : stateAndInfos.length;
-    for (var i = 0; i < boxCount; i++) {
-      var state = stateAndInfos[i];
-      var stateWidth = state.bbox.w;
-      var stateHeight = state.bbox.h;
-//      var stateLabel = state.state.value;
-      var relativeYPos = state.bbox.y;
-      var stateCenterX, stateCenterY;
-      //console.log("info box", i, state, relativeYPos);
-      //console.log("width", upWidth, downWidth, stateWidth, width);
-      if (relativeYPos < 0) {
-        if (upWidth + stateWidth < width) {
-          //var stateCenterX = state.bbox.x * node.width() / 100 + centerX;
-          //var stateCenterY = state.bbox.y * node.height() / 100 + centerY;
-          stateCenterX = centerX - beginPosX + boxPadding + upWidth + stateWidth / 2;
-          stateCenterY = centerY - beginPosY;
-          //console.log("center < 0", stateCenterX, stateCenterY);
-
-          drawStateAndInfosMoreSpecific({
-            context: context,
-            node: node,
-            state: state,
-            centerX: stateCenterX,
-            centerY: stateCenterY,
-            stateWidth: stateWidth,
-            stateHeight: stateHeight,
-            stateVarRadius: stateVarRadius,
-            unitOfInfoRadius: unitOfInfoRadius
-          });
-        }
-        upWidth = upWidth + stateWidth + boxPadding;
-      } else if (relativeYPos > 0) {
-        if (downWidth + stateWidth < width) {
-          stateCenterX = centerX - beginPosX + boxPadding + downWidth + stateWidth / 2;
-          stateCenterY = centerY + beginPosY;
-          //console.log("center > 0", stateCenterX, stateCenterY);
-
-          drawStateAndInfosMoreSpecific({
-            context: context,
-            node: node,
-            state: state,
-            centerX: stateCenterX,
-            centerY: stateCenterY,
-            stateWidth: stateWidth,
-            stateHeight: stateHeight,
-            stateVarRadius: stateVarRadius,
-            unitOfInfoRadius: unitOfInfoRadius
-          });
-        }
-        downWidth = downWidth + stateWidth + boxPadding;
-      }
-      //console.log("after 2 if");
-      context.stroke();
-
-      //This is a temporary workaround
-      $$.sbgn.drawEllipse(context, centerX, centerY, 0, 0);
-
-      //update new state and info position(relative to node center)
-      state.bbox.x = (stateCenterX - centerX) * 100 / node.width();
-      state.bbox.y = (stateCenterY - centerY) * 100 / node.height();
-    }
-    */
-  //};
-
-  /*$$.sbgn.drawStateText = function (context, textProp) {
-    var stateValue = textProp.state.value || '';
-    var stateVariable = textProp.state.variable || '';
-
-    var stateLabel = stateValue + (stateVariable
-            ? "@" + stateVariable
-            : "");
-
-    var fontSize = 9; // parseInt(textProp.height / 1.5);
-
-    textProp.font = fontSize + "px Arial";
-    textProp.label = stateLabel;
-    textProp.color = "#0f0f0f";
-    $$.sbgn.drawText(context, textProp);
-  };
-
-  $$.sbgn.drawInfoText = function (context, textProp) {
-    var fontSize = 9; // parseInt(textProp.height / 1.5);
-    textProp.font = fontSize + "px Arial";
-    textProp.color = "#0f0f0f";
-    $$.sbgn.drawText(context, textProp);
-  };
-
-  $$.sbgn.drawText = function (context, textProp, truncate) {
-    console.log("old draw text", context);
-    var oldFont = context.font;
-    context.font = textProp.font;
-    context.textAlign = "center";
-    context.textBaseline = "middle";
-    var oldStyle = context.fillStyle;
-    context.fillStyle = textProp.color;
-    var oldOpacity = context.globalAlpha;
-    context.globalAlpha = textProp.opacity;
-    var text;
-    
-    textProp.label = textProp.label || '';
-    
-    if (truncate == false) {
-      text = textProp.label;
-    } else {
-      text = truncateText(textProp, context.font);
-    }
-    
-    context.fillText(text, textProp.centerX, textProp.centerY);
-    context.fillStyle = oldStyle;
-    context.font = oldFont;
-    context.globalAlpha = oldOpacity;
-    //context.stroke();
-  };*/
-
   cyMath.calculateDistance = function (point1, point2) {
     var distance = Math.pow(point1[0] - point2[0], 2) + Math.pow(point1[1] - point2[1], 2);
     return Math.sqrt(distance);
@@ -224,65 +83,6 @@ module.exports = function () {
     clone: "#a9a9a9"
   };
 
-  /** result of refactoring, no idea for the name :/ */
-  /*var drawStateAndInfosMoreSpecific = function(params) {
-    var context = params.context;
-    var node = params.node;
-    var state = params.state;
-    var centerX = params.centerX;
-    var centerY = params.centerY;
-    var stateWidth = params.stateWidth;
-    var stateHeight = params.stateHeight;
-    var stateVarRadius = params.stateVarRadius;
-    var unitOfInfoRadius = params.unitOfInfoRadius;
-    var doStroke = params.doStroke || false;
-
-    var textProp = {'centerX': centerX, 'centerY': centerY,
-      'opacity': node.css('text-opacity') * node.css('opacity'),
-      'width': stateWidth, 'height': stateHeight};
-
-    if (state.constructor.name == 'StateVariable') {//draw ellipse
-      drawRoundRectanglePath(context,
-              centerX, centerY,
-              stateWidth, stateHeight, Math.min(stateWidth / 2, stateHeight / 2, stateVarRadius));
-      context.fill();
-
-      textProp.state = state.state;
-      //$$.sbgn.drawStateText(context, textProp);
-    } else if (state.constructor.name == 'UnitOfInformation') {//draw rectangle
-      drawRoundRectanglePath(context,
-              centerX, centerY,
-              stateWidth, stateHeight,
-              Math.min(stateWidth / 2, stateHeight / 2, unitOfInfoRadius));
-      context.fill();
-
-      textProp.label = state.label.text || '';
-      //$$.sbgn.drawInfoText(context, textProp);
-    }
-    state.drawText(context, centerX, centerY);
-    if (doStroke) {
-      context.stroke();
-    }
-  }*/
-
-  /*$$.sbgn.drawStateAndInfos = function (node, context, centerX, centerY) {
-    var stateAndInfos = node._private.data.statesandinfos;
-    //var padding = node.style('padding') ? parseInt(node.style('padding')) : 0;
-    //var width = node.outerWidth(); // width and height may be omitted
-    //var height = node.outerHeight();
-
-    for (var i = 0; i < stateAndInfos.length; i++) {
-      var state = stateAndInfos[i];
-      //console.log("old draw statesandinfos", state.bbox);
-      //var stateWidth = state.bbox.w;
-      //var stateHeight = state.bbox.h;
-      var absCoord = state.getAbsoluteCoord();
-      state.draw(context, absCoord.x, absCoord.y);
-    }
-    //This is a temporary workaround
-    $$.sbgn.drawEllipse(context, centerX, centerY, 0, 0); // ?
-  };*/
-
   $$.sbgn.drawStateAndInfos = function (node, context, centerX, centerY) {
     var layouts = node.data('auxunitlayouts');
 
@@ -290,8 +90,8 @@ module.exports = function () {
       var layout = layouts[side];
       layout.draw(context);
     }
-    //This is a temporary workaround
-    $$.sbgn.drawEllipse(context, centerX, centerY, 0, 0); // ?
+    //This is a temporary workaround                      // <- ?
+    $$.sbgn.drawEllipse(context, centerX, centerY, 0, 0); // <- ?
   };
 
   $$.sbgn.nucleicAcidCheckPoint = function (x, y, centerX, centerY, node, threshold, points, cornerRadius) {
