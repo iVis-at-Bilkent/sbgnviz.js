@@ -128,10 +128,15 @@ AuxiliaryUnit.prototype.setAnchorSide = function(parentBbox) {
   }
 };
 
-AuxiliaryUnit.prototype.addToParent = function (parentNode, location, position) {
+AuxiliaryUnit.prototype.addToParent = function (parentNode, location, position, index) {
 
   // add state var to the parent's statesandinfos
-  parentNode.data('statesandinfos').push(this);
+  if(typeof index != "undefined") { // specific index provided (for undo/redo consistency)
+    parentNode.data('statesandinfos').splice(index, 0, this);
+  }
+  else {
+    parentNode.data('statesandinfos').push(this);
+  }
 
   if(!parentNode.data('auxunitlayouts')) { // ensure minimal initialization
     parentNode.data('auxunitlayouts', {});
@@ -198,7 +203,7 @@ StateVariable.prototype.getText = function() {
   return stateValue + stateVariable;
 };
 
-StateVariable.create = function(parentNode, value, variable, bbox, location, position) {
+StateVariable.create = function(parentNode, value, variable, bbox, location, position, index) {
   // create the new state var of info
   var stateVar = new ns.StateVariable();
   stateVar.parent = parentNode;
@@ -208,7 +213,7 @@ StateVariable.create = function(parentNode, value, variable, bbox, location, pos
   stateVar.bbox = bbox;
 
   // link to layout
-  position = stateVar.addToParent(parentNode, location, position);
+  position = stateVar.addToParent(parentNode, location, position, index);
 
   return {
     index: stateVar.parent.data('statesandinfos').indexOf(stateVar),
@@ -219,6 +224,7 @@ StateVariable.create = function(parentNode, value, variable, bbox, location, pos
 
 StateVariable.prototype.remove = function () {
   var position = this.getPositionIndex();
+  var index = this.parent.data('statesandinfos').indexOf(this);
   this.removeFromParent();
   //console.log("after remove", this.parent.data('auxunitlayouts'), this.parent.data('statesandinfos'));
   return {
@@ -232,7 +238,8 @@ StateVariable.prototype.remove = function () {
       h: this.bbox.h
     },
     location: this.anchorSide,
-    position: position
+    position: position,
+    index: index
   };
 };
 
@@ -265,7 +272,7 @@ UnitOfInformation.prototype.getText = function() {
  * @param [location] - the side where it will be placed top, bottom, right, left or undefined (auto placement)
  * @param [position] - its index in the order of elements placed on its same location // TODO
  */
-UnitOfInformation.create = function (parentNode, value, bbox, location, position) {
+UnitOfInformation.create = function (parentNode, value, bbox, location, position, index) {
   // create the new unit of info
   var unit = new ns.UnitOfInformation();
   unit.parent = parentNode;
@@ -273,7 +280,7 @@ UnitOfInformation.create = function (parentNode, value, bbox, location, position
   unit.bbox = bbox;
 
   //console.log("will insert on", location, position);
-  position = unit.addToParent(parentNode, location, position);
+  position = unit.addToParent(parentNode, location, position, index);
 
   return {
     index: unit.parent.data('statesandinfos').indexOf(unit),
@@ -284,6 +291,7 @@ UnitOfInformation.create = function (parentNode, value, bbox, location, position
 
 UnitOfInformation.prototype.remove = function () {
   var position = this.getPositionIndex();
+  var index = this.parent.data('statesandinfos').indexOf(this);
   this.removeFromParent();
   //console.log("after remove", this.parent.data('auxunitlayouts'), this.parent.data('statesandinfos'));
   return {
@@ -296,7 +304,8 @@ UnitOfInformation.prototype.remove = function () {
       h: this.bbox.h
     },
     location: this.anchorSide,
-    position: position
+    position: position,
+    index: index
   };
 };
 
@@ -403,9 +412,9 @@ ns.StateVariableDefinition = StateVariableDefinition;
 /**
  * Responsible for laying out the auxiliary units contained on a same edge
  */
-alwaysShowAuxUnits = false;
+alwaysShowAuxUnits = true;
 var AuxUnitLayout = function (parentNode, location, alignment) {
-  this.units = []; // this array may have empty indexes
+  this.units = [];
   this.location = location;
   this.alignment = alignment || "left";
   this.parentNode = parentNode;
@@ -430,7 +439,7 @@ AuxUnitLayout.prototype.addAuxUnit = function(unit, position) {
     position = this.units.length - 1;
   }
 
-  this.fillLengthCache();
+  this.updateLengthCache();
   this.update(true);
   if (alwaysShowAuxUnits) {
     // set a minimum size according to both sides on the same orientation
@@ -445,7 +454,7 @@ AuxUnitLayout.prototype.addAuxUnit = function(unit, position) {
 AuxUnitLayout.prototype.removeAuxUnit = function(unit) {
   var index = this.units.indexOf(unit);
   this.units.splice(index, 1);
-  this.fillLengthCache();
+  this.updateLengthCache();
   this.update(true);
   if (alwaysShowAuxUnits) {
     // set a minimum size according to both sides on the same orientation
@@ -480,8 +489,8 @@ AuxUnitLayout.prototype.reorderFromPositions = function() {
     return 0;
   });
   //console.log("units after reoarder", this.units);
-  this.fillLengthCache();
-  this.update();
+  this.updateLengthCache();
+  this.update(true);
 };
 
 /**
@@ -489,12 +498,12 @@ AuxUnitLayout.prototype.reorderFromPositions = function() {
  * can then be compared against the parent node's dimensions, to decide how many
  * aux units to draw.
  */
-AuxUnitLayout.prototype.fillLengthCache = function() {
+AuxUnitLayout.prototype.updateLengthCache = function() {
   this.renderLengthCache = [0];
   var previous = AuxUnitLayout.outerMargin;
   for(var i=0; i < this.units.length; i++) {
     var currentLength;
-    if(this.location == "bottom" || this.location == "top") {
+    if(this.isTorB()) {
       currentLength = this.units[i].bbox.w;
     }
     else {
@@ -503,50 +512,72 @@ AuxUnitLayout.prototype.fillLengthCache = function() {
     this.renderLengthCache.push(previous + currentLength + AuxUnitLayout.outerMargin);
     previous += currentLength + AuxUnitLayout.unitGap;
   }
-  //console.log("lignethcache", this.renderLengthCache);
 };
 
 /**
  * Use the cached precomputed lengths to decide how many units we are capable of drawing,
  * considering the size of the parent node.
- * The number returned says: we are able to draw the N first units of the lists. 
+ * The number returned says: we are able to draw the N first units of the lists.
+ * Unused for now.
  */
 AuxUnitLayout.prototype.getDrawableUnitAmount = function() {
-  // bypass this
   if(alwaysShowAuxUnits) {
+    // bypass all this
     return this.units.length;
   }
 
+  // get the length of the side on which we draw
   var availableSpace;
-  if (this.location == "top" || this.location == "bottom") {
+  if (this.isTorB()) {
     availableSpace = this.parentNode.outerWidth();
   }
   else {
     availableSpace = this.parentNode.outerHeight();
   }
+
+  // loop over the cached precomputed lengths
   for(var i=0; i < this.renderLengthCache.length; i++) {
     if(this.renderLengthCache[i] > availableSpace) {
+      // stop if we overflow
       return i - 1;
     }
   }
   return this.units.length;
 };
 
+AuxUnitLayout.prototype.setDisplayedUnits = function () {
+  // get the length of the side on which we draw
+  var availableSpace;
+  if (this.isTorB()) {
+    availableSpace = this.parentNode.outerWidth();
+  }
+  else {
+    availableSpace = this.parentNode.outerHeight();
+  }
+
+  // there is always n+1 elements in the cachedLength for n units
+  for(var i=0; i < this.units.length; i++) {
+    if((this.renderLengthCache[i+1] <= availableSpace && i < this.maxUnitDisplayed) || alwaysShowAuxUnits) {
+      this.units[i].isDisplayed = true;
+    }
+    else {
+      this.units[i].isDisplayed = false;
+    }
+  }
+};
+
 // TODO find a way to refactor, remove ugliness of top-bottom/left-right.
 AuxUnitLayout.prototype.precomputeCoords = function (doForceUpdate) {
-  var drawableAmount = this.getDrawableUnitAmount();
-  if (drawableAmount > this.maxUnitDisplayed && !alwaysShowAuxUnits) {
-    drawableAmount = this.maxUnitDisplayed;
-  }
-  //console.log("precompute drawableAmount", drawableAmount);
+  this.setDisplayedUnits();
 
   var lengthUsed = AuxUnitLayout.outerMargin;
+  var finalLengthUsed = lengthUsed;
   for(var i=0; i < this.units.length; i++) {
     // change the coordinate system of the auxiliary unit according to the chosen layout
     var auxUnit = this.units[i];
     if (auxUnit.coordType != "relativeToSide" || doForceUpdate) {
       if (auxUnit.coordType == "relativeToCenter" || doForceUpdate) {
-        if(this.location == "top" || this.location == "bottom") {
+        if(this.isTorB()) {
           //auxUnit.bbox.y = 0;
           auxUnit.bbox.x = lengthUsed + auxUnit.bbox.w / 2;
         }
@@ -558,28 +589,23 @@ AuxUnitLayout.prototype.precomputeCoords = function (doForceUpdate) {
       auxUnit.coordType = "relativeToSide"; 
     }
 
-    if(i < drawableAmount) {
-      if(this.location == "top" || this.location == "bottom") {
-        //auxUnit.bbox.y = 0;
-        lengthUsed += auxUnit.bbox.w + AuxUnitLayout.unitGap;
-      }
-      else {
-        //auxUnit.bbox.x = 0;
-        lengthUsed += auxUnit.bbox.h + AuxUnitLayout.unitGap;
-      }
-      auxUnit.isDisplayed = true;
+    if(this.isTorB()) {
+      //auxUnit.bbox.y = 0;
+      lengthUsed += auxUnit.bbox.w + AuxUnitLayout.unitGap;
     }
     else {
-      auxUnit.isDisplayed = false;
+      //auxUnit.bbox.x = 0;
+      lengthUsed += auxUnit.bbox.h + AuxUnitLayout.unitGap;
+    }
+
+    if(auxUnit.isDisplayed) {
+      finalLengthUsed = lengthUsed;
     }
   }
   // adjust the length, should be composed of outerMargin on the end, not unitGap
-  lengthUsed = lengthUsed - AuxUnitLayout.unitGap + AuxUnitLayout.outerMargin;
-  // in case we won't draw all the units, we set the rest of the unit's property isDisplayed to false
-  /*for(var j=i; j < this.units.length; j++) {
-    this.units[j].isDisplayed = false;
-  }*/
-  this.lengthUsed = lengthUsed;
+  finalLengthUsed = finalLengthUsed - AuxUnitLayout.unitGap + AuxUnitLayout.outerMargin;
+
+  this.lengthUsed = finalLengthUsed;
 };
 
 AuxUnitLayout.prototype.draw = function (context) {
