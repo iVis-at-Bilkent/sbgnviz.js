@@ -210,18 +210,24 @@ The following describes objects used by sbgnviz.js and accessible through `sbgnv
 
 #### AuxiliaryUnit
 
+```javascript
 stateorinfobox.id;
 stateorinfobox.parent; // points to the cytoscape parent node
 stateorinfobox.clazz; // 'unit of information' or 'state variable'
 stateorinfobox.bbox; // includes bbox.x, bbox.y, bbox.w, bbox.h
+```
 
 #### StateVariable
 
+```javascript
 stateVariable.state; // includes state.value and state.variable
+```
 
 #### UnitOfInformation
 
+```javascript
 unitOfInformation.label; // includes label.text
+```
 
 #### AuxUnitLayout
 
