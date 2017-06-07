@@ -242,7 +242,7 @@ module.exports = function () {
           }
         }
       });
-      cy.scratch('_newtGlobal', {SBGNEntityTypes: entityHash});
+      cy.scratch('_sbgnviz', {SBGNEntityTypes: entityHash});
 
       // assign statesandinfos to their layout
       cy.nodes().forEach(function(node) {
