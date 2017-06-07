@@ -16,21 +16,24 @@ var AuxiliaryUnit = function (parent) {
   this.isDisplayed = false;
 };
 
-// draw the auxiliary unit at given position
+// draw the auxiliary unit at its position
 AuxiliaryUnit.prototype.draw = function(context) {
   var coords = this.getAbsoluteCoord();
-  cytoscape.sbgn.drawRoundRectanglePath(context,
-              coords.x, coords.y,
-              this.bbox.w, this.bbox.h,
-              Math.min(this.bbox.w / 2, this.bbox.h / 2, this.constructor.shapeRadius));
-  context.fill();
-  this.drawText(context, coords.x, coords.y);
-  context.stroke();
+  this.drawShape(context, coords.x, coords.y);
+  if (this.hasText()) {
+    this.drawText(context, coords.x, coords.y);
+  }
   this.isDisplayed = true;
 };
 
 // to be implemented by children
 AuxiliaryUnit.prototype.getText = function() {
+  throw new Error("Abstract method!");
+};
+AuxiliaryUnit.prototype.hasText = function() {
+  throw new Error("Abstract method!");
+};
+AuxiliaryUnit.prototype.drawShape = function(context, x, y) {
   throw new Error("Abstract method!");
 };
 
@@ -203,6 +206,19 @@ StateVariable.prototype.getText = function() {
   return stateValue + stateVariable;
 };
 
+StateVariable.prototype.hasText = function() {
+  return (this.state.value && this.state.value != "") || (this.state.variable && this.state.variable != "");
+};
+
+StateVariable.prototype.drawShape = function(context, x, y) {
+  cytoscape.sbgn.drawRoundRectanglePath(context,
+              x, y,
+              this.bbox.w, this.bbox.h,
+              Math.min(this.bbox.w / 2, this.bbox.h / 2, StateVariable.shapeRadius));
+  context.fill();
+  context.stroke();
+};
+
 StateVariable.create = function(parentNode, value, variable, bbox, location, position, index) {
   // create the new state var of info
   var stateVar = new ns.StateVariable();
@@ -249,13 +265,32 @@ ns.StateVariable = StateVariable;
 // -------------- UnitOfInformation -------------- //
 /**
  * parent can be an EPN, compartment or subunit
+ * The shape can vary and can be provided to the constructor. By default, it will be rendered with the shape 
+ * of PD units of information.
+ * To provide a custom shape, 2 functions must be passed:
+ *  - shapeFn: the shape function itself, the function that will be called to render the shape
+ *             The prototype should be: fn(context, x, y, [some other arguments])
+ *  - shapeArgsFn: prototype function(self), it should return an array of arguments that will be passed to shapeFn
+ *                 See example as the default below.
+ *  To render the shape, we will simply do: shapeFn.apply(null, [context, x, y] + rest of the list provided by shapeArgsFn() )
  */
-var UnitOfInformation = function (code, value, parent) {
+var UnitOfInformation = function (value, parent, shapeFn, shapeArgsFn) {
   AuxiliaryUnit.call(this, parent);
-  this.code = code;
-  this.value = value;
-  this.label = null; // from legacy code, contains {text: }
+  this.label = {text: value}; // from legacy code, contains {text: }
   this.clazz = "unit of information";
+  if(shapeFn && shapeArgsFn) {
+    this.shapeFn = shapeFn;
+    this.shapeArgsFn = shapeArgsFn;
+  }
+  else { // default shape
+    this.shapeFn = cytoscape.sbgn.drawRoundRectanglePath;
+    this.shapeArgsFn = function (self) {
+      return [  self.bbox.w,
+                self.bbox.h,
+                Math.min(self.bbox.w / 2, self.bbox.h / 2, UnitOfInformation.shapeRadius)
+              ];
+    };
+  }
 };
 UnitOfInformation.prototype = Object.create(AuxiliaryUnit.prototype);
 UnitOfInformation.prototype.constructor = UnitOfInformation;
@@ -263,6 +298,17 @@ UnitOfInformation.shapeRadius = 4;
 
 UnitOfInformation.prototype.getText = function() {
   return this.label.text;
+};
+
+UnitOfInformation.prototype.hasText = function() {
+  return this.label.text && this.label.text != "";
+};
+
+UnitOfInformation.prototype.drawShape = function(context, x, y) {
+  var args = [context, x, y].concat(this.shapeArgsFn(this));
+  this.shapeFn.apply(null, args);
+  context.fill();
+  context.stroke();
 };
 
 /**
@@ -274,9 +320,7 @@ UnitOfInformation.prototype.getText = function() {
  */
 UnitOfInformation.create = function (parentNode, value, bbox, location, position, index) {
   // create the new unit of info
-  var unit = new ns.UnitOfInformation();
-  unit.parent = parentNode;
-  unit.label = {text: value};
+  var unit = new ns.UnitOfInformation(value, parentNode);
   unit.bbox = bbox;
 
   //console.log("will insert on", location, position);
