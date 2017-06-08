@@ -607,12 +607,20 @@ var elementUtilities = {
       // this property needs to take into account:
       // - presence of a label
       // - option to display complex labels
-      // - presence of more than 1 states and info box (leads to have some of them on bottom)
+      // - presence of states and info box on the bottom
       var padding = graphUtilities.getCompoundPaddings();
       if (options.showComplexName && elementUtilities.getElementContent(ele)) {
         padding += options.extraComplexPadding * 0.5;
-        if (ele.data('statesandinfos').length > 1) {
+        // if there is something on the bottom side
+        if (ele.data('auxunitlayouts') && ele.data('auxunitlayouts').bottom && ele.data('auxunitlayouts').bottom.units.length > 0) {
           padding += options.extraComplexPadding * 0.5;
+        }
+      }
+      // for the case where the padding is the tightest, we need a bit of extra space
+      // to avoid touching the infoboxes of the complex
+      else {
+        if (ele.data('statesandinfos').length > 0) {
+          padding += 2;
         }
       }
       return padding;
@@ -623,11 +631,13 @@ var elementUtilities = {
       // this property needs to take into account:
       // - presence of a label
       // - option to display complex labels
-      // - presence of more than 1 states and info box (leads to have some of them on bottom)
+      // - presence of states and info box on the bottom
       var margin =  -1 * options.extraComplexPadding;
       if (options.showComplexName &&
           elementUtilities.getElementContent(ele) &&
-          ele.data('statesandinfos').length > 1) {
+          ele.data('auxunitlayouts') && // check if there is something on the bottom side
+          ele.data('auxunitlayouts').bottom &&
+          ele.data('auxunitlayouts').bottom.units.length > 0) {
         margin -= options.extraComplexPadding * 0.5;
       }
       return margin;
