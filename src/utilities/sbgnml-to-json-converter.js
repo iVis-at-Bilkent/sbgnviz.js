@@ -1,4 +1,5 @@
 var elementUtilities = require('./element-utilities');
+var classes = require('../utilities/classes');
 var graphUtilities = require('./graph-utilities');
 var libsbgnjs = require('libsbgn.js');
 
@@ -43,7 +44,11 @@ var sbgnmlToJson = {
     return false;
   },
   bboxProp: function (ele) {
-    var bbox = ele.bbox;
+    var bbox = {};
+    bbox.x = ele.bbox.x;
+    bbox.y = ele.bbox.y;
+    bbox.w = ele.bbox.w;
+    bbox.h = ele.bbox.h;
 
     // set positions as center
     bbox.x = parseFloat(bbox.x) + parseFloat(bbox.w) / 2;
@@ -55,7 +60,12 @@ var sbgnmlToJson = {
     var xPos = parseFloat(parentBbox.x);
     var yPos = parseFloat(parentBbox.y);
 
-    var bbox = ele.bbox;
+    // don't copy directly ele.box because it contains other things than x y w h
+    var bbox = {};
+    bbox.x = ele.bbox.x;
+    bbox.y = ele.bbox.y;
+    bbox.w = ele.bbox.w;
+    bbox.h = ele.bbox.h;
 
     // set positions as center
     bbox.x = parseFloat(bbox.x) + parseFloat(bbox.w) / 2 - xPos;
@@ -81,8 +91,9 @@ var sbgnmlToJson = {
     var nodes = this.findChildNodes(ele, childTagName);
     return nodes.length > 0 ? nodes[0] : undefined;
   },
-  stateAndInfoProp: function (ele, parentBbox) {
+  stateAndInfoProp: function (ele, parent) {
     var self = this;
+    var parentBbox = parent.bbox;
     var stateAndInfoArray = [];
 
     var childGlyphs = ele.glyphMembers; // this.findChildNodes(ele, 'glyph');
@@ -92,28 +103,25 @@ var sbgnmlToJson = {
       var info = {};
 
       if (glyph.class_ === 'unit of information') {
-        info.id = glyph.id || undefined;
-        info.clazz = glyph.class_ || undefined;
-        info.label = {
+        var unitOfInformation = new classes.UnitOfInformation();
+        unitOfInformation.id = glyph.id || undefined;
+        unitOfInformation.label = {
           'text': (glyph.label && glyph.label.text) || undefined
         };
-        info.bbox = self.stateAndInfoBboxProp(glyph, parentBbox);
-        stateAndInfoArray.push(info);
+        unitOfInformation.bbox = self.stateAndInfoBboxProp(glyph, parentBbox);
+        unitOfInformation.setAnchorSide();
+        stateAndInfoArray.push(unitOfInformation);
       } else if (glyph.class_ === 'state variable') {
-        info.id = glyph.id || undefined;
-        info.clazz = glyph.class_ || undefined;
+        var stateVariable = new classes.StateVariable();
+        stateVariable.id = glyph.id || undefined;
         var state = glyph.state;
-        var value = (state && state.value) || undefined;
-        var variable = (state && state.variable) || undefined;
-        info.state = {
-          'value': value,
-          'variable': variable
-        };
-        info.bbox = self.stateAndInfoBboxProp(glyph, parentBbox);
-        stateAndInfoArray.push(info);
+        stateVariable.state.value = (state && state.value) || undefined;
+        stateVariable.state.variable = (state && state.variable) || undefined;
+        stateVariable.bbox = self.stateAndInfoBboxProp(glyph, parentBbox);
+        stateVariable.setAnchorSide();
+        stateAndInfoArray.push(stateVariable);
       }
     }
-
 
     return stateAndInfoArray;
   },
@@ -133,12 +141,11 @@ var sbgnmlToJson = {
 
       // add compartment according to geometry
       for (var i = 0; i < compartments.length; i++) {
-        var bboxEl = ele.bbox;
         var bbox = {
-          'x': parseFloat(bboxEl.x),
-          'y': parseFloat(bboxEl.y),
-          'w': parseFloat(bboxEl.w),
-          'h': parseFloat(bboxEl.h),
+          'x': parseFloat(ele.bbox.x),
+          'y': parseFloat(ele.bbox.y),
+          'w': parseFloat(ele.bbox.w),
+          'h': parseFloat(ele.bbox.h),
           'id': ele.id
         };
         if (self.isInBoundingBox(bbox, compartments[i])) {
@@ -161,7 +168,7 @@ var sbgnmlToJson = {
     // add label information
     nodeObj.label = (ele.label && ele.label.text) || undefined;
     // add state and info box information
-    nodeObj.statesandinfos = self.stateAndInfoProp(ele, nodeObj.bbox);
+    nodeObj.statesandinfos = self.stateAndInfoProp(ele, nodeObj);
     // adding parent information
     self.addParentInfoToNode(ele, nodeObj, parent, compartments);
 

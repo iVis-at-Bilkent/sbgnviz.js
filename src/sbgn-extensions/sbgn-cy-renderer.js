@@ -15,7 +15,7 @@ module.exports = function () {
   var $$ = cytoscape;
   
   // Taken from cytoscape.js and modified
-  var drawRoundRectanglePath = function(
+  var drawRoundRectanglePath = $$.sbgn.drawRoundRectanglePath = function(
     context, x, y, width, height, radius ){
 
     var halfWidth = width / 2;
@@ -74,125 +74,6 @@ module.exports = function () {
     'complex': true
   };
 
-  var unitOfInfoRadius = 4;
-  var stateVarRadius = 15;
-  $$.sbgn.drawComplexStateAndInfo = function (context, node, stateAndInfos,
-          centerX, centerY, width, height) {
-
-    //This is a temporary workaround
-    $$.sbgn.drawEllipse(context, centerX, centerY, 0, 0);
-
-    var upWidth = 0, downWidth = 0;
-    var boxPadding = 10, betweenBoxPadding = 5;
-    var beginPosY = height / 2, beginPosX = width / 2;
-
-    stateAndInfos.sort($$.sbgn.compareStates);
-
-    for (var i = 0; i < stateAndInfos.length; i++) {
-      var state = stateAndInfos[i];
-      var stateWidth = state.bbox.w;
-      var stateHeight = state.bbox.h;
-//      var stateLabel = state.state.value;
-      var relativeYPos = state.bbox.y;
-      var stateCenterX, stateCenterY;
-
-      if (relativeYPos < 0) {
-        if (upWidth + stateWidth < width) {
-          stateCenterX = centerX - beginPosX + boxPadding + upWidth + stateWidth / 2;
-          stateCenterY = centerY - beginPosY;
-
-          drawStateAndInfosMoreSpecific({
-            context: context,
-            node: node,
-            state: state,
-            centerX: stateCenterX,
-            centerY: stateCenterY,
-            stateWidth: stateWidth,
-            stateHeight: stateHeight,
-            stateVarRadius: stateVarRadius,
-            unitOfInfoRadius: unitOfInfoRadius
-          });
-        }
-        upWidth = upWidth + width + boxPadding;
-      } else if (relativeYPos > 0) {
-        if (downWidth + stateWidth < width) {
-          stateCenterX = centerX - beginPosX + boxPadding + downWidth + stateWidth / 2;
-          stateCenterY = centerY + beginPosY;
-
-          drawStateAndInfosMoreSpecific({
-            context: context,
-            node: node,
-            state: state,
-            centerX: stateCenterX,
-            centerY: stateCenterY,
-            stateWidth: stateWidth,
-            stateHeight: stateHeight,
-            stateVarRadius: stateVarRadius,
-            unitOfInfoRadius: unitOfInfoRadius
-          });
-        }
-        downWidth = downWidth + width + boxPadding;
-      }
-      context.stroke();
-
-      //This is a temporary workaround
-      $$.sbgn.drawEllipse(context, centerX, centerY, 0, 0);
-
-      //update new state and info position(relative to node center)
-      state.bbox.x = (stateCenterX - centerX) * 100 / node.width();
-      state.bbox.y = (stateCenterY - centerY) * 100 / node.height();
-    }
-  };
-
-  $$.sbgn.drawStateText = function (context, textProp) {
-    var stateValue = textProp.state.value || '';
-    var stateVariable = textProp.state.variable || '';
-
-    var stateLabel = stateValue + (stateVariable
-            ? "@" + stateVariable
-            : "");
-
-    var fontSize = 9; // parseInt(textProp.height / 1.5);
-
-    textProp.font = fontSize + "px Arial";
-    textProp.label = stateLabel;
-    textProp.color = "#0f0f0f";
-    $$.sbgn.drawText(context, textProp);
-  };
-
-  $$.sbgn.drawInfoText = function (context, textProp) {
-    var fontSize = 9; // parseInt(textProp.height / 1.5);
-    textProp.font = fontSize + "px Arial";
-    textProp.color = "#0f0f0f";
-    $$.sbgn.drawText(context, textProp);
-  };
-
-  $$.sbgn.drawText = function (context, textProp, truncate) {
-    var oldFont = context.font;
-    context.font = textProp.font;
-    context.textAlign = "center";
-    context.textBaseline = "middle";
-    var oldStyle = context.fillStyle;
-    context.fillStyle = textProp.color;
-    var oldOpacity = context.globalAlpha;
-    context.globalAlpha = textProp.opacity;
-    var text;
-    
-    textProp.label = textProp.label || '';
-    
-    if (truncate == false) {
-      text = textProp.label;
-    } else {
-      text = truncateText(textProp, context.font);
-    }
-    
-    context.fillText(text, textProp.centerX, textProp.centerY);
-    context.fillStyle = oldStyle;
-    context.font = oldFont;
-    context.globalAlpha = oldOpacity;
-    //context.stroke();
-  };
-
   cyMath.calculateDistance = function (point1, point2) {
     var distance = Math.pow(point1[0] - point2[0], 2) + Math.pow(point1[1] - point2[1], 2);
     return Math.sqrt(distance);
@@ -202,77 +83,15 @@ module.exports = function () {
     clone: "#a9a9a9"
   };
 
-  /** result of refactoring, no idea for the name :/ */
-  var drawStateAndInfosMoreSpecific = function(params) {
-    var context = params.context;
-    var node = params.node;
-    var state = params.state;
-    var centerX = params.centerX;
-    var centerY = params.centerY;
-    var stateWidth = params.stateWidth;
-    var stateHeight = params.stateHeight;
-    var stateVarRadius = params.stateVarRadius;
-    var unitOfInfoRadius = params.unitOfInfoRadius;
-    var doStroke = params.doStroke || false;
-
-    var textProp = {'centerX': centerX, 'centerY': centerY,
-      'opacity': node.css('text-opacity') * node.css('opacity'),
-      'width': stateWidth, 'height': stateHeight};
-
-    if (state.clazz == "state variable") {//draw ellipse
-      drawRoundRectanglePath(context,
-              centerX, centerY,
-              stateWidth, stateHeight, Math.min(stateWidth / 2, stateHeight / 2, stateVarRadius));
-      context.fill();
-
-      textProp.state = state.state;
-      $$.sbgn.drawStateText(context, textProp);
-      if (doStroke) {
-        context.stroke();
-      }
-
-
-    } else if (state.clazz == "unit of information") {//draw rectangle
-      drawRoundRectanglePath(context,
-              centerX, centerY,
-              stateWidth, stateHeight,
-              Math.min(stateWidth / 2, stateHeight / 2, unitOfInfoRadius));
-      context.fill();
-
-      textProp.label = state.label.text || ''; // <-- different in original
-      $$.sbgn.drawInfoText(context, textProp);
-      if (doStroke) {
-        context.stroke();
-      }
-    }
-  }
-
-
   $$.sbgn.drawStateAndInfos = function (node, context, centerX, centerY) {
-    var stateAndInfos = node._private.data.statesandinfos;
+    var layouts = node.data('auxunitlayouts');
 
-    for (var i = 0; i < stateAndInfos.length && i < 4; i++) {
-      var state = stateAndInfos[i];
-      var stateWidth = state.bbox.w;
-      var stateHeight = state.bbox.h;
-      var stateCenterX = state.bbox.x * node.width() / 100 + centerX;
-      var stateCenterY = state.bbox.y * node.height() / 100 + centerY;
-
-      drawStateAndInfosMoreSpecific({
-        context: context,
-        node: node,
-        state: state,
-        centerX: stateCenterX,
-        centerY: stateCenterY,
-        stateWidth: stateWidth,
-        stateHeight: stateHeight,
-        stateVarRadius: stateVarRadius,
-        unitOfInfoRadius: unitOfInfoRadius,
-        doStroke: true
-      });
+    for (var side in layouts) {
+      var layout = layouts[side];
+      layout.draw(context);
     }
-    //This is a temporary workaround
-    $$.sbgn.drawEllipse(context, centerX, centerY, 0, 0);
+    //This is a temporary workaround                      // <- ?
+    $$.sbgn.drawEllipse(context, centerX, centerY, 0, 0); // <- ?
   };
 
   $$.sbgn.nucleicAcidCheckPoint = function (x, y, centerX, centerY, node, threshold, points, cornerRadius) {
@@ -750,7 +569,8 @@ module.exports = function () {
 
         var oldStyle = context.fillStyle;
         $$.sbgn.forceOpacityToOne(node, context);
-        $$.sbgn.drawComplexStateAndInfo(context, node, stateAndInfos, centerX, centerY, width, height);
+        //$$.sbgn.drawComplexStateAndInfo(context, node, stateAndInfos, centerX, centerY, width, height);
+        $$.sbgn.drawStateAndInfos(node, context, centerX, centerY);
         context.fillStyle = oldStyle;
       },
 //      intersectLine: cyBaseNodeShapes["roundrectangle"].intersectLine,
@@ -1385,10 +1205,11 @@ module.exports = function () {
       var state = stateAndInfos[i];
       var stateWidth = state.bbox.w;
       var stateHeight = state.bbox.h;
-      var stateCenterX = state.bbox.x * node.width() / 100 + centerX;
-      var stateCenterY = state.bbox.y * node.height() / 100 + centerY;
+      var coord = state.getAbsoluteCoord();
+      var stateCenterX = coord.x;
+      var stateCenterY = coord.y;
 
-      if (state.clazz == "state variable" && stateCount < 2) {//draw ellipse
+      if (state.clazz == "state variable" && state.isDisplayed) {//draw ellipse
         var stateIntersectLines = $$.sbgn.intersectLineEllipse(x, y, centerX, centerY,
                 stateCenterX, stateCenterY, stateWidth, stateHeight, padding);
 
@@ -1396,7 +1217,7 @@ module.exports = function () {
           intersections = intersections.concat(stateIntersectLines);
 
         stateCount++;
-      } else if (state.clazz == "unit of information" && infoCount < 2) {//draw rectangle
+      } else if (state.clazz == "unit of information" && state.isDisplayed) {//draw rectangle
         var infoIntersectLines = $$.sbgn.roundRectangleIntersectLine(x, y, centerX, centerY,
                 stateCenterX, stateCenterY, stateWidth, stateHeight, 5, padding);
 
@@ -1425,10 +1246,11 @@ module.exports = function () {
       var state = stateAndInfos[i];
       var stateWidth = parseFloat(state.bbox.w) + threshold;
       var stateHeight = parseFloat(state.bbox.h) + threshold;
-      var stateCenterX = state.bbox.x * node.width() / 100 + centerX;
-      var stateCenterY = state.bbox.y * node.height() / 100 + centerY;
+      var coord = state.getAbsoluteCoord();
+      var stateCenterX = coord.x;
+      var stateCenterY = coord.y;
 
-      if (state.clazz == "state variable" && stateCount < 2) {//draw ellipse
+      if (state.clazz == "state variable" && state.isDisplayed) {//draw ellipse
         var stateCheckPoint = cyBaseNodeShapes["ellipse"].checkPoint(
                 x, y, padding, stateWidth, stateHeight, stateCenterX, stateCenterY);
 
@@ -1436,7 +1258,7 @@ module.exports = function () {
           return true;
 
         stateCount++;
-      } else if (state.clazz == "unit of information" && infoCount < 2) {//draw rectangle
+      } else if (state.clazz == "unit of information" && state.isDisplayed) {//draw rectangle
         var infoCheckPoint = cyBaseNodeShapes["roundrectangle"].checkPoint(
                 x, y, padding, stateWidth, stateHeight, stateCenterX, stateCenterY);
 

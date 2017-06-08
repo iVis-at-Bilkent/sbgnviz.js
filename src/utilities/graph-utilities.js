@@ -41,11 +41,18 @@ graphUtilities.updateGraph = function(cyGraph) {
 
   //add position information to data for preset layout
   var positionMap = {};
-  for (var i = 0; i < cyGraph.nodes.length; i++) {
-    var xPos = cyGraph.nodes[i].data.bbox.x;
-    var yPos = cyGraph.nodes[i].data.bbox.y;
-    positionMap[cyGraph.nodes[i].data.id] = {'x': xPos, 'y': yPos};
-  }
+  cy.nodes().forEach(function(node) {
+    var xPos = node.data('bbox').x;
+    var yPos = node.data('bbox').y;
+    positionMap[node.data('id')] = {'x': xPos, 'y': yPos};
+
+    // assign correct parents to info boxes
+    var statesandinfos = node.data('statesandinfos');
+    for (var j=0; j < statesandinfos.length; j++) {
+      statesandinfos[j].parent = node;
+    }
+  });
+
 
   this.refreshPaddings(); // Recalculates/refreshes the compound paddings
   cy.endBatch();

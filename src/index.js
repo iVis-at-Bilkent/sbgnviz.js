@@ -24,6 +24,7 @@
     // Utilities to be exposed as is
     var elementUtilities = require('./utilities/element-utilities');
     var undoRedoActionFunctions = require('./utilities/undo-redo-action-functions');
+    var classes = require('./utilities/classes');
     
     sbgnRenderer();
     sbgnCyInstance();
@@ -52,6 +53,8 @@
     for (var prop in graphUtilities) {
       sbgnviz[prop] = graphUtilities[prop];
     }
+
+    sbgnviz.classes = classes;
   };
   
   if ( typeof module !== 'undefined' && module.exports ) {
