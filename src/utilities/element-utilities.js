@@ -600,6 +600,37 @@ var elementUtilities = {
       // Cache the portsordering and return it.
       node.data('portsordering', portsordering);
       return portsordering;
+    },
+
+    // used for handling the variable property of complexes
+    getComplexPadding: function(ele) {
+      // this property needs to take into account:
+      // - presence of a label
+      // - option to display complex labels
+      // - presence of more than 1 states and info box (leads to have some of them on bottom)
+      var padding = graphUtilities.getCompoundPaddings();
+      if (options.showComplexName && elementUtilities.getElementContent(ele)) {
+        padding += options.extraComplexPadding * 0.5;
+        if (ele.data('statesandinfos').length > 1) {
+          padding += options.extraComplexPadding * 0.5;
+        }
+      }
+      return padding;
+    },
+
+    // used for handling the variable property of complexes
+    getComplexMargin: function(ele) {
+      // this property needs to take into account:
+      // - presence of a label
+      // - option to display complex labels
+      // - presence of more than 1 states and info box (leads to have some of them on bottom)
+      var margin =  -1 * options.extraComplexPadding;
+      if (options.showComplexName &&
+          elementUtilities.getElementContent(ele) &&
+          ele.data('statesandinfos').length > 1) {
+        margin -= options.extraComplexPadding * 0.5;
+      }
+      return margin;
     }
     
     // Section End

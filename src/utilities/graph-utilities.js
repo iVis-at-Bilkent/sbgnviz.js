@@ -113,4 +113,9 @@ graphUtilities.recalculatePaddings = graphUtilities.refreshPaddings = function()
   return graphUtilities.calculatedPaddings;
 };
 
+graphUtilities.getCompoundPaddings = function() {
+  // Return calculated paddings in case of that data is invalid return 5
+  return graphUtilities.calculatedPaddings || 5;
+};
+
 module.exports = graphUtilities;

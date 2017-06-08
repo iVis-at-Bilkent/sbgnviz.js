@@ -11,11 +11,6 @@ var cytoscape = libs.cytoscape;
 var optionUtilities = require('../utilities/option-utilities');
 var options = optionUtilities.getOptions();
 
-var getCompoundPaddings = function() {
-  // Return calculated paddings in case of that data is invalid return 5
-  return graphUtilities.calculatedPaddings || 5;
-};
-
 /*
  * Returns the coordinates of the point located on the given angle on the circle with the given centeral coordinates and radius.
  */
@@ -131,37 +126,6 @@ module.exports = function () {
     // register add remove actions
     ur.action("deleteElesSimple", undoRedoActionFunctions.deleteElesSimple, undoRedoActionFunctions.restoreEles);
     ur.action("deleteNodesSmart", undoRedoActionFunctions.deleteNodesSmart, undoRedoActionFunctions.restoreEles);
-  }
-
-  // used for handling the variable property of complexes
-  function getPadding(ele) {
-    // this property needs to take into account:
-    // - presence of a label
-    // - option to display complex labels
-    // - presence of more than 1 states and info box (leads to have some of them on bottom)
-    var padding = getCompoundPaddings();
-    if (options.showComplexName && elementUtilities.getElementContent(ele)) {
-      padding += options.extraComplexPadding * 0.5;
-      if (ele.data('statesandinfos').length > 1) {
-        padding += options.extraComplexPadding * 0.5;
-      }
-    }
-    return padding;
-  }
-
-  // used for handling the variable property of complexes
-  function getMargin(ele) {
-    // this property needs to take into account:
-    // - presence of a label
-    // - option to display complex labels
-    // - presence of more than 1 states and info box (leads to have some of them on bottom)
-    var margin =  -1 * options.extraComplexPadding;
-    if (options.showComplexName &&
-        elementUtilities.getElementContent(ele) &&
-        ele.data('statesandinfos').length > 1) {
-      margin -= options.extraComplexPadding * 0.5;
-    }
-    return margin;
   }
   
   function bindCyEvents() {
@@ -343,8 +307,8 @@ module.exports = function () {
           .css({
             'text-valign': 'bottom',
             'text-halign': 'center',
-            'text-margin-y': getMargin,
-            'padding': getPadding
+            'text-margin-y': elementUtilities.getComplexMargin,
+            'padding': elementUtilities.getComplexPadding
           })
           .selector("node[class='compartment']")
           .css({
@@ -357,7 +321,7 @@ module.exports = function () {
           .selector("node:parent[class='compartment']")
           .css({
             'padding': function() {
-              return getCompoundPaddings() + options.extraCompartmentPadding;
+              return graphUtilities.getCompoundPaddings() + options.extraCompartmentPadding;
             }
           })
           .selector("node:childless[bbox]")
