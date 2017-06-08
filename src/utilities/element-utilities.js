@@ -361,7 +361,7 @@ var elementUtilities = {
             width: ( _class==('complex') || _class==('compartment') )?textWidth * 2:textWidth
         };
 
-        var font = this.getLabelTextSize(ele) + "px Arial";
+        var font = parseInt(ele.css('font-size')) + "px Arial";
         return truncateText(textProp, font); //func. in the cytoscape.renderer.canvas.sbgn-renderer.js
     },
     getLabelTextSize: function (ele) {
