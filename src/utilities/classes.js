@@ -501,7 +501,7 @@ AuxUnitLayout.prototype.addAuxUnit = function(unit, position) {
     // need to resize the parent in case the space was too small
     this.resizeParent(this.lengthUsed);
   }
-  cy.style().update();
+  //cy.style().update(); // <- was it really necessary ?
   return position;
 };
 

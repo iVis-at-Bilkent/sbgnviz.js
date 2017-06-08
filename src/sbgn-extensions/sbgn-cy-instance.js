@@ -185,6 +185,9 @@ module.exports = function () {
     $(document).on('updateGraphEnd', function(event) {
       // list all entitytypes andstore them in the global scratch
       // only stateful EPN (complex, macromolecule or nucleic acid) are concerned
+
+      // following is unapplied due to performance decreasing, adding something like 20% time on load
+      /*cy.startBatch();
       var entityHash = {};
       cy.nodes("[class='complex'], [class='macromolecule'], [class='nucleic acid feature']").forEach(function(node) {
         // identify an entity by its label AND class
@@ -206,9 +209,11 @@ module.exports = function () {
           }
         }
       });
-      cy.scratch('_sbgnviz', {SBGNEntityTypes: entityHash});
+      cy.endBatch();
+      cy.scratch('_sbgnviz', {SBGNEntityTypes: entityHash});*/
 
       // assign statesandinfos to their layout
+      cy.startBatch();
       cy.nodes().forEach(function(node) {
         node.data('auxunitlayouts', {});
         // for each statesandinfos
@@ -227,6 +232,7 @@ module.exports = function () {
           node.data('auxunitlayouts')[location].reorderFromPositions();
         }
       });
+      cy.endBatch();
     });
   }
 
