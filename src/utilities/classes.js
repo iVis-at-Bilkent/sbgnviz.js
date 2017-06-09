@@ -318,9 +318,9 @@ UnitOfInformation.prototype.drawShape = function(context, x, y) {
  * @param [location] - the side where it will be placed top, bottom, right, left or undefined (auto placement)
  * @param [position] - its index in the order of elements placed on its same location // TODO
  */
-UnitOfInformation.create = function (parentNode, value, bbox, location, position, index) {
+UnitOfInformation.create = function (parentNode, value, bbox, location, position, index, shapeFn, shapeArgsFn) {
   // create the new unit of info
-  var unit = new ns.UnitOfInformation(value, parentNode);
+  var unit = new ns.UnitOfInformation(value, parentNode, shapeFn, shapeArgsFn);
   unit.bbox = bbox;
 
   //console.log("will insert on", location, position);
