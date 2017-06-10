@@ -45,7 +45,8 @@ var elementUtilities = {
         'macromolecule multimer': true,
         'simple chemical multimer': true,
         'complex multimer': true,
-        'compartment': true
+        'compartment': true,
+        'biological activity': true,
     },
     //the following were moved here from what used to be utilities/sbgn-filtering.js
     processTypes : ['process', 'omitted process', 'uncertain process',
@@ -262,7 +263,7 @@ var elementUtilities = {
         
         // We need to define new node shapes with their class names for these nodes
         if (_class == 'source and sink' || _class == 'nucleic acid feature' || _class == 'macromolecule' 
-                || _class == 'simple chemical' || _class == 'complex' ) {
+                || _class == 'simple chemical' || _class == 'complex' || _class == 'biological activity') {
             return _class;
         }
         
@@ -313,7 +314,8 @@ var elementUtilities = {
         if (_class == 'macromolecule' || _class == 'simple chemical'
             || _class == 'phenotype'
             || _class == 'unspecified entity' || _class == 'nucleic acid feature'
-            || _class == 'perturbing agent' || _class == 'tag') {
+            || _class == 'perturbing agent' || _class == 'tag'
+            || _class == 'biological activity') {
             content = ele.data('label') ? ele.data('label') : "";
         }
         else if(_class == 'compartment'){
