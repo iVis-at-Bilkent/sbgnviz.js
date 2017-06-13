@@ -47,6 +47,7 @@ var elementUtilities = {
         'complex multimer': true,
         'compartment': true,
         'biological activity': true,
+        'delay': true,
     },
     //the following were moved here from what used to be utilities/sbgn-filtering.js
     processTypes : ['process', 'omitted process', 'uncertain process',
@@ -354,6 +355,9 @@ var elementUtilities = {
         }
         else if (_class == 'dissociation') {
             content = 'o';
+        }
+        else if (_class == 'delay'){
+            content = '\u03C4'; // tau
         }
 
         var textWidth = ele.width() || ele.data('bbox').w;
