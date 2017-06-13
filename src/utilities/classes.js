@@ -463,6 +463,11 @@ var AuxUnitLayout = function (parentNode, location, alignment) {
   this.parentNode = parentNode;
   this.renderLengthCache = [];
   this.lengthUsed = 0;
+
+  // specific rules for the layout
+  if(parentNode.data('class') == "simple chemical") {
+    this.outerMargin = 3;
+  }
 };
 /**
  * outerMargin: the left and right space left between the side of the node, and the first (and last) box
