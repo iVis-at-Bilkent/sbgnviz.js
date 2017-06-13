@@ -71,18 +71,18 @@ AuxiliaryUnit.prototype.drawText = function(context, centerX, centerY, truncate)
 
 AuxiliaryUnit.prototype.getAbsoluteCoord = function() {
   if(this.coordType == "relativeToCenter") {
-    var absX = this.bbox.x * this.parent.outerWidth() / 100 + this.parent._private.position.x;
-    var absY = this.bbox.y * this.parent.outerHeight() / 100 + this.parent._private.position.y;
+    var absX = this.bbox.x * (this.parent.outerWidth() - this.parent._private.data['border-width']) / 100 + this.parent._private.position.x;
+    var absY = this.bbox.y * (this.parent.outerHeight() - this.parent._private.data['border-width']) / 100 + this.parent._private.position.y;
     return {x: absX, y: absY};
   }
   else if(this.coordType == "relativeToSide") {
     if (this.anchorSide == "top" || this.anchorSide == "bottom") {
-      var absX = this.parent._private.position.x - this.parent.outerWidth() / 2 + this.bbox.x;
-      var absY = this.bbox.y * this.parent.outerHeight() / 100 + this.parent._private.position.y;
+      var absX = this.parent._private.position.x - (this.parent.outerWidth() - this.parent._private.data['border-width']) / 2 + this.bbox.x;
+      var absY = this.bbox.y * (this.parent.outerHeight() - this.parent._private.data['border-width']) / 100 + this.parent._private.position.y;
     }
     else {
-      var absY = this.parent._private.position.y - this.parent.outerHeight() / 2 + this.bbox.y;
-      var absX = this.bbox.x * this.parent.outerWidth() / 100 + this.parent._private.position.x;
+      var absY = this.parent._private.position.y - (this.parent.outerHeight() - this.parent._private.data['border-width']) / 2 + this.bbox.y;
+      var absX = this.bbox.x * (this.parent.outerWidth() - this.parent._private.data['border-width']) / 100 + this.parent._private.position.x;
     }
     return {x: absX, y: absY};
   }
