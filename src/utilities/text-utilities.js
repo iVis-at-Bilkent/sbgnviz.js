@@ -30,6 +30,33 @@ var textUtilities = {
     return text;
   },
 
+  // same purpose as previous one, but with clearer responsibility
+  truncate: function(text, font, width) {
+    var context = document.createElement('canvas').getContext("2d");
+    context.font = font;
+    // check trivial case first, when entire text is already small enough
+    if(context.measureText(text).width < width) {
+      return text;
+    }
+    else {
+      var ellipsis = "..";
+      // if ellipsis alone is already too large
+      if(context.measureText(ellipsis).width > width) {
+        return "";
+      }
+
+      var finalLength; // this should always have a value after the loop
+      for(var i=0; i < text.length; i++) {
+        var subtext = text.substring(0, i) + ellipsis;
+        if (context.measureText(subtext).width > width) { // we're too far, take the previous index
+          finalLength = i > 0 ? i-1 : 0;
+          break;
+        }
+      }
+      return text.substring(0, finalLength) + ellipsis;
+    }
+  },
+
   // ensure that returned string follows xsd:ID standard
   // should follow r'^[a-zA-Z_][\w.-]*$'
   getXMLValidId: function(originalId) {

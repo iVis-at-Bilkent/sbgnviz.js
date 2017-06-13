@@ -22,6 +22,10 @@ M. Sari, I. Bahceci, U. Dogrusoz, S.O. Sumer, B.A. Aksoy, O. Babur, E. Demir, "[
       fitLabelsToNodes: function () {
         return false;
       },
+      // Whether to fit labels to a node's info boxes
+      fitLabelsToInfoboxes: function () {
+        return false;
+      },
       // dynamic label size it may be 'small', 'regular', 'large'
       dynamicLabelSize: function () {
         return 'regular';

@@ -11,6 +11,9 @@ var defaults = {
   fitLabelsToNodes: function () {
     return false;
   },
+  fitLabelsToInfoboxes: function () {
+    return false;
+  },
   // dynamic label size it may be 'small', 'regular', 'large'
   dynamicLabelSize: function () {
     return 'regular';

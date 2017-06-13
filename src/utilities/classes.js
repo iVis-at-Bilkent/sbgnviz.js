@@ -2,6 +2,9 @@ var cyRenderer = require('../sbgn-extensions/sbgn-cy-renderer');
 var libs = require('../utilities/lib-utilities').getLibs();
 var jQuery = $ = libs.jQuery;
 var cytoscape = libs.cytoscape;
+var optionUtilities = require('./option-utilities');
+var options = optionUtilities.getOptions();
+var truncate = require('./text-utilities').truncate;
 
 var ns = {};
 
@@ -38,7 +41,7 @@ AuxiliaryUnit.prototype.drawShape = function(context, x, y) {
 };
 
 // draw the statesOrInfo's label at given position
-AuxiliaryUnit.prototype.drawText = function(context, centerX, centerY, truncate) {
+AuxiliaryUnit.prototype.drawText = function(context, centerX, centerY) {
   var fontSize = 9; // parseInt(textProp.height / 1.5);
 
   // part of : $$.sbgn.drawText(context, textProp);
@@ -53,13 +56,26 @@ AuxiliaryUnit.prototype.drawText = function(context, centerX, centerY, truncate)
   context.fillStyle = "#0f0f0f";
   context.globalAlpha = this.parent.css('text-opacity') * this.parent.css('opacity'); // ?
 
-  var text = this.getText();
-
-  /*if (truncate == false) {
-    text = textProp.label;
-  } else {
-    text = truncateText(textProp, context.font);
-  }*/
+  var text;
+  if(options.fitLabelsToInfoboxes()){
+    // here we memoize the truncated text into _textCache,
+    // as it is not something that changes so much
+    text = this.getText();
+    var key = text + context.font + this.bbox.w;
+    if(this._textCache && this._textCache[key]) {
+      text = this._textCache[key];
+    }
+    else {
+      text = truncate(this.getText(), context.font, this.bbox.w);
+      if(!this._textCache) {
+        this._textCache = {};
+      }
+      this._textCache[key] = text;
+    }
+  }
+  else {
+    text = this.getText();
+  }
 
   context.fillText(text, centerX, centerY);
 
