@@ -498,7 +498,7 @@ var AuxUnitLayout = function (parentNode, location, alignment) {
 AuxUnitLayout.outerMargin = 10;
 AuxUnitLayout.unitGap = 5;
 AuxUnitLayout.alwaysShowAuxUnits = false;
-AuxUnitLayout.maxUnitDisplayed = 4;
+AuxUnitLayout.maxUnitDisplayed = -1;
 
 AuxUnitLayout.prototype.update = function(doForceUpdate) {
   this.precomputeCoords(doForceUpdate);
@@ -634,7 +634,9 @@ AuxUnitLayout.prototype.setDisplayedUnits = function () {
   var alwaysShowAuxUnits = this.getAlwaysShowAuxUnits();
   var maxUnitDisplayed = this.getMaxUnitDisplayed();
   for(var i=0; i < this.units.length; i++) {
-    if((this.renderLengthCache[i+1] <= availableSpace && i < maxUnitDisplayed) || alwaysShowAuxUnits) {
+    if((this.renderLengthCache[i+1] <= availableSpace // do we have enough space?
+      && (maxUnitDisplayed == -1 || i < maxUnitDisplayed)) // is there no limit? or are we under that limit?
+      || alwaysShowAuxUnits) { // do we always want to show everything regardless?
       this.units[i].isDisplayed = true;
     }
     else {
