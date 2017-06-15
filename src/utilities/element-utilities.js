@@ -204,10 +204,10 @@ var elementUtilities = {
     },
     // general utilities
     noneIsNotHighlighted: function(){
-        var notHighlightedNodes = cy.nodes(":visible").nodes(".unhighlighted");
-        var notHighlightedEdges = cy.edges(":visible").edges(".unhighlighted");
+        var highlightedNodes = cy.nodes(":visible").nodes(".highlighted");
+        var highlightedEdges = cy.edges(":visible").edges(".highlighted");
 
-        return notHighlightedNodes.length + notHighlightedEdges.length === 0;
+        return highlightedNodes.length + highlightedEdges.length === 0;
     },
     
     // Section End
