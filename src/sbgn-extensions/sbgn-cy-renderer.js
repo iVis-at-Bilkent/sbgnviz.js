@@ -531,7 +531,7 @@ module.exports = function () {
         var centerY = node._private.position.y;
         var stateAndInfos = node._private.data.statesandinfos;
         var label = node._private.data.label;
-        var cornerLength = cyBaseNodeShapes["complex"].cornerLength;
+        var cornerLength = cyBaseNodeShapes["complex"].cornerLength*2.5;
         var multimerPadding = cyBaseNodeShapes["complex"].multimerPadding;
         var cloneMarker = node._private.data.clonemarker;
 
