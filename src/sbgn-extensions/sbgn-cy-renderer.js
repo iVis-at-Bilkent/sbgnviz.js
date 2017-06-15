@@ -66,6 +66,7 @@ module.exports = function () {
     'macromolecule': true,
     'simple chemical': true,
     'biological activity': true,
+    'compartment': true,
   };
 
   var totallyOverridenNodeShapes = $$.sbgn.totallyOverridenNodeShapes = {
@@ -74,6 +75,7 @@ module.exports = function () {
     'simple chemical': true,
     'complex': true,
     'biological activity': true,
+    'compartment': true,
   };
 
   cyMath.calculateDistance = function (point1, point2) {
@@ -343,6 +345,7 @@ module.exports = function () {
   cyStyleProperties.types.nodeShape.enums.push('macromolecule');
   cyStyleProperties.types.nodeShape.enums.push('simple chemical');
   cyStyleProperties.types.nodeShape.enums.push('biological activity');
+  cyStyleProperties.types.nodeShape.enums.push('compartment');
 
   $$.sbgn.registerSbgnNodeShapes = function () {
 
@@ -873,6 +876,64 @@ module.exports = function () {
         var padding = parseInt(node.css('border-width')) / 2;
 
         var nodeCheckPoint = cyBaseNodeShapes["rectangle"].checkPoint(x, y, padding,
+                width, height, centerX, centerY);
+        var stateAndInfoCheckPoint = $$.sbgn.checkPointStateAndInfoBoxes(x, y, node,
+                threshold);
+
+        return nodeCheckPoint || stateAndInfoCheckPoint;
+      }
+    };
+    cyBaseNodeShapes["compartment"] = {
+      points: cyMath.generateUnitNgonPointsFitToSquare( 4, 0 ),
+      draw: function (context, node) {
+        var padding = parseInt(node.css('border-width'));
+        var width = node.outerWidth() - padding;
+        var height = node.outerHeight() - padding;
+        var centerX = node._private.position.x;
+        var centerY = node._private.position.y;
+
+        drawRoundRectanglePath(context,
+                centerX, centerY,
+                width, height);
+        context.fill();
+
+        context.stroke();
+
+        var oldStyle = context.fillStyle;
+        $$.sbgn.forceOpacityToOne(node, context);
+        $$.sbgn.drawStateAndInfos(node, context, centerX, centerY);
+        context.fillStyle = oldStyle;
+
+      },
+      intersectLine: function (node, x, y, portId) {
+        var centerX = node._private.position.x;
+        var centerY = node._private.position.y;
+        var width = node.outerWidth() - parseInt(node.css('border-width'));
+        var height = node.outerHeight() - parseInt(node.css('border-width'));
+        var padding = parseInt(node.css('border-width')) / 2;
+
+        var stateAndInfoIntersectLines = $$.sbgn.intersectLineStateAndInfoBoxes(
+                node, x, y);
+
+        var nodeIntersectLines = cyMath.roundRectangleIntersectLine(
+            x, y,
+            centerX,
+            centerY,
+            width, height,
+            padding );
+
+        var intersections = stateAndInfoIntersectLines.concat(nodeIntersectLines);
+
+        return $$.sbgn.closestIntersectionPoint([x, y], intersections);
+      },
+      checkPoint: function (x, y, node, threshold) {
+        var centerX = node._private.position.x;
+        var centerY = node._private.position.y;
+        var width = node.outerWidth() - parseInt(node.css('border-width')) + threshold;
+        var height = node.outerHeight() - parseInt(node.css('border-width')) + threshold;
+        var padding = parseInt(node.css('border-width')) / 2;
+
+        var nodeCheckPoint = cyBaseNodeShapes["roundrectangle"].checkPoint(x, y, padding,
                 width, height, centerX, centerY);
         var stateAndInfoCheckPoint = $$.sbgn.checkPointStateAndInfoBoxes(x, y, node,
                 threshold);

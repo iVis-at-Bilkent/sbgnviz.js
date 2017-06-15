@@ -253,7 +253,7 @@ var elementUtilities = {
         }
 
         if (_class == 'compartment') {
-            return 'roundrectangle';
+            return 'compartment';
         }
         if (_class == 'phenotype') {
             return 'hexagon';
