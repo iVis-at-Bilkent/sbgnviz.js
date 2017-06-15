@@ -391,4 +391,32 @@ mainUtilities.setShowComplexName = function(showComplexName) {
   });
 };
 
+/*
+ * Sets the ordering of the given nodes.
+ * Ordering options are 'L-to-R', 'R-to-L', 'T-to-B', 'B-to-T', 'none'.
+ * If a node does not have any port before the operation and it is supposed to have some after operation the portDistance parameter is 
+ * used to set the distance between the node center and the ports. The default port distance is 60.
+ * Considers undoable option.
+ */
+mainUtilities.setPortsOrdering = function (nodes, ordering, portDistance) {
+  if ( nodes.length === 0 ) {
+    return;
+  }
+  
+  if (!options.undoable) {
+    elementUtilities.setPortsOrdering(nodes, ordering, portDistance);
+  }
+  else {
+    var param = {
+      nodes: nodes,
+      ordering: ordering,
+      portDistance: portDistance
+    };
+    
+    cy.undoRedo().do("setPortsOrdering", param);
+  }
+  
+  cy.style().update();
+};
+
 module.exports = mainUtilities;
