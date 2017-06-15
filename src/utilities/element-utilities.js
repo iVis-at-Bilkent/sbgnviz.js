@@ -695,6 +695,104 @@ var elementUtilities = {
       nodes.data('portsordering', ordering); // Update the cached orderings of the nodes
       cy.endBatch();
     },
+    
+    /*
+    * Add ports to the given node, with given ordering and port distance.
+    */
+    addPorts: function(node, ordering, portDistance) {
+      var firstPortId = node.id() + ".1"; // Id of first port
+      var secondPortId = node.id() + ".2"; // Id of seconf port
+      // First port object x and y will be filled according to ordering, the first port is supposed to be the left most or the top most one
+      var firstPort = { id: firstPortId };
+      // Second port object x and y will be filled according to ordering, the second port is supposed to be the right most or the bottom most one
+      var secondPort = { id: secondPortId };
+
+      // Complete port objects according to ordering
+      if ( ordering === 'L-to-R' || ordering === 'R-to-L' ) {
+        // If ordering is in horizontal axis first port is the left most one and the second port is the right most one
+        firstPort.x = -1 * portDistance;
+        secondPort.x = portDistance;
+        firstPort.y = 0;
+        secondPort.y = 0;
+      }
+      else { // If ordering is 'T-to-B' or 'B-to-T'
+         // If ordering is in vertical axis first port is the top most one and the second port is the bottom most one
+        firstPort.y = -1 * portDistance;
+        secondPort.y = portDistance;
+        firstPort.x = 0;
+        secondPort.x = 0;
+      }
+
+      var fromLorT = ordering === 'L-to-R' || ordering === 'T-to-B'; // Check if ordering starts from left or top
+      var ports = [firstPort, secondPort]; // Ports array for the node
+      var connectedEdges = node.connectedEdges(); // The edges connected to the node
+
+      cy.startBatch();
+
+      node.data('ports', ports);
+
+      // Reset the portsource and porttarget for each edge connected to the node
+      for ( var i = 0; i < connectedEdges.length; i++ ) {
+        var edge = connectedEdges[i];
+        var edgeClass = edge.data('class');
+        /*
+         * If the node is the edge target we may need to set the porttarget of the edge to the input port of the node (First or second port accoring to the orientation)
+         * if it is the edge soruce we may need to set the portsource of the edge to the output port similarly.
+         * Note that if fron left or top (fromLorT) is true then the first port is the source port and second port is the target port,
+         * else it is vice versa.
+         * 
+         */
+        if ( edge.data('target') === node.id() ) {
+          if (edgeClass === 'production' || this.isModulationArcClass(edgeClass)) {
+            continue; // production or modulation type of edges cannot be connected to any port of target node (A production can have a process as target node but it is supposed to be connected to that node from its body, not from a port)
+          }
+          if ( fromLorT ) {
+            edge.data('porttarget', firstPortId);
+          }
+          else {
+            edge.data('porttarget', secondPortId);
+          }
+        }
+        else {
+          if (edgeClass === 'consumption') {
+            continue; // consumpiton edge cannot be connected to any port of source node
+          }
+          if ( fromLorT ) {
+            edge.data('portsource', secondPortId);
+          }
+          else {
+            edge.data('portsource', firstPortId);
+          }
+        }
+      }
+
+      cy.endBatch();
+    },
+
+    /*
+    * Remove the ports of the given node
+    */
+    removePorts: function(node) {
+      var connectedEdges = node.connectedEdges();
+      var nodeId = node.id();
+
+      cy.startBatch();
+
+      // Reset portsource or porttarget of the connected edges to the node id
+      for ( var i = 0; i < connectedEdges.length; i++ ) {
+        var edge = connectedEdges[i];
+        if ( edge.data('source') === nodeId ) {
+          edge.data('portsource', nodeId);
+        }
+        else {
+          edge.data('porttarget', nodeId);
+        }
+      }
+
+      node.data('ports', []); // Clear ports data
+
+      cy.endBatch();
+    },
 
     // used for handling the variable property of complexes
     getComplexPadding: function(ele) {
