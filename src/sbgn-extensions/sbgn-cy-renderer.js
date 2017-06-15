@@ -523,7 +523,7 @@ module.exports = function () {
     cyBaseNodeShapes["complex"] = {
       points: [],
       multimerPadding: 5,
-      cornerLength: 12,
+      cornerLength: 24,
       draw: function (context, node) {
         var width = node.outerWidth() - parseFloat(node.css('border-width'));
         var height = node.outerHeight()- parseFloat(node.css('border-width'));
@@ -531,7 +531,7 @@ module.exports = function () {
         var centerY = node._private.position.y;
         var stateAndInfos = node._private.data.statesandinfos;
         var label = node._private.data.label;
-        var cornerLength = cyBaseNodeShapes["complex"].cornerLength*2.5;
+        var cornerLength = cyBaseNodeShapes["complex"].cornerLength;
         var multimerPadding = cyBaseNodeShapes["complex"].multimerPadding;
         var cloneMarker = node._private.data.clonemarker;
 
