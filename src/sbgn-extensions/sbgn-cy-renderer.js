@@ -114,7 +114,7 @@ module.exports = function () {
 	    cyBaseNodeShapes['ellipse'].draw(context, x, y, width, height);
     }
     else if ( name == "complex"){
-	    var points = $$.sbgn.generateComplexShapePoints(height/3, width, height);
+	    var points = $$.sbgn.generateComplexShapePoints(height/2, width, height);
 	    drawPolygonPath(context, x, y, width, height, points);
     }
     else if ( name == "perturbation"){
