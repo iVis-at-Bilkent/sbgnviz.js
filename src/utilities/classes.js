@@ -19,6 +19,21 @@ var AuxiliaryUnit = function (parent) {
   this.isDisplayed = false;
 };
 
+/*
+ * Return a new AuxiliaryUnit object. A new parent reference and new id can
+ * optionnally be passed.
+ */
+AuxiliaryUnit.prototype.copy = function (existingInstance, newParent, newId) {
+  var newUnit = existingInstance ? existingInstance : new AuxiliaryUnit();
+  newUnit.parent = newParent ? newParent : this.parent;
+  newUnit.id = newId ? newId : this.id;
+  newUnit.bbox = jQuery.extend(true, {}, this.bbox);
+  newUnit.coordType = this.coordType;
+  newUnit.anchorSide = this.anchorSide;
+  newUnit.isDisplayed = this.isDisplayed;
+  return newUnit;
+};
+
 // draw the auxiliary unit at its position
 AuxiliaryUnit.prototype.draw = function(context) {
   var coords = this.getAbsoluteCoord();
@@ -275,6 +290,14 @@ StateVariable.prototype.remove = function () {
   };
 };
 
+StateVariable.prototype.copy = function(newParent, newId) {
+  var newStateVar = AuxiliaryUnit.prototype.copy.call(this, new StateVariable(), newParent, newId);
+  newStateVar.state = jQuery.extend(true, {}, this.state);
+  newStateVar.stateVariableDefinition = this.stateVariableDefinition;
+  newStateVar.clazz = this.clazz;
+  return newStateVar;
+};
+
 ns.StateVariable = StateVariable;
 // -------------- END StateVariable -------------- //
 
@@ -332,7 +355,8 @@ UnitOfInformation.prototype.drawShape = function(context, x, y) {
  * @param parentNode - the cytoscape element hosting the unit of information
  * @param value - its text
  * @param [location] - the side where it will be placed top, bottom, right, left or undefined (auto placement)
- * @param [position] - its index in the order of elements placed on its same location // TODO
+ * @param [position] - its position in the order of elements placed on the same location
+ * @param [index] - its index in the statesandinfos list
  */
 UnitOfInformation.create = function (parentNode, value, bbox, location, position, index) {
   // create the new unit of info
@@ -367,6 +391,15 @@ UnitOfInformation.prototype.remove = function () {
     position: position,
     index: index
   };
+};
+
+UnitOfInformation.prototype.copy = function(newParent, newId) {
+  var newUnitOfInfo = AuxiliaryUnit.prototype.copy.call(this, new UnitOfInformation(), newParent, newId);
+  newUnitOfInfo.label = jQuery.extend(true, {}, this.label);
+  newUnitOfInfo.clazz = this.clazz;
+  newUnitOfInfo.shapeFn = this.shapeFn;
+  newUnitOfInfo.shapeArgsFn = this.shapeArgsFn;
+  return newUnitOfInfo;
 };
 
 ns.UnitOfInformation = UnitOfInformation;
@@ -475,7 +508,7 @@ ns.StateVariableDefinition = StateVariableDefinition;
 var AuxUnitLayout = function (parentNode, location, alignment) {
   this.units = [];
   this.location = location;
-  this.alignment = alignment || "left";
+  this.alignment = alignment || "left"; // this was intended to be used, but it isn't for now
   this.parentNode = parentNode;
   this.renderLengthCache = [];
   this.lengthUsed = 0;
@@ -789,7 +822,7 @@ AuxUnitLayout.prototype.getOuterMargin = function () {
   else {
     return AuxUnitLayout.outerMargin;
   }
-}
+};
 
 AuxUnitLayout.prototype.getUnitGap = function () {
   if(typeof this.unitGap !== "undefined" && this.unitGap !== null) {
@@ -798,7 +831,7 @@ AuxUnitLayout.prototype.getUnitGap = function () {
   else {
     return AuxUnitLayout.unitGap;
   }
-}
+};
 
 AuxUnitLayout.prototype.getAlwaysShowAuxUnits = function () {
   if(typeof this.alwaysShowAuxUnits !== "undefined" && this.alwaysShowAuxUnits !== null) {
@@ -807,7 +840,7 @@ AuxUnitLayout.prototype.getAlwaysShowAuxUnits = function () {
   else {
     return AuxUnitLayout.alwaysShowAuxUnits;
   }
-}
+};
 
 AuxUnitLayout.prototype.getMaxUnitDisplayed = function () {
   if(typeof this.maxUnitDisplayed !== "undefined" && this.maxUnitDisplayed !== null) {
@@ -816,7 +849,38 @@ AuxUnitLayout.prototype.getMaxUnitDisplayed = function () {
   else {
     return AuxUnitLayout.maxUnitDisplayed;
   }
-}
+};
+
+/*
+ *  Duplicate a layout. Doesn't copy the units attribute, reset it instead.
+ */
+AuxUnitLayout.prototype.copy = function(newParent) {
+  var newLayout = new AuxUnitLayout(newParent);
+  // Copying the same reference to units would be inconsistent.
+  // Duplicating owned units goes beyonnd the scope, because we need to assign
+  // ids that are tied to the global cound of units of a node.
+  // So duplicating units is something that should be properly done outside of this function.
+  // TODO that is a bit dirty, find a nice modular way to arrange that
+  newLayout.units = [];
+  newLayout.location = this.location;
+  newLayout.alignment = this.alignment;
+  newLayout.parentNode = newParent;
+  newLayout.renderLengthCache = this.renderLengthCache;
+  newLayout.lengthUsed = this.lengthUsed;
+  if(typeof this.outerMargin !== "undefined") {
+    newLayout.outerMargin = this.outerMargin;
+  }
+  if(typeof this.unitGap !== "undefined") {
+    newLayout.unitGap = this.unitGap;
+  }
+  if(typeof this.alwaysShowAuxUnits !== "undefined") {
+    newLayout.alwaysShowAuxUnits = this.alwaysShowAuxUnits;
+  }
+  if(typeof this.maxUnitDisplayed !== "undefined") {
+    newLayout.maxUnitDisplayed = this.maxUnitDisplayed;
+  }
+  return newLayout;
+};
 
 ns.AuxUnitLayout = AuxUnitLayout;
 // -------------- END AuxUnitLayout -------------- //
