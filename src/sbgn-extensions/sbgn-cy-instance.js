@@ -142,19 +142,6 @@ module.exports = function () {
         var infoLabel = elementUtilities.getInfoLabel(node);
         node._private.data.infoLabel = infoLabel;
       }
-
-      var edges = cy.edges();
-      // remove bend points before collapse
-      for (var i = 0; i < edges.length; i++) {
-        var edge = edges[i];
-        if (edge.hasClass('edgebendediting-hasbendpoints')) {
-          edge.removeClass('edgebendediting-hasbendpoints');
-          delete edge._private.classes['edgebendediting-hasbendpoints'];
-        }
-      }
-
-      edges.scratch('cyedgebendeditingWeights', []);
-      edges.scratch('cyedgebendeditingDistances', []);
     });
     
     cy.on("expandcollapse.aftercollapse", "node", function (event) {
