@@ -853,9 +853,8 @@ module.exports = function () {
         var padding = parseInt(node.css('border-width')) / 2;
         var cornerRadius = cyMath.getRoundRectangleRadius(width, height);
 
-        var stateAndInfoIntersectLines = $$.sbgn.intersectLineStateAndInfoBoxes(
+        var stateAndInfoIntersectLines = $$.sbgn.intersectLineAfInfoBoxes(
                 node, x, y);
-
        var nodeIntersectLines = cyMath.polygonIntersectLine(
                 x, y,
                 this.points,
@@ -863,7 +862,6 @@ module.exports = function () {
                 centerY,
                 width / 2, height / 2,
                 padding);
-
         var intersections = stateAndInfoIntersectLines.concat(nodeIntersectLines);
 
         return $$.sbgn.closestIntersectionPoint([x, y], intersections);
@@ -1313,6 +1311,65 @@ module.exports = function () {
     return []; // if nothing
   };
 
+  //this function gives the intersections of any line with the upper half of perturbing agent 
+  $$.sbgn.perturbingAgentIntersectLine = function (
+          x1, y1, x2, y2, nodeX, nodeY, width, height, padding) {
+
+    var halfWidth = width / 2;
+    var halfHeight = height / 2;
+
+    // Check intersections with straight line segments
+    var straightLineIntersections = [];
+
+    // Top segment, left to right
+    {
+      var topStartX = nodeX - halfWidth - padding;
+      var topStartY = nodeY - halfHeight - padding;
+      var topEndX = nodeX + halfWidth + padding;
+      var topEndY = topStartY;
+
+      var intersection = cyMath.finiteLinesIntersect(
+              x1, y1, x2, y2, topStartX, topStartY, topEndX, topEndY, false);
+
+      if (intersection.length > 0) {
+        straightLineIntersections = straightLineIntersections.concat(intersection);
+      }
+    }
+
+    // Right segment, top to bottom
+    {
+      var rightStartX = nodeX + halfWidth + padding;
+      var rightStartY = nodeY - halfHeight - padding;
+      var rightEndX = rightStartX - halfWidth/2;
+      var rightEndY = nodeY + padding;
+
+      var intersection = cyMath.finiteLinesIntersect(
+              x1, y1, x2, y2, rightStartX, rightStartY, rightEndX, rightEndY, false);
+
+      if (intersection.length > 0) {
+        straightLineIntersections = straightLineIntersections.concat(intersection);
+      }
+    }
+
+    // Left segment, top to bottom
+    {
+      var leftStartX = nodeX - halfWidth - padding;
+      var leftStartY = nodeY - halfHeight - padding;
+      var leftEndX = leftStartX + halfWidth/2;
+      var leftEndY = nodeY + padding;
+
+      var intersection = cyMath.finiteLinesIntersect(
+              x1, y1, x2, y2, leftStartX, leftStartY, leftEndX, leftEndY, false);
+
+      if (intersection.length > 0) {
+        straightLineIntersections = straightLineIntersections.concat(intersection);
+      }
+    }
+
+   if (straightLineIntersections.length > 0)
+      return straightLineIntersections;
+    return []; // if nothing
+  };
   $$.sbgn.intersectLineEllipse = function (
           x1, y1, x2, y2, centerX, centerY, width, height, padding) {
 
@@ -1389,6 +1446,51 @@ module.exports = function () {
     if (intersections.length > 0)
       return intersections;
     return [];
+  };
+
+  $$.sbgn.intersectLineAfInfoBoxes = function (node, x, y) {
+    var centerX = node._private.position.x;
+    var centerY = node._private.position.y;
+    var padding = parseInt(node.css('border-width')) / 2;
+
+    var infoBox = node._private.data.statesandinfos[0];
+
+    var intersections = [];
+
+    if (infoBox && infoBox.isDisplayed) {
+      var infoBoxWidth = infoBox.bbox.w;
+      var infoBoxHeight = infoBox.bbox.h;
+      var coord = infoBox.getAbsoluteCoord();
+      var infoBoxCenterX = coord.x;
+      var infoBoxCenterY = coord.y;
+
+      if (node.data("name") == "macromolecule" || node.data("name") == "nucleic acid feature"
+              || node.data("name") == "complex"){
+        var infoIntersectLines = $$.sbgn.roundRectangleIntersectLine(x, y, centerX, centerY,
+              infoBoxCenterX, infoBoxCenterY, infoBoxWidth, infoBoxHeight, 5, padding);
+      }
+      else if (node.data("name") == "unspecified entity"){
+        var infoIntersectLines = $$.sbgn.intersectLineEllipse(x, y, centerX, centerY,
+            infoBoxCenterX, infoBoxCenterY, infoBoxWidth, infoBoxHeight, padding);
+      }
+      else if (node.data("name") == "simple chemical"){
+        var infoIntersectLines = cyMath.intersectLineCircle(
+            x, y,
+            centerX, centerY,
+            infoBoxCenterX,
+            infoBoxCenterY,
+            infoBoxWidth/4);
+      }
+      else if (node.data("name") == "perturbation"){
+        var infoIntersectLines = $$.sbgn.perturbingAgentIntersectLine(x, y, centerX, centerY,
+            infoBoxCenterX, infoBoxCenterY, infoBoxWidth, infoBoxHeight, 0, padding);
+      }
+
+      if (infoIntersectLines.length > 0)
+        intersections = intersections.concat(infoIntersectLines);
+    };
+
+    return intersections;
   };
 
   $$.sbgn.checkPointStateAndInfoBoxes = function (x, y, node, threshold) {
