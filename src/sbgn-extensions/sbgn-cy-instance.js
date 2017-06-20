@@ -297,7 +297,7 @@ module.exports = function () {
           .css({
             'shape-polygon-points': '-1, -1,   0.25, -1,   1, 0,    0.25, 1,    -1, 1'
           })
-          .selector("node:parent[class='complex']")
+          .selector("node:parent[class^='complex']") // start with complex
           .css({
             'text-valign': 'bottom',
             'text-halign': 'center',
