@@ -15,8 +15,10 @@ var jQuery = $ = libs.jQuery;
 
 // Helpers start
 function beforePerformLayout() {
-  var nodes = cy.nodes();
+  var parents = cy.nodes(':parent');
   var edges = cy.edges();
+  
+  cy.startBatch();
 
   graphUtilities.disablePorts();
 
@@ -24,6 +26,16 @@ function beforePerformLayout() {
   cy.$('.edgebendediting-hasbendpoints').removeClass('edgebendediting-hasbendpoints');
   edges.scratch('cyedgebendeditingWeights', []);
   edges.scratch('cyedgebendeditingDistances', []);
+  
+  parents.removeData('minWidth');
+  parents.removeData('minHeight');
+  parents.removeData('minWidthBiasLeft');
+  parents.removeData('minWidthBiasRight');
+  parents.removeData('minHeightBiasTop');
+  parents.removeData('minHeightBiasBottom');
+  
+  cy.endBatch();
+  cy.style().update();
 };
 // Helpers end
 

@@ -336,6 +336,50 @@ module.exports = function () {
             'width': 'data(bbox.w)',
             'height': 'data(bbox.h)'
           })
+          .selector("node:parent[minHeight]")
+          .css({
+            'min-height': function(ele) {
+              if (graphUtilities.compoundSizesConsidered) {
+                return ele.data('minHeight');
+              }
+              
+              return 0;
+            }
+          })
+          .selector("node:parent[minHeightBiasTop]")
+          .css({
+            'min-height-bias-top': function(ele) {
+              return ele.data('minHeightBiasTop') + '%';
+            }
+          })
+          .selector("node:parent[minHeightBiasBottom]")
+          .css({
+            'min-height-bias-bottom': function(ele) {
+              return ele.data('minHeightBiasBottom') + '%';
+            }
+          })
+          .selector("node:parent[minWidth]")
+          .css({
+            'min-width': function(ele) {
+              if (graphUtilities.compoundSizesConsidered) {
+                return ele.data('minWidth');
+              }
+              
+              return 0;
+            }
+          })
+          .selector("node:parent[minWidthBiasLeft]")
+          .css({
+            'min-width-bias-left': function(ele) {
+              return ele.data('minWidthBiasLeft') + '%';
+            }
+          })
+          .selector("node:parent[minWidthBiasRight]")
+          .css({
+            'min-width-bias-right': function(ele) {
+              return ele.data('minWidthBiasRight') + '%';
+            }
+          })
           .selector("node.cy-expand-collapse-collapsed-node")
           .css({
             'border-style': 'dashed'

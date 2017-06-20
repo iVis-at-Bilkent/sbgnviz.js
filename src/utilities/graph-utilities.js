@@ -9,7 +9,9 @@ var jQuery = $ = libs.jQuery;
 
 function graphUtilities() {}
 
+// TODO make these initial values user options instead of hardcoding them here
 graphUtilities.portsEnabled = true;
+graphUtilities.compoundSizesConsidered = false;
 
 graphUtilities.disablePorts = function() {
   graphUtilities.portsEnabled = false;
@@ -23,6 +25,20 @@ graphUtilities.enablePorts = function() {
 
 graphUtilities.arePortsEnabled = function() {
   return graphUtilities.portsEnabled;
+};
+
+graphUtilities.considerCompoundSizes = function() {
+  graphUtilities.compoundSizesConsidered = true;
+  cy.style().update();
+};
+
+graphUtilities.omitCompoundSizes = function() {
+  graphUtilities.compoundSizesConsidered = false;
+  cy.style().update();
+};
+
+graphUtilities.areCompoundSizesConsidered = function() {
+  return graphUtilities.compoundSizesConsidered = true;
 };
 
 graphUtilities.updateGraph = function(cyGraph) {
