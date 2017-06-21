@@ -48,6 +48,9 @@ var elementUtilities = {
         'compartment': true,
         'biological activity': true,
         'delay': true,
+        'unknown influence': true,
+        'positive influence': true,
+        'negative influence': true,
     },
     //the following were moved here from what used to be utilities/sbgn-filtering.js
     processTypes : ['process', 'omitted process', 'uncertain process',
@@ -290,16 +293,16 @@ var elementUtilities = {
         if (_class == 'necessary stimulation') {
             return 'triangle-cross';
         }
-        if (_class == 'inhibition') {
+        if (_class == 'inhibition' || _class == 'negative influence') {
             return 'tee';
         }
         if (_class == 'catalysis') {
             return 'circle';
         }
-        if (_class == 'stimulation' || _class == 'production') {
+        if (_class == 'stimulation' || _class == 'production' || _class == 'positive influence') {
             return 'triangle';
         }
-        if (_class == 'modulation') {
+        if (_class == 'modulation' || _class == 'unknown influence') {
             return 'diamond';
         }
         return 'none';
