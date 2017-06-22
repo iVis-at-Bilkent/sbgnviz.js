@@ -2,6 +2,9 @@ var cyRenderer = require('../sbgn-extensions/sbgn-cy-renderer');
 var libs = require('../utilities/lib-utilities').getLibs();
 var jQuery = $ = libs.jQuery;
 var cytoscape = libs.cytoscape;
+var optionUtilities = require('./option-utilities');
+var options = optionUtilities.getOptions();
+var truncate = require('./text-utilities').truncate;
 
 var ns = {};
 
@@ -14,6 +17,21 @@ var AuxiliaryUnit = function (parent) {
   this.coordType = "relativeToCenter";
   this.anchorSide = null;
   this.isDisplayed = false;
+};
+
+/*
+ * Return a new AuxiliaryUnit object. A new parent reference and new id can
+ * optionnally be passed.
+ */
+AuxiliaryUnit.prototype.copy = function (existingInstance, newParent, newId) {
+  var newUnit = existingInstance ? existingInstance : new AuxiliaryUnit();
+  newUnit.parent = newParent ? newParent : this.parent;
+  newUnit.id = newId ? newId : this.id;
+  newUnit.bbox = jQuery.extend(true, {}, this.bbox);
+  newUnit.coordType = this.coordType;
+  newUnit.anchorSide = this.anchorSide;
+  newUnit.isDisplayed = this.isDisplayed;
+  return newUnit;
 };
 
 // draw the auxiliary unit at its position
@@ -38,7 +56,7 @@ AuxiliaryUnit.prototype.drawShape = function(context, x, y) {
 };
 
 // draw the statesOrInfo's label at given position
-AuxiliaryUnit.prototype.drawText = function(context, centerX, centerY, truncate) {
+AuxiliaryUnit.prototype.drawText = function(context, centerX, centerY) {
   var fontSize = 9; // parseInt(textProp.height / 1.5);
 
   // part of : $$.sbgn.drawText(context, textProp);
@@ -53,13 +71,26 @@ AuxiliaryUnit.prototype.drawText = function(context, centerX, centerY, truncate)
   context.fillStyle = "#0f0f0f";
   context.globalAlpha = this.parent.css('text-opacity') * this.parent.css('opacity'); // ?
 
-  var text = this.getText();
-
-  /*if (truncate == false) {
-    text = textProp.label;
-  } else {
-    text = truncateText(textProp, context.font);
-  }*/
+  var text;
+  if(options.fitLabelsToInfoboxes()){
+    // here we memoize the truncated text into _textCache,
+    // as it is not something that changes so much
+    text = this.getText();
+    var key = text + context.font + this.bbox.w;
+    if(this._textCache && this._textCache[key]) {
+      text = this._textCache[key];
+    }
+    else {
+      text = truncate(this.getText(), context.font, this.bbox.w);
+      if(!this._textCache) {
+        this._textCache = {};
+      }
+      this._textCache[key] = text;
+    }
+  }
+  else {
+    text = this.getText();
+  }
 
   context.fillText(text, centerX, centerY);
 
@@ -71,18 +102,18 @@ AuxiliaryUnit.prototype.drawText = function(context, centerX, centerY, truncate)
 
 AuxiliaryUnit.prototype.getAbsoluteCoord = function() {
   if(this.coordType == "relativeToCenter") {
-    var absX = this.bbox.x * this.parent.outerWidth() / 100 + this.parent._private.position.x;
-    var absY = this.bbox.y * this.parent.outerHeight() / 100 + this.parent._private.position.y;
+    var absX = this.bbox.x * (this.parent.outerWidth() - this.parent._private.data['border-width']) / 100 + this.parent._private.position.x;
+    var absY = this.bbox.y * (this.parent.outerHeight() - this.parent._private.data['border-width']) / 100 + this.parent._private.position.y;
     return {x: absX, y: absY};
   }
   else if(this.coordType == "relativeToSide") {
     if (this.anchorSide == "top" || this.anchorSide == "bottom") {
-      var absX = this.parent._private.position.x - this.parent.outerWidth() / 2 + this.bbox.x;
-      var absY = this.bbox.y * this.parent.outerHeight() / 100 + this.parent._private.position.y;
+      var absX = this.parent._private.position.x - (this.parent.outerWidth() - this.parent._private.data['border-width']) / 2 + this.bbox.x;
+      var absY = this.bbox.y * (this.parent.outerHeight() - this.parent._private.data['border-width']) / 100 + this.parent._private.position.y;
     }
     else {
-      var absY = this.parent._private.position.y - this.parent.outerHeight() / 2 + this.bbox.y;
-      var absX = this.bbox.x * this.parent.outerWidth() / 100 + this.parent._private.position.x;
+      var absY = this.parent._private.position.y - (this.parent.outerHeight() - this.parent._private.data['border-width']) / 2 + this.bbox.y;
+      var absX = this.bbox.x * (this.parent.outerWidth() - this.parent._private.data['border-width']) / 100 + this.parent._private.position.x;
     }
     return {x: absX, y: absY};
   }
@@ -259,6 +290,14 @@ StateVariable.prototype.remove = function () {
   };
 };
 
+StateVariable.prototype.copy = function(newParent, newId) {
+  var newStateVar = AuxiliaryUnit.prototype.copy.call(this, new StateVariable(), newParent, newId);
+  newStateVar.state = jQuery.extend(true, {}, this.state);
+  newStateVar.stateVariableDefinition = this.stateVariableDefinition;
+  newStateVar.clazz = this.clazz;
+  return newStateVar;
+};
+
 ns.StateVariable = StateVariable;
 // -------------- END StateVariable -------------- //
 
@@ -316,7 +355,8 @@ UnitOfInformation.prototype.drawShape = function(context, x, y) {
  * @param parentNode - the cytoscape element hosting the unit of information
  * @param value - its text
  * @param [location] - the side where it will be placed top, bottom, right, left or undefined (auto placement)
- * @param [position] - its index in the order of elements placed on its same location // TODO
+ * @param [position] - its position in the order of elements placed on the same location
+ * @param [index] - its index in the statesandinfos list
  */
 UnitOfInformation.create = function (parentNode, value, bbox, location, position, index, shapeFn, shapeArgsFn) {
   // create the new unit of info
@@ -351,6 +391,15 @@ UnitOfInformation.prototype.remove = function () {
     position: position,
     index: index
   };
+};
+
+UnitOfInformation.prototype.copy = function(newParent, newId) {
+  var newUnitOfInfo = AuxiliaryUnit.prototype.copy.call(this, new UnitOfInformation(), newParent, newId);
+  newUnitOfInfo.label = jQuery.extend(true, {}, this.label);
+  newUnitOfInfo.clazz = this.clazz;
+  newUnitOfInfo.shapeFn = this.shapeFn;
+  newUnitOfInfo.shapeArgsFn = this.shapeArgsFn;
+  return newUnitOfInfo;
 };
 
 ns.UnitOfInformation = UnitOfInformation;
@@ -459,10 +508,15 @@ ns.StateVariableDefinition = StateVariableDefinition;
 var AuxUnitLayout = function (parentNode, location, alignment) {
   this.units = [];
   this.location = location;
-  this.alignment = alignment || "left";
+  this.alignment = alignment || "left"; // this was intended to be used, but it isn't for now
   this.parentNode = parentNode;
   this.renderLengthCache = [];
   this.lengthUsed = 0;
+
+  // specific rules for the layout
+  if(parentNode.data('class') == "simple chemical") {
+    this.outerMargin = 3;
+  }
 };
 /**
  * outerMargin: the left and right space left between the side of the node, and the first (and last) box
@@ -477,7 +531,7 @@ var AuxUnitLayout = function (parentNode, location, alignment) {
 AuxUnitLayout.outerMargin = 10;
 AuxUnitLayout.unitGap = 5;
 AuxUnitLayout.alwaysShowAuxUnits = false;
-AuxUnitLayout.maxUnitDisplayed = 4;
+AuxUnitLayout.maxUnitDisplayed = -1;
 
 AuxUnitLayout.prototype.update = function(doForceUpdate) {
   this.precomputeCoords(doForceUpdate);
@@ -613,7 +667,9 @@ AuxUnitLayout.prototype.setDisplayedUnits = function () {
   var alwaysShowAuxUnits = this.getAlwaysShowAuxUnits();
   var maxUnitDisplayed = this.getMaxUnitDisplayed();
   for(var i=0; i < this.units.length; i++) {
-    if((this.renderLengthCache[i+1] <= availableSpace && i < maxUnitDisplayed) || alwaysShowAuxUnits) {
+    if((this.renderLengthCache[i+1] <= availableSpace // do we have enough space?
+      && (maxUnitDisplayed == -1 || i < maxUnitDisplayed)) // is there no limit? or are we under that limit?
+      || alwaysShowAuxUnits) { // do we always want to show everything regardless?
       this.units[i].isDisplayed = true;
     }
     else {
@@ -766,7 +822,7 @@ AuxUnitLayout.prototype.getOuterMargin = function () {
   else {
     return AuxUnitLayout.outerMargin;
   }
-}
+};
 
 AuxUnitLayout.prototype.getUnitGap = function () {
   if(typeof this.unitGap !== "undefined" && this.unitGap !== null) {
@@ -775,7 +831,7 @@ AuxUnitLayout.prototype.getUnitGap = function () {
   else {
     return AuxUnitLayout.unitGap;
   }
-}
+};
 
 AuxUnitLayout.prototype.getAlwaysShowAuxUnits = function () {
   if(typeof this.alwaysShowAuxUnits !== "undefined" && this.alwaysShowAuxUnits !== null) {
@@ -784,7 +840,7 @@ AuxUnitLayout.prototype.getAlwaysShowAuxUnits = function () {
   else {
     return AuxUnitLayout.alwaysShowAuxUnits;
   }
-}
+};
 
 AuxUnitLayout.prototype.getMaxUnitDisplayed = function () {
   if(typeof this.maxUnitDisplayed !== "undefined" && this.maxUnitDisplayed !== null) {
@@ -793,7 +849,38 @@ AuxUnitLayout.prototype.getMaxUnitDisplayed = function () {
   else {
     return AuxUnitLayout.maxUnitDisplayed;
   }
-}
+};
+
+/*
+ *  Duplicate a layout. Doesn't copy the units attribute, reset it instead.
+ */
+AuxUnitLayout.prototype.copy = function(newParent) {
+  var newLayout = new AuxUnitLayout(newParent);
+  // Copying the same reference to units would be inconsistent.
+  // Duplicating owned units goes beyonnd the scope, because we need to assign
+  // ids that are tied to the global cound of units of a node.
+  // So duplicating units is something that should be properly done outside of this function.
+  // TODO that is a bit dirty, find a nice modular way to arrange that
+  newLayout.units = [];
+  newLayout.location = this.location;
+  newLayout.alignment = this.alignment;
+  newLayout.parentNode = newParent;
+  newLayout.renderLengthCache = this.renderLengthCache;
+  newLayout.lengthUsed = this.lengthUsed;
+  if(typeof this.outerMargin !== "undefined") {
+    newLayout.outerMargin = this.outerMargin;
+  }
+  if(typeof this.unitGap !== "undefined") {
+    newLayout.unitGap = this.unitGap;
+  }
+  if(typeof this.alwaysShowAuxUnits !== "undefined") {
+    newLayout.alwaysShowAuxUnits = this.alwaysShowAuxUnits;
+  }
+  if(typeof this.maxUnitDisplayed !== "undefined") {
+    newLayout.maxUnitDisplayed = this.maxUnitDisplayed;
+  }
+  return newLayout;
+};
 
 ns.AuxUnitLayout = AuxUnitLayout;
 // -------------- END AuxUnitLayout -------------- //

@@ -562,7 +562,7 @@ module.exports = function () {
     cyBaseNodeShapes["complex"] = {
       points: [],
       multimerPadding: 5,
-      cornerLength: 12,
+      cornerLength: 24,
       draw: function (context, node) {
         var width = node.outerWidth() - parseFloat(node.css('border-width'));
         var height = node.outerHeight()- parseFloat(node.css('border-width'));

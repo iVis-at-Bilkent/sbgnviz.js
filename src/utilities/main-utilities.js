@@ -15,8 +15,10 @@ var jQuery = $ = libs.jQuery;
 
 // Helpers start
 function beforePerformLayout() {
-  var nodes = cy.nodes();
+  var parents = cy.nodes(':parent');
   var edges = cy.edges();
+  
+  cy.startBatch();
 
   graphUtilities.disablePorts();
 
@@ -24,6 +26,16 @@ function beforePerformLayout() {
   cy.$('.edgebendediting-hasbendpoints').removeClass('edgebendediting-hasbendpoints');
   edges.scratch('cyedgebendeditingWeights', []);
   edges.scratch('cyedgebendeditingDistances', []);
+  
+  parents.removeData('minWidth');
+  parents.removeData('minHeight');
+  parents.removeData('minWidthBiasLeft');
+  parents.removeData('minWidthBiasRight');
+  parents.removeData('minHeightBiasTop');
+  parents.removeData('minHeightBiasBottom');
+  
+  cy.endBatch();
+  cy.style().update();
 };
 // Helpers end
 
@@ -389,6 +401,34 @@ mainUtilities.setShowComplexName = function(showComplexName) {
   cy.nodes('[class="complex"]').forEach(function(ele){
     ele.trigger("data");
   });
+};
+
+/*
+ * Sets the ordering of the given nodes.
+ * Ordering options are 'L-to-R', 'R-to-L', 'T-to-B', 'B-to-T', 'none'.
+ * If a node does not have any port before the operation and it is supposed to have some after operation the portDistance parameter is 
+ * used to set the distance between the node center and the ports. The default port distance is 60.
+ * Considers undoable option.
+ */
+mainUtilities.setPortsOrdering = function (nodes, ordering, portDistance) {
+  if ( nodes.length === 0 ) {
+    return;
+  }
+  
+  if (!options.undoable) {
+    elementUtilities.setPortsOrdering(nodes, ordering, portDistance);
+  }
+  else {
+    var param = {
+      nodes: nodes,
+      ordering: ordering,
+      portDistance: portDistance
+    };
+    
+    cy.undoRedo().do("setPortsOrdering", param);
+  }
+  
+  cy.style().update();
 };
 
 module.exports = mainUtilities;

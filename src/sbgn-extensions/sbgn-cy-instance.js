@@ -126,6 +126,7 @@ module.exports = function () {
     // register add remove actions
     ur.action("deleteElesSimple", undoRedoActionFunctions.deleteElesSimple, undoRedoActionFunctions.restoreEles);
     ur.action("deleteNodesSmart", undoRedoActionFunctions.deleteNodesSmart, undoRedoActionFunctions.restoreEles);
+    ur.action("setPortsOrdering", undoRedoActionFunctions.setPortsOrdering, undoRedoActionFunctions.setPortsOrdering);
   }
   
   function bindCyEvents() {
@@ -141,19 +142,6 @@ module.exports = function () {
         var infoLabel = elementUtilities.getInfoLabel(node);
         node._private.data.infoLabel = infoLabel;
       }
-
-      var edges = cy.edges();
-      // remove bend points before collapse
-      for (var i = 0; i < edges.length; i++) {
-        var edge = edges[i];
-        if (edge.hasClass('edgebendediting-hasbendpoints')) {
-          edge.removeClass('edgebendediting-hasbendpoints');
-          delete edge._private.classes['edgebendediting-hasbendpoints'];
-        }
-      }
-
-      edges.scratch('cyedgebendeditingWeights', []);
-      edges.scratch('cyedgebendeditingDistances', []);
     });
     
     cy.on("expandcollapse.aftercollapse", "node", function (event) {
@@ -309,7 +297,7 @@ module.exports = function () {
           .css({
             'shape-polygon-points': '-1, -1,   0.25, -1,   1, 0,    0.25, 1,    -1, 1'
           })
-          .selector("node:parent[class='complex']")
+          .selector("node:parent[class^='complex']") // start with complex
           .css({
             'text-valign': 'bottom',
             'text-halign': 'center',
@@ -334,6 +322,50 @@ module.exports = function () {
           .css({
             'width': 'data(bbox.w)',
             'height': 'data(bbox.h)'
+          })
+          .selector("node:parent[minHeight]")
+          .css({
+            'min-height': function(ele) {
+              if (graphUtilities.compoundSizesConsidered) {
+                return ele.data('minHeight');
+              }
+              
+              return 0;
+            }
+          })
+          .selector("node:parent[minHeightBiasTop]")
+          .css({
+            'min-height-bias-top': function(ele) {
+              return ele.data('minHeightBiasTop') + '%';
+            }
+          })
+          .selector("node:parent[minHeightBiasBottom]")
+          .css({
+            'min-height-bias-bottom': function(ele) {
+              return ele.data('minHeightBiasBottom') + '%';
+            }
+          })
+          .selector("node:parent[minWidth]")
+          .css({
+            'min-width': function(ele) {
+              if (graphUtilities.compoundSizesConsidered) {
+                return ele.data('minWidth');
+              }
+              
+              return 0;
+            }
+          })
+          .selector("node:parent[minWidthBiasLeft]")
+          .css({
+            'min-width-bias-left': function(ele) {
+              return ele.data('minWidthBiasLeft') + '%';
+            }
+          })
+          .selector("node:parent[minWidthBiasRight]")
+          .css({
+            'min-width-bias-right': function(ele) {
+              return ele.data('minWidthBiasRight') + '%';
+            }
           })
           .selector("node.cy-expand-collapse-collapsed-node")
           .css({

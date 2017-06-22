@@ -22,6 +22,10 @@ M. Sari, I. Bahceci, U. Dogrusoz, S.O. Sumer, B.A. Aksoy, O. Babur, E. Demir, "[
       fitLabelsToNodes: function () {
         return false;
       },
+      // Whether to fit labels to a node's info boxes
+      fitLabelsToInfoboxes: function () {
+        return false;
+      },
       // dynamic label size it may be 'small', 'regular', 'large'
       dynamicLabelSize: function () {
         return 'regular';
@@ -170,6 +174,11 @@ Disable node ports.
 `sbgnviz.arePortsEnabled()`
 Get if node ports are enabled.
 
+`sbgnviz.setPortsOrdering(nodes, ordering, portDistance)`
+Sets the ordering of the given nodes. Ordering options are 'L-to-R', 'R-to-L', 'T-to-B', 'B-to-T', 'none'.
+If a node does not have any port before the operation and it is supposed to have some after operation the portDistance parameter is used to set the distance between the node center and the ports. The default port distance is 70.
+Considers undoable option.
+
 `sbgnviz.startSpinner(classname)`
 Starts a spinner at the middle of network container element. You can specify a css class that the 
 spinner will have. The default classname is 'default-class'. Requires 'fontawesome.css'.
@@ -194,6 +203,7 @@ library of sbgnviz. Most users will not need to use this. It includes the follow
  * `deleteElesSimple` Removes the given elements in a simple way.
  * `getPortsOrdering` Return ordering of ports of a node. Possible return values are 'L-to-R', 'R-to-L', 'T-to-B', 'B-to-T', 'none'.
  * `canHavePorts` Returns whether the given element or elements with the given class can have ports
+ * `setPortsOrdering(nodes, ordering, portDistance)` Similar to `sbgnviz.setPortsOrdering()` but do not considers undoable option.
  
 
 `sbgnviz.undoRedoActionFunctions`
@@ -203,6 +213,7 @@ an extension library of sbgnviz.
  * `deleteElesSimple(param)` Do/Redo function for 'deleteElesSimple' undo redo command.
  * `deleteNodesSmart(param)` Do/Redo function for 'deleteNodesSmart' undo redo command.
  * `restoreEles(eles)` Undo function for 'deleteElesSimple' and 'deleteNodesSmart' undo redo commands.
+ * `setPortsOrdering(param)` Do/Undo/Redo function for 'setPortsOrdering' undo redo command.
 
 ### Classes
 

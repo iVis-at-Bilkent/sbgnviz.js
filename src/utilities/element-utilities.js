@@ -209,10 +209,10 @@ var elementUtilities = {
     },
     // general utilities
     noneIsNotHighlighted: function(){
-        var notHighlightedNodes = cy.nodes(":visible").nodes(".unhighlighted");
-        var notHighlightedEdges = cy.edges(":visible").edges(".unhighlighted");
+        var highlightedNodes = cy.nodes(":visible").nodes(".highlighted");
+        var highlightedEdges = cy.edges(":visible").edges(".highlighted");
 
-        return notHighlightedNodes.length + notHighlightedEdges.length === 0;
+        return highlightedNodes.length + highlightedEdges.length === 0;
     },
     
     // Section End
@@ -609,6 +609,198 @@ var elementUtilities = {
       // Cache the portsordering and return it.
       node.data('portsordering', portsordering);
       return portsordering;
+    },
+    
+    /*
+    * Sets the ordering of the given nodes.
+    * Ordering options are 'L-to-R', 'R-to-L', 'T-to-B', 'B-to-T', 'none'.
+    * If a node does not have any port before the operation and it is supposed to have some after operation the portDistance parameter is 
+    * used to set the distance between the node center and the ports. The default port distance is 60.
+    */
+    setPortsOrdering: function( nodes, ordering, portDistance ) {
+      /*
+      * Retursn if the given portId is porttarget of any of the given edges.
+      * These edges are expected to be the edges connected to the node associated with that port.
+      */
+      var isPortTargetOfAnyEdge = function(edges, portId) {
+        for (var i = 0; i < edges.length; i++) {
+          if (edges[i].data('porttarget') === portId) {
+            return true;
+          }
+        }
+
+        return false;
+      };
+
+      portDistance = portDistance ? portDistance : 70; // The default port distance is 60
+
+      cy.startBatch();
+
+      for ( var i = 0; i < nodes.length; i++ ) {
+        var node = nodes[i];
+        var currentOrdering = sbgnviz.elementUtilities.getPortsOrdering(node); // The current ports ordering of the node
+
+        // If the current ordering is already equal to the desired ordering pass this node directly
+        if ( ordering === currentOrdering ) {
+          continue;
+        }
+
+        if ( ordering === 'none' ) { // If the ordering is 'none' remove the ports of the node
+          elementUtilities.removePorts(node);
+        }
+        else if ( currentOrdering === 'none' ) { // If the desired ordering is not 'none' but the current one is 'none' add ports with the given parameters.
+          elementUtilities.addPorts(node, ordering, portDistance);
+        }
+        else { // Else change the ordering by altering node 'ports'
+          var ports = node.data('ports'); // Ports of the node
+          // If currentOrdering is 'none' use the portDistance given by parameter else use the existing one
+          var dist = currentOrdering === 'none' ? portDistance : ( Math.abs( ports[0].x ) || Math.abs( ports[0].y ) );
+          var connectedEdges = node.connectedEdges(); // The edges connected to the node
+          var portsource, porttarget; // The ports which are portsource/porttarget of the connected edges
+
+          // Determine the portsource and porttarget
+          if ( isPortTargetOfAnyEdge(connectedEdges, ports[0].id) ) {
+            porttarget = ports[0];
+            portsource = ports[1];
+          }
+          else {
+            porttarget = ports[1];
+            portsource = ports[0];
+          }
+
+          if ( ordering === 'L-to-R' ) {
+            // If ordering is 'L-to-R' the porttarget should be the left most port and the portsource should be the right most port
+            porttarget.x = -1 * dist;
+            portsource.x = dist;
+            porttarget.y = 0;
+            portsource.y = 0;
+          }
+          else if ( ordering === 'R-to-L' ) {
+            // If ordering is 'R-to-L' the porttarget should be the right most port and the portsource should be the left most port
+            porttarget.x = dist;
+            portsource.x = -1 * dist;
+            porttarget.y = 0;
+            portsource.y = 0;
+          }
+          else if ( ordering === 'T-to-B' ) {
+            // If ordering is 'T-to-B' the porttarget should be the top most port and the portsource should be the bottom most port
+            porttarget.x = 0;
+            portsource.x = 0;
+            porttarget.y = -1 * dist;
+            portsource.y = dist;
+          }
+          else  { //if ordering is 'B-to-T'
+            // If ordering is 'B-to-T' the porttarget should be the bottom most port and the portsource should be the top most port
+            porttarget.x = 0;
+            portsource.x = 0;
+            porttarget.y = dist;
+            portsource.y = -1 * dist;
+          }
+        }
+
+        node.data('ports', ports); // Reset the node ports
+      }
+
+      nodes.data('portsordering', ordering); // Update the cached orderings of the nodes
+      cy.endBatch();
+    },
+    
+    /*
+    * Add ports to the given node, with given ordering and port distance.
+    */
+    addPorts: function(node, ordering, portDistance) {
+      var firstPortId = node.id() + ".1"; // Id of first port
+      var secondPortId = node.id() + ".2"; // Id of seconf port
+      // First port object x and y will be filled according to ordering, the first port is supposed to be the left most or the top most one
+      var firstPort = { id: firstPortId };
+      // Second port object x and y will be filled according to ordering, the second port is supposed to be the right most or the bottom most one
+      var secondPort = { id: secondPortId };
+
+      // Complete port objects according to ordering
+      if ( ordering === 'L-to-R' || ordering === 'R-to-L' ) {
+        // If ordering is in horizontal axis first port is the left most one and the second port is the right most one
+        firstPort.x = -1 * portDistance;
+        secondPort.x = portDistance;
+        firstPort.y = 0;
+        secondPort.y = 0;
+      }
+      else { // If ordering is 'T-to-B' or 'B-to-T'
+         // If ordering is in vertical axis first port is the top most one and the second port is the bottom most one
+        firstPort.y = -1 * portDistance;
+        secondPort.y = portDistance;
+        firstPort.x = 0;
+        secondPort.x = 0;
+      }
+
+      var fromLorT = ordering === 'L-to-R' || ordering === 'T-to-B'; // Check if ordering starts from left or top
+      var ports = [firstPort, secondPort]; // Ports array for the node
+      var connectedEdges = node.connectedEdges(); // The edges connected to the node
+
+      cy.startBatch();
+
+      node.data('ports', ports);
+
+      // Reset the portsource and porttarget for each edge connected to the node
+      for ( var i = 0; i < connectedEdges.length; i++ ) {
+        var edge = connectedEdges[i];
+        var edgeClass = edge.data('class');
+        /*
+         * If the node is the edge target we may need to set the porttarget of the edge to the input port of the node (First or second port accoring to the orientation)
+         * if it is the edge soruce we may need to set the portsource of the edge to the output port similarly.
+         * Note that if fron left or top (fromLorT) is true then the first port is the source port and second port is the target port,
+         * else it is vice versa.
+         * 
+         */
+        if ( edge.data('target') === node.id() ) {
+          if (edgeClass === 'production' || this.isModulationArcClass(edgeClass)) {
+            continue; // production or modulation type of edges cannot be connected to any port of target node (A production can have a process as target node but it is supposed to be connected to that node from its body, not from a port)
+          }
+          if ( fromLorT ) {
+            edge.data('porttarget', firstPortId);
+          }
+          else {
+            edge.data('porttarget', secondPortId);
+          }
+        }
+        else {
+          if (edgeClass === 'consumption') {
+            continue; // consumpiton edge cannot be connected to any port of source node
+          }
+          if ( fromLorT ) {
+            edge.data('portsource', secondPortId);
+          }
+          else {
+            edge.data('portsource', firstPortId);
+          }
+        }
+      }
+
+      cy.endBatch();
+    },
+
+    /*
+    * Remove the ports of the given node
+    */
+    removePorts: function(node) {
+      var connectedEdges = node.connectedEdges();
+      var nodeId = node.id();
+
+      cy.startBatch();
+
+      // Reset portsource or porttarget of the connected edges to the node id
+      for ( var i = 0; i < connectedEdges.length; i++ ) {
+        var edge = connectedEdges[i];
+        if ( edge.data('source') === nodeId ) {
+          edge.data('portsource', nodeId);
+        }
+        else {
+          edge.data('porttarget', nodeId);
+        }
+      }
+
+      node.data('ports', []); // Clear ports data
+
+      cy.endBatch();
     },
 
     // used for handling the variable property of complexes

@@ -49,6 +49,69 @@ var sbgnmlToJson = {
     bbox.y = ele.bbox.y;
     bbox.w = ele.bbox.w;
     bbox.h = ele.bbox.h;
+    
+    var childNodes = ele.glyphMembers;
+    var minLeft, maxRight, minTop, maxBottom, childrenBboxW, childrenBboxH;
+    var compound;
+
+    // Traverse the other children and update the extreme values
+    for (var i = 0; i < childNodes.length; i++) {
+      var childNode = childNodes[i];
+
+      if (childNode.class_ === 'state variable' || childNode.class_ === 'unit of information') {
+        continue; // Eleminate state variables and info boxes
+      }
+
+      compound = true;
+
+      var childNodeBbox = childNode.bbox;
+      var left = childNodeBbox.x;
+      var right = childNodeBbox.x + childNodeBbox.w;
+      var top = childNodeBbox.y;
+      var bottom = childNodeBbox.y + childNodeBbox.h;
+
+      if (minLeft === undefined || left < minLeft) {
+        minLeft = left;
+      }
+
+      if (maxRight === undefined || right > maxRight) {
+        maxRight = right;
+      }
+
+      if (minTop === undefined || top < minTop) {
+        minTop = top;
+      }
+
+      if (maxBottom === undefined || bottom > maxBottom) {
+        maxBottom = bottom;
+      }
+    }
+
+    if (compound) {
+      // The sizes of children bbox are determined by the difference between the extreme coordinates
+      childrenBboxW = maxRight - minLeft;
+      childrenBboxH = maxBottom - minTop;
+
+      // If children bbox width is bigger than node bbox width set minWidth, and horizontal biases
+      if (childrenBboxW < bbox.w) {
+        ele.minWidth = bbox.w;
+        var extraLeft =  minLeft - bbox.x;
+        var extraRight = (bbox.x + bbox.w) - maxRight;
+
+        ele.minWidthBiasLeft = extraLeft / (extraLeft + extraRight) * 100;
+        ele.minWidthBiasRight = 100 - ele.minWidthBiasLeft;
+      }
+
+      // If children bbox height is bigger than node bbox height set minHeight, and vertical biases
+      if (childrenBboxH < bbox.h) {
+        ele.minHeight = bbox.h;
+        var extraTop = minTop - bbox.y;
+        var extraBottom = (bbox.y + bbox.h) - maxBottom;
+
+        ele.minHeightBiasTop = extraTop / (extraTop + extraBottom) * 100;
+        ele.minHeightBiasBottom = 100 - ele.minHeightBiasTop;
+      }
+    }
 
     // set positions as center
     bbox.x = parseFloat(bbox.x) + parseFloat(bbox.w) / 2;
@@ -163,6 +226,19 @@ var sbgnmlToJson = {
     nodeObj.id = ele.id;
     // add node bounding box information
     nodeObj.bbox = self.bboxProp(ele);
+    
+    if (ele.minWidth) {
+      nodeObj.minWidth = ele.minWidth;
+      nodeObj.minWidthBiasLeft = ele.minWidthBiasLeft;
+      nodeObj.minWidthBiasRight = ele.minWidthBiasRight;
+    }
+    
+    if (ele.minHeight) {
+      nodeObj.minHeight = ele.minHeight;
+      nodeObj.minHeightBiasTop = ele.minHeightBiasTop;
+      nodeObj.minHeightBiasBottom = ele.minHeightBiasBottom;
+    }
+    
     // add class information
     nodeObj.class = ele.class_;
     // add label information
@@ -551,6 +627,7 @@ var sbgnmlToJson = {
     var self = this;
     var cytoscapeJsNodes = [];
     var cytoscapeJsEdges = [];
+    var compartmentChildrenMap = {}; // Map compartments children temporarily
 
     var sbgn = libsbgnjs.Sbgn.fromXML(xmlObject.querySelector('sbgn'));
     var compartments = self.getAllCompartments(sbgn.map.glyphs);
@@ -559,6 +636,29 @@ var sbgnmlToJson = {
     var arcs = sbgn.map.arcs;
 
     var i;
+    for (i = 0; i < glyphs.length; i++) {
+      var glyph = glyphs[i];
+      
+      // libsbgn library lists the glyphs of complexes in ele.glyphMembers but it does not store the glyphs of compartments
+      // store glyph members of compartments here.
+      var compartmentRef = glyph.compartmentRef;
+      
+      if (glyph.class_ === 'compartment') {
+        if (compartmentChildrenMap[glyph.id] === undefined) {
+          compartmentChildrenMap[glyph.id] = [];
+        }
+        
+        glyph.glyphMembers = compartmentChildrenMap[glyph.id];
+      }
+      
+      if (compartmentRef) {
+        if (compartmentChildrenMap[compartmentRef] === undefined) {
+          compartmentChildrenMap[compartmentRef] = [];
+        }
+        compartmentChildrenMap[compartmentRef].push(glyph);
+      }
+    }
+    
     for (i = 0; i < glyphs.length; i++) {
       var glyph = glyphs[i];
       self.traverseNodes(glyph, cytoscapeJsNodes, '', compartments);
