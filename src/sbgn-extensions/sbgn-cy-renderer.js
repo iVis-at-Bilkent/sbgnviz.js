@@ -64,14 +64,18 @@ module.exports = function () {
     'nucleic acid feature': true,
     'complex': true,
     'macromolecule': true,
-    'simple chemical': true
+    'simple chemical': true,
+    'biological activity': true,
+    'compartment': true,
   };
 
   var totallyOverridenNodeShapes = $$.sbgn.totallyOverridenNodeShapes = {
     'macromolecule': true,
     'nucleic acid feature': true,
     'simple chemical': true,
-    'complex': true
+    'complex': true,
+    'biological activity': true,
+    'compartment': true,
   };
 
   cyMath.calculateDistance = function (point1, point2) {
@@ -93,6 +97,39 @@ module.exports = function () {
     //This is a temporary workaround                      // <- ?
     $$.sbgn.drawEllipse(context, centerX, centerY, 0, 0); // <- ?
   };
+
+  $$.sbgn.AfShapeFn = function (context, x, y, width, height, name) {
+    
+    if ( name == "macromolecule"){
+	    cyBaseNodeShapes['roundrectangle'].draw(context, x, y, width, height);
+    }
+    else if ( name == "simple chemical"){
+	    cyBaseNodeShapes['ellipse'].draw(context, x, y, width/2, width/2);
+    }
+    else if ( name == "nucleic acid feature"){
+	    var cornerRadius = cyMath.getRoundRectangleRadius(width, height);
+	    $$.sbgn.drawNucAcidFeature(context, width, height, x, y, cornerRadius);
+    }
+    else if ( name == "unspecified entity"){
+	    cyBaseNodeShapes['ellipse'].draw(context, x, y, width, height);
+    }
+    else if ( name == "complex"){
+	    var points = $$.sbgn.generateComplexShapePoints(height/2, width, height);
+	    drawPolygonPath(context, x, y, width, height, points);
+    }
+    else if ( name == "perturbation"){
+	    var points = [-1, -1,   -0.5, 0,  -1, 1,   1, 1,   0.5, 0, 1, -1];
+	    drawPolygonPath(context, x, y, width, height, points);
+    }
+    else{
+	    cyBaseNodeShapes['rectangle'].draw(context, x, y, width, height);
+    }
+  };
+
+  $$.sbgn.AfShapeArgsFn = function (self){
+	  return [self.bbox.w, self.bbox.h, self.parent.data("name")];
+  }
+
 
   $$.sbgn.nucleicAcidCheckPoint = function (x, y, centerX, centerY, node, threshold, points, cornerRadius) {
     var width = node.width();
@@ -307,6 +344,8 @@ module.exports = function () {
   cyStyleProperties.types.nodeShape.enums.push('complex');
   cyStyleProperties.types.nodeShape.enums.push('macromolecule');
   cyStyleProperties.types.nodeShape.enums.push('simple chemical');
+  cyStyleProperties.types.nodeShape.enums.push('biological activity');
+  cyStyleProperties.types.nodeShape.enums.push('compartment');
 
   $$.sbgn.registerSbgnNodeShapes = function () {
 
@@ -783,6 +822,123 @@ module.exports = function () {
       intersectLine: cyBaseNodeShapes["ellipse"].intersectLine,
       checkPoint: cyBaseNodeShapes["ellipse"].checkPoint
     };
+    cyBaseNodeShapes["biological activity"] = {
+      points: cyMath.generateUnitNgonPointsFitToSquare(4, 0),
+      draw: function (context, node) {
+        var width = node.width();
+        var height = node.height();
+        var centerX = node._private.position.x;
+        var centerY = node._private.position.y;
+        var label = node._private.data.label;
+        var padding = parseInt(node.css('border-width'));
+
+        drawPolygonPath(context,
+                centerX, centerY,
+                width, height, cyBaseNodeShapes["biological activity"].points);
+        context.fill();
+
+        context.stroke();
+
+        var oldStyle = context.fillStyle;
+        $$.sbgn.forceOpacityToOne(node, context);
+        $$.sbgn.drawStateAndInfos(node, context, centerX, centerY);
+        context.fillStyle = oldStyle;
+
+      },
+      intersectLine: function (node, x, y, portId) {
+        var centerX = node._private.position.x;
+        var centerY = node._private.position.y;
+        var width = node.width();
+        var height = node.height();
+        var padding = parseInt(node.css('border-width')) / 2;
+        var cornerRadius = cyMath.getRoundRectangleRadius(width, height);
+
+        var stateAndInfoIntersectLines = $$.sbgn.intersectLineAfInfoBoxes(
+                node, x, y);
+       var nodeIntersectLines = cyMath.polygonIntersectLine(
+                x, y,
+                this.points,
+                centerX,
+                centerY,
+                width / 2, height / 2,
+                padding);
+        var intersections = stateAndInfoIntersectLines.concat(nodeIntersectLines);
+
+        return $$.sbgn.closestIntersectionPoint([x, y], intersections);
+      },
+      checkPoint: function (x, y, node, threshold) {
+        var centerX = node._private.position.x;
+        var centerY = node._private.position.y;
+        var width = node.width() + threshold;
+        var height = node.height() + threshold;
+        var padding = parseInt(node.css('border-width')) / 2;
+
+        var nodeCheckPoint = cyBaseNodeShapes["rectangle"].checkPoint(x, y, padding,
+                width, height, centerX, centerY);
+        var stateAndInfoCheckPoint = $$.sbgn.checkPointStateAndInfoBoxes(x, y, node,
+                threshold);
+
+        return nodeCheckPoint || stateAndInfoCheckPoint;
+      }
+    };
+    cyBaseNodeShapes["compartment"] = {
+      points: cyMath.generateUnitNgonPointsFitToSquare( 4, 0 ),
+      draw: function (context, node) {
+        var padding = parseInt(node.css('border-width'));
+        var width = node.outerWidth() - padding;
+        var height = node.outerHeight() - padding;
+        var centerX = node._private.position.x;
+        var centerY = node._private.position.y;
+
+        drawRoundRectanglePath(context,
+                centerX, centerY,
+                width, height);
+        context.fill();
+
+        context.stroke();
+
+        var oldStyle = context.fillStyle;
+        $$.sbgn.forceOpacityToOne(node, context);
+        $$.sbgn.drawStateAndInfos(node, context, centerX, centerY);
+        context.fillStyle = oldStyle;
+
+      },
+      intersectLine: function (node, x, y, portId) {
+        var centerX = node._private.position.x;
+        var centerY = node._private.position.y;
+        var width = node.outerWidth() - parseInt(node.css('border-width'));
+        var height = node.outerHeight() - parseInt(node.css('border-width'));
+        var padding = parseInt(node.css('border-width')) / 2;
+
+        var stateAndInfoIntersectLines = $$.sbgn.intersectLineStateAndInfoBoxes(
+                node, x, y);
+
+        var nodeIntersectLines = cyMath.roundRectangleIntersectLine(
+            x, y,
+            centerX,
+            centerY,
+            width, height,
+            padding );
+
+        var intersections = stateAndInfoIntersectLines.concat(nodeIntersectLines);
+
+        return $$.sbgn.closestIntersectionPoint([x, y], intersections);
+      },
+      checkPoint: function (x, y, node, threshold) {
+        var centerX = node._private.position.x;
+        var centerY = node._private.position.y;
+        var width = node.outerWidth() - parseInt(node.css('border-width')) + threshold;
+        var height = node.outerHeight() - parseInt(node.css('border-width')) + threshold;
+        var padding = parseInt(node.css('border-width')) / 2;
+
+        var nodeCheckPoint = cyBaseNodeShapes["roundrectangle"].checkPoint(x, y, padding,
+                width, height, centerX, centerY);
+        var stateAndInfoCheckPoint = $$.sbgn.checkPointStateAndInfoBoxes(x, y, node,
+                threshold);
+
+        return nodeCheckPoint || stateAndInfoCheckPoint;
+      }
+    }
   };
 
   $$.sbgn.drawEllipse = function (context, x, y, width, height) {
@@ -1155,6 +1311,65 @@ module.exports = function () {
     return []; // if nothing
   };
 
+  //this function gives the intersections of any line with the upper half of perturbing agent 
+  $$.sbgn.perturbingAgentIntersectLine = function (
+          x1, y1, x2, y2, nodeX, nodeY, width, height, padding) {
+
+    var halfWidth = width / 2;
+    var halfHeight = height / 2;
+
+    // Check intersections with straight line segments
+    var straightLineIntersections = [];
+
+    // Top segment, left to right
+    {
+      var topStartX = nodeX - halfWidth - padding;
+      var topStartY = nodeY - halfHeight - padding;
+      var topEndX = nodeX + halfWidth + padding;
+      var topEndY = topStartY;
+
+      var intersection = cyMath.finiteLinesIntersect(
+              x1, y1, x2, y2, topStartX, topStartY, topEndX, topEndY, false);
+
+      if (intersection.length > 0) {
+        straightLineIntersections = straightLineIntersections.concat(intersection);
+      }
+    }
+
+    // Right segment, top to bottom
+    {
+      var rightStartX = nodeX + halfWidth + padding;
+      var rightStartY = nodeY - halfHeight - padding;
+      var rightEndX = rightStartX - halfWidth/2;
+      var rightEndY = nodeY + padding;
+
+      var intersection = cyMath.finiteLinesIntersect(
+              x1, y1, x2, y2, rightStartX, rightStartY, rightEndX, rightEndY, false);
+
+      if (intersection.length > 0) {
+        straightLineIntersections = straightLineIntersections.concat(intersection);
+      }
+    }
+
+    // Left segment, top to bottom
+    {
+      var leftStartX = nodeX - halfWidth - padding;
+      var leftStartY = nodeY - halfHeight - padding;
+      var leftEndX = leftStartX + halfWidth/2;
+      var leftEndY = nodeY + padding;
+
+      var intersection = cyMath.finiteLinesIntersect(
+              x1, y1, x2, y2, leftStartX, leftStartY, leftEndX, leftEndY, false);
+
+      if (intersection.length > 0) {
+        straightLineIntersections = straightLineIntersections.concat(intersection);
+      }
+    }
+
+   if (straightLineIntersections.length > 0)
+      return straightLineIntersections;
+    return []; // if nothing
+  };
   $$.sbgn.intersectLineEllipse = function (
           x1, y1, x2, y2, centerX, centerY, width, height, padding) {
 
@@ -1231,6 +1446,51 @@ module.exports = function () {
     if (intersections.length > 0)
       return intersections;
     return [];
+  };
+
+  $$.sbgn.intersectLineAfInfoBoxes = function (node, x, y) {
+    var centerX = node._private.position.x;
+    var centerY = node._private.position.y;
+    var padding = parseInt(node.css('border-width')) / 2;
+
+    var infoBox = node._private.data.statesandinfos[0];
+
+    var intersections = [];
+
+    if (infoBox && infoBox.isDisplayed) {
+      var infoBoxWidth = infoBox.bbox.w;
+      var infoBoxHeight = infoBox.bbox.h;
+      var coord = infoBox.getAbsoluteCoord();
+      var infoBoxCenterX = coord.x;
+      var infoBoxCenterY = coord.y;
+
+      if (node.data("name") == "macromolecule" || node.data("name") == "nucleic acid feature"
+              || node.data("name") == "complex"){
+        var infoIntersectLines = $$.sbgn.roundRectangleIntersectLine(x, y, centerX, centerY,
+              infoBoxCenterX, infoBoxCenterY, infoBoxWidth, infoBoxHeight, 5, padding);
+      }
+      else if (node.data("name") == "unspecified entity"){
+        var infoIntersectLines = $$.sbgn.intersectLineEllipse(x, y, centerX, centerY,
+            infoBoxCenterX, infoBoxCenterY, infoBoxWidth, infoBoxHeight, padding);
+      }
+      else if (node.data("name") == "simple chemical"){
+        var infoIntersectLines = cyMath.intersectLineCircle(
+            x, y,
+            centerX, centerY,
+            infoBoxCenterX,
+            infoBoxCenterY,
+            infoBoxWidth/4);
+      }
+      else if (node.data("name") == "perturbation"){
+        var infoIntersectLines = $$.sbgn.perturbingAgentIntersectLine(x, y, centerX, centerY,
+            infoBoxCenterX, infoBoxCenterY, infoBoxWidth, infoBoxHeight, 0, padding);
+      }
+
+      if (infoIntersectLines.length > 0)
+        intersections = intersections.concat(infoIntersectLines);
+    };
+
+    return intersections;
   };
 
   $$.sbgn.checkPointStateAndInfoBoxes = function (x, y, node, threshold) {

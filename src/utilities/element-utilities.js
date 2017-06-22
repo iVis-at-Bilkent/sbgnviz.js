@@ -45,7 +45,12 @@ var elementUtilities = {
         'macromolecule multimer': true,
         'simple chemical multimer': true,
         'complex multimer': true,
-        'compartment': true
+        'compartment': true,
+        'biological activity': true,
+        'delay': true,
+        'unknown influence': true,
+        'positive influence': true,
+        'negative influence': true,
     },
     //the following were moved here from what used to be utilities/sbgn-filtering.js
     processTypes : ['process', 'omitted process', 'uncertain process',
@@ -251,7 +256,7 @@ var elementUtilities = {
         }
 
         if (_class == 'compartment') {
-            return 'roundrectangle';
+            return 'compartment';
         }
         if (_class == 'phenotype') {
             return 'hexagon';
@@ -262,7 +267,7 @@ var elementUtilities = {
         
         // We need to define new node shapes with their class names for these nodes
         if (_class == 'source and sink' || _class == 'nucleic acid feature' || _class == 'macromolecule' 
-                || _class == 'simple chemical' || _class == 'complex' ) {
+                || _class == 'simple chemical' || _class == 'complex' || _class == 'biological activity') {
             return _class;
         }
         
@@ -288,16 +293,16 @@ var elementUtilities = {
         if (_class == 'necessary stimulation') {
             return 'triangle-cross';
         }
-        if (_class == 'inhibition') {
+        if (_class == 'inhibition' || _class == 'negative influence') {
             return 'tee';
         }
         if (_class == 'catalysis') {
             return 'circle';
         }
-        if (_class == 'stimulation' || _class == 'production') {
+        if (_class == 'stimulation' || _class == 'production' || _class == 'positive influence') {
             return 'triangle';
         }
-        if (_class == 'modulation') {
+        if (_class == 'modulation' || _class == 'unknown influence') {
             return 'diamond';
         }
         return 'none';
@@ -313,7 +318,8 @@ var elementUtilities = {
         if (_class == 'macromolecule' || _class == 'simple chemical'
             || _class == 'phenotype'
             || _class == 'unspecified entity' || _class == 'nucleic acid feature'
-            || _class == 'perturbing agent' || _class == 'tag') {
+            || _class == 'perturbing agent' || _class == 'tag'
+            || _class == 'biological activity') {
             content = ele.data('label') ? ele.data('label') : "";
         }
         else if(_class == 'compartment'){
@@ -352,6 +358,9 @@ var elementUtilities = {
         }
         else if (_class == 'dissociation') {
             content = 'o';
+        }
+        else if (_class == 'delay'){
+            content = '\u03C4'; // tau
         }
 
         var textWidth = ele.width() || ele.data('bbox').w;
