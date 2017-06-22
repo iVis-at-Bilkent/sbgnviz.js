@@ -282,9 +282,25 @@ module.exports = function () {
     context.fill();
   };
 
+  /*
+   * Code taken from https://jsperf.com/string-prototype-endswith
+   * Direct implementation seems to work better.
+   * Using this improves isMultimer() performance.
+   * Makes it take 0.1 or 0.2% less time from the whole
+   * loading process, down from ~0.4% initially.
+   */
+  function endsWith(str, pattern) {
+    for (var i = pattern.length, l = str.length; i--;) {
+      if (str.charAt(--l) != pattern.charAt(i)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   $$.sbgn.isMultimer = function (node) {
     var sbgnClass = node._private.data.class;
-    if (sbgnClass && sbgnClass.indexOf("multimer") != -1)
+    if (sbgnClass && endsWith(sbgnClass, "multimer"))
       return true;
     return false;
   };
