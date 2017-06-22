@@ -358,9 +358,9 @@ UnitOfInformation.prototype.drawShape = function(context, x, y) {
  * @param [position] - its position in the order of elements placed on the same location
  * @param [index] - its index in the statesandinfos list
  */
-UnitOfInformation.create = function (parentNode, value, bbox, location, position, index) {
+UnitOfInformation.create = function (parentNode, value, bbox, location, position, index, shapeFn, shapeArgsFn) {
   // create the new unit of info
-  var unit = new ns.UnitOfInformation(value, parentNode);
+  var unit = new ns.UnitOfInformation(value, parentNode, shapeFn, shapeArgsFn);
   unit.bbox = bbox;
 
   //console.log("will insert on", location, position);
