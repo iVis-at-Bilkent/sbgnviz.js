@@ -47,6 +47,13 @@ var elementUtilities = {
         'complex multimer': true,
         'compartment': true,
         'biological activity': true,
+        'BA plain': true,
+        'BA unspecified entity': true,
+        'BA simple chemical': true,
+        'BA macromolecule': true,
+        'BA nucleic acid feature': true,
+        'BA perturbing agent': true,
+        'BA complex': true,
         'delay': true,
         'unknown influence': true,
         'positive influence': true,
@@ -264,6 +271,10 @@ var elementUtilities = {
         if (_class == 'perturbing agent' || _class == 'tag') {
             return 'polygon';
         }
+
+        if (_class.startsWith('BA')){
+            return 'biological activity';
+        }
         
         // We need to define new node shapes with their class names for these nodes
         if (_class == 'source and sink' || _class == 'nucleic acid feature' || _class == 'macromolecule' 
@@ -319,7 +330,7 @@ var elementUtilities = {
             || _class == 'phenotype'
             || _class == 'unspecified entity' || _class == 'nucleic acid feature'
             || _class == 'perturbing agent' || _class == 'tag'
-            || _class == 'biological activity') {
+            || _class == 'biological activity' || _class.startsWith('BA')) {
             content = ele.data('label') ? ele.data('label') : "";
         }
         else if(_class == 'compartment'){
