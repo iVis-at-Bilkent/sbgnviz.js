@@ -98,26 +98,26 @@ module.exports = function () {
     $$.sbgn.drawEllipse(context, centerX, centerY, 0, 0); // <- ?
   };
 
-  $$.sbgn.AfShapeFn = function (context, x, y, width, height, name) {
+  $$.sbgn.AfShapeFn = function (context, x, y, width, height, type) {
     
-    if ( name == "macromolecule"){
+    if ( type == "BA macromolecule"){
 	    cyBaseNodeShapes['roundrectangle'].draw(context, x, y, width, height);
     }
-    else if ( name == "simple chemical"){
+    else if ( type == "BA simple chemical"){
 	    cyBaseNodeShapes['ellipse'].draw(context, x, y, width/2, width/2);
     }
-    else if ( name == "nucleic acid feature"){
+    else if ( type == "BA nucleic acid feature"){
 	    var cornerRadius = cyMath.getRoundRectangleRadius(width, height);
 	    $$.sbgn.drawNucAcidFeature(context, width, height, x, y, cornerRadius);
     }
-    else if ( name == "unspecified entity"){
+    else if ( type == "BA unspecified entity"){
 	    cyBaseNodeShapes['ellipse'].draw(context, x, y, width, height);
     }
-    else if ( name == "complex"){
+    else if ( type == "BA complex"){
 	    var points = $$.sbgn.generateComplexShapePoints(height/2, width, height);
 	    drawPolygonPath(context, x, y, width, height, points);
     }
-    else if ( name == "perturbation"){
+    else if ( type == "BA perturbing agent"){
 	    var points = [-1, -1,   -0.5, 0,  -1, 1,   1, 1,   0.5, 0, 1, -1];
 	    drawPolygonPath(context, x, y, width, height, points);
     }
@@ -127,7 +127,7 @@ module.exports = function () {
   };
 
   $$.sbgn.AfShapeArgsFn = function (self){
-	  return [self.bbox.w, self.bbox.h, self.parent.data("name")];
+	  return [self.bbox.w, self.bbox.h, self.parent.data("class")];
   }
 
 
@@ -1480,16 +1480,16 @@ module.exports = function () {
       var infoBoxCenterX = coord.x;
       var infoBoxCenterY = coord.y;
 
-      if (node.data("name") == "macromolecule" || node.data("name") == "nucleic acid feature"
-              || node.data("name") == "complex"){
+      if (node.data("class") == "BA macromolecule" || node.data("class") == "BA nucleic acid feature"
+              || node.data("class") == "BA complex"){
         var infoIntersectLines = $$.sbgn.roundRectangleIntersectLine(x, y, centerX, centerY,
               infoBoxCenterX, infoBoxCenterY, infoBoxWidth, infoBoxHeight, 5, padding);
       }
-      else if (node.data("name") == "unspecified entity"){
+      else if (node.data("class") == "BA unspecified entity"){
         var infoIntersectLines = $$.sbgn.intersectLineEllipse(x, y, centerX, centerY,
             infoBoxCenterX, infoBoxCenterY, infoBoxWidth, infoBoxHeight, padding);
       }
-      else if (node.data("name") == "simple chemical"){
+      else if (node.data("class") == "BA simple chemical"){
         var infoIntersectLines = cyMath.intersectLineCircle(
             x, y,
             centerX, centerY,
@@ -1497,7 +1497,7 @@ module.exports = function () {
             infoBoxCenterY,
             infoBoxWidth/4);
       }
-      else if (node.data("name") == "perturbation"){
+      else if (node.data("class") == "BA perturbing agent"){
         var infoIntersectLines = $$.sbgn.perturbingAgentIntersectLine(x, y, centerX, centerY,
             infoBoxCenterX, infoBoxCenterY, infoBoxWidth, infoBoxHeight, 0, padding);
       }
