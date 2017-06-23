@@ -375,7 +375,6 @@ var elementUtilities = {
     },
     getLabelTextSize: function (ele) {
       var _class = ele.data('class');
-
       // These types of nodes cannot have label but this is statement is needed as a workaround
       if (_class === 'association') {
         return 20;
@@ -404,6 +403,10 @@ var elementUtilities = {
         }
         
         return this.getDynamicLabelTextSize(ele, coeff);
+      }
+
+      if (_class === 'delay'){
+        return this.getDynamicLabelTextSize(ele, 2);
       }
 
       if (_class === 'complex' || _class === 'compartment') {
