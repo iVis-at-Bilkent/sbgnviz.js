@@ -590,6 +590,10 @@ module.exports = function () {
         var multimerPadding = cyBaseNodeShapes["complex"].multimerPadding;
         var cloneMarker = node._private.data.clonemarker;
 
+        // if the node is collapsed, decrease corner length
+        if (node.hasClass('cy-expand-collapse-collapsed-node'))
+          cornerLength = 14;
+
         cyBaseNodeShapes["complex"].points = $$.sbgn.generateComplexShapePoints(cornerLength,
                 width, height);
 

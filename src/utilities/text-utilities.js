@@ -22,7 +22,7 @@ var textUtilities = {
     var width;
     var len = text.length;
     var ellipsis = "..";
-    var textWidth = (textProp.width > 30) ? textProp.width - 10 : textProp.width;
+    var textWidth = (textProp.width > 30) ? textProp.width - 16 : textProp.width;
     while ((width = context.measureText(text).width) > textWidth) {
       --len;
       text = text.substring(0, len) + ellipsis;
