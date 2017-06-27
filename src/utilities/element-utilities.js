@@ -374,11 +374,11 @@ var elementUtilities = {
             content = '\u03C4'; // tau
         }
 
-        var textWidth = ele.width() || ele.data('bbox').w;
+        var textWidth = ele.outerWidth() || ele.data('bbox').w;
 
         var textProp = {
             label: content,
-            width: ( _class==('complex') || _class==('compartment') )?textWidth * 2:textWidth
+            width: ( _class == 'perturbing agent' ? textWidth / 2 : textWidth)
         };
 
         var font = parseInt(ele.css('font-size')) + "px Arial";
