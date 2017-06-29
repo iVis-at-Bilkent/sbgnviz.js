@@ -464,7 +464,7 @@ module.exports = function () {
               return elementUtilities.getEndPoint(ele, 'target');
             }
           })
-          .selector("edge[class='inhibition']")
+          .selector("edge[class='inhibition'],[class='negative influence']")
           .css({
             'target-arrow-fill': 'filled'
           })
