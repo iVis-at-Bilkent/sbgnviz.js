@@ -1198,7 +1198,6 @@ module.exports = function () {
 
     // Check intersections with straight line segments
     var straightLineIntersections = [];
-
     // Top segment, left to right
     {
       var topStartX = nodeX - halfWidth + cornerRadius - padding;
@@ -1454,7 +1453,7 @@ module.exports = function () {
         stateCount++;
       } else if (state.clazz == "unit of information" && state.isDisplayed) {//draw rectangle
         var infoIntersectLines = $$.sbgn.roundRectangleIntersectLine(x, y, centerX, centerY,
-                stateCenterX, stateCenterY, stateWidth, stateHeight, 5, padding);
+                stateCenterX, stateCenterY, stateWidth, stateHeight, 0, padding);
 
         if (infoIntersectLines.length > 0)
           intersections = intersections.concat(infoIntersectLines);

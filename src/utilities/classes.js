@@ -321,13 +321,13 @@ var UnitOfInformation = function (value, parent, shapeFn, shapeArgsFn) {
     this.shapeFn = shapeFn;
     this.shapeArgsFn = shapeArgsFn;
   }
-  else { // default shape
-    this.shapeFn = cytoscape.sbgn.drawRoundRectanglePath;
+  else { // default shape is rectangle
+    this.shapeFn = function(c,x,y,w,h){
+      cytoscape.baseNodeShapes['rectangle'].draw(c, x, y, w, h)
+    };
+
     this.shapeArgsFn = function (self) {
-      return [  self.bbox.w,
-                self.bbox.h,
-                Math.min(self.bbox.w / 2, self.bbox.h / 2, UnitOfInformation.shapeRadius)
-              ];
+      return [self.bbox.w, self.bbox.h, 0];
     };
   }
 };
