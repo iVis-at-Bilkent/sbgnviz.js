@@ -174,29 +174,48 @@ var elementUtilities = {
         // var processes = nodesToShow.nodes("node[class='process']");
         // var nonProcesses = nodesToShow.nodes("node[class!='process']");
         // var neighborProcesses = nonProcesses.neighborhood("node[class='process']");
-
+        
+        extendNodeTypes = ['process', 'omitted process', 'uncertain process',
+        'association', 'dissociation', 'phenotype', 'and', 'or', 'not', 'delay'];
+    
+        //Here, logical operators are also considered as processes, since they also get inputs and outputs
         var processes = nodesToShow.filter(function(ele, i){
             if(typeof ele === "number") {
               ele = i;
             }
-            return $.inArray(ele._private.data.class, self.processTypes) >= 0;
+            return $.inArray(ele._private.data.class, extendNodeTypes) >= 0;
         });
         var nonProcesses = nodesToShow.filter(function(ele, i){
             if(typeof ele === "number") {
               ele = i;
             }
-            return $.inArray(ele._private.data.class, self.processTypes) === -1;
+            return $.inArray(ele._private.data.class, extendNodeTypes) === -1;
         });
-        var neighborProcesses = nonProcesses.neighborhood().filter(function(ele, i){
+        var neighborProcesses = nonProcesses.neighborhood().union(processes.neighborhood()).filter(function(ele, i){
             if(typeof ele === "number") {
               ele = i;
             }
-            return $.inArray(ele._private.data.class, self.processTypes) >= 0;
+            return $.inArray(ele._private.data.class, extendNodeTypes) >= 0;
+        });
+        //For AF support, subject to change
+        var neighborNonProcesses = nonProcesses.neighborhood().filter(function(ele, i){
+            if(typeof ele === "number") {
+              ele = i;
+            }
+            return $.inArray(ele._private.data.class, extendNodeTypes) >= -1;
         });
 
         nodesToShow = nodesToShow.add(processes.neighborhood());
         nodesToShow = nodesToShow.add(neighborProcesses);
         nodesToShow = nodesToShow.add(neighborProcesses.neighborhood());
+        nodesToShow = nodesToShow.add(neighborNonProcesses);
+        
+        neighborProcesses.neighborhood().forEach(function(ele){
+            if(jQuery.inArray(ele._private.data.class, extendNodeTypes) >= 0)
+            {
+               nodesToShow = nodesToShow.add(ele.neighborhood());   
+            }
+        });
 
         //add parents
         nodesToShow = nodesToShow.add(nodesToShow.nodes().parents());
