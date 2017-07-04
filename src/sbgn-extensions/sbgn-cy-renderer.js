@@ -7,7 +7,7 @@ var libs = require('../utilities/lib-utilities').getLibs();
 var jQuery = $ = libs.jQuery;
 var cytoscape = libs.cytoscape;
 
-var cyMath = cytoscape.math;
+var cyMath = math = cytoscape.math;
 var cyBaseNodeShapes = cytoscape.baseNodeShapes;
 var cyStyleProperties = cytoscape.styleProperties;
 
@@ -902,6 +902,119 @@ module.exports = function () {
       }
     };
     cyBaseNodeShapes["compartment"] = {
+
+      name: 'compartment',
+      points: math.generateUnitNgonPointsFitToSquare( 4, 0 ),
+      draw: function( context, node){
+        var padding = parseInt(node.css('border-width'));
+        var width = node.outerWidth() - padding;
+        var height = node.outerHeight() - padding;
+        var centerX = node._private.position.x;
+        var centerY = node._private.position.y;
+
+        drawBarrelPath(context, centerX, centerY, width, height );
+        context.fill();
+        context.stroke();
+
+        var oldStyle = context.fillStyle;
+        $$.sbgn.forceOpacityToOne(node, context);
+        $$.sbgn.drawStateAndInfos(node, context, centerX, centerY);
+        context.fillStyle = oldStyle;
+
+      },
+
+      intersectLine: function(node, x, y){
+
+        var centerX = node._private.position.x;
+        var centerY = node._private.position.y;
+        var width = node.outerWidth() - parseInt(node.css('border-width'));
+        var height = node.outerHeight() - parseInt(node.css('border-width'));
+        var padding = parseInt(node.css('border-width')) / 2;
+
+        var bPts = generateBarrelBezierPts( width + 2*padding, height + 2*padding, centerX, centerY );
+
+        var pts = [].concat(bPts.topLeft, bPts.topRight, bPts.bottomRight, bPts.bottomLeft);
+
+        return math.polygonIntersectLine( x, y, pts, centerX, centerY );
+      },
+
+      checkPoint: function(x, y, node, threshold ){
+        var centerX = node._private.position.x;
+        var centerY = node._private.position.y;
+        var width = node.outerWidth() - parseInt(node.css('border-width')) + threshold;
+        var height = node.outerHeight() - parseInt(node.css('border-width')) + threshold;
+        var padding = parseInt(node.css('border-width')) / 2;
+
+        var curveConstants = math.getBarrelCurveConstants( width, height );
+        var hOffset = curveConstants.heightOffset;
+        var wOffset = curveConstants.widthOffset;
+
+        // Check hBox
+        if( math.pointInsidePolygon( x, y, this.points,
+          centerX, centerY, width, height - 2 *  hOffset, [0, -1], padding ) ){
+          return true;
+        }
+
+        // Check vBox
+        if( math.pointInsidePolygon( x, y, this.points,
+          centerX, centerY, width - 2 * wOffset, height, [0, -1], padding ) ){
+          return true;
+        }
+
+        var barrelCurvePts = generateBarrelBezierPts( width, height, centerX, centerY );
+
+        var getCurveT = function (x, y, curvePts) {
+          var x0 = curvePts[ 4 ];
+          var x1 = curvePts[ 2 ];
+          var x2 = curvePts[ 0 ];
+          var y0 = curvePts[ 5 ];
+          // var y1 = curvePts[ 3 ];
+          var y2 = curvePts[ 1 ];
+
+          var xMin = Math.min( x0, x2 );
+          var xMax = Math.max( x0, x2 );
+          var yMin = Math.min( y0, y2 );
+          var yMax = Math.max( y0, y2 );
+
+          if( xMin <= x && x <= xMax  && yMin <= y && y <= yMax ){
+            var coeff = math.bezierPtsToQuadCoeff( x0, x1, x2 );
+            var roots = math.solveQuadratic( coeff[0], coeff[1], coeff[2], x );
+
+            var validRoots = roots.filter(function( r ){
+              return 0 <= r && r <= 1;
+            });
+
+            if( validRoots.length > 0 ){
+              return validRoots[ 0 ];
+            }
+          }
+          return null;
+        };
+
+        var curveRegions = Object.keys( barrelCurvePts );
+        for( var i = 0; i < curveRegions.length; i++ ){
+          var corner = curveRegions[ i ];
+          var cornerPts = barrelCurvePts[ corner ];
+          var t = getCurveT( x, y, cornerPts );
+
+          if( t == null ){ continue; }
+
+          var y0 = cornerPts[ 5 ];
+          var y1 = cornerPts[ 3 ];
+          var y2 = cornerPts[ 1 ];
+          var bezY = math.qbezierAt( y0, y1, y2, t );
+
+          if( cornerPts.isTop && bezY <= y ){
+            return true;
+          }
+          if( cornerPts.isBottom && y <= bezY ){
+            return true;
+          }
+        }
+        return false;
+      }
+    };
+    cyBaseNodeShapes["oldCompartment"] = {
       points: cyMath.generateUnitNgonPointsFitToSquare( 4, 0 ),
       draw: function (context, node) {
         var padding = parseInt(node.css('border-width'));
@@ -1557,5 +1670,103 @@ module.exports = function () {
     }
 
     return false;
+  };
+
+//------------------------------------------------------------------------------  
+// The following functions should be replaced by Cytoscape functions once v3.1.2 is released
+//------------------------------------------------------------------------------  
+
+  var drawBarrelPath = function(
+  context, x, y, width, height ){
+
+    var halfWidth = width / 2;
+    var halfHeight = height / 2;
+
+    var xBegin = x - halfWidth;
+    var xEnd = x + halfWidth;
+    var yBegin = y - halfHeight;
+    var yEnd = y + halfHeight;
+
+    var barrelCurveConstants = math.getBarrelCurveConstants( width, height );
+    var wOffset = barrelCurveConstants.widthOffset;
+    var hOffset = barrelCurveConstants.heightOffset;
+    var ctrlPtXOffset = barrelCurveConstants.ctrlPtOffsetPct * width;
+
+    if( context.beginPath ){ context.beginPath(); }
+
+    context.moveTo( xBegin, yBegin + hOffset );
+
+    context.lineTo( xBegin, yEnd - hOffset );
+    context.quadraticCurveTo( xBegin + ctrlPtXOffset, yEnd, xBegin + wOffset, yEnd );
+
+    context.lineTo( xEnd - wOffset, yEnd );
+    context.quadraticCurveTo( xEnd - ctrlPtXOffset, yEnd, xEnd, yEnd - hOffset )
+
+    context.lineTo( xEnd, yBegin + hOffset );
+    context.quadraticCurveTo( xEnd - ctrlPtXOffset, yBegin, xEnd -  wOffset, yBegin );
+
+    context.lineTo( xBegin + wOffset, yBegin );
+    context.quadraticCurveTo( xBegin + ctrlPtXOffset, yBegin, xBegin, yBegin + hOffset );
+
+    context.closePath();
+  };
+
+  var generateBarrelBezierPts = function( width, height, centerX, centerY ){
+      var hh = height / 2;
+      var hw = width / 2;
+      var xBegin = centerX - hw;
+      var xEnd = centerX + hw;
+      var yBegin = centerY - hh;
+      var yEnd = centerY + hh;
+
+      var curveConstants = math.getBarrelCurveConstants( width, height );
+      var hOffset = curveConstants.heightOffset;
+      var wOffset = curveConstants.widthOffset;
+      var ctrlPtXOffset = curveConstants.ctrlPtOffsetPct * width;
+
+      // points are in clockwise order, inner (imaginary) control pt on [4, 5]
+      var pts = {
+        topLeft: [ xBegin, yBegin + hOffset, xBegin + ctrlPtXOffset, yBegin, xBegin + wOffset, yBegin ],
+        topRight: [ xEnd - wOffset, yBegin, xEnd - ctrlPtXOffset, yBegin, xEnd, yBegin + hOffset ],
+        bottomRight: [ xEnd, yEnd - hOffset, xEnd - ctrlPtXOffset, yEnd, xEnd - wOffset, yEnd ],
+        bottomLeft: [ xBegin + wOffset, yEnd, xBegin + ctrlPtXOffset, yEnd, xBegin, yEnd - hOffset ]
+      };
+
+      pts.topLeft.isTop = true;
+      pts.topRight.isTop = true;
+      pts.bottomLeft.isBottom = true;
+      pts.bottomRight.isBottom = true;
+      return pts;
+  };
+ 
+  math.bezierPtsToQuadCoeff = function( p0, p1, p2 ){
+    return [
+      p0 - 2 * p1 + p2,
+      2 * ( p1 - p0 ),
+      p0];
+  };
+
+  math.getBarrelCurveConstants = function( width, height ){
+  // get curve width, height, and control point position offsets as a percentage of node height / width
+    return {
+      heightOffset: 0.05 * height,
+      widthOffset: 0.25 * width,
+      ctrlPtOffsetPct: 0.05
+    };
+  };
+
+  math.solveQuadratic = function( a, b, c, val ){
+    c -= val;
+
+    var r = b * b - 4 * a * c;
+
+    if( r < 0 ){ return []; }
+
+    var sqrtR = Math.sqrt( r );
+    var denom = 2 * a;
+    var root1 = ( -b + sqrtR ) / denom;
+    var root2 = ( -b - sqrtR ) / denom;
+
+    return [ root1, root2 ];
   };
 };
