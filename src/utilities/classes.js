@@ -665,7 +665,7 @@ AuxUnitLayout.prototype.setDisplayedUnits = function () {
     availableSpace = this.parentNode.outerWidth();
     // due to corner of barrel shaped compartment decrease availableSpace -- no infobox on corners
     if (this.parentNode.data("class") == "compartment")
-        availableSpace *= 0.98;
+        availableSpace *= 0.8;
   }
   else {
     availableSpace = this.parentNode.outerHeight();
