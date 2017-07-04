@@ -37,6 +37,7 @@ AuxiliaryUnit.prototype.copy = function (existingInstance, newParent, newId) {
 // draw the auxiliary unit at its position
 AuxiliaryUnit.prototype.draw = function(context) {
   var coords = this.getAbsoluteCoord();
+
   this.drawShape(context, coords.x, coords.y);
   if (this.hasText()) {
     this.drawText(context, coords.x, coords.y);
@@ -115,6 +116,11 @@ AuxiliaryUnit.prototype.getAbsoluteCoord = function() {
       var absY = this.parent._private.position.y - (this.parent.outerHeight() - this.parent._private.data['border-width']) / 2 + this.bbox.y;
       var absX = this.bbox.x * (this.parent.outerWidth() - this.parent._private.data['border-width']) / 100 + this.parent._private.position.x;
     }
+
+  // due to corner of barrel shaped compartment shift absX to right
+  if (this.parent.data("class") == "compartment"){
+      absX += this.parent.outerWidth() * 0.1;
+  };
     return {x: absX, y: absY};
   }
 };
@@ -642,7 +648,6 @@ AuxUnitLayout.prototype.getDrawableUnitAmount = function() {
   else {
     availableSpace = this.parentNode.outerHeight();
   }
-
   // loop over the cached precomputed lengths
   for(var i=0; i < this.renderLengthCache.length; i++) {
     if(this.renderLengthCache[i] > availableSpace) {
@@ -658,6 +663,9 @@ AuxUnitLayout.prototype.setDisplayedUnits = function () {
   var availableSpace;
   if (this.isTorB()) {
     availableSpace = this.parentNode.outerWidth();
+    // due to corner of barrel shaped compartment decrease availableSpace -- no infobox on corners
+    if (this.parentNode.data("class") == "compartment")
+        availableSpace *= 0.98;
   }
   else {
     availableSpace = this.parentNode.outerHeight();
