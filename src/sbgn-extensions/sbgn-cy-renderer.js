@@ -1690,7 +1690,7 @@ module.exports = function () {
     var barrelCurveConstants = math.getBarrelCurveConstants( width, height );
     var wOffset = barrelCurveConstants.widthOffset;
     var hOffset = barrelCurveConstants.heightOffset;
-    var ctrlPtXOffset = barrelCurveConstants.ctrlPtOffsetPct * width;
+    var ctrlPtXOffset = barrelCurveConstants.ctrlPtOffsetPct * wOffset;
 
     if( context.beginPath ){ context.beginPath(); }
 
@@ -1749,8 +1749,8 @@ module.exports = function () {
   math.getBarrelCurveConstants = function( width, height ){
   // get curve width, height, and control point position offsets as a percentage of node height / width
     return {
-      heightOffset: 0.05 * height,
-      widthOffset: 0.25 * width,
+      heightOffset: Math.min(15, 0.05 * width),
+      widthOffset: Math.min(100, 0.25 * height),
       ctrlPtOffsetPct: 0.05
     };
   };
