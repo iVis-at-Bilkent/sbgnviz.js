@@ -257,6 +257,30 @@ mainUtilities.deleteNodesSmart = function(_nodes) {
   }
 };
 
+// Highlights selected elements. Requires viewUtilities extension and considers 'undoable' option.
+mainUtilities.highlightSelected = function(_eles) {
+
+  var elesToHighlight = _eles;
+  if (elesToHighlight.length === 0) {
+    return;
+  }
+  var notHighlightedEles = cy.elements(".nothighlighted").filter(":visible");
+  var highlightedEles = cy.elements(':visible').difference(notHighlightedEles);
+  if (elesToHighlight.same(highlightedEles)) {
+    return;
+  }
+  
+  // If this function is being called we can assume that view utilities extension is on use
+  var viewUtilities = cy.viewUtilities('get');
+  
+  if (options.undoable) {
+    cy.undoRedo().do("highlight", elesToHighlight);
+  }
+  else {
+    viewUtilities.highlight(elesToHighlight);
+  }
+};
+
 // Highlights neighbours of the given nodes. Requires viewUtilities extension and considers 'undoable' option.
 mainUtilities.highlightNeighbours = function(_nodes) {
   // If this function is being called we can assume that view utilities extension is on use

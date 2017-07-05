@@ -108,6 +108,9 @@ Removes the given elements in a simple way. Considers 'undoable' option.
 `sbgnviz.deleteNodesSmart(nodes)`
 Extends the given nodes list in a smart way to leave the map intact and removes the resulting list. Considers 'undoable' option.
 
+`sbgnviz.highlightSelected(eles)`
+Highlights selected elements. Requires viewUtilities extension and considers 'undoable' option.
+
 `sbgnviz.highlightNeighbours(nodes)`
 Highlights neighbours of the given nodes. Requires viewUtilities extension and considers 'undoable' option.
 
