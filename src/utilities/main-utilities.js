@@ -279,6 +279,8 @@ mainUtilities.highlightSelected = function(_eles) {
   else {
     viewUtilities.highlight(elesToHighlight);
   }
+  
+  cy.elements().unselect();
 };
 
 // Highlights neighbours of the given nodes. Requires viewUtilities extension and considers 'undoable' option.
@@ -303,6 +305,8 @@ mainUtilities.highlightNeighbours = function(_nodes) {
   else {
     viewUtilities.highlight(elesToHighlight);
   }
+  
+  cy.elements().unselect();
 };
 
 // Finds the elements whose label includes the given label and highlights processes of those elements.
@@ -337,6 +341,8 @@ mainUtilities.searchByLabel = function(label) {
   else {
     viewUtilities.highlight(nodesToHighlight);
   }
+  
+  cy.elements().unselect();
 };
 
 // Highlights processes of the given nodes. Requires viewUtilities extension and considers 'undoable' option.
@@ -361,6 +367,8 @@ mainUtilities.highlightProcesses = function(_nodes) {
   else {
     viewUtilities.highlight(elesToHighlight);
   }
+  
+  cy.elements().unselect();
 };
 
 // Unhighlights any highlighted element. Requires viewUtilities extension and considers 'undoable' option.
