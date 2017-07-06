@@ -210,7 +210,11 @@ mainUtilities.hideNodesSmart = function(_nodes) {
     cy.undoRedo().do("batch", actions);
   }
   else {
+    var nodesWithHiddenNeighbor = cy.edges(":hidden").connectedNodes(':visible');
+    thinBorder(nodesWithHiddenNeighbor);
     viewUtilities.hide(nodesToHide);
+    var nodesWithHiddenNeighbor = cy.edges(":hidden").connectedNodes(':visible');
+    thickenBorder(nodesWithHiddenNeighbor);
   }
 };
 
@@ -245,7 +249,11 @@ mainUtilities.showNodesSmart = function(_nodes) {
     cy.undoRedo().do("batch", actions);
   }
   else {
+    var nodesWithHiddenNeighbor = cy.edges(":hidden").connectedNodes(':visible');
+    thinBorder(nodesWithHiddenNeighbor);
     viewUtilities.hide(nodesToHide);
+    var nodesWithHiddenNeighbor = cy.edges(":hidden").connectedNodes(':visible');
+    thickenBorder(nodesWithHiddenNeighbor);
   }
 };
 
@@ -271,6 +279,8 @@ mainUtilities.showAll = function() {
     cy.undoRedo().do("batch", actions);
   }
   else {
+    var nodesWithHiddenNeighbor = cy.edges(":hidden").connectedNodes(':visible');
+    thinBorder(nodesWithHiddenNeighbor);
     viewUtilities.show(cy.elements());
   }
 };
