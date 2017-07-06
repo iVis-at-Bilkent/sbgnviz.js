@@ -170,6 +170,10 @@ module.exports = function () {
       }
     });
 
+    cy.on('layoutstop', function (event) {
+        elementUtilities.changePortsOrientationAfterLayout();
+    });
+
     $(document).on('updateGraphEnd', function(event) {
       // list all entitytypes andstore them in the global scratch
       // only stateful EPN (complex, macromolecule or nucleic acid) are concerned

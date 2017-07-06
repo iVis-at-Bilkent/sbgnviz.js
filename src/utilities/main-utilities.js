@@ -20,7 +20,7 @@ function beforePerformLayout() {
   
   cy.startBatch();
 
-  graphUtilities.disablePorts();
+  // graphUtilities.disablePorts();
 
   // TODO do this by using extension API
   cy.$('.edgebendediting-hasbendpoints').removeClass('edgebendediting-hasbendpoints');

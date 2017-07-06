@@ -22,6 +22,9 @@ var defaults = {
   compoundPadding: function () {
     return 10;
   },
+  improveFlow: function () {
+      return false;
+  },
   // extra padding for compartment and complexes
   extraCompartmentPadding: 10,
   extraComplexPadding: 10,

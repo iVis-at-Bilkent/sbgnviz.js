@@ -836,6 +836,367 @@ var elementUtilities = {
       cy.endBatch();
     },
 
+    changePortsOrientationAfterLayout: function() {
+        //Check all processes and logical operators with ports
+        cy.nodes().forEach(function(ele){
+            if (ele.data('class') === 'process' || ele.data('class') === 'omitted process' || ele.data('class') === 'uncertain process' || ele.data('class') === 'association' || ele.data('class') === 'dissociation' || ele.data('class') === 'and' || ele.data('class') === 'or' || ele.data('class') === 'not')
+            {
+                if (graphUtilities.portsEnabled === true && ele.data('ports').length === 2 )
+                {
+                    var bestOrientation = elementUtilities.changePortsOrientation(ele);
+                    elementUtilities.setPortsOrdering(ele, bestOrientation);
+                    // If improve-flow is checked we do the swaping of simple nodes with each other
+                    var improveFlow = options.improveFlow;
+                    improveFlow = typeof improveFlow === 'function' ? improveFlow.call() : improveFlow;
+                    if (improveFlow)
+                    {
+                        elementUtilities.postChangePortsOrientation(ele, bestOrientation);
+                    }
+                }
+            }
+        });
+        cy.style().update();
+    },
+    /*
+     Calculates the best orientation for an 'ele' with port (process or logical operator) and returns it.
+     */
+    changePortsOrientation: function(ele) {
+        var processId = ele.id();
+        var orientation = {'L-to-R': 0, 'R-to-L' : 0, 'T-to-B' : 0, 'B-to-T' : 0};
+        var targetingEdges = cy.edges("[target='"+processId+"']"); // Holds edges who have the input port as a target
+        var sourcingEdges = cy.edges("[source='"+processId+"']"); // Holds edges who have the output port as a source
+        // Checks if the ports belong to a process or logial operator, it does the calculations based on the edges connected to its ports
+        if (ele.data('class') === 'process' || ele.data('class') === 'omitted process' || ele.data('class') === 'uncertain process' || ele.data('class') === 'association' || ele.data('class') === 'dissociation')
+        {
+            targetingEdges.forEach(function(edge){
+                if (edge.data('class') === 'consumption')
+                {
+                    var source = cy.getElementById(edge.data('source')); //Holds the element from the other side of edge
+                    var simple = false; //Checks if it is a simple node - connected with only 1 edge
+                    if (source.connectedEdges().length === 1)
+                        simple = true;
+                    elementUtilities.calculateOrientationScore(ele, source, orientation, 'L-to-R', 'R-to-L', 'x', simple);
+                    elementUtilities.calculateOrientationScore(ele, source, orientation, 'T-to-B', 'B-to-T', 'y', simple);
+                }
+            });
+            sourcingEdges.forEach(function (edge) {
+                if (edge.data('class') === 'production') {
+                    var target = cy.getElementById(edge.data('target'));
+                    var simple = false;
+                    if (target.connectedEdges().length === 1)
+                        simple = true;
+                    elementUtilities.calculateOrientationScore(ele, target, orientation, 'R-to-L', 'L-to-R', 'x', simple);
+                    elementUtilities.calculateOrientationScore(ele, target, orientation, 'B-to-T', 'T-to-B', 'y', simple);
+                }
+            });
+        }
+        else if (ele.data('class') === 'and' || ele.data('class') === 'or' || ele.data('class') === 'not')
+        {
+            targetingEdges.forEach(function(edge){
+                if (edge.data('class') === 'logic arc')
+                {
+                    var source = cy.getElementById(edge.data('source'));
+                    var simple = false;
+                    if (source.connectedEdges().length === 1)
+                        simple = true;
+                    elementUtilities.calculateOrientationScore(ele, source, orientation, 'L-to-R', 'R-to-L', 'x', simple);
+                    elementUtilities.calculateOrientationScore(ele, source, orientation, 'T-to-B', 'B-to-T', 'y', simple);
+                }
+            });
+            sourcingEdges.forEach(function (edge) {
+                if (edge.data('class') === 'modulation' || edge.data('class') === 'stimulation' || edge.data('class') === 'catalysis' || edge.data('class') === 'inhibition' || edge.data('class') === 'necessary stimulation' || edge.data('class') === 'logic arc') {
+                    var target = cy.getElementById(edge.data('target'));
+                    var simple = false;
+                    if (target.connectedEdges().length === 1)
+                        simple = true;
+                    elementUtilities.calculateOrientationScore(ele, target, orientation, 'R-to-L', 'L-to-R', 'x', simple);
+                    elementUtilities.calculateOrientationScore(ele, target, orientation, 'B-to-T', 'T-to-B', 'y', simple);
+                }
+            });
+        }
+        //Calculates the best orientation from all orientation scores
+        var bestOrientation = "L-to-R";
+        var bestScore = orientation['L-to-R'];//The score of the best orientation is always positive
+        for (var property in orientation) {
+            if (orientation[property] > bestScore)
+            {
+                bestScore = orientation[property];
+                bestOrientation = property;
+            }
+        }
+        return bestOrientation;
+    },
+    /*
+     This function calculates the scores for each orientation
+     @param ele - is the node (process, logical operator) whose orientation will be changed. It can be process,omitted process,
+     uncertain process, association, dissociation, logical operator
+     @param other - is the other node, and based on its position scores are given to orientations
+     @param orientation - holds scores for each orientation
+     @param firstOrientation - can be L-to-R or T-to-B
+     @param oppositeOrientation - opposite of the upper orientation (R-to-L , B-to-T)
+     @param pos - can be 'x' or 'y' (based on vertical or horizontal direction of ports)
+     @param simple - checks if 'other' node is simple node (with degree 1)
+     */
+    calculateOrientationScore: function(ele, other, orientation, firstOrientation, oppositeOrientation, pos, simple) {
+        var coeff = 0.5;
+        var score = 2;
+        if (simple)
+            score = 1; // If it is a simple node, its score should affect less
+        var nodeWidthOrHeight = 0;
+        if (pos === 'x')
+            nodeWidthOrHeight = ele.width()/2;
+        else if (pos ==='y')
+            nodeWidthOrHeight = ele.height()/2;
+        if (other.position(pos) < ele.position(pos) - nodeWidthOrHeight)
+        {
+            orientation[firstOrientation] += score;
+            orientation[oppositeOrientation] -= score;
+        }
+        else if (other.position(pos) >= ele.position(pos) - nodeWidthOrHeight && other.position(pos) <= ele.position(pos) + nodeWidthOrHeight)
+        {
+            orientation[firstOrientation] += (ele.position(pos) - other.position(pos))/nodeWidthOrHeight*coeff;
+            orientation[oppositeOrientation] -= (ele.position(pos) - other.position(pos))/nodeWidthOrHeight*coeff;
+        }
+        else if (other.position(pos) >  ele.position(pos) + nodeWidthOrHeight)
+        {
+            orientation[firstOrientation] -= score;
+            orientation[oppositeOrientation] += score;
+        }
+    },
+    /*
+     After a process is oriented, for each simple node that is on the wrong side of the port,
+     we try to find another simple node of degree 0 on the opposite side and swap them afterwards.
+     If from the opposide side we cannot find such a node then we try to swap it with an effector node of degree 1
+     */
+    postChangePortsOrientation: function(ele, bestOrientation) {
+        var processId = ele.id();
+        var inputPort = []; // Holds all simple nodes connected with input port
+        var outputPort = []; // Holds all simple nodes connected with output port
+        var notConnectedToPort = []; // Holds all simple nodes not connected with input or output port
+        var targetingEdges = cy.edges("[target='"+processId+"']");
+        var sourcingEdges = cy.edges("[source='"+processId+"']");
+        // Checks simple nodes and add them to one of the arrays mentioned above
+        if (ele.data('class') === 'process' || ele.data('class') === 'omitted process' || ele.data('class') === 'uncertain process' || ele.data('class') === 'association' || ele.data('class') === 'dissociation')
+        {
+            targetingEdges.forEach(function(edge){
+                var source = cy.getElementById(edge.data('source'));
+                if (edge.data('class') === 'consumption')
+                {
+                    elementUtilities.addSimpleNodeToArray(ele, source, bestOrientation, inputPort, "input");
+                }
+                else
+                {
+                    elementUtilities.addSimpleNodeToArray(ele, source, bestOrientation, notConnectedToPort, "notConnected");
+                }
+            });
+            sourcingEdges.forEach(function (edge) {
+                var target = cy.getElementById(edge.data('target'));
+                if (edge.data('class') === 'production') {
+                    elementUtilities.addSimpleNodeToArray(ele, target, bestOrientation, outputPort, "output");
+                }
+                else
+                {
+                    elementUtilities.addSimpleNodeToArray(ele, target, bestOrientation, notConnectedToPort, "notConnected");
+                }
+            });
+        }
+        else if (ele.data('class') === 'and' || ele.data('class') === 'or' || ele.data('class') === 'not')
+        {
+            targetingEdges.forEach(function(edge){
+                var source = cy.getElementById(edge.data('source'));
+                if (edge.data('class') === 'logic arc')
+                {
+                    elementUtilities.addSimpleNodeToArray(ele, source, bestOrientation, inputPort, "input");
+                }
+                else
+                {
+                    elementUtilities.addSimpleNodeToArray(ele, source, bestOrientation, notConnectedToPort, "notConnected");
+                }
+            });
+            sourcingEdges.forEach(function (edge) {
+                var target = cy.getElementById(edge.data('target'));
+                if (edge.data('class') === 'modulation' || edge.data('class') === 'stimulation' || edge.data('class') === 'catalysis' || edge.data('class') === 'inhibition' || edge.data('class') === 'necessary stimulation' || edge.data('class') === 'logic arc')
+                {
+                    elementUtilities.addSimpleNodeToArray(ele, target, bestOrientation, outputPort, "output");
+                }
+                else
+                {
+                    elementUtilities.addSimpleNodeToArray(ele, target, bestOrientation, notConnectedToPort, "notConnected");
+                }
+            });
+        }
+        //The arrays are sorted in order to keep the high priority of nodes positioned completely to the other side
+        inputPort.sort(function(a, b){return b.score - a.score});
+        outputPort.sort(function(a, b){return b.score - a.score});
+        notConnectedToPort.sort(function(a, b){return a.score - b.score});
+        //First we check for direct swaping between nodes from different ports positioned to the wrong side
+        var minLength = inputPort.length;
+        if (outputPort.length < minLength)
+            minLength = outputPort.length;
+        for (i = 0; i < minLength; i++)
+        {
+            var inputPortEle = inputPort.pop();
+            var outputPortEle = outputPort.pop();
+            elementUtilities.swapElements(inputPortEle, outputPortEle);
+        }
+        /*
+         After that we iterate over each element of effector nodes and see the scores it produces by swaping
+         with nodes connected to input or output ports
+         */
+        for (i = notConnectedToPort.length -1; i >= 0 ; i--)
+        {
+            var effector = notConnectedToPort[i];
+            if (outputPort.length > 0 && inputPort.length > 0)
+            {
+                var firstOutput = outputPort[outputPort.length - 1];
+                elementUtilities.swapElements(effector, firstOutput);
+                var firstOutputScore = -elementUtilities.checkNegativeOrientationScore(ele, cy.getElementById(firstOutput.id), bestOrientation);
+                elementUtilities.swapElements(effector, firstOutput);
+                var firstInput = inputPort[inputPort.length - 1];
+                elementUtilities.swapElements(effector, firstInput);
+                var firstInputScore = elementUtilities.checkNegativeOrientationScore(ele, cy.getElementById(firstInput.id), bestOrientation);
+                if (firstInputScore > firstOutputScore && firstInputScore > firstInput.score)
+                {
+                    inputPort.pop();
+                }
+                else if ( firstOutputScore > firstInputScore && firstOutputScore > firstOutput.score)
+                {
+                    elementUtilities.swapElements(effector, firstInput);
+                    elementUtilities.swapElements(effector, firstOutput);
+                    outputPort.pop();
+                }
+            }
+            else if (outputPort.length > 0)
+            {
+                var firstOutput = outputPort[outputPort.length - 1];
+                elementUtilities.swapElements(effector, firstOutput);
+                var firstOutputScore = -elementUtilities.checkNegativeOrientationScore(ele, cy.getElementById(firstOutput.id), bestOrientation);
+                if ( firstOutputScore > firstOutput.score)
+                {
+                    outputPort.pop();
+                }
+                else
+                    elementUtilities.swapElements(effector, firstOutput); //swap back
+            }
+            else if (inputPort.length > 0)
+            {
+                var firstInput = inputPort[inputPort.length - 1];
+                elementUtilities.swapElements(effector, firstInput);
+                var firstInputScore = elementUtilities.checkNegativeOrientationScore(ele, cy.getElementById(firstInput.id), bestOrientation);
+                if ( firstInputScore > firstInput.score)
+                {
+                    inputPort.pop();
+                }
+                else
+                    elementUtilities.swapElements(effector, firstInput);
+            }
+        }
+    },
+    /*
+     * Adds simple nodes when they have negative score to inputPort, outputPort or notConnectedPort arrays
+     * */
+    addSimpleNodeToArray: function(ele, other, orientation, array, connectedTo) {
+        if (other.connectedEdges().length === 1)
+        {
+            var nodeScore;
+            var obj = {};
+            if (connectedTo === "notConnected")
+            {
+                nodeScore = Math.abs(elementUtilities.checkNegativeOrientationScore(ele, other, orientation));
+                obj['id'] = other.id();
+                obj['score'] = nodeScore;
+                array.push(obj);
+            }
+            else
+            {
+                if (connectedTo === "input")
+                    nodeScore = elementUtilities.checkNegativeOrientationScore(ele, other, orientation);
+                else if (connectedTo === "output")
+                    nodeScore = -elementUtilities.checkNegativeOrientationScore(ele, other, orientation);
+                if (nodeScore < 0) //if it is in the wrong side we add it to the input array
+                {
+                    obj['id'] = other.id();
+                    obj['score'] = nodeScore;
+                    array.push(obj);
+                }
+            }
+        }
+    },
+    /*
+     This function calculates the score of a node based on its position with respect to a process/logical operator
+     @param ele - is the node with the ports. It can be process,omitted process,
+     uncertain process, association, dissociation, logical operator
+     @param other - is the other node, and based on its position score of a node is calculated
+     @param orientation - A string which holds current best orientation
+     */
+    checkNegativeOrientationScore: function(ele, other, orientation) {
+        var coeff = 0.5;
+        var score = 1;
+        if (orientation === 'L-to-R' || orientation === 'R-to-L')
+        {
+            var nodeWidth = ele.width()/2;
+            if (other.position('x') < ele.position('x') - nodeWidth)
+            {
+                if (orientation === 'L-to-R')
+                    return score;
+                else if (orientation === 'R-to-L')
+                    return -score;
+            }
+            else if (other.position('x') >= ele.position('x') - nodeWidth && other.position('x') <= ele.position('x') + nodeWidth)
+            {
+                if (orientation === 'L-to-R')
+                    return (ele.position('x') - other.position('x'))/nodeWidth*coeff;
+                else if (orientation === 'R-to-L')
+                    return -(ele.position('x') - other.position('x'))/nodeWidth*coeff;
+            }
+            else if (other.position('x') > ele.position('x') + nodeWidth)
+            {
+                if (orientation === 'L-to-R')
+                    return -score;
+                else if (orientation === 'R-to-L')
+                    return score;
+            }
+        }
+        if (orientation === 'T-to-B' || orientation === 'B-to-T')
+        {
+            var nodeHeight = ele.height()/2;
+            if (other.position('y') < ele.position('y') - nodeHeight)
+            {
+                if (orientation === 'T-to-B')
+                    return score;
+                else if (orientation === 'B-to-T')
+                    return -score;
+            }
+            else if (other.position('y') >= ele.position('y') - nodeHeight && other.position('y') <= ele.position('y') + nodeHeight)
+            {
+                if (orientation === 'T-to-B')
+                    return (ele.position('y') - other.position('y'))/nodeHeight*coeff;
+                else if (orientation === 'B-to-T')
+                    return -(ele.position('y') - other.position('y'))/nodeHeight*coeff;
+            }
+            else if (other.position('y') > ele.position('y') + nodeHeight)
+            {
+                if (orientation === 'T-to-B')
+                    return -score;
+                else if (orientation === 'B-to-T')
+                    return score;
+            }
+        }
+    },
+    /*
+     Swaps the positions of 2 elements
+     */
+    swapElements: function(firstEle, secondEle) {
+        var firstNode = cy.getElementById(firstEle.id);
+        var secondNode = cy.getElementById(secondEle.id);
+        var tempx = firstNode.position('x');
+        var tempy = firstNode.position('y');
+        firstNode.position('x', secondNode.position('x'));
+        firstNode.position('y', secondNode.position('y'));
+        secondNode.position('x', tempx);
+        secondNode.position('y', tempy);
+    },
+
     // used for handling the variable property of complexes
     getComplexPadding: function(ele) {
       // this property needs to take into account:
