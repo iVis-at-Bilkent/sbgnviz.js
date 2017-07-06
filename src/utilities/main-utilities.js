@@ -159,6 +159,25 @@ mainUtilities.expandAll = function() {
   }
 };
 
+// Increase border width to show nodes with hidden neighbors
+function thickenBorder(eles) {
+  eles.forEach(function( ele ){
+    var defaultBorderWidth = Number(ele.data("border-width"));
+    ele.data("border-width", defaultBorderWidth + 2);
+  });
+  eles.data("thickBorder", true);
+  return eles;
+}
+// Decrease border width when hidden neighbors of the nodes become visible
+function thinBorder(eles) {
+  eles.forEach(function( ele ){
+    var defaultBorderWidth = Number(ele.data("border-width"));
+    ele.data("border-width", defaultBorderWidth - 2);
+  });
+  eles.removeData("thickBorder");
+  return eles;
+}
+
 // Extends the given nodes list in a smart way to leave the map intact and hides the resulting list. 
 // Requires viewUtilities extension and considers 'undoable' option.
 mainUtilities.hideNodesSmart = function(_nodes) {
@@ -175,7 +194,20 @@ mainUtilities.hideNodesSmart = function(_nodes) {
   }
   
   if(options.undoable) {
-    cy.undoRedo().do("hide", nodesToHide);
+    
+    var ur = cy.undoRedo();
+    ur.action("thickenBorder", thickenBorder, thinBorder);
+    ur.action("thinBorder", thinBorder, thickenBorder);
+    
+    // Batching
+    var actions = []; 
+    var nodesWithHiddenNeighbor = cy.edges(":hidden").connectedNodes().intersection(nodesToHide);
+    actions.push({name: "thinBorder", param: nodesWithHiddenNeighbor}); 
+    actions.push({name: "hide", param: nodesToHide});
+    nodesWithHiddenNeighbor = nodesToHide.neighborhood(":visible")
+            .nodes().difference(nodesToHide).difference(cy.nodes("[thickBorder]"));
+    actions.push({name: "thickenBorder", param: nodesWithHiddenNeighbor});  
+    cy.undoRedo().do("batch", actions);
   }
   else {
     viewUtilities.hide(nodesToHide);
@@ -198,7 +230,19 @@ mainUtilities.showNodesSmart = function(_nodes) {
   }
   
   if(options.undoable) {
-    cy.undoRedo().do("hide", nodesToHide);
+    var ur = cy.undoRedo();
+    ur.action("thickenBorder", thickenBorder, thinBorder);
+    ur.action("thinBorder", thinBorder, thickenBorder);
+    
+    // Batching
+    var actions = [];    
+    var nodesWithHiddenNeighbor = cy.edges(":hidden").connectedNodes(':visible');
+    actions.push({name: "thinBorder", param: nodesWithHiddenNeighbor});  
+    actions.push({name: "hide", param: nodesToHide});
+    nodesWithHiddenNeighbor = nodesToHide.neighborhood(":visible")
+            .nodes().difference(nodesToHide);
+    actions.push({name: "thickenBorder", param: nodesWithHiddenNeighbor});  
+    cy.undoRedo().do("batch", actions);
   }
   else {
     viewUtilities.hide(nodesToHide);
@@ -215,7 +259,16 @@ mainUtilities.showAll = function() {
   }
   
   if(options.undoable) {
-    cy.undoRedo().do("show", cy.elements());
+    var ur = cy.undoRedo();
+    ur.action("thickenBorder", thickenBorder, thinBorder);
+    ur.action("thinBorder", thinBorder, thickenBorder);
+    
+    // Batching   
+    var actions = [];
+    var nodesWithHiddenNeighbor = cy.nodes("[thickBorder]");
+    actions.push({name: "thinBorder", param: nodesWithHiddenNeighbor});  
+    actions.push({name: "show", param: cy.elements()});
+    cy.undoRedo().do("batch", actions);
   }
   else {
     viewUtilities.show(cy.elements());
