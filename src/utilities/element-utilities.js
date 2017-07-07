@@ -841,7 +841,7 @@ var elementUtilities = {
         cy.nodes().forEach(function(ele){
             if (ele.data('class') === 'process' || ele.data('class') === 'omitted process' || ele.data('class') === 'uncertain process' || ele.data('class') === 'association' || ele.data('class') === 'dissociation' || ele.data('class') === 'and' || ele.data('class') === 'or' || ele.data('class') === 'not')
             {
-                if (graphUtilities.portsEnabled === true && ele.data('ports').length === 2 )
+                if ( ele.data('ports').length === 2 )
                 {
                     var bestOrientation = elementUtilities.changePortsOrientation(ele);
                     elementUtilities.setPortsOrdering(ele, bestOrientation);
