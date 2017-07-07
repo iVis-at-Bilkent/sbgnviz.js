@@ -198,11 +198,11 @@ var elementUtilities = {
             return $.inArray(ele._private.data.class, extendNodeTypes) >= 0;
         });
         //For AF support, subject to change
-        var neighborNonProcesses = nonProcesses.neighborhood().filter(function(ele, i){
+        var neighborNonProcesses = nonProcesses.union(nonProcesses.neighborhood(":hidden")).filter(function(ele, i){
             if(typeof ele === "number") {
               ele = i;
             }
-            return $.inArray(ele._private.data.class, extendNodeTypes) >= -1;
+            return $.inArray(ele._private.data.class, extendNodeTypes) === -1;
         });
 
         nodesToShow = nodesToShow.add(processes.neighborhood());
