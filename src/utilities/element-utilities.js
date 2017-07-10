@@ -61,7 +61,7 @@ var elementUtilities = {
     },
     //the following were moved here from what used to be utilities/sbgn-filtering.js
     processTypes : ['process', 'omitted process', 'uncertain process',
-        'association', 'dissociation', 'phenotype'],
+        'association', 'dissociation'],
     
     // Returns whether the given element or elements with the given class can have ports.
     canHavePorts : function(ele) {
