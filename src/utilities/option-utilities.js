@@ -23,7 +23,7 @@ var defaults = {
     return 10;
   },
   improveFlow: function () {
-      return false;
+      return true;
   },
   // extra padding for compartment and complexes
   extraCompartmentPadding: 10,
