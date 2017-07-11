@@ -137,7 +137,7 @@ module.exports = function () {
     cy.on("expandcollapse.beforecollapse", "node", function (event) {
       var node = this;
       //The children info of complex nodes should be shown when they are collapsed
-      if (node._private.data.class == "complex") {
+      if (node._private.data.class.startsWith("complex")) {
         //The node is being collapsed store infolabel to use it later
         var infoLabel = elementUtilities.getInfoLabel(node);
         node._private.data.infoLabel = infoLabel;
@@ -165,7 +165,7 @@ module.exports = function () {
       var node = this;
       cy.nodes().updateCompoundBounds();
       //Don't show children info when the complex node is expanded
-      if (node._private.data.class == "complex") {
+      if (node._private.data.class.startsWith("complex")) {
         node.removeStyle('content');
       }
     });

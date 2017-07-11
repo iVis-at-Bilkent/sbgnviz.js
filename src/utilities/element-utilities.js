@@ -155,7 +155,7 @@ var elementUtilities = {
     },
     getNeighboursOfNodes: function(_nodes){
         var nodes = _nodes.nodes(); // Ensure that nodes list just include nodes
-        nodes = nodes.add(nodes.parents("node[class='complex']"));
+        nodes = nodes.add(nodes.parents("node[class^='complex']"));
         nodes = nodes.add(nodes.descendants());
         var neighborhoodEles = nodes.neighborhood();
         var elesToReturn = nodes.add(neighborhoodEles);
@@ -169,7 +169,7 @@ var elementUtilities = {
         //add parents
         nodesToShow = nodesToShow.add(nodesToShow.parents());
         //add complex children
-        nodesToShow = nodesToShow.add(nodesToShow.nodes("node[class='complex']").descendants());
+        nodesToShow = nodesToShow.add(nodesToShow.nodes("node[class^='complex']").descendants());
 
         // var processes = nodesToShow.nodes("node[class='process']");
         // var nonProcesses = nodesToShow.nodes("node[class!='process']");
@@ -220,7 +220,7 @@ var elementUtilities = {
         //add parents
         nodesToShow = nodesToShow.add(nodesToShow.nodes().parents());
         //add children
-        nodesToShow = nodesToShow.add(nodesToShow.nodes("node[class='complex']").descendants());
+        nodesToShow = nodesToShow.add(nodesToShow.nodes("node[class^='complex']").descendants());
 
         return nodesToShow;
     },
