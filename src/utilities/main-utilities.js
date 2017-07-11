@@ -84,7 +84,7 @@ mainUtilities.collapseComplexes = function() {
   // Get expandCollapse api
   var expandCollapse = cy.expandCollapse('get');
   
-  var complexes = cy.nodes("[class='complex']");
+  var complexes = cy.nodes("[class^='complex']");
   if (expandCollapse.collapsibleNodes(complexes).length == 0) {
     return;
   }
@@ -104,7 +104,7 @@ mainUtilities.expandComplexes = function() {
   // Get expandCollapse api
   var expandCollapse = cy.expandCollapse('get');
   
-  var nodes = expandCollapse.expandableNodes(cy.nodes().filter("[class='complex']"));
+  var nodes = expandCollapse.expandableNodes(cy.nodes().filter("[class^='complex']"));
   if (nodes.length == 0) {
     return;
   }
@@ -493,7 +493,7 @@ mainUtilities.getQtipContent = function(node) {
 mainUtilities.setShowComplexName = function(showComplexName) {
   options.showComplexName = showComplexName;
   // make change active by triggering data which will trigger style update
-  cy.nodes('[class="complex"]').forEach(function(ele){
+  cy.nodes('[class^="complex"]').forEach(function(ele){
     ele.trigger("data");
   });
 };
