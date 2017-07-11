@@ -2,6 +2,7 @@ var elementUtilities = require('./element-utilities');
 var classes = require('../utilities/classes');
 var graphUtilities = require('./graph-utilities');
 var libsbgnjs = require('libsbgn.js');
+var libs = require('./lib-utilities').getLibs();
 
 var sbgnmlToJson = {
   insertedNodes: {},
@@ -161,12 +162,31 @@ var sbgnmlToJson = {
 
     var childGlyphs = ele.glyphMembers; // this.findChildNodes(ele, 'glyph');
 
+    // if a biological activity node has no unit of info, it must be a BA plain
+    if(elementUtilities.mapType == "AF" && childGlyphs.length == 0) {
+      parent.class = "BA plain";
+    }
+
     for (var i = 0; i < childGlyphs.length; i++) {
       var glyph = childGlyphs[i];
       var info = {};
 
       if (glyph.class_ === 'unit of information') {
         var unitOfInformation = new classes.UnitOfInformation();
+        if(glyph.entity) {
+          // change the parent class according to its true class of biological activity
+          switch(glyph.entity.name) {
+            case 'unspecified entity':    parent.class = "BA unspecified entity"; break;
+            case 'simple chemical':       parent.class = "BA simple chemical"; break;
+            case 'macromolecule':         parent.class = "BA macromolecule"; break;
+            case 'nucleic acid feature':  parent.class = "BA nucleic acid feature"; break;
+            case 'perturbation':          parent.class = "BA perturbing agent"; break;
+            case 'complex':               parent.class = "BA complex"; break;
+          }
+          unitOfInformation.shapeFn = libs.cytoscape.sbgn.AfShapeFn;
+          unitOfInformation.shapeArgsFn = libs.cytoscape.sbgn.AfShapeArgsFn;
+        }
+
         unitOfInformation.id = glyph.id || undefined;
         unitOfInformation.label = {
           'text': (glyph.label && glyph.label.text) || undefined
@@ -247,6 +267,8 @@ var sbgnmlToJson = {
     nodeObj.statesandinfos = self.stateAndInfoProp(ele, nodeObj);
     // adding parent information
     self.addParentInfoToNode(ele, nodeObj, parent, compartments);
+    // add language info, this will always be the mapType
+    nodeObj.language = elementUtilities.mapType;
 
     // add clone information
     if (ele.clone) {
@@ -483,6 +505,8 @@ var sbgnmlToJson = {
     edgeObj.id = ele.id || undefined;
     edgeObj.class = ele.class_;
     edgeObj.bendPointPositions = bendPointPositions;
+    // add language info, this will always be the mapType
+    edgeObj.language = elementUtilities.mapType;
 
     edgeObj.cardinality = 0;
     if (ele.glyphs.length > 0) {
@@ -630,6 +654,16 @@ var sbgnmlToJson = {
     var compartmentChildrenMap = {}; // Map compartments children temporarily
 
     var sbgn = libsbgnjs.Sbgn.fromXML(xmlObject.querySelector('sbgn'));
+    if(sbgn.map.language == "process description") {
+      elementUtilities.mapType = "PD";
+    }
+    else if(sbgn.map.language == "activity flow") {
+      elementUtilities.mapType = "AF";
+    }
+    else {
+      elementUtilities.mapType = "Unknown";
+    }
+
     var compartments = self.getAllCompartments(sbgn.map.glyphs);
 
     var glyphs = sbgn.map.glyphs;

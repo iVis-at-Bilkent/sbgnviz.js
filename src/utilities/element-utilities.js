@@ -10,6 +10,9 @@ var jQuery = $ = libs.jQuery;
 var graphUtilities = require('./graph-utilities');
 
 var elementUtilities = {
+
+    mapType: undefined, // initialize map type
+
     //the list of the element classes handled by the tool
     handledElements: {
         'unspecified entity': true,

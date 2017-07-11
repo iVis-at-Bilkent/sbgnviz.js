@@ -42,10 +42,22 @@ var jsonToSbgnml = {
             hasRenderExtension = true;
         }
 
+        var mapLanguage;
+        if(elementUtilities.mapType == "PD") {
+            mapLanguage = "process description";
+        }
+        else if(elementUtilities.mapType == "AF") {
+            mapLanguage = "activity flow";
+        }
+        else {
+            // case of a mixed map with bits of AF and PD for example
+            mapLanguage = "unknown";
+        }
+
         //add headers
         xmlHeader = "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>\n";
         var sbgn = new libsbgnjs.Sbgn({xmlns: 'http://sbgn.org/libsbgn/0.3'});
-        var map = new libsbgnjs.Map({language: 'process description', id: mapID});
+        var map = new libsbgnjs.Map({language: mapLanguage, id: mapID});
         if (hasExtension) { // extension is there
             var extension = new libsbgnjs.Extension();
             if (hasRenderExtension) {
@@ -150,6 +162,10 @@ var jsonToSbgnml = {
         var self = this;
         var nodeClass = node._private.data.class;
         var glyphList = [];
+
+        if( nodeClass.startsWith('BA')) {
+            nodeClass = "biological activity";
+        }
 
         var glyph = new libsbgnjs.Glyph({id: node._private.data.id, class_: nodeClass});
 
@@ -359,6 +375,22 @@ var jsonToSbgnml = {
             label.text = node.label.text;
         glyph.setLabel(label);
         glyph.setBbox(this.addStateAndInfoBbox(mainGlyph, node));
+
+        // assign correct entity tag for AF case
+        var entityName = null;
+        switch(mainGlyph._private.data.class) {
+            case 'BA unspecified entity':   entityName = "unspecified entity"; break;
+            case 'BA simple chemical':      entityName = "simple chemical"; break;
+            case 'BA macromolecule':        entityName = "macromolecule"; break;
+            case 'BA nucleic acid feature': entityName = "nucleic acid feature"; break;
+            case 'BA perturbing agent':     entityName = "perturbation"; break;
+            case 'BA complex':              entityName = "complex"; break;
+        }
+        // entity tag aren't always there, only for AF
+        // but we still need to keep this information for unknown map type
+        if(entityName) {
+            glyph.setEntity(new libsbgnjs.EntityType({name: entityName}));
+        }
 
         return glyph;
     }
