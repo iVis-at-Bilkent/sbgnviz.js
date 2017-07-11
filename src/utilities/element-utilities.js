@@ -442,8 +442,12 @@ var elementUtilities = {
         return this.getDynamicLabelTextSize(ele, 2);
       }
 
-      if (_class === 'complex' || _class === 'compartment') {
+      if (_class === 'compartment') {
         return 16;
+      }
+
+      if (_class == 'complex' || _class == 'complex multimer') {
+          return 14;
       }
 
       return this.getDynamicLabelTextSize(ele);
@@ -1238,6 +1242,8 @@ var elementUtilities = {
           ele.data('auxunitlayouts').bottom.units.length > 0) {
         margin -= options.extraComplexPadding * 0.5;
       }
+    if (ele.css("font-size") == "14px")
+          margin -= 2;
       return margin;
     }
     
