@@ -61,6 +61,7 @@ var elementUtilities = {
         'unknown influence': true,
         'positive influence': true,
         'negative influence': true,
+        'submap': true,
     },
     //the following were moved here from what used to be utilities/sbgn-filtering.js
     processTypes : ['process', 'omitted process', 'uncertain process',
@@ -297,6 +298,10 @@ var elementUtilities = {
         if (_class.startsWith('BA')){
             return 'biological activity';
         }
+
+        if (_class == 'submap'){
+            return 'rectangle';
+        }
         
         // We need to define new node shapes with their class names for these nodes
         if (_class == 'source and sink' || _class == 'nucleic acid feature' || _class == 'macromolecule' 
@@ -352,7 +357,8 @@ var elementUtilities = {
             || _class == 'phenotype'
             || _class == 'unspecified entity' || _class == 'nucleic acid feature'
             || _class == 'perturbing agent' || _class == 'tag'
-            || _class == 'biological activity' || _class.startsWith('BA')) {
+            || _class == 'biological activity' || _class.startsWith('BA')
+            || _class == 'submap') {
             content = ele.data('label') ? ele.data('label') : "";
         }
         else if(_class == 'compartment'){
