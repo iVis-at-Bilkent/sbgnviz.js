@@ -442,14 +442,6 @@ var elementUtilities = {
         return this.getDynamicLabelTextSize(ele, 2);
       }
 
-      if (_class === 'compartment') {
-        return 16;
-      }
-
-      if (_class == 'complex' || _class == 'complex multimer') {
-          return 14;
-      }
-
       return this.getDynamicLabelTextSize(ele);
     },
     getCardinalityDistance: function (ele) {
@@ -538,12 +530,27 @@ var elementUtilities = {
 
       if (dynamicLabelSizeCoefficient === undefined) {
         if (dynamicLabelSize == 'small') {
+          if (ele.data("class").startsWith("complex"))
+            return 10;
+          else if (ele.data("class") == "compartment")
+            return 12;
+
           dynamicLabelSizeCoefficient = 0.75;
         }
         else if (dynamicLabelSize == 'regular') {
+          if (ele.data("class").startsWith("complex"))
+            return 11;
+          else if (ele.data("class") == "compartment")
+            return 14;
+
           dynamicLabelSizeCoefficient = 1;
         }
         else if (dynamicLabelSize == 'large') {
+          if (ele.data("class").startsWith("complex"))
+            return 12;
+          else if (ele.data("class") == "compartment")
+            return 16;
+
           dynamicLabelSizeCoefficient = 1.25;
         }
       }
