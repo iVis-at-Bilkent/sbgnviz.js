@@ -449,6 +449,7 @@ mainUtilities.removeHighlights = function() {
   else {
     viewUtilities.removeHighlights();
   }
+  cy.style().update();
 };
 
 // Performs layout by given layoutOptions. Considers 'undoable' option. However, by setting notUndoable parameter
