@@ -325,6 +325,20 @@ module.exports = function () {
               return graphUtilities.getCompoundPaddings() + options.extraCompartmentPadding;
             }
           })
+          .selector("node[class='submap']")
+          .css({
+            'border-width': 2.25,
+            'background-opacity': 0,
+            'text-valign': 'bottom',
+            'text-halign': 'center',
+            'text-margin-y' : -1 * options.extraCompartmentPadding
+          })
+          .selector("node:parent[class='submap']")
+          .css({
+            'padding': function() {
+              return graphUtilities.getCompoundPaddings() + options.extraCompartmentPadding;
+            }
+          })
           .selector("node:childless[bbox]")
           .css({
             'width': 'data(bbox.w)',
