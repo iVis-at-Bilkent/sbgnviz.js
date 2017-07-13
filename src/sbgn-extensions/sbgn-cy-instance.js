@@ -309,7 +309,8 @@ module.exports = function () {
             'text-valign': 'bottom',
             'text-halign': 'center',
             'text-margin-y': elementUtilities.getComplexMargin,
-            'padding': elementUtilities.getComplexPadding
+            'padding': elementUtilities.getComplexPadding,
+            'compound-sizing-wrt-labels' : 'exclude',
           })
           .selector("node[class='compartment']")
           .css({
@@ -317,7 +318,8 @@ module.exports = function () {
             'background-opacity': 0,
             'text-valign': 'bottom',
             'text-halign': 'center',
-            'text-margin-y' : -1 * options.extraCompartmentPadding
+            'text-margin-y' : -1 * options.extraCompartmentPadding,
+            'compound-sizing-wrt-labels' : 'exclude',
           })
           .selector("node:parent[class='compartment']")
           .css({
@@ -331,7 +333,8 @@ module.exports = function () {
             'background-opacity': 0,
             'text-valign': 'bottom',
             'text-halign': 'center',
-            'text-margin-y' : -1 * options.extraCompartmentPadding
+            'text-margin-y' : -1 * options.extraCompartmentPadding,
+            'compound-sizing-wrt-labels' : 'exclude',
           })
           .selector("node:parent[class='submap']")
           .css({
