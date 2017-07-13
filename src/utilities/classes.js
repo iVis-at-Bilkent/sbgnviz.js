@@ -18,6 +18,7 @@ var AuxiliaryUnit = function (parent) {
   this.anchorSide = null;
   this.isDisplayed = false;
 };
+AuxiliaryUnit.defaultBackgroundColor = "#ffffff";
 
 /*
  * Return a new AuxiliaryUnit object. A new parent reference and new id can
@@ -252,7 +253,10 @@ StateVariable.prototype.drawShape = function(context, x, y) {
               x, y,
               this.bbox.w, this.bbox.h,
               Math.min(this.bbox.w / 2, this.bbox.h / 2, StateVariable.shapeRadius));
+  var tmp_ctxt = context.fillStyle;
+  context.fillStyle = AuxiliaryUnit.defaultBackgroundColor;
   context.fill();
+  context.fillStyle = tmp_ctxt;
   context.stroke();
 };
 
@@ -352,7 +356,10 @@ UnitOfInformation.prototype.hasText = function() {
 UnitOfInformation.prototype.drawShape = function(context, x, y) {
   var args = [context, x, y].concat(this.shapeArgsFn(this));
   this.shapeFn.apply(null, args);
+  var tmp_ctxt = context.fillStyle;
+  context.fillStyle = AuxiliaryUnit.defaultBackgroundColor;
   context.fill();
+  context.fillStyle = tmp_ctxt;
   context.stroke();
 };
 
