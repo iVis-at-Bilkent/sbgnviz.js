@@ -538,7 +538,7 @@ var elementUtilities = {
         if (dynamicLabelSize == 'small') {
           if (ele.data("class").startsWith("complex"))
             return 10;
-          else if (ele.data("class") == "compartment")
+          else if (ele.data("class") == "compartment" || ele.data("class") == "submap")
             return 12;
 
           dynamicLabelSizeCoefficient = 0.75;
@@ -546,7 +546,7 @@ var elementUtilities = {
         else if (dynamicLabelSize == 'regular') {
           if (ele.data("class").startsWith("complex"))
             return 11;
-          else if (ele.data("class") == "compartment")
+          else if (ele.data("class") == "compartment" || ele.data("class") == "submap")
             return 14;
 
           dynamicLabelSizeCoefficient = 1;
@@ -554,7 +554,7 @@ var elementUtilities = {
         else if (dynamicLabelSize == 'large') {
           if (ele.data("class").startsWith("complex"))
             return 12;
-          else if (ele.data("class") == "compartment")
+          else if (ele.data("class") == "compartment" || ele.data("class") == "submap")
             return 16;
 
           dynamicLabelSizeCoefficient = 1.25;
