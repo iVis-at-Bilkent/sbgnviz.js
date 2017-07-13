@@ -124,7 +124,17 @@ fileUtilities.loadSBGNMLFile = function(file, callback) {
 
     setTimeout(function () {
       if (typeof callback !== 'undefined') callback(text);
-      updateGraph(sbgnmlToJson.convert(textToXmlObject(text)));
+      var cyGraph;
+      try {
+        cyGraph = sbgnmlToJson.convert(textToXmlObject(text));
+      }
+      catch (err) {
+        uiUtilities.endSpinner("load-file-spinner");
+        console.log(err);
+        return;
+      }
+
+      updateGraph(cyGraph);
       uiUtilities.endSpinner("load-file-spinner");
       $( document ).trigger( "sbgnvizLoadFileEnd", [ file.name ] ); // Trigger an event signaling that a file is loaded
     }, 0);
