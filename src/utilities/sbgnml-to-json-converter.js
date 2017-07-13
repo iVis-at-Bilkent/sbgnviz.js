@@ -653,7 +653,14 @@ var sbgnmlToJson = {
     var cytoscapeJsEdges = [];
     var compartmentChildrenMap = {}; // Map compartments children temporarily
 
-    var sbgn = libsbgnjs.Sbgn.fromXML(xmlObject.querySelector('sbgn'));
+    var sbgn;
+    try {
+      sbgn = libsbgnjs.Sbgn.fromXML(xmlObject.querySelector('sbgn'));
+    }
+    catch (err) {
+      throw new Error("Could not parse sbgnml.");
+    }
+
     if(sbgn.map.language == "process description") {
       elementUtilities.mapType = "PD";
     }
