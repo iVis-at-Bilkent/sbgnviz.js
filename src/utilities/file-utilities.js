@@ -106,7 +106,7 @@ fileUtilities.loadSample = function(filename, folderpath) {
   it is completely optional.
   signature: callback(textXml)
 */
-fileUtilities.loadSBGNMLFile = function(file, callback) {
+fileUtilities.loadSBGNMLFile = function(file, callback1, callback2) {
   var self = this;
   uiUtilities.startSpinner("load-file-spinner");
   
@@ -123,7 +123,7 @@ fileUtilities.loadSBGNMLFile = function(file, callback) {
     var text = this.result;
 
     setTimeout(function () {
-      if (typeof callback !== 'undefined') callback(text);
+      if (typeof callback1 !== 'undefined') callback1(text);
       var cyGraph;
       try {
         cyGraph = sbgnmlToJson.convert(textToXmlObject(text));
@@ -131,6 +131,7 @@ fileUtilities.loadSBGNMLFile = function(file, callback) {
       catch (err) {
         uiUtilities.endSpinner("load-file-spinner");
         console.log(err);
+        if (typeof callback2 !== 'undefined') callback2();
         return;
       }
 
