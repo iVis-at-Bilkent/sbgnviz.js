@@ -289,6 +289,20 @@ var sbgnmlToJson = {
 
       relativeXPos = relativeXPos / parseFloat(nodeObj.bbox.w) * 100;
       relativeYPos = relativeYPos / parseFloat(nodeObj.bbox.h) * 100;
+      
+      // We assume that ports are not inside the node shape. 
+      // Therefore, abs. value of their relative x and y coordinates (relative to node center) should be bigger than 50.
+      if (Math.abs(relativeXPos) < 50) {
+        relativeXPos = 0;
+      }
+      
+      if (Math.abs(relativeYPos) < 50) {
+        relativeYPos = 0;
+      }
+      
+      if (relativeXPos === 0 && relativeYPos === 0) {
+        continue;
+      }
 
       ports.push({
         id: id,
