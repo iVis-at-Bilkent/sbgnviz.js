@@ -68,7 +68,7 @@ var jsonToSbgnml = {
 
         // get all glyphs
         var glyphList = [];
-        cy.nodes(":visible").each(function(ele, i){
+        cy.nodes().each(function(ele, i){
             if(typeof ele === "number") {
               ele = i;
             }
@@ -81,7 +81,7 @@ var jsonToSbgnml = {
         }
 
         // get all arcs
-        cy.edges(":visible").each(function(ele, i){
+        cy.edges().each(function(ele, i){
             if(typeof ele === "number") {
               ele = i;
             }
@@ -217,14 +217,7 @@ var jsonToSbgnml = {
         }
         // check for annotations
         if (node.data('annotations') && !$.isEmptyObject(node.data('annotations'))) {
-            var extension;
-            if(glyph.extension) { // an extension is already there for thise glyph
-                extension = glyph.extension;
-            }
-            else {
-                extension = new libsbgnjs.Extension();
-                glyph.setExtension(extension);
-            }
+            var extension = self.getOrCreateExtension(glyph);
             var annotExt = self.getAnnotationExtension(node);
             extension.add(annotExt);
         }
@@ -240,6 +233,28 @@ var jsonToSbgnml = {
                     glyph.addGlyphMember(glyphMemberList[i]);
                 }
             });
+        }
+
+        var newtExtString = "";
+        var hasNewtExt = false;
+
+        // add info for collapsed nodes
+        if(node.data('collapsedChildren')) {
+            newtExtString += "<collapsed/>";
+            hasNewtExt = true;
+        }
+
+        // add info for hidden nodes
+        if(node.hidden()) {
+            newtExtString += "<hidden/>";
+            hasNewtExt = true;
+        }
+
+        // add string to a new extension for this glyph
+        if(hasNewtExt) {
+            var extension = self.getOrCreateExtension(glyph);
+            extension.list["newt"] = jQuery.parseXML("<newt>"+newtExtString+"</newt>");
+            console.log(extension.toXML());
         }
 
         // current glyph is done
@@ -258,7 +273,21 @@ var jsonToSbgnml = {
         return  glyphList;
     },
 
+    // element: a libsbgn.js glyph or edge object
+    getOrCreateExtension: function(element) {
+        var extension;
+        if(element.extension) { // an extension is already there for this element
+            extension = element.extension;
+        }
+        else {
+            extension = new libsbgnjs.Extension();
+            element.setExtension(extension);
+        }
+        return extension;
+    },
+
     getArcSbgnml : function(edge){
+        var self = this;
         //Temporary hack to resolve "undefined" arc source and targets
         var arcTarget = edge._private.data.porttarget;
         var arcSource = edge._private.data.portsource;
@@ -300,16 +329,16 @@ var jsonToSbgnml = {
         }
         // check for annotations
         if (edge.data('annotations') && !$.isEmptyObject(edge.data('annotations'))) {
-            var extension;
-            if(arc.extension) { // an extension is already there for thise arc
-                extension = arc.extension;
-            }
-            else {
-                extension = new libsbgnjs.Extension();
-                arc.setExtension(extension);
-            }
+            var extension = self.getOrCreateExtension(arc);
             var annotExt = this.getAnnotationExtension(edge);
             extension.add(annotExt);
+        }
+
+        // add info for hidden edges
+        if(edge.hidden()) {
+            var extension = self.getOrCreateExtension(arc);
+            extension.list["newt"] = jQuery.parseXML("<newt><hidden/></newt>");
+            console.log(extension.toXML());
         }
 
         return arc;
