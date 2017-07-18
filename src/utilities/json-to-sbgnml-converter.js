@@ -68,7 +68,7 @@ var jsonToSbgnml = {
 
         // get all glyphs
         var glyphList = [];
-        cy.nodes().each(function(ele, i){
+        cy.nodes(":visible").each(function(ele, i){
             if(typeof ele === "number") {
               ele = i;
             }
@@ -81,7 +81,7 @@ var jsonToSbgnml = {
         }
 
         // get all arcs
-        cy.edges().each(function(ele, i){
+        cy.edges(":visible").each(function(ele, i){
             if(typeof ele === "number") {
               ele = i;
             }
