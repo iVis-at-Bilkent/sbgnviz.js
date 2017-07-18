@@ -68,6 +68,8 @@ var jsonToSbgnml = {
 
         // get all glyphs
         var glyphList = [];
+        // be carefule that :visible is also used during recursive search of nodes
+        // in the getGlyphSbgnml function. If not set accordingly, discrepancies will occur.
         cy.nodes(":visible").each(function(ele, i){
             if(typeof ele === "number") {
               ele = i;
@@ -262,7 +264,7 @@ var jsonToSbgnml = {
 
         // keep going with all the included glyphs
         if(nodeClass === "compartment"){
-            node.children().each(function(ele, i){
+            node.children(":visible").each(function(ele, i){
                 if(typeof ele === "number") {
                   ele = i;
                 }
