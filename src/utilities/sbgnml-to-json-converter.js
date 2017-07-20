@@ -163,7 +163,7 @@ var sbgnmlToJson = {
     var childGlyphs = ele.glyphMembers; // this.findChildNodes(ele, 'glyph');
 
     // if a biological activity node has no unit of info, it must be a BA plain
-    if(elementUtilities.mapType == "AF" && childGlyphs.length == 0) {
+    if(parent.class == "biological activity" && childGlyphs.length == 0) {
       parent.class = "BA plain";
     }
 
