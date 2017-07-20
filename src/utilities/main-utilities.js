@@ -358,7 +358,7 @@ mainUtilities.highlightNeighbours = function(_nodes) {
   }
   var notHighlightedEles = cy.elements(".nothighlighted").filter(":visible");
   var highlightedEles = cy.elements(':visible').difference(notHighlightedEles);
-  if (elesToHighlight.same(highlightedEles)) {
+  if (elesToHighlight.same(highlightedEles) && !cy.elements(":unselected").empty()) {
     return;
   }
   
