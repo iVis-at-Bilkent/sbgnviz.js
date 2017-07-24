@@ -94,7 +94,9 @@ AuxiliaryUnit.prototype.drawText = function(context, centerX, centerY) {
     text = this.getText();
   }
 
+  context.beginPath();
   context.fillText(text, centerX, centerY);
+  context.closePath();
 
   // restore saved style
   context.fillStyle = oldStyle;

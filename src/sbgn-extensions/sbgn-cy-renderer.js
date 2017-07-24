@@ -94,8 +94,6 @@ module.exports = function () {
       var layout = layouts[side];
       layout.draw(context);
     }
-    //This is a temporary workaround                      // <- ?
-    $$.sbgn.drawEllipse(context, centerX, centerY, 0, 0); // <- ?
   };
 
   $$.sbgn.AfShapeFn = function (context, x, y, width, height, type) {
