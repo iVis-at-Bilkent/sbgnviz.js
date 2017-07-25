@@ -344,8 +344,8 @@ module.exports = function () {
   //complex's width or height is changed
   $$.sbgn.generateComplexShapePoints = function (cornerLength, width, height) {
     //cp stands for corner proportion
-    var cpX = cornerLength / width;
-    var cpY = cornerLength / height;
+    var cpX = Math.min(cornerLength, 0.5 * width) / width;
+    var cpY = Math.min(cornerLength, 0.5 * height) / height;
 
     var complexPoints = [-1 + cpX, -1, -1, -1 + cpY, -1, 1 - cpY, -1 + cpX,
       1, 1 - cpX, 1, 1, 1 - cpY, 1, -1 + cpY, 1 - cpX, -1];
@@ -588,9 +588,6 @@ module.exports = function () {
         var multimerPadding = cyBaseNodeShapes["complex"].multimerPadding;
         var cloneMarker = node._private.data.clonemarker;
 
-        // if the node is collapsed, decrease corner length
-        if (node.hasClass('cy-expand-collapse-collapsed-node'))
-          cornerLength = 14;
 
         cyBaseNodeShapes["complex"].points = $$.sbgn.generateComplexShapePoints(cornerLength,
                 width, height);
