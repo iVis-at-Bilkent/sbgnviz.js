@@ -171,10 +171,13 @@ module.exports = function () {
     });
 
     cy.on('layoutstop', function (event) {
+      if (event.layout.options.name !== 'preset')
+      {
         if (graphUtilities.portsEnabled === true)
         {
-            elementUtilities.changePortsOrientationAfterLayout();
+          elementUtilities.changePortsOrientationAfterLayout();
         }
+      }
     });
 
     $(document).on('updateGraphEnd', function(event) {
