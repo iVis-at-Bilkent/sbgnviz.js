@@ -94,6 +94,8 @@ module.exports = function () {
       var layout = layouts[side];
       layout.draw(context);
     }
+    context.beginPath();
+    context.closePath();
   };
 
   $$.sbgn.AfShapeFn = function (context, x, y, width, height, type) {
