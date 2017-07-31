@@ -251,7 +251,7 @@ module.exports = function () {
           })
           .selector("node[?clonemarker][class='perturbing agent'],node[?clonemarker][class='unspecified entity']")
           .css({
-            'background-image': imgPath + '/clone_bg.png',
+            'background-image': "url('" + 'data:image/svg+xml;utf8,%3Csvg%20width%3D%22100%22%20height%3D%22100%22%20viewBox%3D%220%200%20100%20100%22%20style%3D%22fill%3Anone%3Bstroke%3Ablack%3Bstroke-width%3A0%3B%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20%3E%3Crect%20x%3D%220%22%20y%3D%220%22%20width%3D%22100%22%20height%3D%22100%22%20style%3D%22fill%3A%23a9a9a9%22/%3E%20%3C/svg%3E' + "')",
             'background-position-x': '50%',
             'background-position-y': '100%',
             'background-width': '100%',
