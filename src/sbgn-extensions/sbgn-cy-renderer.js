@@ -204,26 +204,24 @@ module.exports = function () {
     var halfHeight = height / 2;
     //var cornerRadius = $$.math.getRoundRectangleRadius(width, height);
     var cornerRadius = Math.min(halfWidth, halfHeight);
-    context.translate(x, y);
 
     context.beginPath();
 
     // Start at top middle
-    context.moveTo(0, -halfHeight);
+    context.moveTo(x, y-halfHeight);
     // Arc from middle top to right side
-    context.arcTo(halfWidth, -halfHeight, halfWidth, 0, cornerRadius);
+    context.arcTo(x+halfWidth, y-halfHeight, x+halfWidth, y, cornerRadius);
     // Arc from right side to bottom
-    context.arcTo(halfWidth, halfHeight, 0, halfHeight, cornerRadius);
+    context.arcTo(x+halfWidth, y+halfHeight, x, y+halfHeight, cornerRadius);
     // Arc from bottom to left side
-    context.arcTo(-halfWidth, halfHeight, -halfWidth, 0, cornerRadius);
+    context.arcTo(x-halfWidth, y+halfHeight, x-halfWidth, y, cornerRadius);
     // Arc from left side to topBorder
-    context.arcTo(-halfWidth, -halfHeight, 0, -halfHeight, cornerRadius);
+    context.arcTo(x-halfWidth, y-halfHeight, x, y-halfHeight, cornerRadius);
     // Join line
-    context.lineTo(0, -halfHeight);
+    context.lineTo(x, y-halfHeight);
 
     context.closePath();
 
-    context.translate(-x, -y);
   };
 
   $$.sbgn.drawSimpleChemical = function (
@@ -241,20 +239,16 @@ module.exports = function () {
       context.fillStyle = $$.sbgn.colors.clone;
 
       context.beginPath();
-      context.translate(centerX, centerY);
-      context.scale(width / 2, height / 2);
 
-      var markerBeginX = -1 * Math.sin(Math.PI / 3);
-      var markerBeginY = Math.cos(Math.PI / 3);
-      var markerEndX = 0;
+      var markerBeginX = centerX - width/2 * Math.sin(Math.PI / 3);
+      var markerBeginY = centerY + height/2 * Math.cos(Math.PI / 3);
+      var markerEndX = centerX;
       var markerEndY = markerBeginY;
 
       context.moveTo(markerBeginX, markerBeginY);
       context.lineTo(markerEndX, markerEndY);
-      context.arc(0, 0, 1, 3 * Math.PI / 6, 5 * Math.PI / 6);
+      context.arc(centerX, centerY, width/2, 3 * Math.PI / 6, 5 * Math.PI / 6);
 
-      context.scale(2 / width, 2 / height);
-      context.translate(-centerX, -centerY);
       context.closePath();
 
       context.fill();
@@ -273,20 +267,16 @@ module.exports = function () {
       context.fillStyle = $$.sbgn.colors.clone;
 
       context.beginPath();
-      context.translate(centerX, centerY);
-      context.scale(width / 2, height / 2);
 
-      var markerBeginX = 0;
-      var markerBeginY = Math.cos(Math.PI / 3);
-      var markerEndX = 1 * Math.sin(Math.PI / 3);
+      var markerBeginX = centerX;
+      var markerBeginY = centerY + height/2 * Math.cos(Math.PI / 3);
+      var markerEndX = centerX + width/2 * Math.sin(Math.PI / 3);
       var markerEndY = markerBeginY;
 
       context.moveTo(markerBeginX, markerBeginY);
       context.lineTo(markerEndX, markerEndY);
-      context.arc(0, 0, 1, Math.PI / 6, 3 * Math.PI / 6);
+      context.arc(centerX, centerY, width/2, Math.PI / 6, 3 * Math.PI / 6);
 
-      context.scale(2 / width, 2 / height);
-      context.translate(-centerX, -centerY);
       context.closePath();
 
       context.fill();
@@ -303,19 +293,18 @@ module.exports = function () {
           centerX, centerY, cornerRadius) {
     var halfWidth = width / 2;
     var halfHeight = height / 2;
-
-    context.translate(centerX, centerY);
+    var left = centerX - halfWidth, right = centerX + halfWidth;
+    var bottom = centerY - halfHeight, top = centerY + halfHeight;
     context.beginPath();
 
-    context.moveTo(-halfWidth, -halfHeight);
-    context.lineTo(halfWidth, -halfHeight);
-    context.lineTo(halfWidth, 0);
-    context.arcTo(halfWidth, halfHeight, 0, halfHeight, cornerRadius);
-    context.arcTo(-halfWidth, halfHeight, -halfWidth, 0, cornerRadius);
-    context.lineTo(-halfWidth, -halfHeight);
+    context.moveTo(left, bottom);
+    context.lineTo(right, bottom);
+    context.lineTo(right, centerY);
+    context.arcTo(right, top, centerX, top, cornerRadius);
+    context.arcTo(left, top, left, centerY, cornerRadius);
+    context.lineTo(left, bottom);
 
     context.closePath();
-    context.translate(-centerX, -centerY);
     context.fill();
   };
 
@@ -823,15 +812,12 @@ module.exports = function () {
         context.stroke();
 
         context.beginPath();
-        context.translate(centerX, centerY);
-        context.scale(width * Math.sqrt(2) / 2, height * Math.sqrt(2) / 2);
+        var scaleX = width * Math.sqrt(2) / 2, scaleY =  height * Math.sqrt(2) / 2;
 
-        context.moveTo(pts[2], pts[3]);
-        context.lineTo(pts[6], pts[7]);
+        context.moveTo(centerX + scaleX * pts[2], centerY + scaleY * pts[3]);
+        context.lineTo(centerX + scaleX * pts[6], centerY + scaleY * pts[7]);
         context.closePath();
 
-        context.scale(2 / (width * Math.sqrt(2)), 2 / (height * Math.sqrt(2)));
-        context.translate(-centerX, -centerY);
 
         context.stroke();
 
