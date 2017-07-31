@@ -160,7 +160,7 @@ mainUtilities.expandAll = function() {
 };
 
 // Increase border width to show nodes with hidden neighbors
-function thickenBorder(eles) {
+mainUtilities.thickenBorder = function(eles){
   eles.forEach(function( ele ){
     var defaultBorderWidth = Number(ele.data("border-width"));
     ele.data("border-width", defaultBorderWidth + 2);
@@ -169,7 +169,7 @@ function thickenBorder(eles) {
   return eles;
 }
 // Decrease border width when hidden neighbors of the nodes become visible
-function thinBorder(eles) {
+mainUtilities.thinBorder = function(eles){
   eles.forEach(function( ele ){
     var defaultBorderWidth = Number(ele.data("border-width"));
     ele.data("border-width", defaultBorderWidth - 2);
@@ -196,8 +196,8 @@ mainUtilities.hideNodesSmart = function(_nodes) {
   if(options.undoable) {
     
     var ur = cy.undoRedo();
-    ur.action("thickenBorder", thickenBorder, thinBorder);
-    ur.action("thinBorder", thinBorder, thickenBorder);
+    ur.action("thickenBorder", mainUtilities.thickenBorder, mainUtilities.thinBorder);
+    ur.action("thinBorder", mainUtilities.thinBorder, mainUtilities.thickenBorder);
     
     // Batching
     var actions = []; 
@@ -211,10 +211,10 @@ mainUtilities.hideNodesSmart = function(_nodes) {
   }
   else {
     var nodesWithHiddenNeighbor = cy.edges(":hidden").connectedNodes(':visible');
-    thinBorder(nodesWithHiddenNeighbor);
+    mainUtilities.thinBorder(nodesWithHiddenNeighbor);
     viewUtilities.hide(nodesToHide);
     var nodesWithHiddenNeighbor = cy.edges(":hidden").connectedNodes(':visible');
-    thickenBorder(nodesWithHiddenNeighbor);
+    mainUtilities.thickenBorder(nodesWithHiddenNeighbor);
   }
 };
 
@@ -235,8 +235,8 @@ mainUtilities.showNodesSmart = function(_nodes) {
   
   if(options.undoable) {
     var ur = cy.undoRedo();
-    ur.action("thickenBorder", thickenBorder, thinBorder);
-    ur.action("thinBorder", thinBorder, thickenBorder);
+    ur.action("thickenBorder", mainUtilities.thickenBorder, mainUtilities.thinBorder);
+    ur.action("thinBorder", mainUtilities.thinBorder, mainUtilities.thickenBorder);
     
     // Batching
     var actions = [];    
@@ -250,11 +250,37 @@ mainUtilities.showNodesSmart = function(_nodes) {
   }
   else {
     var nodesWithHiddenNeighbor = cy.edges(":hidden").connectedNodes(':visible');
-    thinBorder(nodesWithHiddenNeighbor);
+    mainUtilities.thinBorder(nodesWithHiddenNeighbor);
     viewUtilities.hide(nodesToHide);
     var nodesWithHiddenNeighbor = cy.edges(":hidden").connectedNodes(':visible');
-    thickenBorder(nodesWithHiddenNeighbor);
+    mainUtilities.thickenBorder(nodesWithHiddenNeighbor);
   }
+};
+
+// Unhides elements passed as arguments. Requires viewUtilities extension and considers 'undoable' option.
+mainUtilities.showEles = function(eles) {
+    // If this function is being called we can assume that view utilities extension is on use
+    var viewUtilities = cy.viewUtilities('get');
+    if(options.undoable) {
+        var ur = cy.undoRedo();
+        ur.action("thickenBorder", mainUtilities.thickenBorder, mainUtilities.thinBorder);
+        ur.action("thinBorder", mainUtilities.thinBorder, mainUtilities.thickenBorder);
+        var nodesToThinBorder = eles.neighborhood(":visible").nodes("[thickBorder]");
+        var nodesToThickenBorder = cy.edges(":hidden").difference(eles.edges()).connectedNodes().intersection(eles.nodes());
+        // Batching
+        var actions = [];
+        actions.push({name: "thinBorder", param: nodesToThinBorder});
+        actions.push({name: "show", param: eles});
+        actions.push({name: "thickenBorder", param: nodesToThickenBorder});
+        cy.undoRedo().do("batch", actions);
+    }
+    else {
+        var nodesWithHiddenNeighbor = cy.edges(":hidden").connectedNodes(':visible');
+        mainUtilities.thinBorder(nodesWithHiddenNeighbor);
+        viewUtilities.show(eles);
+        var nodesWithHiddenNeighbor = cy.edges(":hidden").connectedNodes(':visible');
+        mainUtilities.thickenBorder(nodesWithHiddenNeighbor);
+    }
 };
 
 // Unhides all elements. Requires viewUtilities extension and considers 'undoable' option.
@@ -268,8 +294,8 @@ mainUtilities.showAll = function() {
   
   if(options.undoable) {
     var ur = cy.undoRedo();
-    ur.action("thickenBorder", thickenBorder, thinBorder);
-    ur.action("thinBorder", thinBorder, thickenBorder);
+    ur.action("thickenBorder", mainUtilities.thickenBorder, mainUtilities.thinBorder);
+    ur.action("thinBorder", mainUtilities.thinBorder, mainUtilities.thickenBorder);
     
     // Batching   
     var actions = [];
@@ -280,7 +306,7 @@ mainUtilities.showAll = function() {
   }
   else {
     var nodesWithHiddenNeighbor = cy.edges(":hidden").connectedNodes(':visible');
-    thinBorder(nodesWithHiddenNeighbor);
+    mainUtilities.thinBorder(nodesWithHiddenNeighbor);
     viewUtilities.show(cy.elements());
   }
 };
