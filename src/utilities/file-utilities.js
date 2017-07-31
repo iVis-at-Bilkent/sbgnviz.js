@@ -83,6 +83,11 @@ fileUtilities.saveAsJpg = function(filename) {
   saveAs(b64toBlob(b64data, "image/jpg"), filename || "network.jpg");
 };
 
+fileUtilities.saveAsSvg = function(filename) {
+  var svgContent = cy.svg({scale: 1, full: true});
+  saveAs(new Blob([svgContent], {type:"image/svg+xml;charset=utf-8"}), filename || "network.svg");
+};
+
 fileUtilities.loadSample = function(filename, folderpath) {
   uiUtilities.startSpinner("load-spinner");
   
