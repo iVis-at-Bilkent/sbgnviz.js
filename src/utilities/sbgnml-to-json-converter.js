@@ -669,26 +669,35 @@ var sbgnmlToJson = {
 
     var sbgn;
     try {
-      sbgn = libsbgnjs.Sbgn.fromXML(xmlObject.querySelector('sbgn'));
+      var xmlString = new XMLSerializer().serializeToString(xmlObject);
+      sbgn = libsbgnjs.Sbgn.fromXML(xmlString);
     }
     catch (err) {
-      throw new Error("Could not parse sbgnml.");
+      throw new Error("Could not parse sbgnml. "+ err);
     }
 
-    if(sbgn.map.language == "process description") {
+    var map;
+    if(sbgn.maps.length < 1) { // empty sbgn
+      return {nodes: [], edges: []};
+    }
+    else {
+      map = sbgn.maps[0]; // take first map of the file as the main map
+    }
+
+    if(map.language == "process description") {
       elementUtilities.mapType = "PD";
     }
-    else if(sbgn.map.language == "activity flow") {
+    else if(map.language == "activity flow") {
       elementUtilities.mapType = "AF";
     }
     else {
       elementUtilities.mapType = "Unknown";
     }
 
-    var compartments = self.getAllCompartments(sbgn.map.glyphs);
+    var compartments = self.getAllCompartments(map.glyphs);
 
-    var glyphs = sbgn.map.glyphs;
-    var arcs = sbgn.map.arcs;
+    var glyphs = map.glyphs;
+    var arcs = map.arcs;
 
     var i;
     for (i = 0; i < glyphs.length; i++) {
@@ -724,8 +733,8 @@ var sbgnmlToJson = {
       self.addCytoscapeJsEdge(arc, cytoscapeJsEdges, xmlObject);
     }
 
-    if (sbgn.map.extension && sbgn.map.extension.has('renderInformation')) { // render extension was found
-      self.applyStyle(sbgn.map.extension.get('renderInformation'), cytoscapeJsNodes, cytoscapeJsEdges);
+    if (map.extension && map.extension.has('renderInformation')) { // render extension was found
+      self.applyStyle(map.extension.get('renderInformation'), cytoscapeJsNodes, cytoscapeJsEdges);
     }
 
     var cytoscapeJsGraph = {};

@@ -90,7 +90,7 @@ var jsonToSbgnml = {
             map.addArc(self.getArcSbgnml(ele));
         });
 
-        sbgn.setMap(map);
+        sbgn.addMap(map);
         return prettyprint.xml(xmlHeader + sbgn.toXML());
     },
 
