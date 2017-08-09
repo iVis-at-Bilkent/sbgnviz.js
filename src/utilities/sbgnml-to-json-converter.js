@@ -3,9 +3,11 @@ var classes = require('../utilities/classes');
 var graphUtilities = require('./graph-utilities');
 var libsbgnjs = require('libsbgn.js');
 var libs = require('./lib-utilities').getLibs();
+var parseString = require('xml2js').parseString;
 
 var sbgnmlToJson = {
   insertedNodes: {},
+  map: undefined,
   getAllCompartments: function (glyphList) {
     var compartments = [];
 
@@ -661,6 +663,16 @@ var sbgnmlToJson = {
       }
     }
   },
+  mapPropertiesToObj: function() {
+    if (this.map.extension && this.map.extension.has('mapProperties')) { // render extension was found
+       var xml = this.map.extension.get('mapProperties');
+       var obj;
+       parseString(xml, function (err, result) {
+          obj = result;
+       });
+       return obj;
+    }
+  },
   convert: function (xmlObject) {
     var self = this;
     var cytoscapeJsNodes = [];
@@ -684,6 +696,7 @@ var sbgnmlToJson = {
       map = sbgn.maps[0]; // take first map of the file as the main map
     }
 
+    this.map = map;
     if(map.language == "process description") {
       elementUtilities.mapType = "PD";
     }

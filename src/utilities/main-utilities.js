@@ -553,4 +553,13 @@ mainUtilities.setPortsOrdering = function (nodes, ordering, portDistance) {
   cy.style().update();
 };
 
+/**
+ * Get map properties from SBGNML file
+ * Needs to be called after file is loaded - sbgnvizLoadFileEnd event
+ * return: map properties as object
+ */
+mainUtilities.getMapProperties = function() {
+  return sbgnmlToJson.mapPropertiesToObj();
+ }
+
 module.exports = mainUtilities;
