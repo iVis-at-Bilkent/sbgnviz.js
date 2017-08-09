@@ -7,6 +7,8 @@ var pkgVersion = require('../../package.json').version; // need info about sbgnv
 var pkgName = require('../../package.json').name;
 var prettyprint = require('pretty-data').pd;
 var graphUtilities = require('./graph-utilities');
+var xml2js = require('xml2js');
+var mapPropertiesBuilder = new xml2js.Builder({rootName: "mapProperties"});
 
 var jsonToSbgnml = {
     /*
@@ -32,7 +34,7 @@ var jsonToSbgnml = {
             }
         }
     */
-    createSbgnml : function(filename, renderInfo){
+    createSbgnml : function(filename, renderInfo, mapProperties){
         var self = this;
         var mapID = txtUtil.getXMLValidId(filename);
         var hasExtension = false;
@@ -64,6 +66,14 @@ var jsonToSbgnml = {
                 extension.add(self.getRenderExtensionSbgnml(renderInfo));
             }
             map.setExtension(extension);
+            if (mapProperties) {
+                var xml = mapPropertiesBuilder.buildObject(mapProperties);
+                map.extension.add(xml);
+            }
+
+        } else if (mapProperties) {
+            map.setExtension(new libsbgnjs.Extension());
+            map.extension.add(mapPropertiesBuilder.buildObject(mapProperties));
         }
 
         // get all glyphs
