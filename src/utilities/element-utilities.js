@@ -1057,6 +1057,13 @@ var elementUtilities = {
         {
             var inputPortEle = inputPort.pop();
             var outputPortEle = outputPort.pop();
+            //Checks if free nodes belong to the same compound
+            var firstNode = cy.getElementById(inputPortEle.id);
+            var secondNode = cy.getElementById(outputPortEle.id);
+            if (firstNode.data('parent') !== secondNode.data('parent'))
+            {
+                continue;
+            }
             elementUtilities.swapElements(inputPortEle, outputPortEle);
         }
         /*
@@ -1066,29 +1073,17 @@ var elementUtilities = {
         for (i = notConnectedToPort.length -1; i >= 0 ; i--)
         {
             var effector = notConnectedToPort[i];
-            if (outputPort.length > 0 && inputPort.length > 0)
+            if (outputPort.length > 0)
             {
                 var firstOutput = outputPort[outputPort.length - 1];
-                elementUtilities.swapElements(effector, firstOutput);
-                var firstOutputScore = -elementUtilities.checkNegativeOrientationScore(ele, cy.getElementById(firstOutput.id), bestOrientation);
-                elementUtilities.swapElements(effector, firstOutput);
-                var firstInput = inputPort[inputPort.length - 1];
-                elementUtilities.swapElements(effector, firstInput);
-                var firstInputScore = elementUtilities.checkNegativeOrientationScore(ele, cy.getElementById(firstInput.id), bestOrientation);
-                if (firstInputScore > firstOutputScore && firstInputScore > firstInput.score)
+                //Checks if free nodes belong to the same compound
+                var firstNode = cy.getElementById(effector.id);
+                var secondNode = cy.getElementById(firstOutput.id);
+                if (firstNode.data('parent') !== secondNode.data('parent'))
                 {
-                    inputPort.pop();
+                    continue;
                 }
-                else if ( firstOutputScore > firstInputScore && firstOutputScore > firstOutput.score)
-                {
-                    elementUtilities.swapElements(effector, firstInput);
-                    elementUtilities.swapElements(effector, firstOutput);
-                    outputPort.pop();
-                }
-            }
-            else if (outputPort.length > 0)
-            {
-                var firstOutput = outputPort[outputPort.length - 1];
+
                 elementUtilities.swapElements(effector, firstOutput);
                 var firstOutputScore = -elementUtilities.checkNegativeOrientationScore(ele, cy.getElementById(firstOutput.id), bestOrientation);
                 if ( firstOutputScore > firstOutput.score)
@@ -1101,6 +1096,14 @@ var elementUtilities = {
             else if (inputPort.length > 0)
             {
                 var firstInput = inputPort[inputPort.length - 1];
+                //Checks if free nodes belong to the same compound
+                var firstNode = cy.getElementById(effector.id);
+                var secondNode = cy.getElementById(firstInput.id);
+                if (firstNode.data('parent') !== secondNode.data('parent'))
+                {
+                    continue;
+                }
+
                 elementUtilities.swapElements(effector, firstInput);
                 var firstInputScore = elementUtilities.checkNegativeOrientationScore(ele, cy.getElementById(firstInput.id), bestOrientation);
                 if ( firstInputScore > firstInput.score)
