@@ -115,11 +115,6 @@ fileUtilities.loadSBGNMLFile = function(file, callback1, callback2) {
   var self = this;
   uiUtilities.startSpinner("load-file-spinner");
   
-  // Users may want to do customized things while an external file is being loaded
-  // Trigger an event for this purpose and specify the 'filename' as an event parameter
-  $( document ).trigger( "sbgnvizLoadFile", [ file.name ] ); // Aliases for sbgnvizLoadFileStart
-  $( document ).trigger( "sbgnvizLoadFileStart", [ file.name ] ); 
-  
   var textType = /text.*/;
 
   var reader = new FileReader();
@@ -132,6 +127,10 @@ fileUtilities.loadSBGNMLFile = function(file, callback1, callback2) {
       var cyGraph;
       try {
         cyGraph = sbgnmlToJson.convert(textToXmlObject(text));
+        // Users may want to do customized things while an external file is being loaded
+        // Trigger an event for this purpose and specify the 'filename' as an event parameter
+        $( document ).trigger( "sbgnvizLoadFile", [ file.name ] ); // Aliases for sbgnvizLoadFileStart
+        $( document ).trigger( "sbgnvizLoadFileStart", [ file.name ] ); 
       }
       catch (err) {
         uiUtilities.endSpinner("load-file-spinner");
