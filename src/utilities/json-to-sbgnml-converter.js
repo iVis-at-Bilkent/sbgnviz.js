@@ -78,7 +78,7 @@ var jsonToSbgnml = {
 
         // get all glyphs
         var glyphList = [];
-        // be carefule that :visible is also used during recursive search of nodes
+        // be careful that :visible is also used during recursive search of nodes
         // in the getGlyphSbgnml function. If not set accordingly, discrepancies will occur.
         cy.nodes(":visible").each(function(ele, i){
             if(typeof ele === "number") {
@@ -265,7 +265,7 @@ var jsonToSbgnml = {
         // add string to a new extension for this glyph
         if(hasNewtExt) {
             var extension = self.getOrCreateExtension(glyph);
-            extension.list["newt"] = jQuery.parseXML("<newt>"+newtExtString+"</newt>");
+            extension.add("<newt>"+newtExtString+"</newt>");
             console.log(extension.toXML());
         }
 
@@ -349,7 +349,7 @@ var jsonToSbgnml = {
         // add info for hidden edges
         if(edge.hidden()) {
             var extension = self.getOrCreateExtension(arc);
-            extension.list["newt"] = jQuery.parseXML("<newt><hidden/></newt>");
+            extension.add("<newt><hidden/></newt>");
             console.log(extension.toXML());
         }
 
