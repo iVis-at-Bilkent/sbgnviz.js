@@ -261,16 +261,23 @@ mainUtilities.showNodesSmart = function(_nodes) {
 mainUtilities.showEles = function(eles) {
     // If this function is being called we can assume that view utilities extension is on use
     var viewUtilities = cy.viewUtilities('get');
+    var hiddenEles = eles.filter(':hidden');
+    if (hiddenEles.length === 0) {
+        return;
+    }
     if(options.undoable) {
         var ur = cy.undoRedo();
         ur.action("thickenBorder", mainUtilities.thickenBorder, mainUtilities.thinBorder);
         ur.action("thinBorder", mainUtilities.thinBorder, mainUtilities.thickenBorder);
-        var nodesToThinBorder = eles.neighborhood(":visible").nodes("[thickBorder]");
-        var nodesToThickenBorder = cy.edges(":hidden").difference(eles.edges()).connectedNodes().intersection(eles.nodes());
+        
         // Batching
         var actions = [];
+        var nodesToThinBorder = (hiddenEles.neighborhood(":visible").nodes("[thickBorder]"))
+                                .difference(cy.edges(":hidden").difference(hiddenEles.edges().union(hiddenEles.nodes().connectedEdges())).connectedNodes());
         actions.push({name: "thinBorder", param: nodesToThinBorder});
-        actions.push({name: "show", param: eles});
+        actions.push({name: "show", param: hiddenEles});
+        var nodesToThickenBorder = hiddenEles.nodes().edgesWith(cy.nodes(":hidden").difference(hiddenEles.nodes()))
+	            .connectedNodes().intersection(hiddenEles.nodes());
         actions.push({name: "thickenBorder", param: nodesToThickenBorder});
         cy.undoRedo().do("batch", actions);
     }
