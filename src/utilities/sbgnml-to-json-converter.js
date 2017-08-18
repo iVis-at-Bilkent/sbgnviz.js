@@ -1,22 +1,28 @@
 var elementUtilities = require('./element-utilities');
+var classes = require('../utilities/classes');
+var graphUtilities = require('./graph-utilities');
+var libsbgnjs = require('libsbgn.js');
+var libs = require('./lib-utilities').getLibs();
+var parseString = require('xml2js').parseString;
 
 var sbgnmlToJson = {
   insertedNodes: {},
-  getAllCompartments: function (xmlObject) {
+  map: undefined,
+  getAllCompartments: function (glyphList) {
     var compartments = [];
 
-    var compartmentEls = xmlObject.querySelectorAll("glyph[class='compartment']");
-
-    for (var i = 0; i < compartmentEls.length; i++) {
-      var compartment = compartmentEls[i];
-      var bbox = this.findChildNode(compartment, 'bbox');
-      compartments.push({
-        'x': parseFloat(bbox.getAttribute('x')),
-        'y': parseFloat(bbox.getAttribute('y')),
-        'w': parseFloat(bbox.getAttribute('w')),
-        'h': parseFloat(bbox.getAttribute('h')),
-        'id': compartment.getAttribute('id')
-      });
+    for (var i = 0; i < glyphList.length; i++) {
+      if (glyphList[i].class_ == 'compartment') {
+        var compartment = glyphList[i];
+        var bbox = compartment.bbox;
+        compartments.push({
+          'x': parseFloat(bbox.x),
+          'y': parseFloat(bbox.y),
+          'w': parseFloat(bbox.w),
+          'h': parseFloat(bbox.h),
+          'id': compartment.id
+        });
+      }
     }
 
     compartments.sort(function (c1, c2) {
@@ -41,12 +47,75 @@ var sbgnmlToJson = {
     return false;
   },
   bboxProp: function (ele) {
-    var bbox = ele.querySelector('bbox');
+    var bbox = {};
+    bbox.x = ele.bbox.x;
+    bbox.y = ele.bbox.y;
+    bbox.w = ele.bbox.w;
+    bbox.h = ele.bbox.h;
+    
+    var childNodes = ele.glyphMembers;
+    var minLeft, maxRight, minTop, maxBottom, childrenBboxW, childrenBboxH;
+    var compound;
 
-    bbox.x = bbox.getAttribute('x');
-    bbox.y = bbox.getAttribute('y');
-    bbox.w = bbox.getAttribute('w');
-    bbox.h = bbox.getAttribute('h');
+    // Traverse the other children and update the extreme values
+    for (var i = 0; i < childNodes.length; i++) {
+      var childNode = childNodes[i];
+
+      if (childNode.class_ === 'state variable' || childNode.class_ === 'unit of information') {
+        continue; // Eleminate state variables and info boxes
+      }
+
+      compound = true;
+
+      var childNodeBbox = childNode.bbox;
+      var left = childNodeBbox.x;
+      var right = childNodeBbox.x + childNodeBbox.w;
+      var top = childNodeBbox.y;
+      var bottom = childNodeBbox.y + childNodeBbox.h;
+
+      if (minLeft === undefined || left < minLeft) {
+        minLeft = left;
+      }
+
+      if (maxRight === undefined || right > maxRight) {
+        maxRight = right;
+      }
+
+      if (minTop === undefined || top < minTop) {
+        minTop = top;
+      }
+
+      if (maxBottom === undefined || bottom > maxBottom) {
+        maxBottom = bottom;
+      }
+    }
+
+    if (compound) {
+      // The sizes of children bbox are determined by the difference between the extreme coordinates
+      childrenBboxW = maxRight - minLeft;
+      childrenBboxH = maxBottom - minTop;
+
+      // If children bbox width is bigger than node bbox width set minWidth, and horizontal biases
+      if (childrenBboxW < bbox.w) {
+        ele.minWidth = bbox.w;
+        var extraLeft =  minLeft - bbox.x;
+        var extraRight = (bbox.x + bbox.w) - maxRight;
+
+        ele.minWidthBiasLeft = extraLeft / (extraLeft + extraRight) * 100;
+        ele.minWidthBiasRight = 100 - ele.minWidthBiasLeft;
+      }
+
+      // If children bbox height is bigger than node bbox height set minHeight, and vertical biases
+      if (childrenBboxH < bbox.h) {
+        ele.minHeight = bbox.h;
+        var extraTop = minTop - bbox.y;
+        var extraBottom = (bbox.y + bbox.h) - maxBottom;
+
+        ele.minHeightBiasTop = extraTop / (extraTop + extraBottom) * 100;
+        ele.minHeightBiasBottom = 100 - ele.minHeightBiasTop;
+      }
+    }
+
     // set positions as center
     bbox.x = parseFloat(bbox.x) + parseFloat(bbox.w) / 2;
     bbox.y = parseFloat(bbox.y) + parseFloat(bbox.h) / 2;
@@ -57,12 +126,12 @@ var sbgnmlToJson = {
     var xPos = parseFloat(parentBbox.x);
     var yPos = parseFloat(parentBbox.y);
 
-    var bbox = ele.querySelector('bbox');
-
-    bbox.x = bbox.getAttribute('x');
-    bbox.y = bbox.getAttribute('y');
-    bbox.w = bbox.getAttribute('w');
-    bbox.h = bbox.getAttribute('h');
+    // don't copy directly ele.box because it contains other things than x y w h
+    var bbox = {};
+    bbox.x = ele.bbox.x;
+    bbox.y = ele.bbox.y;
+    bbox.w = ele.bbox.w;
+    bbox.h = ele.bbox.h;
 
     // set positions as center
     bbox.x = parseFloat(bbox.x) + parseFloat(bbox.w) / 2 - xPos;
@@ -88,46 +157,62 @@ var sbgnmlToJson = {
     var nodes = this.findChildNodes(ele, childTagName);
     return nodes.length > 0 ? nodes[0] : undefined;
   },
-  stateAndInfoProp: function (ele, parentBbox) {
+  stateAndInfoProp: function (ele, parent) {
     var self = this;
+    var parentBbox = parent.bbox;
     var stateAndInfoArray = [];
 
-    var childGlyphs = this.findChildNodes(ele, 'glyph');
+    var childGlyphs = ele.glyphMembers; // this.findChildNodes(ele, 'glyph');
+
+    // if a biological activity node has no unit of info, it must be a BA plain
+    if(parent.class == "biological activity" && childGlyphs.length == 0) {
+      parent.class = "BA plain";
+    }
 
     for (var i = 0; i < childGlyphs.length; i++) {
       var glyph = childGlyphs[i];
       var info = {};
 
-      if (glyph.className === 'unit of information') {
-        info.id = glyph.getAttribute('id') || undefined;
-        info.clazz = glyph.className || undefined;
-        var label = glyph.querySelector('label');
-        info.label = {
-          'text': (label && label.getAttribute('text')) || undefined
+      if (glyph.class_ === 'unit of information') {
+        var unitOfInformation = new classes.UnitOfInformation();
+        if(glyph.entity) {
+          // change the parent class according to its true class of biological activity
+          switch(glyph.entity.name) {
+            case 'unspecified entity':    parent.class = "BA unspecified entity"; break;
+            case 'simple chemical':       parent.class = "BA simple chemical"; break;
+            case 'macromolecule':         parent.class = "BA macromolecule"; break;
+            case 'nucleic acid feature':  parent.class = "BA nucleic acid feature"; break;
+            case 'perturbation':          parent.class = "BA perturbing agent"; break;
+            case 'complex':               parent.class = "BA complex"; break;
+          }
+          unitOfInformation.shapeFn = libs.cytoscape.sbgn.AfShapeFn;
+          unitOfInformation.shapeArgsFn = libs.cytoscape.sbgn.AfShapeArgsFn;
+        }
+
+        unitOfInformation.id = glyph.id || undefined;
+        unitOfInformation.label = {
+          'text': (glyph.label && glyph.label.text) || undefined
         };
-        info.bbox = self.stateAndInfoBboxProp(glyph, parentBbox);
-        stateAndInfoArray.push(info);
-      } else if (glyph.className === 'state variable') {
-        info.id = glyph.getAttribute('id') || undefined;
-        info.clazz = glyph.className || undefined;
-        var state = glyph.querySelector('state');
-        var value = (state && state.getAttribute('value')) || undefined;
-        var variable = (state && state.getAttribute('variable')) || undefined;
-        info.state = {
-          'value': value,
-          'variable': variable
-        };
-        info.bbox = self.stateAndInfoBboxProp(glyph, parentBbox);
-        stateAndInfoArray.push(info);
+        unitOfInformation.bbox = self.stateAndInfoBboxProp(glyph, parentBbox);
+        unitOfInformation.setAnchorSide();
+        stateAndInfoArray.push(unitOfInformation);
+      } else if (glyph.class_ === 'state variable') {
+        var stateVariable = new classes.StateVariable();
+        stateVariable.id = glyph.id || undefined;
+        var state = glyph.state;
+        stateVariable.state.value = (state && state.value) || undefined;
+        stateVariable.state.variable = (state && state.variable) || undefined;
+        stateVariable.bbox = self.stateAndInfoBboxProp(glyph, parentBbox);
+        stateVariable.setAnchorSide();
+        stateAndInfoArray.push(stateVariable);
       }
     }
-
 
     return stateAndInfoArray;
   },
   addParentInfoToNode: function (ele, nodeObj, parent, compartments) {
     var self = this;
-    var compartmentRef = ele.getAttribute('compartmentRef');
+    var compartmentRef = ele.compartmentRef;
 
     if (parent) {
       nodeObj.parent = parent;
@@ -141,13 +226,12 @@ var sbgnmlToJson = {
 
       // add compartment according to geometry
       for (var i = 0; i < compartments.length; i++) {
-        var bboxEl = self.findChildNode(ele, 'bbox');
         var bbox = {
-          'x': parseFloat(bboxEl.getAttribute('x')),
-          'y': parseFloat(bboxEl.getAttribute('y')),
-          'w': parseFloat(bboxEl.getAttribute('w')),
-          'h': parseFloat(bboxEl.getAttribute('h')),
-          'id': ele.getAttribute('id')
+          'x': parseFloat(ele.bbox.x),
+          'y': parseFloat(ele.bbox.y),
+          'w': parseFloat(ele.bbox.w),
+          'h': parseFloat(ele.bbox.h),
+          'id': ele.id
         };
         if (self.isInBoundingBox(bbox, compartments[i])) {
           nodeObj.parent = compartments[i].id;
@@ -161,22 +245,35 @@ var sbgnmlToJson = {
     var nodeObj = {};
 
     // add id information
-    nodeObj.id = ele.getAttribute('id');
+    nodeObj.id = ele.id;
     // add node bounding box information
     nodeObj.bbox = self.bboxProp(ele);
+    
+    if (ele.minWidth) {
+      nodeObj.minWidth = ele.minWidth;
+      nodeObj.minWidthBiasLeft = ele.minWidthBiasLeft;
+      nodeObj.minWidthBiasRight = ele.minWidthBiasRight;
+    }
+    
+    if (ele.minHeight) {
+      nodeObj.minHeight = ele.minHeight;
+      nodeObj.minHeightBiasTop = ele.minHeightBiasTop;
+      nodeObj.minHeightBiasBottom = ele.minHeightBiasBottom;
+    }
+    
     // add class information
-    nodeObj.class = ele.className;
+    nodeObj.class = ele.class_;
     // add label information
-    var label = self.findChildNode(ele, 'label');
-    nodeObj.label = (label && label.getAttribute('text')) || undefined;
+    nodeObj.label = (ele.label && ele.label.text) || undefined;
     // add state and info box information
-    nodeObj.statesandinfos = self.stateAndInfoProp(ele, nodeObj.bbox);
+    nodeObj.statesandinfos = self.stateAndInfoProp(ele, nodeObj);
     // adding parent information
     self.addParentInfoToNode(ele, nodeObj, parent, compartments);
+    // add language info, this will always be the mapType
+    nodeObj.language = elementUtilities.mapType;
 
     // add clone information
-    var cloneMarkers = self.findChildNodes(ele, 'clone');
-    if (cloneMarkers.length > 0) {
+    if (ele.clone) {
       nodeObj.clonemarker = true;
     } else {
       nodeObj.clonemarker = undefined;
@@ -184,16 +281,30 @@ var sbgnmlToJson = {
 
     // add port information
     var ports = [];
-    var portElements = ele.querySelectorAll('port');
+    var portElements = ele.ports;
 
     for (var i = 0; i < portElements.length; i++) {
       var portEl = portElements[i];
-      var id = portEl.getAttribute('id');
-      var relativeXPos = parseFloat(portEl.getAttribute('x')) - nodeObj.bbox.x;
-      var relativeYPos = parseFloat(portEl.getAttribute('y')) - nodeObj.bbox.y;
+      var id = portEl.id;
+      var relativeXPos = parseFloat(portEl.x) - nodeObj.bbox.x;
+      var relativeYPos = parseFloat(portEl.y) - nodeObj.bbox.y;
 
       relativeXPos = relativeXPos / parseFloat(nodeObj.bbox.w) * 100;
       relativeYPos = relativeYPos / parseFloat(nodeObj.bbox.h) * 100;
+      
+      // We assume that ports are not inside the node shape. 
+      // Therefore, abs. value of their relative x and y coordinates (relative to node center) should be bigger than 50.
+      if (Math.abs(relativeXPos) < 50) {
+        relativeXPos = 0;
+      }
+      
+      if (Math.abs(relativeYPos) < 50) {
+        relativeYPos = 0;
+      }
+      
+      if (relativeXPos === 0 && relativeYPos === 0) {
+        continue;
+      }
 
       ports.push({
         id: id,
@@ -203,30 +314,108 @@ var sbgnmlToJson = {
     }
 
     nodeObj.ports = ports;
+    
+    var _class = nodeObj.class;
+    // If the node can have ports and it has exactly 2 ports then it should be represented by a bigger bbox.
+    // This is because we represent it as a polygon and so the whole shape including the ports are rendered in the node bbox.
+    if (elementUtilities.canHavePorts(_class)) {
+      if (graphUtilities.portsEnabled && ports.length === 2) {
+        // We assume that the ports are symmetric to the node center so using just one of the ports is enough
+        var port = ports[0];
+        var orientation = port.x === 0 ? 'vertical' : 'horizontal';
+        // This is the ratio of the area occupied with ports over without ports
+        var ratio = orientation === 'vertical' ? Math.abs(port.y) / 50 : Math.abs(port.x) / 50;
+        // Multiply the bbox with the calculated ratio
+        nodeObj.bbox.w = parseFloat(nodeObj.bbox.w) * ratio;
+        nodeObj.bbox.h = parseFloat(nodeObj.bbox.h) * ratio;
+      }
+    }
+
+    if (ele.extension && ele.extension.has('annotation')) { // annotation extension was found
+      var rdfElement = ele.extension.get('annotation').rdfElement;
+      nodeObj = self.handleAnnotations(nodeObj, rdfElement);
+    }
 
     var cytoscapeJsNode = {data: nodeObj};
     jsonArray.push(cytoscapeJsNode);
   },
+  /**
+   * given a future cy object, and the corresponding element's libsbgnjs' extension, populates the annotations field
+   */
+  handleAnnotations: function(cyObject, rdfElement) {
+    // local utility function
+    function dbFromUrl(url) {
+      var regexp = /^http:\/\/identifiers.org\/(.+?)\/.+$/;
+      return url.replace(regexp, '$1');
+    }
+
+    function fillElementDataAnnotation(cyObject, annotationIndex, status, selectedDB, selectedRelation, annotationValue) {
+      if(!cyObject.annotations) {
+        cyObject.annotations = {};
+      }
+      var annotId = cyObject.id+"-annot-"+annotationIndex;
+
+      cyObject.annotations[annotId] = {
+        // The following may be hazardous. But setting it as unchecked leave the annotation out if the file is saved.
+        // This would lead to the user losing annotations without knowing it.
+        status: status, // <-- we trust that what's been loaded is valid.
+        selectedDB: selectedDB,
+        selectedRelation: selectedRelation,
+        annotationValue: annotationValue
+      };
+      return cyObject;
+    }
+
+    // we assume that the id of the rdf:about field is the one of the current node, and that there's only 1 description
+    var id = rdfElement.getAllIds()[0];
+    var resources = rdfElement.getResourcesOfId(id);
+    var customProperties = rdfElement.getCustomPropertiesOfId(id);
+
+    var globalAnnotIndex = 0;
+    // handle controlled properties
+    for (var fullQualifier in resources) {
+      var relation = libsbgnjs.annot.Util.reducePrefix(fullQualifier);
+      for(var i=0; i<resources[fullQualifier].length; i++) {
+        var value = resources[fullQualifier][i];
+        var selectedDB = dbFromUrl(value);
+        cyObject = fillElementDataAnnotation(cyObject, globalAnnotIndex, "validated", selectedDB, relation, value);
+        globalAnnotIndex++;
+      }
+    }
+    // handle custom properties
+    for (var key in customProperties) {
+      var value = customProperties[key];
+      cyObject = fillElementDataAnnotation(cyObject, globalAnnotIndex, "validated", key, "sio:SIO_000223", value);
+      globalAnnotIndex++;
+    }
+
+    return cyObject;
+  },
   traverseNodes: function (ele, jsonArray, parent, compartments) {
-    var elId = ele.getAttribute('id');
-    if (!elementUtilities.handledElements[ele.className]) {
+    var elId = ele.id;
+    if (!elementUtilities.handledElements[ele.class_]) {
       return;
     }
     this.insertedNodes[elId] = true;
     var self = this;
     // add complex nodes here
 
-    var eleClass = ele.className;
+    var eleClass = ele.class_;
 
-    if (eleClass === 'complex' || eleClass === 'submap') {
+    if (eleClass === 'complex' || eleClass === 'complex multimer' || eleClass === 'submap') {
       self.addCytoscapeJsNode(ele, jsonArray, parent, compartments);
 
-      var childGlyphs = self.findChildNodes(ele, 'glyph');
+      var childGlyphs = ele.glyphMembers;
       for (var i = 0; i < childGlyphs.length; i++) {
         var glyph = childGlyphs[i];
-        var glyphClass = glyph.className;
+        var glyphClass = glyph.class_;
         if (glyphClass !== 'state variable' && glyphClass !== 'unit of information') {
-          self.traverseNodes(glyph, jsonArray, elId, compartments);
+          if(!glyph.compartmentRef || glyph.compartmentRef == elId) {
+            self.traverseNodes(glyph, jsonArray, elId, compartments);
+          }
+          else if (glyph.compartmentRef != elId) {
+            self.traverseNodes(glyph, jsonArray, glyph.compartmentRef, compartments);
+          };
         }
       }
     } else {
@@ -261,8 +450,8 @@ var sbgnmlToJson = {
   },
   getArcSourceAndTarget: function (arc, xmlObject) {
     // source and target can be inside of a port
-    var source = arc.getAttribute('source');
-    var target = arc.getAttribute('target');
+    var source = arc.source;
+    var target = arc.target;
     var sourceNodeId;
     var targetNodeId;
 
@@ -305,11 +494,11 @@ var sbgnmlToJson = {
   getArcBendPointPositions: function (ele) {
     var bendPointPositions = [];
 
-    var children = this.findChildNodes(ele, 'next');
+    var children = ele.nexts;
 
     for (var i = 0; i < children.length; i++) {
-      var posX = children[i].getAttribute('x');
-      var posY = children[i].getAttribute('y');
+      var posX = children[i].x;
+      var posY = children[i].y;
 
       bendPointPositions.push({
         x: posX,
@@ -320,7 +509,7 @@ var sbgnmlToJson = {
     return bendPointPositions;
   },
   addCytoscapeJsEdge: function (ele, jsonArray, xmlObject) {
-    if (!elementUtilities.handledElements[ele.className]) {
+    if (!elementUtilities.handledElements[ele.class_]) {
       return;
     }
 
@@ -334,19 +523,18 @@ var sbgnmlToJson = {
     var edgeObj = {};
     var bendPointPositions = self.getArcBendPointPositions(ele);
 
-    edgeObj.id = ele.getAttribute('id') || undefined;
-    edgeObj.class = ele.className;
+    edgeObj.id = ele.id || undefined;
+    edgeObj.class = ele.class_;
     edgeObj.bendPointPositions = bendPointPositions;
+    // add language info, this will always be the mapType
+    edgeObj.language = elementUtilities.mapType;
 
-    var glyphChildren = self.findChildNodes(ele, 'glyph');
-    var glyphDescendents = ele.querySelectorAll('glyph');
-    if (glyphDescendents.length <= 0) {
-      edgeObj.cardinality = 0;
-    } else {
-      for (var i = 0; i < glyphChildren.length; i++) {
-        if (glyphChildren[i].className === 'cardinality') {
-          var label = glyphChildren[i].querySelector('label');
-          edgeObj.cardinality = label.getAttribute('text') || undefined;
+    edgeObj.cardinality = 0;
+    if (ele.glyphs.length > 0) {
+      for (var i = 0; i < ele.glyphs.length; i++) {
+        if (ele.glyphs[i].class_ === 'cardinality') {
+          var label = ele.glyphs[i].label;
+          edgeObj.cardinality = label.text || undefined;
         }
       }
     }
@@ -354,23 +542,205 @@ var sbgnmlToJson = {
     edgeObj.source = sourceAndTarget.source;
     edgeObj.target = sourceAndTarget.target;
 
-    edgeObj.portsource = ele.getAttribute('source');
-    edgeObj.porttarget = ele.getAttribute('target');
+    edgeObj.portsource = ele.source;
+    edgeObj.porttarget = ele.target;
+
+    if (ele.extension && ele.extension.has('annotation')) { // annotation extension was found
+      var rdfElement = ele.extension.get('annotation').rdfElement;
+      edgeObj = self.handleAnnotations(edgeObj, rdfElement);
+    }
 
     var cytoscapeJsEdge = {data: edgeObj};
     jsonArray.push(cytoscapeJsEdge);
+  },
+  applyStyle: function (renderInformation, nodes, edges) {
+    // get all color id references to their value
+    var colorList = renderInformation.listOfColorDefinitions.colorDefinitions;
+    var colorIDToValue = {};
+    for (var i=0; i < colorList.length; i++) {
+      colorIDToValue[colorList[i].id] = colorList[i].value;
+    }
+
+    // convert style list to elementId-indexed object pointing to style
+    // also convert color references to color values
+    var styleList = renderInformation.listOfStyles.styles;
+    var elementIDToStyle = {};
+    for (var i=0; i < styleList.length; i++) {
+      var style = styleList[i];
+      var renderGroup = style.renderGroup;
+
+      // convert color references
+      if (renderGroup.stroke != null) {
+        renderGroup.stroke = colorIDToValue[renderGroup.stroke];
+      }
+      if (renderGroup.fill != null) {
+        renderGroup.fill = colorIDToValue[renderGroup.fill];
+      }
+
+      var idList = style.idList.split(' ');
+      for (var j=0; j < idList.length; j++) {
+        var id = idList[j];
+        elementIDToStyle[id] = renderGroup;
+      }
+    }
+
+    function hexToDecimal (hex) {
+      return Math.round(parseInt('0x'+hex) / 255 * 100) / 100;
+    }
+
+    function convertHexColor (hex) {
+      if (hex.length == 7) { // no opacity provided
+        return {opacity: null, color: hex};
+      }
+      else { // length of 9
+        var color = hex.slice(0,7);
+        var opacity = hexToDecimal(hex.slice(-2));
+        return {opacity: opacity, color: color};
+      }
+    }
+
+    // apply the style to nodes and overwrite the default style
+    for (var i=0; i < nodes.length; i++) {
+      var node = nodes[i];
+      // special case for color properties, we need to check opacity
+      var bgColor = elementIDToStyle[node.data['id']].fill;
+      if (bgColor) {
+        var res = convertHexColor(bgColor);
+        node.data['background-color'] = res.color;
+        node.data['background-opacity'] = res.opacity;
+      }
+
+      var borderColor = elementIDToStyle[node.data['id']].stroke;
+      if (borderColor) {
+        var res = convertHexColor(borderColor);
+        node.data['border-color'] = res.color;
+      }
+
+      var borderWidth = elementIDToStyle[node.data['id']].strokeWidth;
+      if (borderWidth) {
+        node.data['border-width'] = borderWidth;
+      }
+
+      var fontSize = elementIDToStyle[node.data['id']].fontSize;
+      if (fontSize) {
+        node.data['font-size'] = fontSize;
+      }
+
+      var fontFamily = elementIDToStyle[node.data['id']].fontFamily;
+      if (fontFamily) {
+        node.data['font-family'] = fontFamily;
+      }
+
+      var fontStyle = elementIDToStyle[node.data['id']].fontStyle;
+      if (fontStyle) {
+        node.data['font-style'] = fontStyle;
+      }
+
+      var fontWeight = elementIDToStyle[node.data['id']].fontWeight;
+      if (fontWeight) {
+        node.data['font-weight'] = fontWeight;
+      }
+
+      var textAnchor = elementIDToStyle[node.data['id']].textAnchor;
+      if (textAnchor) {
+        node.data['text-halign'] = textAnchor;
+      }
+
+      var vtextAnchor = elementIDToStyle[node.data['id']].vtextAnchor;
+      if (vtextAnchor) {
+        node.data['text-valign'] = vtextAnchor;
+      }
+    }
+
+    // do the same for edges
+    for (var i=0; i < edges.length; i++) {
+      var edge = edges[i];
+
+      var lineColor = elementIDToStyle[edge.data['id']].stroke;
+      if (lineColor) {
+        var res = convertHexColor(lineColor);
+        edge.data['line-color'] = res.color;
+      }
+
+      var width = elementIDToStyle[edge.data['id']].strokeWidth;
+      if (width) {
+        edge.data['width'] = width;
+      }
+    }
+  },
+  mapPropertiesToObj: function() {
+    if (this.map.extension && this.map.extension.has('mapProperties')) { // render extension was found
+       var xml = this.map.extension.get('mapProperties');
+       var obj;
+       parseString(xml, function (err, result) {
+          obj = result;
+       });
+       return obj;
+    }
   },
   convert: function (xmlObject) {
     var self = this;
     var cytoscapeJsNodes = [];
     var cytoscapeJsEdges = [];
+    var compartmentChildrenMap = {}; // Map compartments children temporarily
 
-    var compartments = self.getAllCompartments(xmlObject);
+    var sbgn;
+    try {
+      var xmlString = new XMLSerializer().serializeToString(xmlObject);
+      sbgn = libsbgnjs.Sbgn.fromXML(xmlString);
+    }
+    catch (err) {
+      throw new Error("Could not parse sbgnml. "+ err);
+    }
 
-    var glyphs = self.findChildNodes(xmlObject.querySelector('map'), 'glyph');
-    var arcs = self.findChildNodes(xmlObject.querySelector('map'), 'arc');
+    var map;
+    if(sbgn.maps.length < 1) { // empty sbgn
+      return {nodes: [], edges: []};
+    }
+    else {
+      map = sbgn.maps[0]; // take first map of the file as the main map
+    }
+
+    this.map = map;
+    if(map.language == "process description") {
+      elementUtilities.mapType = "PD";
+    }
+    else if(map.language == "activity flow") {
+      elementUtilities.mapType = "AF";
+    }
+    else {
+      elementUtilities.mapType = "Unknown";
+    }
+
+    var compartments = self.getAllCompartments(map.glyphs);
+
+    var glyphs = map.glyphs;
+    var arcs = map.arcs;
 
     var i;
+    for (i = 0; i < glyphs.length; i++) {
+      var glyph = glyphs[i];
+      
+      // libsbgn library lists the glyphs of complexes in ele.glyphMembers but it does not store the glyphs of compartments
+      // store glyph members of compartments here.
+      var compartmentRef = glyph.compartmentRef;
+      
+      if (glyph.class_ === 'compartment') {
+        if (compartmentChildrenMap[glyph.id] === undefined) {
+          compartmentChildrenMap[glyph.id] = [];
+        }
+        
+        glyph.glyphMembers = compartmentChildrenMap[glyph.id];
+      }
+      
+      if (compartmentRef) {
+        if (compartmentChildrenMap[compartmentRef] === undefined) {
+          compartmentChildrenMap[compartmentRef] = [];
+        }
+        compartmentChildrenMap[compartmentRef].push(glyph);
+      }
+    }
+
     for (i = 0; i < glyphs.length; i++) {
       var glyph = glyphs[i];
       self.traverseNodes(glyph, cytoscapeJsNodes, '', compartments);
@@ -379,6 +749,10 @@ var sbgnmlToJson = {
     for (i = 0; i < arcs.length; i++) {
       var arc = arcs[i];
       self.addCytoscapeJsEdge(arc, cytoscapeJsEdges, xmlObject);
+    }
+
+    if (map.extension && map.extension.has('renderInformation')) { // render extension was found
+      self.applyStyle(map.extension.get('renderInformation'), cytoscapeJsNodes, cytoscapeJsEdges);
     }
 
     var cytoscapeJsGraph = {};

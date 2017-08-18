@@ -9,6 +9,38 @@ var jQuery = $ = libs.jQuery;
 
 function graphUtilities() {}
 
+// TODO make these initial values user options instead of hardcoding them here
+graphUtilities.portsEnabled = true;
+graphUtilities.compoundSizesConsidered = false;
+
+graphUtilities.disablePorts = function() {
+  graphUtilities.portsEnabled = false;
+  cy.style().update();
+};
+
+graphUtilities.enablePorts = function() {
+  graphUtilities.portsEnabled = true;
+  cy.style().update();
+};
+
+graphUtilities.arePortsEnabled = function() {
+  return graphUtilities.portsEnabled;
+};
+
+graphUtilities.considerCompoundSizes = function() {
+  graphUtilities.compoundSizesConsidered = true;
+  cy.style().update();
+};
+
+graphUtilities.omitCompoundSizes = function() {
+  graphUtilities.compoundSizesConsidered = false;
+  cy.style().update();
+};
+
+graphUtilities.areCompoundSizesConsidered = function() {
+  return graphUtilities.compoundSizesConsidered = true;
+};
+
 graphUtilities.updateGraph = function(cyGraph) {
   console.log('cy update called');
   $( document ).trigger( "updateGraphStart" );
@@ -25,21 +57,33 @@ graphUtilities.updateGraph = function(cyGraph) {
 
   //add position information to data for preset layout
   var positionMap = {};
-  for (var i = 0; i < cyGraph.nodes.length; i++) {
-    var xPos = cyGraph.nodes[i].data.bbox.x;
-    var yPos = cyGraph.nodes[i].data.bbox.y;
-    positionMap[cyGraph.nodes[i].data.id] = {'x': xPos, 'y': yPos};
-  }
+  cy.nodes().forEach(function(node) {
+    var xPos = node.data('bbox').x;
+    var yPos = node.data('bbox').y;
+    positionMap[node.data('id')] = {'x': xPos, 'y': yPos};
 
-  cy.layout({
+    // assign correct parents to info boxes
+    var statesandinfos = node.data('statesandinfos');
+    for (var j=0; j < statesandinfos.length; j++) {
+      statesandinfos[j].parent = node;
+    }
+  });
+
+
+  this.refreshPaddings(); // Recalculates/refreshes the compound paddings
+  cy.endBatch();
+  
+  var layout = cy.layout({
     name: 'preset',
     positions: positionMap,
     fit: true,
     padding: 50
   });
-
-  this.refreshPaddings(true);
-  cy.endBatch();
+  
+  // Check this for cytoscape.js backward compatibility
+  if (layout && layout.run) {
+    layout.run();
+  }
 
   // Update the style
   cy.style().update();
@@ -74,34 +118,20 @@ graphUtilities.calculatePaddings = function(paddingPercent) {
   if (calc_padding < 5) {
     calc_padding = 5;
   }
-  
-  this.calculatedPaddings = calc_padding;
 
   return calc_padding;
 };
 
-graphUtilities.refreshPaddings = function(recalculatePaddings, nodes) {
-  // Consider all nodes by default
-  if (!nodes) {
-    nodes = cy.nodes();
-  }
-  
-  var compounds = nodes.filter('$node > node');
-  
-  // If there is no compound return directly
-  if (compounds.length === 0) {
-    return;
-  }
-  
-  // If it is not forced do not recalculate paddings
-  var calc_padding = recalculatePaddings ? this.calculatePaddings() : this.calculatedPaddings;
-  
-  cy.startBatch();
-  compounds.css('padding-left', calc_padding);
-  compounds.css('padding-right', calc_padding);
-  compounds.css('padding-top', calc_padding);
-  compounds.css('padding-bottom', calc_padding);
-  cy.endBatch();
+graphUtilities.recalculatePaddings = graphUtilities.refreshPaddings = function() {
+  // this.calculatedPaddings is not working here 
+  // TODO: replace this reference with this.calculatedPaddings once the reason is figured out
+  graphUtilities.calculatedPaddings = this.calculatePaddings();
+  return graphUtilities.calculatedPaddings;
+};
+
+graphUtilities.getCompoundPaddings = function() {
+  // Return calculated paddings in case of that data is invalid return 5
+  return graphUtilities.calculatedPaddings || 5;
 };
 
 module.exports = graphUtilities;

@@ -65,6 +65,7 @@ function textToXmlObject(text) {
 // Helper functions End
 
 function fileUtilities() {}
+fileUtilities.loadXMLDoc = loadXMLDoc;
 
 fileUtilities.saveAsPng = function(filename) {
   var pngContent = cy.png({scale: 3, full: true});
@@ -80,6 +81,11 @@ fileUtilities.saveAsJpg = function(filename) {
   // this is to remove the beginning of the pngContent: data:img/png;base64,
   var b64data = jpgContent.substr(jpgContent.indexOf(",") + 1);
   saveAs(b64toBlob(b64data, "image/jpg"), filename || "network.jpg");
+};
+
+fileUtilities.saveAsSvg = function(filename) {
+  var svgContent = cy.svg({scale: 1, full: true});
+  saveAs(new Blob([svgContent], {type:"image/svg+xml;charset=utf-8"}), filename || "network.svg");
 };
 
 fileUtilities.loadSample = function(filename, folderpath) {
@@ -100,14 +106,14 @@ fileUtilities.loadSample = function(filename, folderpath) {
   }, 0);
 };
 
-fileUtilities.loadSBGNMLFile = function(file) {
+/*
+  callback is a function remotely defined to add specific behavior that isn't implemented here.
+  it is completely optional.
+  signature: callback(textXml)
+*/
+fileUtilities.loadSBGNMLFile = function(file, callback1, callback2) {
   var self = this;
   uiUtilities.startSpinner("load-file-spinner");
-  
-  // Users may want to do customized things while an external file is being loaded
-  // Trigger an event for this purpose and specify the 'filename' as an event parameter
-  $( document ).trigger( "sbgnvizLoadFile", [ file.name ] ); // Aliases for sbgnvizLoadFileStart
-  $( document ).trigger( "sbgnvizLoadFileStart", [ file.name ] ); 
   
   var textType = /text.*/;
 
@@ -117,7 +123,23 @@ fileUtilities.loadSBGNMLFile = function(file) {
     var text = this.result;
 
     setTimeout(function () {
-      updateGraph(sbgnmlToJson.convert(textToXmlObject(text)));
+      if (typeof callback1 !== 'undefined') callback1(text);
+      var cyGraph;
+      try {
+        cyGraph = sbgnmlToJson.convert(textToXmlObject(text));
+        // Users may want to do customized things while an external file is being loaded
+        // Trigger an event for this purpose and specify the 'filename' as an event parameter
+        $( document ).trigger( "sbgnvizLoadFile", [ file.name ] ); // Aliases for sbgnvizLoadFileStart
+        $( document ).trigger( "sbgnvizLoadFileStart", [ file.name ] ); 
+      }
+      catch (err) {
+        uiUtilities.endSpinner("load-file-spinner");
+        console.log(err);
+        if (typeof callback2 !== 'undefined') callback2();
+        return;
+      }
+
+      updateGraph(cyGraph);
       uiUtilities.endSpinner("load-file-spinner");
       $( document ).trigger( "sbgnvizLoadFileEnd", [ file.name ] ); // Trigger an event signaling that a file is loaded
     }, 0);
@@ -125,14 +147,29 @@ fileUtilities.loadSBGNMLFile = function(file) {
 
   reader.readAsText(file);
 };
+fileUtilities.loadSBGNMLText = function(textData){
+    setTimeout(function () {
+        updateGraph(sbgnmlToJson.convert(textToXmlObject(textData)));
+        uiUtilities.endSpinner("load-file-spinner");
+    }, 0);
 
-fileUtilities.saveAsSbgnml = function(filename) {
-  var sbgnmlText = jsonToSbgnml.createSbgnml();
+};
 
+fileUtilities.saveAsSbgnml = function(filename, renderInfo, mapProperties) {
+  var sbgnmlText = jsonToSbgnml.createSbgnml(filename, renderInfo, mapProperties);
   var blob = new Blob([sbgnmlText], {
     type: "text/plain;charset=utf-8;",
   });
   saveAs(blob, filename);
+};
+fileUtilities.convertSbgnmlTextToJson = function(sbgnmlText){
+    return sbgnmlToJson.convert(textToXmlObject(sbgnmlText));
+};
+
+fileUtilities.createJson = function(json){
+    var sbgnmlText = jsonToSbgnml.createSbgnml();
+    return sbgnmlToJson.convert(textToXmlObject(sbgnmlText));
+
 };
 
 module.exports = fileUtilities;

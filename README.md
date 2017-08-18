@@ -22,6 +22,10 @@ M. Sari, I. Bahceci, U. Dogrusoz, S.O. Sumer, B.A. Aksoy, O. Babur, E. Demir, "[
       fitLabelsToNodes: function () {
         return false;
       },
+      // Whether to fit labels to a node's info boxes
+      fitLabelsToInfoboxes: function () {
+        return false;
+      },
       // dynamic label size it may be 'small', 'regular', 'large'
       dynamicLabelSize: function () {
         return 'regular';
@@ -43,27 +47,30 @@ M. Sari, I. Bahceci, U. Dogrusoz, S.O. Sumer, B.A. Aksoy, O. Babur, E. Demir, "[
 node.data('id'); // Id of a node. (Specific to cytoscape.js)
 node.data('label'); // Label of a node.
 node.data('parent'); // Parent id of a node. (Specific to cytoscape.js)
-node.data('class'); // SBGN specific class of a node. If it ends with 'multimer' it means that this node is a multimer.
+// SBGN specific class of a node. If it ends with 'multimer' it means that this node is a multimer.
+node.data('class');
 node.data('clonemarker'); // Whether the node is cloned.
 node.data('bbox'); // Bounding box of a node includes bbox.x, bbox.y, bbox.w, bbox.h
-node.data('ports'); // Ports list of a node. A node port includes port.id, port.x, port.y where port.x and port.y are percentages relative to node position and size.
-node.data('statesandinfos'); // Includes state and information boxes list of a node.
-// A stateorinfobox includes the followings.
-var stateorinfobox = node.data('statesandinfos')[i];
-stateorinfobox.id; // Id of that box.
-stateorinfobox.clazz; // See whether that box is related to a 'unit of information' or a 'state variable'.
-stateorinfobox.bbox; // Bbox of that box. Includes bbox.x, bbox.y, bbox.w, bbox.h where bbox.x and bbox.y are percentages relative to node position and size.
-stateorinfobox.state; // Just included in state variables. Includes state.value and state.variable.
-stateorinfobox.label; // Just included in units of information includes label.text.
+// Ports list of a node. A node port includes port.id, port.x, port.y where port.x and port.y are
+// percentages relative to node position and size.
+node.data('ports');
+node.data('statesandinfos'); // a list of UnitOfInformation and StateVariable objects
+// an object containing 0 to 4 keys (top, bottom, left, right) pointing to AuxUnitLayout objects
+node.data('auxunitlayouts');
+
 // Edges specific data.
 edge.data('id'); // Id of an edge. (Specific to cytoscape.js)
 edge.data('source'); // Id of source node. (Specific to cytoscape.js)
 edge.data('target'); // Id of target node. (Specific to cytoscape.js)
 edge.data('class'); // SBGN specific class of an edge.
 edge.data('cardinality'); // SBGN cardinality of an edge.
-edge.data('portsource'); // This is set if the edge is connected to its source node by a specific port of that node.
-edge.data('porttarget'); // This is set if the edge is connected to its target node by a specific port of that node.
-edge.data('bendPointPositions'); // Bend point positions of an edge. Includes x and y coordinates. This data is to be passed to edgeBendEditing extension.
+// The following is set if the edge is connected to its source node by a specific port of that node.
+edge.data('portsource');
+// The following is set if the edge is connected to its target node by a specific port of that node.
+edge.data('porttarget');
+// Bend point positions of an edge. Includes x and y coordinates. This data is to be passed to
+// edgeBendEditing extension.
+edge.data('bendPointPositions');
 ```
 
 ## API
@@ -101,6 +108,9 @@ Removes the given elements in a simple way. Considers 'undoable' option.
 `sbgnviz.deleteNodesSmart(nodes)`
 Extends the given nodes list in a smart way to leave the map intact and removes the resulting list. Considers 'undoable' option.
 
+`sbgnviz.highlightSelected(eles)`
+Highlights selected elements. Requires viewUtilities extension and considers 'undoable' option.
+
 `sbgnviz.highlightNeighbours(nodes)`
 Highlights neighbours of the given nodes. Requires viewUtilities extension and considers 'undoable' option.
 
@@ -135,10 +145,8 @@ in a special format (http://js.cytoscape.org/#notation/elements-json).
 Calculates the paddings for compounds based on dimensions of simple nodes and a specific percentadge.
 As this percentadge takes the given paddingPercent or compoundPadding option.
 
-`sbgnviz.refreshPaddings(recalculatePaddings, nodes)`
-If nodes parameter is set refreshes the paddings of given nodes, else refreshes the paddings of whole graph.
-If recalculatePaddings parameter is set to a truthy value recalculates the paddings before refreshing, else uses
-the last calculated value for the paddings. 
+`sbgnviz.recalculatePaddings()`
+Recalculates/refreshes the compound paddings. Aliases `sbgnviz.refreshPaddings()`.
 
 `sbgnviz.saveAsPng(filename)`
 Exports the current graph to a png file. The name of the file is determined by the filename parameter which is 
@@ -151,11 +159,28 @@ Exports the current graph to a jpg file. The name of the file is determined by t
 `sbgnviz.loadSample(filename, folderpath)`
 Loads a sample file whose name and path of containing folder is given.
 
-`sbgnviz.loadSBGNMLFile(file)`
-Loads the given sbgnml file.
+`sbgnviz.loadSBGNMLFile(file[, callback])`
+Loads the given sbgnml file. Optionally apply a callback function upon loading. Callback accepts the file as an xml string as argument.
+
+`loadSBGNMLText(textData)`
+Loads a graph from the given text data in sbgnml format.
 
 `sbgnviz.saveAsSbgnml(filename)`
 Exports the current graph to an sbgnml file with the given filename.
+
+`sbgnviz.enablePorts()`
+Enable node ports.
+
+`sbgnviz.disablePorts()`
+Disable node ports.
+
+`sbgnviz.arePortsEnabled()`
+Get if node ports are enabled.
+
+`sbgnviz.setPortsOrdering(nodes, ordering, portDistance)`
+Sets the ordering of the given nodes. Ordering options are 'L-to-R', 'R-to-L', 'T-to-B', 'B-to-T', 'none'.
+If a node does not have any port before the operation and it is supposed to have some after operation the portDistance parameter is used to set the distance between the node center and the ports. The default port distance is 70.
+Considers undoable option.
 
 `sbgnviz.startSpinner(classname)`
 Starts a spinner at the middle of network container element. You can specify a css class that the 
@@ -179,6 +204,9 @@ library of sbgnviz. Most users will not need to use this. It includes the follow
  * `noneIsNotHighlighted()` Returns true if there is no element having 'unhighlighted' class.
  * `deleteNodesSmart(nodes)` Extends the given nodes list in a smart way to leave the map intact and removes the resulting list.
  * `deleteElesSimple` Removes the given elements in a simple way.
+ * `getPortsOrdering` Return ordering of ports of a node. Possible return values are 'L-to-R', 'R-to-L', 'T-to-B', 'B-to-T', 'none'.
+ * `canHavePorts` Returns whether the given element or elements with the given class can have ports
+ * `setPortsOrdering(nodes, ordering, portDistance)` Similar to `sbgnviz.setPortsOrdering()` but do not considers undoable option.
  
 
 `sbgnviz.undoRedoActionFunctions`
@@ -188,6 +216,62 @@ an extension library of sbgnviz.
  * `deleteElesSimple(param)` Do/Redo function for 'deleteElesSimple' undo redo command.
  * `deleteNodesSmart(param)` Do/Redo function for 'deleteNodesSmart' undo redo command.
  * `restoreEles(eles)` Undo function for 'deleteElesSimple' and 'deleteNodesSmart' undo redo commands.
+ * `setPortsOrdering(param)` Do/Undo/Redo function for 'setPortsOrdering' undo redo command.
+
+### Classes
+
+The following describes objects used by sbgnviz.js and accessible through `sbgnviz.classes`.
+
+#### AuxiliaryUnit
+
+```javascript
+stateorinfobox.id;
+stateorinfobox.parent; // points to the cytoscape parent node
+stateorinfobox.clazz; // 'unit of information' or 'state variable'
+stateorinfobox.bbox; // includes bbox.x, bbox.y, bbox.w, bbox.h
+```
+
+#### StateVariable
+
+```javascript
+stateVariable.state; // includes state.value and state.variable
+```
+
+#### UnitOfInformation
+
+```javascript
+unitOfInformation.label; // includes label.text
+```
+
+#### AuxUnitLayout
+
+```javascript
+
+// instance variables
+auxUnitLayout.units // list of StateVariable or UnitOfInformation
+auxUnitLayout.location // top, bottom, left, right
+auxUnitLayout.parentNode // link to cytoscape parent node
+
+// instance methods
+// add an auxiliary unit to this layout, optionnally inserting it at a given position
+auxUnitLayout.addAuxUnit(unit [,position]);
+// remove an auxiliary unit from this layout
+auxUnitLayout.removeAuxUnit(unit);
+
+// class variables
+// those options can be defined for each instance individually. If no value is found for an
+// instance, then the class' value is used.
+AuxUnitLayout.outerMargin = 10;
+AuxUnitLayout.unitGap = 5;
+AuxUnitLayout.alwaysShowAuxUnits = false;
+AuxUnitLayout.maxUnitDisplayed = 4;
+
+```
+
+#### EntityType
+
+#### StateVariableDefinition
+
 
 ## Events
 `$(document).on('sbgnvizLoadSampleStart', function(event, filename) { ... });` Triggered when a sample is being loaded. Aliases `sbgnvizLoadSample`.

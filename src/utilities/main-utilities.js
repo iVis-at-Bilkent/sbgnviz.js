@@ -7,6 +7,7 @@ var elementUtilities = require('./element-utilities');
 var jsonToSbgnml = require('./json-to-sbgnml-converter');
 var sbgnmlToJson = require('./sbgnml-to-json-converter');
 var optionUtilities = require('./option-utilities');
+var graphUtilities = require('./graph-utilities');
 
 var options = optionUtilities.getOptions();
 var libs = require('./lib-utilities').getLibs();
@@ -14,21 +15,27 @@ var jQuery = $ = libs.jQuery;
 
 // Helpers start
 function beforePerformLayout() {
-  var nodes = cy.nodes();
+  var parents = cy.nodes(':parent');
   var edges = cy.edges();
+  
+  cy.startBatch();
 
-  nodes.removeData("ports");
-  edges.removeData("portsource");
-  edges.removeData("porttarget");
-
-  nodes.data("ports", []);
-  edges.data("portsource", []);
-  edges.data("porttarget", []);
+  // graphUtilities.disablePorts();
 
   // TODO do this by using extension API
   cy.$('.edgebendediting-hasbendpoints').removeClass('edgebendediting-hasbendpoints');
   edges.scratch('cyedgebendeditingWeights', []);
   edges.scratch('cyedgebendeditingDistances', []);
+  
+  parents.removeData('minWidth');
+  parents.removeData('minHeight');
+  parents.removeData('minWidthBiasLeft');
+  parents.removeData('minWidthBiasRight');
+  parents.removeData('minHeightBiasTop');
+  parents.removeData('minHeightBiasBottom');
+  
+  cy.endBatch();
+  cy.style().update();
 };
 // Helpers end
 
@@ -77,7 +84,7 @@ mainUtilities.collapseComplexes = function() {
   // Get expandCollapse api
   var expandCollapse = cy.expandCollapse('get');
   
-  var complexes = cy.nodes("[class='complex']");
+  var complexes = cy.nodes("[class^='complex']");
   if (expandCollapse.collapsibleNodes(complexes).length == 0) {
     return;
   }
@@ -97,7 +104,7 @@ mainUtilities.expandComplexes = function() {
   // Get expandCollapse api
   var expandCollapse = cy.expandCollapse('get');
   
-  var nodes = expandCollapse.expandableNodes(cy.nodes().filter("[class='complex']"));
+  var nodes = expandCollapse.expandableNodes(cy.nodes().filter("[class^='complex']"));
   if (nodes.length == 0) {
     return;
   }
@@ -152,6 +159,25 @@ mainUtilities.expandAll = function() {
   }
 };
 
+// Increase border width to show nodes with hidden neighbors
+mainUtilities.thickenBorder = function(eles){
+  eles.forEach(function( ele ){
+    var defaultBorderWidth = Number(ele.data("border-width"));
+    ele.data("border-width", defaultBorderWidth + 2);
+  });
+  eles.data("thickBorder", true);
+  return eles;
+}
+// Decrease border width when hidden neighbors of the nodes become visible
+mainUtilities.thinBorder = function(eles){
+  eles.forEach(function( ele ){
+    var defaultBorderWidth = Number(ele.data("border-width"));
+    ele.data("border-width", defaultBorderWidth - 2);
+  });
+  eles.removeData("thickBorder");
+  return eles;
+}
+
 // Extends the given nodes list in a smart way to leave the map intact and hides the resulting list. 
 // Requires viewUtilities extension and considers 'undoable' option.
 mainUtilities.hideNodesSmart = function(_nodes) {
@@ -168,10 +194,27 @@ mainUtilities.hideNodesSmart = function(_nodes) {
   }
   
   if(options.undoable) {
-    cy.undoRedo().do("hide", nodesToHide);
+    
+    var ur = cy.undoRedo();
+    ur.action("thickenBorder", mainUtilities.thickenBorder, mainUtilities.thinBorder);
+    ur.action("thinBorder", mainUtilities.thinBorder, mainUtilities.thickenBorder);
+    
+    // Batching
+    var actions = []; 
+    var nodesWithHiddenNeighbor = cy.edges(":hidden").connectedNodes().intersection(nodesToHide);
+    actions.push({name: "thinBorder", param: nodesWithHiddenNeighbor}); 
+    actions.push({name: "hide", param: nodesToHide});
+    nodesWithHiddenNeighbor = nodesToHide.neighborhood(":visible")
+            .nodes().difference(nodesToHide).difference(cy.nodes("[thickBorder]"));
+    actions.push({name: "thickenBorder", param: nodesWithHiddenNeighbor});  
+    cy.undoRedo().do("batch", actions);
   }
   else {
+    var nodesWithHiddenNeighbor = cy.edges(":hidden").connectedNodes(':visible');
+    mainUtilities.thinBorder(nodesWithHiddenNeighbor);
     viewUtilities.hide(nodesToHide);
+    var nodesWithHiddenNeighbor = cy.edges(":hidden").connectedNodes(':visible');
+    mainUtilities.thickenBorder(nodesWithHiddenNeighbor);
   }
 };
 
@@ -191,11 +234,60 @@ mainUtilities.showNodesSmart = function(_nodes) {
   }
   
   if(options.undoable) {
-    cy.undoRedo().do("hide", nodesToHide);
+    var ur = cy.undoRedo();
+    ur.action("thickenBorder", mainUtilities.thickenBorder, mainUtilities.thinBorder);
+    ur.action("thinBorder", mainUtilities.thinBorder, mainUtilities.thickenBorder);
+    
+    // Batching
+    var actions = [];    
+    var nodesWithHiddenNeighbor = cy.edges(":hidden").connectedNodes(':visible');
+    actions.push({name: "thinBorder", param: nodesWithHiddenNeighbor});  
+    actions.push({name: "hide", param: nodesToHide});
+    nodesWithHiddenNeighbor = nodesToHide.neighborhood(":visible")
+            .nodes().difference(nodesToHide);
+    actions.push({name: "thickenBorder", param: nodesWithHiddenNeighbor});  
+    cy.undoRedo().do("batch", actions);
   }
   else {
+    var nodesWithHiddenNeighbor = cy.edges(":hidden").connectedNodes(':visible');
+    mainUtilities.thinBorder(nodesWithHiddenNeighbor);
     viewUtilities.hide(nodesToHide);
+    var nodesWithHiddenNeighbor = cy.edges(":hidden").connectedNodes(':visible');
+    mainUtilities.thickenBorder(nodesWithHiddenNeighbor);
   }
+};
+
+// Unhides elements passed as arguments. Requires viewUtilities extension and considers 'undoable' option.
+mainUtilities.showEles = function(eles) {
+    // If this function is being called we can assume that view utilities extension is on use
+    var viewUtilities = cy.viewUtilities('get');
+    var hiddenEles = eles.filter(':hidden');
+    if (hiddenEles.length === 0) {
+        return;
+    }
+    if(options.undoable) {
+        var ur = cy.undoRedo();
+        ur.action("thickenBorder", mainUtilities.thickenBorder, mainUtilities.thinBorder);
+        ur.action("thinBorder", mainUtilities.thinBorder, mainUtilities.thickenBorder);
+        
+        // Batching
+        var actions = [];
+        var nodesToThinBorder = (hiddenEles.neighborhood(":visible").nodes("[thickBorder]"))
+                                .difference(cy.edges(":hidden").difference(hiddenEles.edges().union(hiddenEles.nodes().connectedEdges())).connectedNodes());
+        actions.push({name: "thinBorder", param: nodesToThinBorder});
+        actions.push({name: "show", param: hiddenEles});
+        var nodesToThickenBorder = hiddenEles.nodes().edgesWith(cy.nodes(":hidden").difference(hiddenEles.nodes()))
+	            .connectedNodes().intersection(hiddenEles.nodes());
+        actions.push({name: "thickenBorder", param: nodesToThickenBorder});
+        cy.undoRedo().do("batch", actions);
+    }
+    else {
+        var nodesWithHiddenNeighbor = cy.edges(":hidden").connectedNodes(':visible');
+        mainUtilities.thinBorder(nodesWithHiddenNeighbor);
+        viewUtilities.show(eles);
+        var nodesWithHiddenNeighbor = cy.edges(":hidden").connectedNodes(':visible');
+        mainUtilities.thickenBorder(nodesWithHiddenNeighbor);
+    }
 };
 
 // Unhides all elements. Requires viewUtilities extension and considers 'undoable' option.
@@ -208,9 +300,20 @@ mainUtilities.showAll = function() {
   }
   
   if(options.undoable) {
-    cy.undoRedo().do("show", cy.elements());
+    var ur = cy.undoRedo();
+    ur.action("thickenBorder", mainUtilities.thickenBorder, mainUtilities.thinBorder);
+    ur.action("thinBorder", mainUtilities.thinBorder, mainUtilities.thickenBorder);
+    
+    // Batching   
+    var actions = [];
+    var nodesWithHiddenNeighbor = cy.nodes("[thickBorder]");
+    actions.push({name: "thinBorder", param: nodesWithHiddenNeighbor});  
+    actions.push({name: "show", param: cy.elements()});
+    cy.undoRedo().do("batch", actions);
   }
   else {
+    var nodesWithHiddenNeighbor = cy.edges(":hidden").connectedNodes(':visible');
+    mainUtilities.thinBorder(nodesWithHiddenNeighbor);
     viewUtilities.show(cy.elements());
   }
 };
@@ -250,6 +353,32 @@ mainUtilities.deleteNodesSmart = function(_nodes) {
   }
 };
 
+// Highlights selected elements. Requires viewUtilities extension and considers 'undoable' option.
+mainUtilities.highlightSelected = function(_eles) {
+
+  var elesToHighlight = _eles;
+  if (elesToHighlight.length === 0) {
+    return;
+  }
+  var notHighlightedEles = cy.elements(".nothighlighted").filter(":visible");
+  var highlightedEles = cy.elements(':visible').difference(notHighlightedEles);
+  if (elesToHighlight.same(highlightedEles)) {
+    return;
+  }
+  
+  // If this function is being called we can assume that view utilities extension is on use
+  var viewUtilities = cy.viewUtilities('get');
+  
+  if (options.undoable) {
+    cy.undoRedo().do("highlight", elesToHighlight);
+  }
+  else {
+    viewUtilities.highlight(elesToHighlight);
+  }
+  
+  cy.elements().unselect();
+};
+
 // Highlights neighbours of the given nodes. Requires viewUtilities extension and considers 'undoable' option.
 mainUtilities.highlightNeighbours = function(_nodes) {
   // If this function is being called we can assume that view utilities extension is on use
@@ -262,7 +391,7 @@ mainUtilities.highlightNeighbours = function(_nodes) {
   }
   var notHighlightedEles = cy.elements(".nothighlighted").filter(":visible");
   var highlightedEles = cy.elements(':visible').difference(notHighlightedEles);
-  if (elesToHighlight.same(highlightedEles)) {
+  if (elesToHighlight.same(highlightedEles) && !cy.elements(":unselected").empty()) {
     return;
   }
   
@@ -272,6 +401,8 @@ mainUtilities.highlightNeighbours = function(_nodes) {
   else {
     viewUtilities.highlight(elesToHighlight);
   }
+  
+  cy.elements().unselect();
 };
 
 // Finds the elements whose label includes the given label and highlights processes of those elements.
@@ -281,7 +412,10 @@ mainUtilities.searchByLabel = function(label) {
     return;
   }
   
-  var nodesToHighlight = cy.nodes(":visible").filter(function (i, ele) {
+  var nodesToHighlight = cy.nodes(":visible").filter(function (ele, i) {
+    if(typeof ele === "number") {
+      ele = i;
+    }
     if (ele.data("label") && ele.data("label").toLowerCase().indexOf(label) >= 0) {
       return true;
     }
@@ -303,6 +437,8 @@ mainUtilities.searchByLabel = function(label) {
   else {
     viewUtilities.highlight(nodesToHighlight);
   }
+  
+  cy.elements().unselect();
 };
 
 // Highlights processes of the given nodes. Requires viewUtilities extension and considers 'undoable' option.
@@ -327,6 +463,8 @@ mainUtilities.highlightProcesses = function(_nodes) {
   else {
     viewUtilities.highlight(elesToHighlight);
   }
+  
+  cy.elements().unselect();
 };
 
 // Unhighlights any highlighted element. Requires viewUtilities extension and considers 'undoable' option.
@@ -344,6 +482,7 @@ mainUtilities.removeHighlights = function() {
   else {
     viewUtilities.removeHighlights();
   }
+  cy.style().update();
 };
 
 // Performs layout by given layoutOptions. Considers 'undoable' option. However, by setting notUndoable parameter
@@ -353,7 +492,12 @@ mainUtilities.performLayout = function(layoutOptions, notUndoable) {
   beforePerformLayout();
   
   if (!options.undoable || notUndoable) { // 'notUndoable' flag can be used to have composite actions in undo/redo stack
-    cy.elements().filter(':visible').layout(layoutOptions);
+    var layout = cy.elements().filter(':visible').layout(layoutOptions);
+    
+    // Check this for cytoscape.js backward compatibility
+    if (layout && layout.run) {
+      layout.run();
+    }
   }
   else {
     cy.undoRedo().do("layout", {
@@ -378,5 +522,51 @@ mainUtilities.convertSbgnmlToJson = function(data) {
 mainUtilities.getQtipContent = function(node) {
   return elementUtilities.getQtipContent(node);
 };
+
+// Change option
+mainUtilities.setShowComplexName = function(showComplexName) {
+  options.showComplexName = showComplexName;
+  // make change active by triggering data which will trigger style update
+  cy.nodes('[class^="complex"]').forEach(function(ele){
+    ele.trigger("data");
+  });
+};
+
+/*
+ * Sets the ordering of the given nodes.
+ * Ordering options are 'L-to-R', 'R-to-L', 'T-to-B', 'B-to-T', 'none'.
+ * If a node does not have any port before the operation and it is supposed to have some after operation the portDistance parameter is 
+ * used to set the distance between the node center and the ports. The default port distance is 60.
+ * Considers undoable option.
+ */
+mainUtilities.setPortsOrdering = function (nodes, ordering, portDistance) {
+  if ( nodes.length === 0 ) {
+    return;
+  }
+  
+  if (!options.undoable) {
+    elementUtilities.setPortsOrdering(nodes, ordering, portDistance);
+  }
+  else {
+    var param = {
+      nodes: nodes,
+      ordering: ordering,
+      portDistance: portDistance
+    };
+    
+    cy.undoRedo().do("setPortsOrdering", param);
+  }
+  
+  cy.style().update();
+};
+
+/**
+ * Get map properties from SBGNML file
+ * Needs to be called after file is loaded - sbgnvizLoadFileEnd event
+ * return: map properties as object
+ */
+mainUtilities.getMapProperties = function() {
+  return sbgnmlToJson.mapPropertiesToObj();
+ }
 
 module.exports = mainUtilities;

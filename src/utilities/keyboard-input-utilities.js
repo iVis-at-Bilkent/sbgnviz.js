@@ -26,12 +26,15 @@ var keyboardInputUtilities = {
   isBackspaceKey: function(e) {
     return e.keyCode === 8;
   },
+  isTabKey: function(e) {
+    return e.keyCode === 9;
+  },
   isEnterKey: function(e) {
     return e.keyCode === 13;
   },
   isIntegerFieldInput: function(value, e) {
     return this.isCtrlOrCommandPressed(e) || this.isMinusSignKey(e) || this.isNumberKey(e) 
-            || this.isBackspaceKey(e) || this.isLeftKey(e) || this.isRightKey(e) || this.isEnterKey(e);
+            || this.isBackspaceKey(e) || this.isTabKey(e) || this.isLeftKey(e) || this.isRightKey(e) || this.isEnterKey(e);
   },
   isFloatFieldInput: function(value, e) {
     return this.isIntegerFieldInput(value, e) || this.isDotKey(e);
