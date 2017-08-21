@@ -80,7 +80,7 @@ var jsonToSbgnml = {
         var glyphList = [];
         // be careful that :visible is also used during recursive search of nodes
         // in the getGlyphSbgnml function. If not set accordingly, discrepancies will occur.
-        cy.nodes(":visible").each(function(ele, i){
+        cy.nodes().each(function(ele, i){
             if(typeof ele === "number") {
               ele = i;
             }
@@ -93,7 +93,7 @@ var jsonToSbgnml = {
         }
 
         // get all arcs
-        cy.edges(":visible").each(function(ele, i){
+        cy.edges().each(function(ele, i){
             if(typeof ele === "number") {
               ele = i;
             }
@@ -262,11 +262,16 @@ var jsonToSbgnml = {
             hasNewtExt = true;
         }
 
+        // add info for nodes which has hidden neighbour
+        if(node.data("thickBorder")) {
+            newtExtString += "<hasHiddenNeighbour/>";
+            hasNewtExt = true;
+        }
+
         // add string to a new extension for this glyph
         if(hasNewtExt) {
             var extension = self.getOrCreateExtension(glyph);
             extension.add("<newt>"+newtExtString+"</newt>");
-            console.log(extension.toXML());
         }
 
         // current glyph is done
@@ -274,7 +279,7 @@ var jsonToSbgnml = {
 
         // keep going with all the included glyphs
         if(nodeClass === "compartment"){
-            node.children(":visible").each(function(ele, i){
+            node.children().each(function(ele, i){
                 if(typeof ele === "number") {
                   ele = i;
                 }
@@ -350,7 +355,6 @@ var jsonToSbgnml = {
         if(edge.hidden()) {
             var extension = self.getOrCreateExtension(arc);
             extension.add("<newt><hidden/></newt>");
-            console.log(extension.toXML());
         }
 
         return arc;
