@@ -363,13 +363,15 @@ module.exports = function () {
           .selector("node:parent[minHeightBiasTop]")
           .css({
             'min-height-bias-top': function(ele) {
-              return ele.data('minHeightBiasTop') + '%';
+              var min = ele.data('minHeightBiasTop');
+              return (min > 0 ? min : 100) + '%';
             }
           })
           .selector("node:parent[minHeightBiasBottom]")
           .css({
             'min-height-bias-bottom': function(ele) {
-              return ele.data('minHeightBiasBottom') + '%';
+              var min = ele.data('minHeightBiasBottom');
+              return (min > 0 ? min : 100) + '%';
             }
           })
           .selector("node:parent[minWidth]")
@@ -385,13 +387,15 @@ module.exports = function () {
           .selector("node:parent[minWidthBiasLeft]")
           .css({
             'min-width-bias-left': function(ele) {
-              return ele.data('minWidthBiasLeft') + '%';
+              var min = ele.data('minWidthBiasLeft');
+              return (min > 0 ? min : 100) + '%';
             }
           })
           .selector("node:parent[minWidthBiasRight]")
           .css({
             'min-width-bias-right': function(ele) {
-              return ele.data('minWidthBiasRight') + '%';
+              var min = ele.data('minWidthBiasRight');
+              return (min > 0 ? min : 100) + '%';
             }
           })
           .selector("node.cy-expand-collapse-collapsed-node")

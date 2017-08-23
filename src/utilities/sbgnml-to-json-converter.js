@@ -345,6 +345,9 @@ var sbgnmlToJson = {
         if (result.newt.hasHiddenNeighbour){
           nodeObj.thickBorder = true;
         }
+        if (result.newt.collapsed){
+          nodeObj.collapse = true;
+        }
       });
     }
 
