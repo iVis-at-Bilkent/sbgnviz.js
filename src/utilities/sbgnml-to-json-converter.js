@@ -243,6 +243,7 @@ var sbgnmlToJson = {
   addCytoscapeJsNode: function (ele, jsonArray, parent, compartments) {
     var self = this;
     var nodeObj = {};
+    var styleObj = {};
 
     // add id information
     nodeObj.id = ele.id;
@@ -336,7 +337,21 @@ var sbgnmlToJson = {
       nodeObj = self.handleAnnotations(nodeObj, rdfElement);
     }
 
-    var cytoscapeJsNode = {data: nodeObj};
+    if (ele.extension && ele.extension.has("newt")){
+      parseString(ele.extension.get("newt"), function (err, result) {
+        if (result.newt.hidden){
+          styleObj.display = "none";
+        }
+        if (result.newt.hasHiddenNeighbour){
+          nodeObj.thickBorder = true;
+        }
+        if (result.newt.collapsed){
+          nodeObj.collapse = true;
+        }
+      });
+    }
+
+    var cytoscapeJsNode = {data: nodeObj, style: styleObj};
     jsonArray.push(cytoscapeJsNode);
   },
   /**
@@ -521,6 +536,7 @@ var sbgnmlToJson = {
     }
 
     var edgeObj = {};
+    var styleObj = {};
     var bendPointPositions = self.getArcBendPointPositions(ele);
 
     edgeObj.id = ele.id || undefined;
@@ -550,7 +566,15 @@ var sbgnmlToJson = {
       edgeObj = self.handleAnnotations(edgeObj, rdfElement);
     }
 
-    var cytoscapeJsEdge = {data: edgeObj};
+    if (ele.extension && ele.extension.has("newt")){
+      parseString(ele.extension.get("newt"), function (err, result) {
+        if (result.newt.hidden){
+          styleObj.display = "none";
+        }
+      });
+    }
+
+    var cytoscapeJsEdge = {data: edgeObj, style: styleObj};
     jsonArray.push(cytoscapeJsEdge);
   },
   applyStyle: function (renderInformation, nodes, edges) {

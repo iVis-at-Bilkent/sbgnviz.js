@@ -101,6 +101,10 @@ fileUtilities.loadSample = function(filename, folderpath) {
   
   setTimeout(function () {
     updateGraph(sbgnmlToJson.convert(xmlObject));
+    // collapse nodes
+    if (cy.nodes("[collapse]").length > 0 ){
+      cy.expandCollapse('get').collapse(cy.nodes("[collapse]", {layoutBy: null}));
+    }
     uiUtilities.endSpinner("load-spinner");
     $( document ).trigger( "sbgnvizLoadSampleEnd", [ filename ] ); // Trigger an event signaling that a sample is loaded
   }, 0);
@@ -140,6 +144,10 @@ fileUtilities.loadSBGNMLFile = function(file, callback1, callback2) {
       }
 
       updateGraph(cyGraph);
+      // collapse nodes
+      if (cy.nodes("[collapse]").length > 0 ){
+        cy.expandCollapse('get').collapse(cy.nodes("[collapse]"), {layoutBy: null});
+      }
       uiUtilities.endSpinner("load-file-spinner");
       $( document ).trigger( "sbgnvizLoadFileEnd", [ file.name ] ); // Trigger an event signaling that a file is loaded
     }, 0);
