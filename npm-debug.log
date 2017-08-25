@@ -1,0 +1,227 @@
+0 info it worked if it ends with ok
+1 verbose cli [ '/usr/bin/node', '/usr/bin/npm', 'link' ]
+2 info using npm@2.15.11
+3 info using node@v4.7.3
+4 verbose linkPkg /home/safarli/Documents/AF-support/sbgnviz.js
+5 silly gentlyRm /usr/local/lib/node_modules/sbgnviz is being purged
+6 verbose gentlyRm don't care about contents; nuking /usr/local/lib/node_modules/sbgnviz
+7 silly vacuum-fs purging /usr/local/lib/node_modules/sbgnviz
+8 silly vacuum-fs quitting because other entries in /usr/local/lib/node_modules
+9 verbose link build target /usr/local/lib/node_modules/sbgnviz
+10 verbose install where, what [ '/home/safarli/Documents/AF-support/sbgnviz.js', [] ]
+11 verbose readDependencies loading dependencies from /home/safarli/Documents/AF-support/sbgnviz.js/package.json
+12 verbose install where, deps [ '/home/safarli/Documents/AF-support/sbgnviz.js',
+12 verbose install   [ 'libsbgn.js',
+12 verbose install     'pretty-data',
+12 verbose install     'xml2js',
+12 verbose install     'browserify',
+12 verbose install     'gulp',
+12 verbose install     'gulp-derequire',
+12 verbose install     'gulp-jshint',
+12 verbose install     'gulp-prompt',
+12 verbose install     'gulp-replace',
+12 verbose install     'gulp-shell',
+12 verbose install     'gulp-util',
+12 verbose install     'jshint-stylish',
+12 verbose install     'node-notifier',
+12 verbose install     'run-sequence',
+12 verbose install     'vinyl-buffer',
+12 verbose install     'vinyl-source-stream' ] ]
+13 verbose install peerDependency jquery wasn't going to be installed; adding
+14 warn peerDependencies The peer dependency jquery included from sbgnviz will no
+15 warn peerDependencies longer be automatically installed to fulfill the peerDependency
+16 warn peerDependencies in npm 3+. Your application will need to depend on it explicitly.
+17 verbose install peerDependency filesaverjs wasn't going to be installed; adding
+18 warn peerDependencies The peer dependency filesaverjs included from sbgnviz will no
+19 warn peerDependencies longer be automatically installed to fulfill the peerDependency
+20 warn peerDependencies in npm 3+. Your application will need to depend on it explicitly.
+21 verbose install peerDependency cytoscape wasn't going to be installed; adding
+22 warn peerDependencies The peer dependency cytoscape included from sbgnviz will no
+23 warn peerDependencies longer be automatically installed to fulfill the peerDependency
+24 warn peerDependencies in npm 3+. Your application will need to depend on it explicitly.
+25 verbose install where, peers [ '/home/safarli/Documents/AF-support/sbgnviz.js',
+25 verbose install   [ 'jquery', 'filesaverjs', 'cytoscape' ] ]
+26 verbose installManyTop reading for lifecycle /home/safarli/Documents/AF-support/sbgnviz.js/package.json
+27 info preinstall sbgnviz@3.1.0
+28 verbose installManyTop reading scoped package data from /home/safarli/Documents/AF-support/sbgnviz.js/node_modules/browserify/package.json
+29 verbose installManyTop reading scoped package data from /home/safarli/Documents/AF-support/sbgnviz.js/node_modules/cytoscape/package.json
+30 verbose installManyTop reading scoped package data from /home/safarli/Documents/AF-support/sbgnviz.js/node_modules/filesaverjs/package.json
+31 verbose installManyTop reading scoped package data from /home/safarli/Documents/AF-support/sbgnviz.js/node_modules/gulp/package.json
+32 verbose installManyTop reading scoped package data from /home/safarli/Documents/AF-support/sbgnviz.js/node_modules/gulp-derequire/package.json
+33 verbose installManyTop reading scoped package data from /home/safarli/Documents/AF-support/sbgnviz.js/node_modules/gulp-jshint/package.json
+34 verbose installManyTop reading scoped package data from /home/safarli/Documents/AF-support/sbgnviz.js/node_modules/gulp-prompt/package.json
+35 verbose installManyTop reading scoped package data from /home/safarli/Documents/AF-support/sbgnviz.js/node_modules/gulp-replace/package.json
+36 verbose installManyTop reading scoped package data from /home/safarli/Documents/AF-support/sbgnviz.js/node_modules/gulp-shell/package.json
+37 verbose installManyTop reading scoped package data from /home/safarli/Documents/AF-support/sbgnviz.js/node_modules/gulp-util/package.json
+38 verbose installManyTop reading scoped package data from /home/safarli/Documents/AF-support/sbgnviz.js/node_modules/jquery/package.json
+39 verbose installManyTop reading scoped package data from /home/safarli/Documents/AF-support/sbgnviz.js/node_modules/jshint-stylish/package.json
+40 verbose installManyTop reading scoped package data from /home/safarli/Documents/AF-support/sbgnviz.js/node_modules/libsbgn.js/package.json
+41 verbose installManyTop reading scoped package data from /home/safarli/Documents/AF-support/sbgnviz.js/node_modules/lodash/package.json
+42 verbose installManyTop reading scoped package data from /home/safarli/Documents/AF-support/sbgnviz.js/node_modules/node-notifier/package.json
+43 verbose installManyTop reading scoped package data from /home/safarli/Documents/AF-support/sbgnviz.js/node_modules/pretty-data/package.json
+44 verbose installManyTop reading scoped package data from /home/safarli/Documents/AF-support/sbgnviz.js/node_modules/run-sequence/package.json
+45 verbose installManyTop reading scoped package data from /home/safarli/Documents/AF-support/sbgnviz.js/node_modules/sax/package.json
+46 verbose installManyTop reading scoped package data from /home/safarli/Documents/AF-support/sbgnviz.js/node_modules/vinyl-buffer/package.json
+47 verbose installManyTop reading scoped package data from /home/safarli/Documents/AF-support/sbgnviz.js/node_modules/vinyl-source-stream/package.json
+48 verbose installManyTop reading scoped package data from /home/safarli/Documents/AF-support/sbgnviz.js/node_modules/xml2js/package.json
+49 verbose installManyTop reading scoped package data from /home/safarli/Documents/AF-support/sbgnviz.js/node_modules/xmlbuilder/package.json
+50 info package.json gulp-derequire@2.1.0 license should be a valid SPDX license expression
+51 verbose readDependencies loading dependencies from /home/safarli/Documents/AF-support/sbgnviz.js/package.json
+52 verbose targetResolver reading package data from /home/safarli/Documents/AF-support/sbgnviz.js/node_modules/browserify/package.json
+53 verbose targetResolver reading package data from /home/safarli/Documents/AF-support/sbgnviz.js/node_modules/cytoscape/package.json
+54 verbose targetResolver reading package data from /home/safarli/Documents/AF-support/sbgnviz.js/node_modules/filesaverjs/package.json
+55 verbose targetResolver reading package data from /home/safarli/Documents/AF-support/sbgnviz.js/node_modules/gulp/package.json
+56 verbose targetResolver reading package data from /home/safarli/Documents/AF-support/sbgnviz.js/node_modules/gulp-derequire/package.json
+57 verbose targetResolver reading package data from /home/safarli/Documents/AF-support/sbgnviz.js/node_modules/gulp-jshint/package.json
+58 verbose targetResolver reading package data from /home/safarli/Documents/AF-support/sbgnviz.js/node_modules/gulp-prompt/package.json
+59 verbose targetResolver reading package data from /home/safarli/Documents/AF-support/sbgnviz.js/node_modules/gulp-replace/package.json
+60 verbose targetResolver reading package data from /home/safarli/Documents/AF-support/sbgnviz.js/node_modules/gulp-shell/package.json
+61 verbose targetResolver reading package data from /home/safarli/Documents/AF-support/sbgnviz.js/node_modules/gulp-util/package.json
+62 verbose targetResolver reading package data from /home/safarli/Documents/AF-support/sbgnviz.js/node_modules/jquery/package.json
+63 verbose targetResolver reading package data from /home/safarli/Documents/AF-support/sbgnviz.js/node_modules/jshint-stylish/package.json
+64 verbose targetResolver reading package data from /home/safarli/Documents/AF-support/sbgnviz.js/node_modules/libsbgn.js/package.json
+65 verbose targetResolver reading package data from /home/safarli/Documents/AF-support/sbgnviz.js/node_modules/lodash/package.json
+66 verbose targetResolver reading package data from /home/safarli/Documents/AF-support/sbgnviz.js/node_modules/node-notifier/package.json
+67 verbose targetResolver reading package data from /home/safarli/Documents/AF-support/sbgnviz.js/node_modules/pretty-data/package.json
+68 verbose targetResolver reading package data from /home/safarli/Documents/AF-support/sbgnviz.js/node_modules/run-sequence/package.json
+69 verbose targetResolver reading package data from /home/safarli/Documents/AF-support/sbgnviz.js/node_modules/sax/package.json
+70 verbose targetResolver reading package data from /home/safarli/Documents/AF-support/sbgnviz.js/node_modules/vinyl-buffer/package.json
+71 verbose targetResolver reading package data from /home/safarli/Documents/AF-support/sbgnviz.js/node_modules/vinyl-source-stream/package.json
+72 verbose targetResolver reading package data from /home/safarli/Documents/AF-support/sbgnviz.js/node_modules/xml2js/package.json
+73 verbose targetResolver reading package data from /home/safarli/Documents/AF-support/sbgnviz.js/node_modules/xmlbuilder/package.json
+74 verbose targetResolver reading package data from /home/safarli/Documents/AF-support/sbgnviz.js/node_modules/.bin/browserify/package.json
+75 verbose targetResolver reading package data from /home/safarli/Documents/AF-support/sbgnviz.js/node_modules/.bin/gulp/package.json
+76 verbose targetResolver reading package data from /home/safarli/Documents/AF-support/sbgnviz.js/node_modules/.bin/notify/package.json
+77 verbose already installed skipping node-notifier@^4.3.1 /home/safarli/Documents/AF-support/sbgnviz.js
+78 verbose already installed skipping run-sequence@^1.1.4 /home/safarli/Documents/AF-support/sbgnviz.js
+79 verbose already installed skipping vinyl-buffer@^1.0.0 /home/safarli/Documents/AF-support/sbgnviz.js
+80 verbose already installed skipping vinyl-source-stream@^1.1.0 /home/safarli/Documents/AF-support/sbgnviz.js
+81 verbose already installed skipping jquery@^2.2.4 /home/safarli/Documents/AF-support/sbgnviz.js
+82 verbose already installed skipping filesaverjs@~0.2.2 /home/safarli/Documents/AF-support/sbgnviz.js
+83 verbose already installed skipping cytoscape@iVis-at-Bilkent/cytoscape.js#unstable /home/safarli/Documents/AF-support/sbgnviz.js
+84 verbose already installed skipping libsbgn.js@^0.1.1 /home/safarli/Documents/AF-support/sbgnviz.js
+85 verbose already installed skipping pretty-data@^0.40.0 /home/safarli/Documents/AF-support/sbgnviz.js
+86 verbose already installed skipping xml2js@^0.4.17 /home/safarli/Documents/AF-support/sbgnviz.js
+87 verbose already installed skipping browserify@^11.2.0 /home/safarli/Documents/AF-support/sbgnviz.js
+88 verbose already installed skipping gulp@^3.9.0 /home/safarli/Documents/AF-support/sbgnviz.js
+89 verbose already installed skipping gulp-derequire@^2.1.0 /home/safarli/Documents/AF-support/sbgnviz.js
+90 verbose already installed skipping gulp-jshint@^1.11.2 /home/safarli/Documents/AF-support/sbgnviz.js
+91 verbose already installed skipping gulp-prompt@^0.1.2 /home/safarli/Documents/AF-support/sbgnviz.js
+92 verbose already installed skipping gulp-replace@^0.5.4 /home/safarli/Documents/AF-support/sbgnviz.js
+93 verbose already installed skipping gulp-shell@^0.5.0 /home/safarli/Documents/AF-support/sbgnviz.js
+94 verbose already installed skipping gulp-util@^3.0.6 /home/safarli/Documents/AF-support/sbgnviz.js
+95 verbose already installed skipping jshint-stylish@^2.0.1 /home/safarli/Documents/AF-support/sbgnviz.js
+96 silly install resolved []
+97 info build /home/safarli/Documents/AF-support/sbgnviz.js
+98 info linkStuff sbgnviz@3.1.0
+99 silly linkStuff sbgnviz@3.1.0 has /home/safarli/Documents/AF-support as its parent node_modules
+100 verbose linkBins sbgnviz@3.1.0
+101 verbose linkMans sbgnviz@3.1.0
+102 verbose rebuildBundles sbgnviz@3.1.0
+103 verbose rebuildBundles [ '.bin',
+103 verbose rebuildBundles   'browserify',
+103 verbose rebuildBundles   'cytoscape',
+103 verbose rebuildBundles   'filesaverjs',
+103 verbose rebuildBundles   'gulp',
+103 verbose rebuildBundles   'gulp-derequire',
+103 verbose rebuildBundles   'gulp-jshint',
+103 verbose rebuildBundles   'gulp-prompt',
+103 verbose rebuildBundles   'gulp-replace',
+103 verbose rebuildBundles   'gulp-shell',
+103 verbose rebuildBundles   'gulp-util',
+103 verbose rebuildBundles   'jquery',
+103 verbose rebuildBundles   'jshint-stylish',
+103 verbose rebuildBundles   'libsbgn.js',
+103 verbose rebuildBundles   'lodash',
+103 verbose rebuildBundles   'node-notifier',
+103 verbose rebuildBundles   'pretty-data',
+103 verbose rebuildBundles   'run-sequence',
+103 verbose rebuildBundles   'sax',
+103 verbose rebuildBundles   'vinyl-buffer',
+103 verbose rebuildBundles   'vinyl-source-stream',
+103 verbose rebuildBundles   'xml2js',
+103 verbose rebuildBundles   'xmlbuilder' ]
+104 verbose rebuild bundle /home/safarli/Documents/AF-support/sbgnviz.js/node_modules/cytoscape
+105 info build /home/safarli/Documents/AF-support/sbgnviz.js/node_modules/cytoscape
+106 info preinstall cytoscape@3.1.1
+107 info linkStuff cytoscape@3.1.1
+108 silly linkStuff cytoscape@3.1.1 has /home/safarli/Documents/AF-support/sbgnviz.js/node_modules as its parent node_modules
+109 verbose linkBins cytoscape@3.1.1
+110 verbose linkMans cytoscape@3.1.1
+111 verbose rebuildBundles cytoscape@3.1.1
+112 verbose rebuildBundles [ 'canvas2svg' ]
+113 info install cytoscape@3.1.1
+114 info postinstall cytoscape@3.1.1
+115 verbose rebuild bundle /home/safarli/Documents/AF-support/sbgnviz.js/node_modules/filesaverjs
+116 info build /home/safarli/Documents/AF-support/sbgnviz.js/node_modules/filesaverjs
+117 info preinstall filesaverjs@0.2.2
+118 info linkStuff filesaverjs@0.2.2
+119 silly linkStuff filesaverjs@0.2.2 has /home/safarli/Documents/AF-support/sbgnviz.js/node_modules as its parent node_modules
+120 verbose linkBins filesaverjs@0.2.2
+121 verbose linkMans filesaverjs@0.2.2
+122 verbose rebuildBundles filesaverjs@0.2.2
+123 info install filesaverjs@0.2.2
+124 info postinstall filesaverjs@0.2.2
+125 verbose rebuild bundle /home/safarli/Documents/AF-support/sbgnviz.js/node_modules/jquery
+126 info build /home/safarli/Documents/AF-support/sbgnviz.js/node_modules/jquery
+127 info preinstall jquery@2.2.4
+128 info linkStuff jquery@2.2.4
+129 silly linkStuff jquery@2.2.4 has /home/safarli/Documents/AF-support/sbgnviz.js/node_modules as its parent node_modules
+130 verbose linkBins jquery@2.2.4
+131 verbose linkMans jquery@2.2.4
+132 verbose rebuildBundles jquery@2.2.4
+133 info install jquery@2.2.4
+134 info postinstall jquery@2.2.4
+135 verbose rebuild bundle /home/safarli/Documents/AF-support/sbgnviz.js/node_modules/lodash
+136 info build /home/safarli/Documents/AF-support/sbgnviz.js/node_modules/lodash
+137 info preinstall lodash@4.17.4
+138 info linkStuff lodash@4.17.4
+139 silly linkStuff lodash@4.17.4 has /home/safarli/Documents/AF-support/sbgnviz.js/node_modules as its parent node_modules
+140 verbose linkBins lodash@4.17.4
+141 verbose linkMans lodash@4.17.4
+142 verbose rebuildBundles lodash@4.17.4
+143 info install lodash@4.17.4
+144 info postinstall lodash@4.17.4
+145 verbose rebuild bundle /home/safarli/Documents/AF-support/sbgnviz.js/node_modules/sax
+146 info build /home/safarli/Documents/AF-support/sbgnviz.js/node_modules/sax
+147 info preinstall sax@1.2.4
+148 info linkStuff sax@1.2.4
+149 silly linkStuff sax@1.2.4 has /home/safarli/Documents/AF-support/sbgnviz.js/node_modules as its parent node_modules
+150 verbose linkBins sax@1.2.4
+151 verbose linkMans sax@1.2.4
+152 verbose rebuildBundles sax@1.2.4
+153 info install sax@1.2.4
+154 info postinstall sax@1.2.4
+155 verbose rebuild bundle /home/safarli/Documents/AF-support/sbgnviz.js/node_modules/xmlbuilder
+156 info build /home/safarli/Documents/AF-support/sbgnviz.js/node_modules/xmlbuilder
+157 info preinstall xmlbuilder@4.2.1
+158 info linkStuff xmlbuilder@4.2.1
+159 silly linkStuff xmlbuilder@4.2.1 has /home/safarli/Documents/AF-support/sbgnviz.js/node_modules as its parent node_modules
+160 verbose linkBins xmlbuilder@4.2.1
+161 verbose linkMans xmlbuilder@4.2.1
+162 verbose rebuildBundles xmlbuilder@4.2.1
+163 info install xmlbuilder@4.2.1
+164 info postinstall xmlbuilder@4.2.1
+165 info install sbgnviz@3.1.0
+166 info postinstall sbgnviz@3.1.0
+167 info prepublish sbgnviz@3.1.0
+168 verbose validateInstall loading /home/safarli/Documents/AF-support/sbgnviz.js/package.json for validation
+169 verbose stack Error: The package cytoscape@3.1.1 does not satisfy its siblings' peerDependencies requirements!
+169 verbose stack     at /usr/lib64/node_modules/npm/lib/install.js:125:32
+169 verbose stack     at /usr/lib64/node_modules/npm/lib/install.js:268:7
+169 verbose stack     at /usr/lib64/node_modules/npm/node_modules/read-installed/read-installed.js:142:5
+169 verbose stack     at /usr/lib64/node_modules/npm/node_modules/read-installed/read-installed.js:263:14
+169 verbose stack     at cb (/usr/lib64/node_modules/npm/node_modules/slide/lib/async-map.js:47:24)
+169 verbose stack     at /usr/lib64/node_modules/npm/node_modules/read-installed/read-installed.js:263:14
+169 verbose stack     at cb (/usr/lib64/node_modules/npm/node_modules/slide/lib/async-map.js:47:24)
+169 verbose stack     at /usr/lib64/node_modules/npm/node_modules/read-installed/read-installed.js:263:14
+169 verbose stack     at cb (/usr/lib64/node_modules/npm/node_modules/slide/lib/async-map.js:47:24)
+169 verbose stack     at /usr/lib64/node_modules/npm/node_modules/read-installed/read-installed.js:263:14
+170 verbose cwd /home/safarli/Documents/AF-support/sbgnviz.js
+171 error Linux 4.4.79-18.23-default
+172 error argv "/usr/bin/node" "/usr/bin/npm" "link"
+173 error node v4.7.3
+174 error npm  v2.15.11
+175 error code EPEERINVALID
+176 error peerinvalid The package cytoscape@3.1.1 does not satisfy its siblings' peerDependencies requirements!
+177 verbose exit [ 1, true ]
