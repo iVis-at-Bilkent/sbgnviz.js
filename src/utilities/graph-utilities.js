@@ -65,7 +65,7 @@ graphUtilities.updateGraph = function(cyGraph) {
     // assign correct parents to info boxes
     var statesandinfos = node.data('statesandinfos');
     for (var j=0; j < statesandinfos.length; j++) {
-      statesandinfos[j].parent = node;
+      statesandinfos[j].parent = node.id();
     }
   });
 

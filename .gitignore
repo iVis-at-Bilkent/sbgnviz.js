@@ -5,3 +5,6 @@
 /HTML5Application/nbproject/private/
 
 node_modules/
+
+src/.DS_Store
+src/utilities/.DS_Store

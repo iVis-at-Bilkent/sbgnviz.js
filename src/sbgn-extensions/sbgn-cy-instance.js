@@ -61,8 +61,8 @@ var generateShapeWithPortString = function(lineHW, shapeHW, type, orientation) {
 			abovePoints = '-' + shapeHW + ' -' + shapeHW + ' ' + shapeHW + ' -' + shapeHW + ' ';
 			belowPoints = shapeHW + ' ' + shapeHW + ' -' + shapeHW + ' ' + shapeHW + ' ';
 		}
-		
-		polygonStr = "-1 -" + lineHW + " -" + shapeHW + " -" + lineHW + " ";	
+
+		polygonStr = "-1 -" + lineHW + " -" + shapeHW + " -" + lineHW + " ";
 		polygonStr += abovePoints;
 		polygonStr += shapeHW + " -" + lineHW + " 1 -" + lineHW + " 1 " + lineHW + " " + shapeHW + " " + lineHW + " ";
 		polygonStr += belowPoints;
@@ -220,14 +220,14 @@ module.exports = function () {
           var location = statesandinfos.anchorSide; // top bottom right left
           var layouts = node.data('auxunitlayouts');
           if(!layouts[location]) { // layout doesn't exist yet for this location
-            layouts[location] = new classes.AuxUnitLayout(node, location);
+            layouts[location] = classes.AuxUnitLayout.construct(node, location);
           }
           // populate the layout of this side
-          layouts[location].addAuxUnit(statesandinfos);
+          classes.AuxUnitLayout.addAuxUnit(layouts[location], statesandinfos);
         }
         // ensure that each layout has statesandinfos in correct order according to their initial positions
         for(var location in node.data('auxunitlayouts')) {
-          node.data('auxunitlayouts')[location].reorderFromPositions();
+          classes.AuxUnitLayout.reorderFromPositions(node.data('auxunitlayouts')[location]);
         }
       });
       cy.endBatch();
