@@ -29,9 +29,7 @@ var AuxiliaryUnit = {};
 AuxiliaryUnit.construct = function(parent) {
   var obj = {};
 
-  if (parent) {
-    obj.parent = typeof parent === 'string' ? parent : parent.id(); // Keep parent id instead of the parent object itself to avoid circular references
-  }
+  AuxiliaryUnit.setParentRef(obj, parent);
 
   obj.id = null;
   obj.bbox = null;
@@ -52,6 +50,13 @@ AuxiliaryUnit.getParent = function(mainObj) {
   return parent;
 };
 
+AuxiliaryUnit.setParentRef = function(mainObj, newParent) {
+  if (mainObj && newParent) {
+    // Reference to id instead of the node itself to avaoid circular reference
+    mainObj.parent = typeof newParent === 'string' ? newParent : newParent.id();
+  }
+}
+
 AuxiliaryUnit.defaultBackgroundColor = "#ffffff";
 
 /*
@@ -61,12 +66,9 @@ AuxiliaryUnit.defaultBackgroundColor = "#ffffff";
 AuxiliaryUnit.copy = function (mainObj, existingInstance, newParent, newId) {
   var newUnit = existingInstance ? existingInstance : AuxiliaryUnit.construct();
 
-  // Use id to avaoid circular reference
-  if (newParent && typeof newParent !== 'string') {
-    newParent = newParent.id();
-  }
+  var parentToSet = newParent || getAuxUnitClass(mainObj).getParent(mainObj);
+  AuxiliaryUnit.setParentRef(newUnit, parentToSet);
 
-  newUnit.parent = newParent ? newParent : mainObj.getParent();
   newUnit.id = newId ? newId : mainObj.id;
   newUnit.bbox = jQuery.extend(true, {}, mainObj.bbox);
   newUnit.coordType = mainObj.coordType;
@@ -101,6 +103,7 @@ AuxiliaryUnit.drawShape = function(mainObj, context, x, y) {
 
 // draw the statesOrInfo's label at given position
 AuxiliaryUnit.drawText = function(mainObj, context, centerX, centerY) {
+  var parent = getAuxUnitClass(mainObj).getParent(mainObj);
   var fontSize = 9; // parseInt(textProp.height / 1.5);
 
   // part of : $$.sbgn.drawText(context, textProp);
@@ -113,7 +116,7 @@ AuxiliaryUnit.drawText = function(mainObj, context, centerX, centerY) {
   context.textAlign = "center";
   context.textBaseline = "middle";
   context.fillStyle = "#0f0f0f";
-  context.globalAlpha = mainObj.getParent().css('text-opacity') * mainObj.getParent().css('opacity'); // ?
+  context.globalAlpha = parent.css('text-opacity') * parent.css('opacity'); // ?
 
   var text;
   if(options.fitLabelsToInfoboxes()){
@@ -317,10 +320,7 @@ StateVariable.drawShape = function(mainObj, context, x, y) {
 StateVariable.create = function(parentNode, value, variable, bbox, location, position, index) {
   // create the new state var of info
   var stateVar = StateVariable.construct();
-  if (parentNode) {
-    // Use id of parent node instead of the node itself to avaoid circular references
-    stateVar.parent = typeof parentNode === 'string' ? parentNode : parentNode.id();
-  }
+  StateVariable.setParentRef(stateVar, parentNode);
 
   stateVar.value = value;
   stateVar.variable = variable;
@@ -583,9 +583,7 @@ AuxUnitLayout.construct = function(parentNode, location, alignment) {
   obj.units = [];
   obj.location = location;
   obj.alignment = alignment || "left"; // this was intended to be used, but it isn't for now
-  if (parentNode) {
-      obj.parentNode = typeof parentNode === 'string' ? parentNode : parentNode.id(); // Keep id of parent node to avaoid circular references
-  }
+  AuxUnitLayout.setParentNodeRef(obj, parentNode);
 
   obj.renderLengthCache = [];
   obj.lengthUsed = 0;
@@ -608,6 +606,13 @@ AuxUnitLayout.getParentNode = function(mainObj) {
 
   return parentNode;
 };
+
+AuxUnitLayout.setParentNodeRef = function(mainObj, parentNode) {
+  if (mainObj && parentNode) {
+    // Keep id of parent node to avaoid circular references
+    mainObj.parentNode = typeof parentNode === 'string' ? parentNode : parentNode.id();
+  }
+}
 
 /**
  * outerMargin: the left and right space left between the side of the node, and the first (and last) box
@@ -958,7 +963,7 @@ AuxUnitLayout.copy = function(mainObj, newParent) {
   newLayout.units = [];
   newLayout.location = mainObj.location;
   newLayout.alignment = mainObj.alignment;
-  newLayout.parentNode = newParent;
+  AuxUnitLayout.setParentNodeRef(newLayout, newParent);
   newLayout.renderLengthCache = mainObj.renderLengthCache;
   newLayout.lengthUsed = mainObj.lengthUsed;
   if(typeof mainObj.outerMargin !== "undefined") {
