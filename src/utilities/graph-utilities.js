@@ -66,7 +66,7 @@ graphUtilities.updateGraph = function(cyGraph) {
     // assign correct parents to info boxes
     var statesandinfos = node.data('statesandinfos');
     for (var j=0; j < statesandinfos.length; j++) {
-      classes.getAuxUnitClass(statesandinfos[j]).setParentRef(statesandinfos[i], node);
+      classes.getAuxUnitClass(statesandinfos[j]).setParentRef(statesandinfos[j], node);
     }
   });
 
