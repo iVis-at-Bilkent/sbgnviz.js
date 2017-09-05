@@ -103,7 +103,8 @@ AuxiliaryUnit.drawShape = function(mainObj, context, x, y) {
 
 // draw the statesOrInfo's label at given position
 AuxiliaryUnit.drawText = function(mainObj, context, centerX, centerY) {
-  var parent = getAuxUnitClass(mainObj).getParent(mainObj);
+  var unitClass = getAuxUnitClass(mainObj);
+  var parent = unitClass.getParent(mainObj);
   var fontSize = 9; // parseInt(textProp.height / 1.5);
 
   // part of : $$.sbgn.drawText(context, textProp);
@@ -122,13 +123,13 @@ AuxiliaryUnit.drawText = function(mainObj, context, centerX, centerY) {
   if(options.fitLabelsToInfoboxes()){
     // here we memoize the truncated text into _textCache,
     // as it is not something that changes so much
-    text = mainObj.getText();
+    text = unitClass.getText(mainObj);
     var key = text + context.font + mainObj.bbox.w;
     if(mainObj._textCache && mainObj._textCache[key]) {
       text = mainObj._textCache[key];
     }
     else {
-      text = truncate(mainObj.getText(), context.font, mainObj.bbox.w);
+      text = truncate(unitClass.getText(mainObj), context.font, mainObj.bbox.w);
       if(!mainObj._textCache) {
         mainObj._textCache = {};
       }
@@ -136,7 +137,7 @@ AuxiliaryUnit.drawText = function(mainObj, context, centerX, centerY) {
     }
   }
   else {
-    text = mainObj.getText();
+    text = unitClass.getText(mainObj);
   }
 
   context.fillText(text, centerX, centerY);

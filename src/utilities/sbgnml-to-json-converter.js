@@ -195,7 +195,7 @@ var sbgnmlToJson = {
         classes.UnitOfInformation.setAnchorSide(unitOfInformation);
         stateAndInfoArray.push(unitOfInformation);
       } else if (glyph.class_ === 'state variable') {
-        var stateVariable = new classes.StateVariable();
+        var stateVariable = classes.StateVariable.construct();
         stateVariable.id = glyph.id || undefined;
         var state = glyph.state;
         stateVariable.state.value = (state && state.value) || undefined;
