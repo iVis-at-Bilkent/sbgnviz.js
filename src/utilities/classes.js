@@ -8,6 +8,22 @@ var truncate = require('./text-utilities').truncate;
 
 var ns = {};
 
+// Keep in mind that for each method 'mainObj' parameter refers to the main object for which the operation will be done.
+// It refers to the object that could be refered by 'this' while there was prototyping in these classes.
+// For example AuxiliaryUnit.copy(mainObj, existingInstance, newParent, newId) copies the variable passed by 'mainObj'
+// parameter and in this case 'mainObj' can be considered as `the object to be copied`
+
+// The old constructors are replaced by 'construct()' methods while removing prototyping from the classes.
+
+// 'AuxiliaryUnit' and 'AuxUnitLayout' objects keep the id of their parent nodes instead of the nodes themselves to avoid circular references.
+// To maintain this property related methods to get and set parent nodes should be used instead of directly accessing the parent object.
+
+// Also, there is a parent-child relationship between the AuxiliaryUnit class and StateVariable and UnitOfInformation
+// classes. While calling a method of AuxiliaryUnit class that method should be called from
+// the actual class of related auxilary unit (Would be StateVariable or UnitOfInformation. This is needed to prevent conflictions when the
+// methods of AuxiliaryUnit class is overriden by these classes). That class can be obtained by calling 'getAuxUnitClass(mainObj)'
+// method for the auxilary unit object.
+
 var getAuxUnitClass = function(unit) {
   // Unit parameter may pass the unit itself or the type of the unit check it
   var unitType = typeof unit === 'string' ? unit : unit.clazz;
@@ -19,10 +35,6 @@ var getAuxUnitClass = function(unit) {
 ns.getAuxUnitClass = getAuxUnitClass; // Expose getAuxUnitClass method
 
 var AuxiliaryUnit = {};
-
-// Keep in mind that for each methods mainObj parameter refers to the main object for which the operation will be done.
-// For example AuxiliaryUnit.copy(mainObj, existingInstance, newParent, newId) copies the variable passed by mainObj
-// parameter and in this case mainObj can be considered as `object to copy`
 
 // -------------- AuxiliaryUnit -------------- //
 // constructs a new auxiliary unit object and returns it
