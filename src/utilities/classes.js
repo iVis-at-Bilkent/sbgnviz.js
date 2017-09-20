@@ -197,7 +197,7 @@ AuxiliaryUnit.setAnchorSide = function(mainObj, parentBbox) {
       mainObj.anchorSide = "top";
       mainObj.bbox.y = -50;
     }
-    else if (thisY => 0) {
+    else if (thisY >= 0) {
       if (thisX > 45) {
         mainObj.anchorSide = "right";
         mainObj.bbox.x = 50;
