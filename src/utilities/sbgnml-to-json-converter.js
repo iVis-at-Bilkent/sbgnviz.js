@@ -425,12 +425,12 @@ var sbgnmlToJson = {
         var glyph = childGlyphs[i];
         var glyphClass = glyph.class_;
         if (glyphClass !== 'state variable' && glyphClass !== 'unit of information') {
-          if(!glyph.compartmentRef || glyph.compartmentRef == elId) {
+          if (glyph.compartmentRef && glyph.compartmentRef != elId && eleClass == 'submap') {
+            self.traverseNodes(glyph, jsonArray, glyph.compartmentRef, compartments);
+          }
+          else {
             self.traverseNodes(glyph, jsonArray, elId, compartments);
           }
-          else if (glyph.compartmentRef != elId) {
-            self.traverseNodes(glyph, jsonArray, glyph.compartmentRef, compartments);
-          };
         }
       }
     } else {
