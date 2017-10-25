@@ -1,14 +1,21 @@
-var elementUtilities = require('./element-utilities');
-var classes = require('../utilities/classes');
-var graphUtilities = require('./graph-utilities');
 var libsbgnjs = require('libsbgn.js');
-var libs = require('./lib-utilities').getLibs();
 var parseString = require('xml2js').parseString;
+var libUtilities = require('./lib-utilities');
+var classes = require('./classes');
 
-var sbgnmlToJson = {
-  insertedNodes: {},
-  map: undefined,
-  getAllCompartments: function (glyphList) {
+module.exports = function () {
+  var elementUtilities, graphUtilities;
+
+  function sbgnmlToJson (param) {
+    elementUtilities = param.elementUtilities;
+    graphUtilities = param.graphUtilities;
+  }
+
+  sbgnmlToJson.insertedNodes = {};
+
+  sbgnmlToJson.map = undefined;
+
+  sbgnmlToJson.getAllCompartments = function (glyphList) {
     var compartments = [];
 
     for (var i = 0; i < glyphList.length; i++) {
@@ -36,8 +43,9 @@ var sbgnmlToJson = {
     });
 
     return compartments;
-  },
-  isInBoundingBox: function (bbox1, bbox2) {
+  };
+
+  sbgnmlToJson.isInBoundingBox = function (bbox1, bbox2) {
     if (bbox1.x > bbox2.x &&
         bbox1.y > bbox2.y &&
         bbox1.x + bbox1.w < bbox2.x + bbox2.w &&
@@ -45,14 +53,15 @@ var sbgnmlToJson = {
       return true;
     }
     return false;
-  },
-  bboxProp: function (ele) {
+  };
+
+  sbgnmlToJson.bboxProp = function (ele) {
     var bbox = {};
     bbox.x = ele.bbox.x;
     bbox.y = ele.bbox.y;
     bbox.w = ele.bbox.w;
     bbox.h = ele.bbox.h;
-    
+
     var childNodes = ele.glyphMembers;
     var minLeft, maxRight, minTop, maxBottom, childrenBboxW, childrenBboxH;
     var compound;
@@ -121,8 +130,9 @@ var sbgnmlToJson = {
     bbox.y = parseFloat(bbox.y) + parseFloat(bbox.h) / 2;
 
     return bbox;
-  },
-  stateAndInfoBboxProp: function (ele, parentBbox) {
+  };
+
+  sbgnmlToJson.stateAndInfoBboxProp = function (ele, parentBbox) {
     var xPos = parseFloat(parentBbox.x);
     var yPos = parseFloat(parentBbox.y);
 
@@ -141,8 +151,9 @@ var sbgnmlToJson = {
     bbox.y = bbox.y / parseFloat(parentBbox.h) * 100;
 
     return bbox;
-  },
-  findChildNodes: function (ele, childTagName) {
+  };
+
+  sbgnmlToJson.findChildNodes = function (ele, childTagName) {
     // find child nodes at depth level of 1 relative to the element
     var children = [];
     for (var i = 0; i < ele.childNodes.length; i++) {
@@ -152,12 +163,14 @@ var sbgnmlToJson = {
       }
     }
     return children;
-  },
-  findChildNode: function (ele, childTagName) {
+  };
+
+  sbgnmlToJson.findChildNode = function (ele, childTagName) {
     var nodes = this.findChildNodes(ele, childTagName);
     return nodes.length > 0 ? nodes[0] : undefined;
-  },
-  stateAndInfoProp: function (ele, parent) {
+  };
+
+  sbgnmlToJson.stateAndInfoProp = function (ele, parent) {
     var self = this;
     var parentBbox = parent.bbox;
     var stateAndInfoArray = [];
@@ -207,8 +220,9 @@ var sbgnmlToJson = {
     }
 
     return stateAndInfoArray;
-  },
-  addParentInfoToNode: function (ele, nodeObj, parent, compartments) {
+  };
+
+  sbgnmlToJson.addParentInfoToNode = function (ele, nodeObj, parent, compartments) {
     var self = this;
     var compartmentRef = ele.compartmentRef;
 
@@ -237,8 +251,9 @@ var sbgnmlToJson = {
         }
       }
     }
-  },
-  addCytoscapeJsNode: function (ele, jsonArray, parent, compartments) {
+  };
+
+  sbgnmlToJson.addCytoscapeJsNode = function (ele, jsonArray, parent, compartments) {
     var self = this;
     var nodeObj = {};
     var styleObj = {};
@@ -247,19 +262,19 @@ var sbgnmlToJson = {
     nodeObj.id = ele.id;
     // add node bounding box information
     nodeObj.bbox = self.bboxProp(ele);
-    
+
     if (ele.minWidth) {
       nodeObj.minWidth = ele.minWidth;
       nodeObj.minWidthBiasLeft = ele.minWidthBiasLeft;
       nodeObj.minWidthBiasRight = ele.minWidthBiasRight;
     }
-    
+
     if (ele.minHeight) {
       nodeObj.minHeight = ele.minHeight;
       nodeObj.minHeightBiasTop = ele.minHeightBiasTop;
       nodeObj.minHeightBiasBottom = ele.minHeightBiasBottom;
     }
-    
+
     // add class information
     nodeObj.class = ele.class_;
     // add label information
@@ -290,17 +305,17 @@ var sbgnmlToJson = {
 
       relativeXPos = relativeXPos / parseFloat(nodeObj.bbox.w) * 100;
       relativeYPos = relativeYPos / parseFloat(nodeObj.bbox.h) * 100;
-      
-      // We assume that ports are not inside the node shape. 
+
+      // We assume that ports are not inside the node shape.
       // Therefore, abs. value of their relative x and y coordinates (relative to node center) should be bigger than 50.
       if (Math.abs(relativeXPos) < 50) {
         relativeXPos = 0;
       }
-      
+
       if (Math.abs(relativeYPos) < 50) {
         relativeYPos = 0;
       }
-      
+
       if (relativeXPos === 0 && relativeYPos === 0) {
         continue;
       }
@@ -313,7 +328,7 @@ var sbgnmlToJson = {
     }
 
     nodeObj.ports = ports;
-    
+
     var _class = nodeObj.class;
     // If the node can have ports and it has exactly 2 ports then it should be represented by a bigger bbox.
     // This is because we represent it as a polygon and so the whole shape including the ports are rendered in the node bbox.
@@ -351,11 +366,12 @@ var sbgnmlToJson = {
 
     var cytoscapeJsNode = {data: nodeObj, style: styleObj};
     jsonArray.push(cytoscapeJsNode);
-  },
+  };
+
   /**
-   * given a future cy object, and the corresponding element's libsbgnjs' extension, populates the annotations field
-   */
-  handleAnnotations: function(cyObject, rdfElement) {
+  * given a future cy object, and the corresponding element's libsbgnjs' extension, populates the annotations field
+  */
+  sbgnmlToJson.handleAnnotations = function(cyObject, rdfElement) {
     // local utility function
     function dbFromUrl(url) {
       var regexp = /^http:\/\/identifiers.org\/(.+?)\/.+$/;
@@ -403,8 +419,9 @@ var sbgnmlToJson = {
     }
 
     return cyObject;
-  },
-  traverseNodes: function (ele, jsonArray, parent, compartments) {
+  };
+
+  sbgnmlToJson.traverseNodes = function (ele, jsonArray, parent, compartments) {
     var elId = ele.id;
     if (!elementUtilities.handledElements[ele.class_]) {
       return;
@@ -434,11 +451,13 @@ var sbgnmlToJson = {
     } else {
       self.addCytoscapeJsNode(ele, jsonArray, parent, compartments);
     }
-  },
-  getPorts: function (xmlObject) {
+  };
+
+  sbgnmlToJson.getPorts = function (xmlObject) {
     return ( xmlObject._cachedPorts = xmlObject._cachedPorts || xmlObject.querySelectorAll('port'));
-  },
-  getGlyphs: function (xmlObject) {
+  };
+
+  sbgnmlToJson.getGlyphs = function (xmlObject) {
     var glyphs = xmlObject._cachedGlyphs;
 
     if (!glyphs) {
@@ -455,13 +474,15 @@ var sbgnmlToJson = {
     }
 
     return glyphs;
-  },
-  getGlyphById: function (xmlObject, id) {
+  };
+
+  sbgnmlToJson.getGlyphById = function (xmlObject, id) {
     this.getGlyphs(xmlObject); // make sure cache is built
 
     return xmlObject._id2glyph[id];
-  },
-  getArcSourceAndTarget: function (arc, xmlObject) {
+  };
+
+  sbgnmlToJson.getArcSourceAndTarget = function (arc, xmlObject) {
     // source and target can be inside of a port
     var source = arc.source;
     var target = arc.target;
@@ -502,9 +523,9 @@ var sbgnmlToJson = {
     }
 
     return {'source': sourceNodeId, 'target': targetNodeId};
-  },
+  };
 
-  getArcBendPointPositions: function (ele) {
+  sbgnmlToJson.getArcBendPointPositions = function (ele) {
     var bendPointPositions = [];
 
     var children = ele.nexts;
@@ -520,8 +541,9 @@ var sbgnmlToJson = {
     }
 
     return bendPointPositions;
-  },
-  addCytoscapeJsEdge: function (ele, jsonArray, xmlObject) {
+  };
+
+  sbgnmlToJson.addCytoscapeJsEdge = function (ele, jsonArray, xmlObject) {
     if (!elementUtilities.handledElements[ele.class_]) {
       return;
     }
@@ -574,8 +596,9 @@ var sbgnmlToJson = {
 
     var cytoscapeJsEdge = {data: edgeObj, style: styleObj};
     jsonArray.push(cytoscapeJsEdge);
-  },
-  applyStyle: function (renderInformation, nodes, edges) {
+  };
+
+  sbgnmlToJson.applyStyle = function (renderInformation, nodes, edges) {
     // get all color id references to their value
     var colorList = renderInformation.listOfColorDefinitions.colorDefinitions;
     var colorIDToValue = {};
@@ -689,8 +712,9 @@ var sbgnmlToJson = {
         edge.data['width'] = width;
       }
     }
-  },
-  mapPropertiesToObj: function() {
+  };
+
+  sbgnmlToJson.mapPropertiesToObj = function() {
     if (this.map.extension && this.map.extension.has('mapProperties')) { // render extension was found
        var xml = this.map.extension.get('mapProperties');
        var obj;
@@ -699,8 +723,9 @@ var sbgnmlToJson = {
        });
        return obj;
     }
-  },
-  convert: function (xmlObject) {
+  };
+
+  sbgnmlToJson.convert = function (xmlObject) {
     var self = this;
     var cytoscapeJsNodes = [];
     var cytoscapeJsEdges = [];
@@ -742,19 +767,19 @@ var sbgnmlToJson = {
     var i;
     for (i = 0; i < glyphs.length; i++) {
       var glyph = glyphs[i];
-      
+
       // libsbgn library lists the glyphs of complexes in ele.glyphMembers but it does not store the glyphs of compartments
       // store glyph members of compartments here.
       var compartmentRef = glyph.compartmentRef;
-      
+
       if (glyph.class_ === 'compartment') {
         if (compartmentChildrenMap[glyph.id] === undefined) {
           compartmentChildrenMap[glyph.id] = [];
         }
-        
+
         glyph.glyphMembers = compartmentChildrenMap[glyph.id];
       }
-      
+
       if (compartmentRef) {
         if (compartmentChildrenMap[compartmentRef] === undefined) {
           compartmentChildrenMap[compartmentRef] = [];
@@ -784,7 +809,7 @@ var sbgnmlToJson = {
     this.insertedNodes = {};
 
     return cytoscapeJsGraph;
-  }
-};
+  };
 
-module.exports = sbgnmlToJson;
+  return sbgnmlToJson;
+};

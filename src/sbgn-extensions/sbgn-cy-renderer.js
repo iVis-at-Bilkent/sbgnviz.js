@@ -2,7 +2,6 @@
  * Render sbgn specific shapes which are not supported by cytoscape.js core
  */
 
-var truncateText = require('../utilities/text-utilities').truncateText;
 var libs = require('../utilities/lib-utilities').getLibs();
 var jQuery = $ = libs.jQuery;
 var cytoscape = libs.cytoscape;
@@ -94,7 +93,7 @@ module.exports = function () {
 
     for (var side in layouts) {
       var layout = layouts[side];
-      classes.AuxUnitLayout.draw(layout, context);
+      classes.AuxUnitLayout.draw(layout, node.cy(), context);
     }
     context.beginPath();
     context.closePath();
@@ -1537,7 +1536,7 @@ module.exports = function () {
       var state = stateAndInfos[i];
       var stateWidth = state.bbox.w;
       var stateHeight = state.bbox.h;
-      var coord = classes.StateVariable.getAbsoluteCoord(state);
+      var coord = classes.StateVariable.getAbsoluteCoord(state, node.cy());
       var stateCenterX = coord.x;
       var stateCenterY = coord.y;
 
@@ -1577,7 +1576,7 @@ module.exports = function () {
     if (infoBox && infoBox.isDisplayed) {
       var infoBoxWidth = infoBox.bbox.w;
       var infoBoxHeight = infoBox.bbox.h;
-      var coord = classes.UnitOfInformation.getAbsoluteCoord(infoBox);
+      var coord = classes.UnitOfInformation.getAbsoluteCoord(infoBox, node.cy());
       var infoBoxCenterX = coord.x;
       var infoBoxCenterY = coord.y;
 
@@ -1623,7 +1622,7 @@ module.exports = function () {
       var state = stateAndInfos[i];
       var stateWidth = parseFloat(state.bbox.w) + threshold;
       var stateHeight = parseFloat(state.bbox.h) + threshold;
-      var coord = classes.StateVariable.getAbsoluteCoord(state);
+      var coord = classes.StateVariable.getAbsoluteCoord(state, node.cy());
       var stateCenterX = coord.x;
       var stateCenterY = coord.y;
 
