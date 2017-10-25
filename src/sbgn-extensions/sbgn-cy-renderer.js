@@ -11,6 +11,8 @@ var cyMath = math = cytoscape.math;
 var cyBaseNodeShapes = cytoscape.baseNodeShapes;
 var cyStyleProperties = cytoscape.styleProperties;
 
+var classes = require('../utilities/classes');
+
 module.exports = function () {
   var $$ = cytoscape;
   
@@ -92,14 +94,14 @@ module.exports = function () {
 
     for (var side in layouts) {
       var layout = layouts[side];
-      layout.draw(context);
+      classes.AuxUnitLayout.draw(layout, context);
     }
     context.beginPath();
     context.closePath();
   };
 
-  $$.sbgn.AfShapeFn = function (context, x, y, width, height, type) {
-    
+  $$.sbgn.UnitOfInformationShapeFn = function (context, x, y, width, height, type) {
+
     if ( type == "BA macromolecule"){
 	    cyBaseNodeShapes['roundrectangle'].draw(context, x, y, width, height);
     }
@@ -126,9 +128,9 @@ module.exports = function () {
     }
   };
 
-  $$.sbgn.AfShapeArgsFn = function (self){
-	  return [self.bbox.w, self.bbox.h, self.parent.data("class")];
-  }
+  // $$.sbgn.AfShapeArgsFn = function (self){
+	//   return [self.bbox.w, self.bbox.h, classes.getAuxUnitClass(self).getParent(self).data("class")];
+  // }
 
 
   $$.sbgn.nucleicAcidCheckPoint = function (x, y, centerX, centerY, node, threshold, points, cornerRadius) {
@@ -1535,7 +1537,7 @@ module.exports = function () {
       var state = stateAndInfos[i];
       var stateWidth = state.bbox.w;
       var stateHeight = state.bbox.h;
-      var coord = state.getAbsoluteCoord();
+      var coord = classes.StateVariable.getAbsoluteCoord(state);
       var stateCenterX = coord.x;
       var stateCenterY = coord.y;
 
@@ -1575,7 +1577,7 @@ module.exports = function () {
     if (infoBox && infoBox.isDisplayed) {
       var infoBoxWidth = infoBox.bbox.w;
       var infoBoxHeight = infoBox.bbox.h;
-      var coord = infoBox.getAbsoluteCoord();
+      var coord = classes.UnitOfInformation.getAbsoluteCoord(infoBox);
       var infoBoxCenterX = coord.x;
       var infoBoxCenterY = coord.y;
 
@@ -1621,7 +1623,7 @@ module.exports = function () {
       var state = stateAndInfos[i];
       var stateWidth = parseFloat(state.bbox.w) + threshold;
       var stateHeight = parseFloat(state.bbox.h) + threshold;
-      var coord = state.getAbsoluteCoord();
+      var coord = classes.StateVariable.getAbsoluteCoord(state);
       var stateCenterX = coord.x;
       var stateCenterY = coord.y;
 
