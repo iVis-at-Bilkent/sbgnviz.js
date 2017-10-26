@@ -1,6 +1,6 @@
 # SBGNViz version 3
 
-SBGNViz is a web application based on [Cytoscape.js](http://cytoscape.github.io/cytoscape.js/) to visualize pathway models represented by [SBGN Process Description Notation](http://sbgn.github.io/sbgn/specifications). It accepts the pathway models represented in [SBGN-ML](https://github.com/sbgn/sbgn/wiki/LibSBGN) format.
+SBGNViz is a web application based on [Cytoscape.js](http://cytoscape.github.io/cytoscape.js/) to visualize the pathway models represented by [SBGN](http://www.sbgn.org) Process Description (PD) and Activity Flow (AF) Notation. It accepts the pathway models represented in [SBGN-ML](https://github.com/sbgn/sbgn/wiki/LibSBGN) format.
 
 ## Software
 
@@ -341,8 +341,8 @@ Thanks to JetBrains for an [Open Source License](https://www.jetbrains.com/buy/o
 
 ## Team
 
-  * [Metin Can Siper](https://github.com/metincansiper), [Selim Firat Yilmaz](https://github.com/mrsfy), [Ugur Dogrusoz](https://github.com/ugurdogrusoz), and [Alper Karacelik](https://github.com/alperkaracelik) of [i-Vis at Bilkent University](http://www.cs.bilkent.edu.tr/~ivis)
-
+  * [Ilkin Safarli](https://github.com/kinimesi), [Hasan Balci](https://github.com/hasanbalci), [Leonard Dervishi](https://github.com/leonarddrv), and [Ugur Dogrusoz](https://github.com/ugurdogrusoz) of [i-Vis at Bilkent University](http://www.cs.bilkent.edu.tr/~ivis), [Metin Can Siper](https://github.com/metincansiper) of the Demir Lab at [OHSU](http://www.ohsu.edu/), and [Ludovic Roy](https://github.com/royludo) of [EISBM](http://eisbm.org)
+  
 #### Alumni
 
-  * Istemi Bahceci, Mecit Sari, Ayhun Tekat, M.Furkan Sahin
+  * Alper Karacelik, Selim Firat Yilmaz, Istemi Bahceci, Mecit Sari, Ayhun Tekat, M.Furkan Sahin
