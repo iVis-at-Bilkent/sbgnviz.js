@@ -174,7 +174,7 @@ var sbgnmlToJson = {
       var info = {};
 
       if (glyph.class_ === 'unit of information') {
-        var unitOfInformation = new classes.UnitOfInformation();
+        var unitOfInformation = classes.UnitOfInformation.construct();
         if(glyph.entity) {
           // change the parent class according to its true class of biological activity
           switch(glyph.entity.name) {
@@ -185,8 +185,6 @@ var sbgnmlToJson = {
             case 'perturbation':          parent.class = "BA perturbing agent"; break;
             case 'complex':               parent.class = "BA complex"; break;
           }
-          unitOfInformation.shapeFn = libs.cytoscape.sbgn.AfShapeFn;
-          unitOfInformation.shapeArgsFn = libs.cytoscape.sbgn.AfShapeArgsFn;
         }
 
         unitOfInformation.id = glyph.id || undefined;
@@ -194,16 +192,16 @@ var sbgnmlToJson = {
           'text': (glyph.label && glyph.label.text) || undefined
         };
         unitOfInformation.bbox = self.stateAndInfoBboxProp(glyph, parentBbox);
-        unitOfInformation.setAnchorSide();
+        classes.UnitOfInformation.setAnchorSide(unitOfInformation);
         stateAndInfoArray.push(unitOfInformation);
       } else if (glyph.class_ === 'state variable') {
-        var stateVariable = new classes.StateVariable();
+        var stateVariable = classes.StateVariable.construct();
         stateVariable.id = glyph.id || undefined;
         var state = glyph.state;
         stateVariable.state.value = (state && state.value) || undefined;
         stateVariable.state.variable = (state && state.variable) || undefined;
         stateVariable.bbox = self.stateAndInfoBboxProp(glyph, parentBbox);
-        stateVariable.setAnchorSide();
+        classes.StateVariable.setAnchorSide(stateVariable);
         stateAndInfoArray.push(stateVariable);
       }
     }

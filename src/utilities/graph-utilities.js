@@ -6,6 +6,7 @@ var optionUtilities = require('./option-utilities');
 var options = optionUtilities.getOptions();
 var libs = require('./lib-utilities').getLibs();
 var jQuery = $ = libs.jQuery;
+var classes = require('./classes')
 
 function graphUtilities() {}
 
@@ -65,21 +66,21 @@ graphUtilities.updateGraph = function(cyGraph) {
     // assign correct parents to info boxes
     var statesandinfos = node.data('statesandinfos');
     for (var j=0; j < statesandinfos.length; j++) {
-      statesandinfos[j].parent = node;
+      classes.getAuxUnitClass(statesandinfos[j]).setParentRef(statesandinfos[j], node);
     }
   });
 
 
   this.refreshPaddings(); // Recalculates/refreshes the compound paddings
   cy.endBatch();
-  
+
   var layout = cy.layout({
     name: 'preset',
     positions: positionMap,
     fit: true,
     padding: 50
   });
-  
+
   // Check this for cytoscape.js backward compatibility
   if (layout && layout.run) {
     layout.run();
@@ -91,7 +92,7 @@ graphUtilities.updateGraph = function(cyGraph) {
   if (cy.edgeBendEditing && cy.edgeBendEditing('initialized')) {
     cy.edgeBendEditing('get').initBendPoints(cy.edges());
   }
-  
+
   $( document ).trigger( "updateGraphEnd" );
 };
 
@@ -123,7 +124,7 @@ graphUtilities.calculatePaddings = function(paddingPercent) {
 };
 
 graphUtilities.recalculatePaddings = graphUtilities.refreshPaddings = function() {
-  // this.calculatedPaddings is not working here 
+  // this.calculatedPaddings is not working here
   // TODO: replace this reference with this.calculatedPaddings once the reason is figured out
   graphUtilities.calculatedPaddings = this.calculatePaddings();
   return graphUtilities.calculatedPaddings;
