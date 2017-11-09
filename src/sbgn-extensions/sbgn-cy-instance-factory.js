@@ -167,7 +167,13 @@ module.exports = function () {
 	      }
 	    });
 
-	    $(document).on('updateGraphEnd', function(event) {
+	    $(document).on('updateGraphEnd', function(event, _cy) {
+
+				// if the event is not triggered for this cy instance return directly
+				if ( _cy != cy ) {
+					return;
+				}
+
 	      // list all entitytypes andstore them in the global scratch
 	      // only stateful EPN (complex, macromolecule or nucleic acid) are concerned
 

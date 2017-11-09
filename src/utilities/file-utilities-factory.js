@@ -100,12 +100,10 @@ module.exports = function () {
  fileUtilities.loadSample = function(filename, folderpath) {
    uiUtilities.startSpinner("load-spinner");
 
-   var networkContainer = $(options.networkContainerSelector);
-
    // Users may want to do customized things while a sample is being loaded
    // Trigger an event for this purpose and specify the 'filename' as an event parameter
-   networkContainer.trigger( "sbgnvizLoadSample", [ filename ] ); // Aliases for sbgnvizLoadSampleStart
-   networkContainer.trigger( "sbgnvizLoadSampleStart", [ filename ] );
+   $(document).trigger( "sbgnvizLoadSample", [ filename, cy ] ); // Aliases for sbgnvizLoadSampleStart
+   $(document).trigger( "sbgnvizLoadSampleStart", [ filename, cy ] );
 
    // load xml document use default folder path if it is not specified
    var xmlObject = loadXMLDoc((folderpath || 'sample-app/samples/') + filename);
@@ -117,7 +115,7 @@ module.exports = function () {
        cy.expandCollapse('get').collapse(cy.nodes("[collapse]", {layoutBy: null}));
      }
      uiUtilities.endSpinner("load-spinner");
-     networkContainer.trigger( "sbgnvizLoadSampleEnd", [ filename ] ); // Trigger an event signaling that a sample is loaded
+     $(document).trigger( "sbgnvizLoadSampleEnd", [ filename, cy ] ); // Trigger an event signaling that a sample is loaded
    }, 0);
  };
 
@@ -138,8 +136,7 @@ module.exports = function () {
      var text = this.result;
 
      setTimeout(function () {
-       var networkContainer = $(options.networkContainerSelector);
-
+       
        if (typeof callback1 !== 'undefined') callback1(text);
 
        var cyGraph;
@@ -147,8 +144,8 @@ module.exports = function () {
          cyGraph = sbgnmlToJson.convert(textToXmlObject(text));
          // Users may want to do customized things while an external file is being loaded
          // Trigger an event for this purpose and specify the 'filename' as an event parameter
-         networkContainer.trigger( "sbgnvizLoadFile", [ file.name ] ); // Aliases for sbgnvizLoadFileStart
-         networkContainer.trigger( "sbgnvizLoadFileStart", [ file.name ] );
+         $(document).trigger( "sbgnvizLoadFile", [ file.name, cy ] ); // Aliases for sbgnvizLoadFileStart
+         $(document).trigger( "sbgnvizLoadFileStart", [ file.name, cy ] );
        }
        catch (err) {
          uiUtilities.endSpinner("load-file-spinner");
@@ -163,7 +160,7 @@ module.exports = function () {
          cy.expandCollapse('get').collapse(cy.nodes("[collapse]"), {layoutBy: null});
        }
        uiUtilities.endSpinner("load-file-spinner");
-       networkContainer.trigger( "sbgnvizLoadFileEnd", [ file.name ] ); // Trigger an event signaling that a file is loaded
+       $(document).trigger( "sbgnvizLoadFileEnd", [ file.name, cy ] ); // Trigger an event signaling that a file is loaded
      }, 0);
    };
 

@@ -52,9 +52,7 @@ module.exports = function () {
   graphUtilities.updateGraph = function(cyGraph) {
     console.log('cy update called');
 
-    var networkContainer = $(options.networkContainerSelector);
-
-    networkContainer.trigger( "updateGraphStart" );
+    $(document).trigger( "updateGraphStart", cy );
     // Reset undo/redo stack and buttons when a new graph is loaded
     if (options.undoable) {
       cy.undoRedo().reset();
@@ -103,7 +101,7 @@ module.exports = function () {
       cy.edgeBendEditing('get').initBendPoints(cy.edges());
     }
 
-    networkContainer.trigger( "updateGraphEnd" );
+    $(document).trigger( "updateGraphEnd", cy );
   };
 
   graphUtilities.calculatePaddings = function(paddingPercent) {
