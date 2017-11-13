@@ -263,6 +263,7 @@ var jsonToSbgnml = {
         // add info for collapsed nodes
         if(node.data('collapsedChildren')) {
             newtExtString += "<collapsed/>";
+            newtExtString += "<positionBeforeSaving x='" + node.position().x +"' y='" + node.position().y + "'/>";
             hasNewtExt = true;
         }
 
