@@ -344,6 +344,8 @@ var sbgnmlToJson = {
           nodeObj.thickBorder = true;
         }
         if (result.newt.collapsed){
+          nodeObj.positionBeforeSaving = {x : Number(result.newt.positionBeforeSaving[0].$.x),
+              y: Number(result.newt.positionBeforeSaving[0].$.y)};
           nodeObj.collapse = true;
         }
       });
