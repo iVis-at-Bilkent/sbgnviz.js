@@ -43,7 +43,7 @@ module.exports = function () {
     for ( var i = 0; i < nodes.length; i++ ) {
       var node = nodes[i];
       var ports = node.data('ports');
-      var currentOrdering = sbgnviz.elementUtilities.getPortsOrdering(node); // Get the current node ports ordering
+      var currentOrdering = elementUtilities.getPortsOrdering(node); // Get the current node ports ordering
       var portsCopy = ports.length === 2 ? [ { id: ports[0].id, x: ports[0].x, y: ports[0].y }, { id: ports[1].id, x: ports[1].x, y: ports[1].y } ] : [];
       nodePropMap[node.id()] = { ordering: currentOrdering, ports: portsCopy };
     }

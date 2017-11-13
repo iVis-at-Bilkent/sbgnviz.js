@@ -59,48 +59,48 @@ module.exports = function () {
     });
   }
 
-  $(document).isNumberKey = function(e) {
+  keyboardInputUtilities.isNumberKey = function(e) {
     return ( e.keyCode >= 48 && e.keyCode <= 57 ) || ( e.keyCode >= 96 && e.keyCode <= 105 );
   };
 
-  $(document).isDotKey = function(e) {
+  keyboardInputUtilities.isDotKey = function(e) {
     return e.keyCode === 190;
   };
 
-  $(document).isMinusSignKey = function(e) {
+  keyboardInputUtilities.isMinusSignKey = function(e) {
     return e.keyCode === 109 || e.keyCode === 189;
   };
 
-  $(document).isLeftKey = function(e) {
+  keyboardInputUtilities.isLeftKey = function(e) {
     return e.keyCode === 37;
   };
 
-  $(document).isRightKey = function(e) {
+  keyboardInputUtilities.isRightKey = function(e) {
     return e.keyCode === 39;
   };
 
-  $(document).isBackspaceKey = function(e) {
+  keyboardInputUtilities.isBackspaceKey = function(e) {
     return e.keyCode === 8;
   };
 
-  $(document).isTabKey = function(e) {
+  keyboardInputUtilities.isTabKey = function(e) {
     return e.keyCode === 9;
   };
 
-  $(document).isEnterKey = function(e) {
+  keyboardInputUtilities.isEnterKey = function(e) {
     return e.keyCode === 13;
   };
 
-  $(document).isIntegerFieldInput = function(value, e) {
+  keyboardInputUtilities.isIntegerFieldInput = function(value, e) {
     return this.isCtrlOrCommandPressed(e) || this.isMinusSignKey(e) || this.isNumberKey(e)
             || this.isBackspaceKey(e) || this.isTabKey(e) || this.isLeftKey(e) || this.isRightKey(e) || this.isEnterKey(e);
   };
 
-  $(document).isFloatFieldInput = function(value, e) {
+  keyboardInputUtilities.isFloatFieldInput = function(value, e) {
     return this.isIntegerFieldInput(value, e) || this.isDotKey(e);
   };
 
-  $(document).isCtrlOrCommandPressed = function(e) {
+  keyboardInputUtilities.isCtrlOrCommandPressed = function(e) {
     return e.ctrlKey || e.metaKey;
   };
 

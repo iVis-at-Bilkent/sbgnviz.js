@@ -733,7 +733,7 @@ module.exports = function () {
 
     for ( var i = 0; i < nodes.length; i++ ) {
       var node = nodes[i];
-      var currentOrdering = sbgnviz.elementUtilities.getPortsOrdering(node); // The current ports ordering of the node
+      var currentOrdering = this.getPortsOrdering(node); // The current ports ordering of the node
 
       // If the current ordering is already equal to the desired ordering pass this node directly
       if ( ordering === currentOrdering ) {

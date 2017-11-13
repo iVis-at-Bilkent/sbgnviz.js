@@ -447,7 +447,7 @@ UnitOfInformation.create = function (parentNode, cy, value, bbox, location, posi
   }
 };
 
-UnitOfInformation.remove = function (mainObj) {
+UnitOfInformation.remove = function (mainObj, cy) {
   var position = UnitOfInformation.getPositionIndex(mainObj, cy);
   var index = UnitOfInformation.getParent(mainObj, cy).data('statesandinfos').indexOf(mainObj);
   UnitOfInformation.removeFromParent(mainObj, cy);
