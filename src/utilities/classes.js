@@ -115,7 +115,8 @@ AuxiliaryUnit.drawShape = function(mainObj, cy, context, x, y) {
 
 // draw the statesOrInfo's label at given position
 AuxiliaryUnit.drawText = function(mainObj, cy, context, centerX, centerY) {
-  var options = cy.sbgnvizParams.optionUtilities.getOptions();
+  // access the sbgnvizParams set for cy
+  var options = cy.scratch('_sbgnviz').sbgnvizParams.optionUtilities.getOptions();
   var unitClass = getAuxUnitClass(mainObj);
   var parent = unitClass.getParent(mainObj, cy);
   var fontSize = 9; // parseInt(textProp.height / 1.5);

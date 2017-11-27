@@ -51,7 +51,9 @@
     jsonToSbgnmlConverter(param);
     sbgnmlToJsonConverter(param);
 
-    sbgnCyInstance.getCy().sbgnvizParams = param;
+    // set scratch pad for sbgnviz and init sbgnvizParams inside it
+    sbgnCyInstance.getCy().scratch('_sbgnviz', {});
+    sbgnCyInstance.getCy().scratch('_sbgnviz').sbgnvizParams = param;
 
     // Expose the api
     var api = {};
