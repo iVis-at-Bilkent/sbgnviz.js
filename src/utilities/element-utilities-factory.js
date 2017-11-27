@@ -444,7 +444,7 @@ module.exports = function () {
       var fitLabelsToNodes = options.fitLabelsToNodes;
       fitLabelsToNodes = typeof fitLabelsToNodes === 'function' ? fitLabelsToNodes.call() : fitLabelsToNodes;
 
-      return fitLabelsToNodes ? textProp.label : truncateText(textProp, font);
+      return fitLabelsToNodes ? truncateText(textProp, font) : textProp.label;
   };
 
   elementUtilities.getLabelTextSize = function (ele) {
