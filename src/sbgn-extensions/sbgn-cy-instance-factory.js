@@ -502,28 +502,25 @@ module.exports = function () {
 	            'selection-box-opacity': '0.2', 'selection-box-border-color': selectionColor
 	          });
 
-	  // $(document).ready(function ()
-	  // {
-	    var sbgnNetworkContainer = $(options.networkContainerSelector);
+    var sbgnNetworkContainer = $(options.networkContainerSelector);
 
-	    // create and init cytoscape:
-	    cytoscape({
-	      container: sbgnNetworkContainer,
-	      style: sbgnStyleSheet,
-	      showOverlay: false, minZoom: 0.125, maxZoom: 16,
-	      boxSelectionEnabled: true,
-	      motionBlur: true,
-	      wheelSensitivity: 0.1,
-	      ready: function () {
-					cy = this;
-	        // If undoable register undo/redo actions
-	        if (options.undoable) {
-	          registerUndoRedoActions();
-	        }
-	        bindCyEvents();
-	      }
-	    });
-	  // });
+    // create and init cytoscape:
+    cytoscape({
+      container: sbgnNetworkContainer,
+      style: sbgnStyleSheet,
+      showOverlay: false, minZoom: 0.125, maxZoom: 16,
+      boxSelectionEnabled: true,
+      motionBlur: true,
+      wheelSensitivity: 0.1,
+      ready: function () {
+				cy = this;
+        // If undoable register undo/redo actions
+        if (options.undoable) {
+          registerUndoRedoActions();
+        }
+        bindCyEvents();
+      }
+    });
 	};
 
 	sbgnCyInstance.getCy = function () {

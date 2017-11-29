@@ -11,51 +11,49 @@ module.exports = function () {
   function keyboardInputUtilities (param) {
 
     // Listen to events on network container
-    $(document).ready(function () {
-      $(document).on('keydown', '.integer-input', function(e){
-        var value = $(this).attr('value');
-        return keyboardInputUtilities.isIntegerFieldInput(value, e);
-      });
+    $(document).on('keydown', '.integer-input', function(e){
+      var value = $(this).attr('value');
+      return keyboardInputUtilities.isIntegerFieldInput(value, e);
+    });
 
-      $(document).on('keydown', '.float-input', function(e){
-        var value = $(this).attr('value');
-        return keyboardInputUtilities.isFloatFieldInput(value, e);
-      });
+    $(document).on('keydown', '.float-input', function(e){
+      var value = $(this).attr('value');
+      return keyboardInputUtilities.isFloatFieldInput(value, e);
+    });
 
-      $(document).on('change', '.integer-input,.float-input', function(e){
-        var min   = $(this).attr('min');
-        var max   = $(this).attr('max');
-        var value = parseFloat($(this).val());
+    $(document).on('change', '.integer-input,.float-input', function(e){
+      var min   = $(this).attr('min');
+      var max   = $(this).attr('max');
+      var value = parseFloat($(this).val());
 
+      if(min != null) {
+        min = parseFloat(min);
+      }
+
+      if(max != null) {
+        max = parseFloat(max);
+      }
+
+      if(min != null && value < min) {
+        value = min;
+      }
+      else if(max != null && value > max) {
+        value = max;
+      }
+
+      if(isNaN(value)) {
         if(min != null) {
-          min = parseFloat(min);
-        }
-
-        if(max != null) {
-          max = parseFloat(max);
-        }
-
-        if(min != null && value < min) {
           value = min;
         }
-        else if(max != null && value > max) {
+        else if(max != null) {
           value = max;
         }
-
-        if(isNaN(value)) {
-          if(min != null) {
-            value = min;
-          }
-          else if(max != null) {
-            value = max;
-          }
-          else {
-            value = 0;
-          }
+        else {
+          value = 0;
         }
+      }
 
-        $(this).val("" + value);
-      });
+      $(this).val("" + value);
     });
   }
 
