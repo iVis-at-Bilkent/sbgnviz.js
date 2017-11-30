@@ -75,121 +75,127 @@ edge.data('bendPointPositions');
 
 ## API
 
-`sbgnviz.expandNodes(nodes)`
+`sbgnviz.register(options)`
+Register with libraries before creating instances
+
+`var instance = sbgnviz(options)`
+Creates an extension instance with the given options
+
+`instance.expandNodes(nodes)`
 Expand given nodes. Requires expandCollapse extension and considers undoable option.
 
-`sbgnviz.collapseNodes(nodes)`
+`instance.collapseNodes(nodes)`
 Collapse given nodes. Requires expandCollapse extension and considers undoable option.
 
-`sbgnviz.expandComplexes()`
+`instance.expandComplexes()`
 Expands the complex nodes in the graph recursively. Requires expandCollapse extension and considers undoable option.
 
-`sbgnviz.collapseComplexes()`
+`instance.collapseComplexes()`
 Collapses the complex nodes in the graph recursively. Requires expandCollapse extension and considers undoable option.
 
-`sbgnviz.collapseAll()`
+`instance.collapseAll()`
 Collapses all nodes in the graph recursively. Requires expandCollapse extension and considers undoable option.
 
-`sbgnviz.expandAll()`
+`instance.expandAll()`
 Expands all nodes in the graph recursively. Requires expandCollapse extension and considers undoable option.
 
-`sbgnviz.hideNodesSmart(nodes)`
+`instance.hideNodesSmart(nodes)`
 Extends the given nodes list in a smart way to leave the map intact and hides the resulting list. Requires viewUtilities extension and considers 'undoable' option.
 
-`sbgnviz.showNodesSmart(nodes)`
+`instance.showNodesSmart(nodes)`
 Extends the given nodes list in a smart way to leave the map intact. Then unhides the resulting list and hides others. Requires viewUtilities extension and considers 'undoable' option.
 
-`sbgnviz.showAll()`
+`instance.showAll()`
 Unhides all elements. Requires viewUtilities extension and considers 'undoable' option.
 
-`sbgnviz.deleteElesSimple(eles)`
+`instance.deleteElesSimple(eles)`
 Removes the given elements in a simple way. Considers 'undoable' option.
 
-`sbgnviz.deleteNodesSmart(nodes)`
+`instance.deleteNodesSmart(nodes)`
 Extends the given nodes list in a smart way to leave the map intact and removes the resulting list. Considers 'undoable' option.
 
-`sbgnviz.highlightSelected(eles)`
+`instance.highlightSelected(eles)`
 Highlights selected elements. Requires viewUtilities extension and considers 'undoable' option.
 
-`sbgnviz.highlightNeighbours(nodes)`
+`instance.highlightNeighbours(nodes)`
 Highlights neighbours of the given nodes. Requires viewUtilities extension and considers 'undoable' option.
 
-`sbgnviz.highlightProcesses(nodes)`
+`instance.highlightProcesses(nodes)`
 Highlights processes of the given nodes. Requires viewUtilities extension and considers 'undoable' option.
 
-`sbgnviz.searchByLabel(label)`
+`instance.searchByLabel(label)`
 Finds the elements whose label includes the given label and highlights processes of those elements.
 Requires viewUtilities extension and considers 'undoable' option.
 
-`sbgnviz.removeHighlights()`
+`instance.removeHighlights()`
 Unhighlights any highlighted element. Requires viewUtilities extension and considers 'undoable' option.
 
-`sbgnviz.performLayout(layoutOptions, notUndoable)`
+`instance.performLayout(layoutOptions, notUndoable)`
 Performs layout by given layoutOptions. Considers 'undoable' option. However, by setting notUndoable parameter
 to a truthy value you can force an undable layout operation independant of 'undoable' option.
 
-`sbgnviz.createSbgnml()`
+`instance.createSbgnml()`
 Creates an sbgnml file content from the exising graph and returns it.
 
-`sbgnviz.convertSbgnmlToJson(data)`
+`instance.convertSbgnmlToJson(data)`
 Converts given sbgnml data to a json object in a special format (http://js.cytoscape.org/#notation/elements-json) and returns it.
 
-`sbgnviz.getQtipContent(node)`
+`instance.getQtipContent(node)`
 Create the qtip contents of the given node and returns it.
 
-`sbgnviz.updateGraph(cyGraph)`
-Update the graph by given cyGraph parameter which is a json object including data of cytoscape elements 
+`instance.updateGraph(cyGraph)`
+Update the graph by given cyGraph parameter which is a json object including data of cytoscape elements
 in a special format (http://js.cytoscape.org/#notation/elements-json).
 
-`sbgnviz.calculatePaddings(paddingPercent)`
+`instance.calculatePaddings(paddingPercent)`
 Calculates the paddings for compounds based on dimensions of simple nodes and a specific percentadge.
 As this percentadge takes the given paddingPercent or compoundPadding option.
 
-`sbgnviz.recalculatePaddings()`
-Recalculates/refreshes the compound paddings. Aliases `sbgnviz.refreshPaddings()`.
+`instance.recalculatePaddings()`
+Recalculates/refreshes the compound paddings. Aliases `instance.refreshPaddings()`.
 
-`sbgnviz.saveAsPng(filename)`
-Exports the current graph to a png file. The name of the file is determined by the filename parameter which is 
+`instance.saveAsPng(filename)`
+Exports the current graph to a png file. The name of the file is determined by the filename parameter which is
 'network.png' by default.
 
-`sbgnviz.saveAsJpg(filename)`
-Exports the current graph to a jpg file. The name of the file is determined by the filename parameter which is 
+`instance.saveAsJpg(filename)`
+Exports the current graph to a jpg file. The name of the file is determined by the filename parameter which is
 'network.jpg' by default.
 
-`sbgnviz.loadSample(filename, folderpath)`
+`instance.loadSample(filename, folderpath)`
 Loads a sample file whose name and path of containing folder is given.
 
-`sbgnviz.loadSBGNMLFile(file[, callback])`
+`instance.loadSBGNMLFile(file[, callback])`
 Loads the given sbgnml file. Optionally apply a callback function upon loading. Callback accepts the file as an xml string as argument.
 
-`loadSBGNMLText(textData)`
+`instance.loadSBGNMLText(textData)`
 Loads a graph from the given text data in sbgnml format.
 
-`sbgnviz.saveAsSbgnml(filename)`
+`instance.saveAsSbgnml(filename)`
 Exports the current graph to an sbgnml file with the given filename.
 
-`sbgnviz.enablePorts()`
+`instance.enablePorts()`
 Enable node ports.
 
-`sbgnviz.disablePorts()`
+`instance.disablePorts()`
 Disable node ports.
 
-`sbgnviz.arePortsEnabled()`
+`instance.arePortsEnabled()`
 Get if node ports are enabled.
 
-`sbgnviz.setPortsOrdering(nodes, ordering, portDistance)`
+`instance.setPortsOrdering(nodes, ordering, portDistance)`
 Sets the ordering of the given nodes. Ordering options are 'L-to-R', 'R-to-L', 'T-to-B', 'B-to-T', 'none'.
 If a node does not have any port before the operation and it is supposed to have some after operation the portDistance parameter is used to set the distance between the node center and the ports. The default port distance is 70.
 Considers undoable option.
 
-`sbgnviz.startSpinner(classname)`
-Starts a spinner at the middle of network container element. You can specify a css class that the 
+`instance.startSpinner(classname)`
+Starts a spinner at the middle of network container element. You can specify a css class that the
 spinner will have. The default classname is 'default-class'. Requires 'fontawesome.css'.
 
-`sbgnviz.endSpinner(classname)`
+`instance.endSpinner(classname)`
 Ends any spinner having a css class with the given name. Requires 'fontawesome.css'.
 
-`sbgnviz.elementUtilities`
+`instance.elementUtilities`
 General and sbgn specific utilities for cytoscape elements. These are exposed for the users who builds an extension
 library of sbgnviz. Most users will not need to use this. It includes the followings.
 
@@ -206,10 +212,10 @@ library of sbgnviz. Most users will not need to use this. It includes the follow
  * `deleteElesSimple` Removes the given elements in a simple way.
  * `getPortsOrdering` Return ordering of ports of a node. Possible return values are 'L-to-R', 'R-to-L', 'T-to-B', 'B-to-T', 'none'.
  * `canHavePorts` Returns whether the given element or elements with the given class can have ports
- * `setPortsOrdering(nodes, ordering, portDistance)` Similar to `sbgnviz.setPortsOrdering()` but do not considers undoable option.
- 
+ * `setPortsOrdering(nodes, ordering, portDistance)` Similar to `instance.setPortsOrdering()` but do not considers undoable option.
 
-`sbgnviz.undoRedoActionFunctions`
+
+`instance.undoRedoActionFunctions`
 Functions to be utilized in defining new actions for cytoscape.js-undo-redo extension. These are exposed for the users who builds
 an extension library of sbgnviz.
 
