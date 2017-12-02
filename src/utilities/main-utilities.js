@@ -360,9 +360,8 @@ mainUtilities.highlightSelected = function(_eles) {
   if (elesToHighlight.length === 0) {
     return;
   }
-  var notHighlightedEles = cy.elements(".nothighlighted").filter(":visible");
-  var highlightedEles = cy.elements(':visible').difference(notHighlightedEles);
-  if (elesToHighlight.same(highlightedEles)) {
+  var highlightedEles = cy.elements(".highlighted").filter(":visible");
+  if (highlightedEles.contains(elesToHighlight)) {
     return;
   }
   
@@ -389,9 +388,8 @@ mainUtilities.highlightNeighbours = function(_nodes) {
   if (elesToHighlight.length === 0) {
     return;
   }
-  var notHighlightedEles = cy.elements(".nothighlighted").filter(":visible");
-  var highlightedEles = cy.elements(':visible').difference(notHighlightedEles);
-  if (elesToHighlight.same(highlightedEles) && !cy.elements(":unselected").empty()) {
+  var highlightedEles = cy.elements(".highlighted").filter(":visible");
+  if (highlightedEles.contains(elesToHighlight) && !cy.elements(":unselected").empty()) {
     return;
   }
   
@@ -448,9 +446,8 @@ mainUtilities.highlightProcesses = function(_nodes) {
   if (elesToHighlight.length === 0) {
     return;
   }
-  var notHighlightedEles = cy.elements(".nothighlighted").filter(":visible");
-  var highlightedEles = cy.elements(':visible').difference(notHighlightedEles);
-  if (elesToHighlight.same(highlightedEles)) {
+  var highlightedEles = cy.elements(".highlighted").filter(":visible");
+  if (highlightedEles.contains(elesToHighlight)) {
     return;
   }
   
