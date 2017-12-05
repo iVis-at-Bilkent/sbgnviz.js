@@ -1,24 +1,35 @@
 /*
- * This file exports the functions to be utilized in undoredo extension actions 
+ * This file exports the functions to be utilized in undoredo extension actions
  */
-var elementUtilities = require('./element-utilities');
 
-var undoRedoActionFunctions = {
-  deleteElesSimple: function (param) {
+module.exports = function () {
+
+  var elementUtilities;
+  var cy;
+
+  function undoRedoActionFunctions (param) {
+    elementUtilities = param.elementUtilities;
+    cy = param.sbgnCyInstance.getCy();
+  }
+
+  undoRedoActionFunctions.deleteElesSimple = function (param) {
     return elementUtilities.deleteElesSimple(param.eles);
-  },
-  restoreEles: function (eles) {
+  };
+
+  undoRedoActionFunctions.restoreEles = function (eles) {
     var param = {};
     param.eles = elementUtilities.restoreEles(eles);
     return param;
-  },
-  deleteNodesSmart: function (param) {
+  };
+
+  undoRedoActionFunctions.deleteNodesSmart = function (param) {
     if (param.firstTime) {
       return elementUtilities.deleteNodesSmart(param.eles);
     }
     return elementUtilities.deleteElesSimple(param.eles);
-  },
-  setPortsOrdering: function(param) {
+  };
+
+  undoRedoActionFunctions.setPortsOrdering = function(param) {
     var nodes = param.nodes;
     var ordering = param.ordering;
     var portDistance = param.portDistance;
@@ -32,7 +43,7 @@ var undoRedoActionFunctions = {
     for ( var i = 0; i < nodes.length; i++ ) {
       var node = nodes[i];
       var ports = node.data('ports');
-      var currentOrdering = sbgnviz.elementUtilities.getPortsOrdering(node); // Get the current node ports ordering
+      var currentOrdering = elementUtilities.getPortsOrdering(node); // Get the current node ports ordering
       var portsCopy = ports.length === 2 ? [ { id: ports[0].id, x: ports[0].x, y: ports[0].y }, { id: ports[1].id, x: ports[1].x, y: ports[1].y } ] : [];
       nodePropMap[node.id()] = { ordering: currentOrdering, ports: portsCopy };
     }
@@ -77,7 +88,7 @@ var undoRedoActionFunctions = {
     }
 
     return result;
-  }
-};
+  };
 
-module.exports = undoRedoActionFunctions;
+  return undoRedoActionFunctions;
+};

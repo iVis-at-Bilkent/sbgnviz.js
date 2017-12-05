@@ -1,9 +1,9 @@
-var cyRenderer = require('../sbgn-extensions/sbgn-cy-renderer');
+
 var libs = require('../utilities/lib-utilities').getLibs();
 var jQuery = $ = libs.jQuery;
 var cytoscape = libs.cytoscape;
-var optionUtilities = require('./option-utilities');
-var options = optionUtilities.getOptions();
+// var optionUtilities = require('./option-utilities');
+// var options = optionUtilities.getOptions();
 var truncate = require('./text-utilities').truncate;
 
 var ns = {};
@@ -52,7 +52,7 @@ AuxiliaryUnit.construct = function(parent) {
   return obj;
 };
 
-AuxiliaryUnit.getParent = function(mainObj) {
+AuxiliaryUnit.getParent = function(mainObj, cy) {
   var parent = mainObj.parent;
   // If parent variable stores the id of parent instead of the actual parent get the actual parent by id
   if (typeof parent === 'string') {
@@ -75,10 +75,10 @@ AuxiliaryUnit.defaultBackgroundColor = "#ffffff";
  * Return a new AuxiliaryUnit object. A new parent reference and new id can
  * optionnally be passed.
  */
-AuxiliaryUnit.copy = function (mainObj, existingInstance, newParent, newId) {
+AuxiliaryUnit.copy = function (mainObj, cy, existingInstance, newParent, newId) {
   var newUnit = existingInstance ? existingInstance : AuxiliaryUnit.construct();
 
-  var parentToSet = newParent || getAuxUnitClass(mainObj).getParent(mainObj);
+  var parentToSet = newParent || getAuxUnitClass(mainObj).getParent(mainObj, cy);
   AuxiliaryUnit.setParentRef(newUnit, parentToSet);
 
   newUnit.id = newId ? newId : mainObj.id;
@@ -91,32 +91,34 @@ AuxiliaryUnit.copy = function (mainObj, existingInstance, newParent, newId) {
 };
 
 // draw the auxiliary unit at its position
-AuxiliaryUnit.draw = function(mainObj, context) {
+AuxiliaryUnit.draw = function(mainObj, cy, context) {
   var unitClass = getAuxUnitClass(mainObj);
-  var coords = unitClass.getAbsoluteCoord(mainObj);
+  var coords = unitClass.getAbsoluteCoord(mainObj, cy);
 
-  unitClass.drawShape(mainObj, context, coords.x, coords.y);
-  if (unitClass.hasText(mainObj)) {
-    unitClass.drawText(mainObj, context, coords.x, coords.y);
+  unitClass.drawShape(mainObj, cy, context, coords.x, coords.y);
+  if (unitClass.hasText(mainObj, cy)) {
+    unitClass.drawText(mainObj, cy, context, coords.x, coords.y);
   }
   mainObj.isDisplayed = true;
 };
 
 // to be implemented by children
-AuxiliaryUnit.getText = function(mainObj) {
+AuxiliaryUnit.getText = function(mainObj, cy) {
   throw new Error("Abstract method!");
 };
-AuxiliaryUnit.hasText = function(mainObj) {
+AuxiliaryUnit.hasText = function(mainObj, cy) {
   throw new Error("Abstract method!");
 };
-AuxiliaryUnit.drawShape = function(mainObj, context, x, y) {
+AuxiliaryUnit.drawShape = function(mainObj, cy, context, x, y) {
   throw new Error("Abstract method!");
 };
 
 // draw the statesOrInfo's label at given position
-AuxiliaryUnit.drawText = function(mainObj, context, centerX, centerY) {
+AuxiliaryUnit.drawText = function(mainObj, cy, context, centerX, centerY) {
+  // access the sbgnvizParams set for cy
+  var options = cy.scratch('_sbgnviz').sbgnvizParams.optionUtilities.getOptions();
   var unitClass = getAuxUnitClass(mainObj);
-  var parent = unitClass.getParent(mainObj);
+  var parent = unitClass.getParent(mainObj, cy);
   var fontSize = 9; // parseInt(textProp.height / 1.5);
 
   // part of : $$.sbgn.drawText(context, textProp);
@@ -135,13 +137,13 @@ AuxiliaryUnit.drawText = function(mainObj, context, centerX, centerY) {
   if(options.fitLabelsToInfoboxes()){
     // here we memoize the truncated text into _textCache,
     // as it is not something that changes so much
-    text = unitClass.getText(mainObj);
+    text = unitClass.getText(mainObj, cy);
     var key = text + context.font + mainObj.bbox.w;
     if(mainObj._textCache && mainObj._textCache[key]) {
       text = mainObj._textCache[key];
     }
     else {
-      text = truncate(unitClass.getText(mainObj), context.font, mainObj.bbox.w);
+      text = truncate(unitClass.getText(mainObj, cy), context.font, mainObj.bbox.w);
       if(!mainObj._textCache) {
         mainObj._textCache = {};
       }
@@ -149,7 +151,7 @@ AuxiliaryUnit.drawText = function(mainObj, context, centerX, centerY) {
     }
   }
   else {
-    text = unitClass.getText(mainObj);
+    text = unitClass.getText(mainObj, cy);
   }
 
   context.fillText(text, centerX, centerY);
@@ -160,8 +162,8 @@ AuxiliaryUnit.drawText = function(mainObj, context, centerX, centerY) {
   context.globalAlpha = oldOpacity;
 };
 
-AuxiliaryUnit.getAbsoluteCoord = function(mainObj) {
-  var parent = getAuxUnitClass(mainObj).getParent(mainObj);
+AuxiliaryUnit.getAbsoluteCoord = function(mainObj, cy) {
+  var parent = getAuxUnitClass(mainObj).getParent(mainObj, cy);
   if(mainObj.coordType == "relativeToCenter") {
     var absX = mainObj.bbox.x * (parent.outerWidth() - parent._private.data['border-width']) / 100 + parent._private.position.x;
     var absY = mainObj.bbox.y * (parent.outerHeight() - parent._private.data['border-width']) / 100 + parent._private.position.y;
@@ -228,7 +230,7 @@ AuxiliaryUnit.setAnchorSide = function(mainObj, parentBbox) {
   }
 };
 
-AuxiliaryUnit.addToParent = function (mainObj, parentNode, location, position, index) {
+AuxiliaryUnit.addToParent = function (mainObj, cy, parentNode, location, position, index) {
 
   // add state var to the parent's statesandinfos
   if(typeof index != "undefined") { // specific index provided (for undo/redo consistency)
@@ -242,7 +244,7 @@ AuxiliaryUnit.addToParent = function (mainObj, parentNode, location, position, i
     parentNode.data('auxunitlayouts', {});
   }
   if(!location) { // location not provided, need to define it automatically
-    location = AuxUnitLayout.selectNextAvailable(parentNode);
+    location = AuxUnitLayout.selectNextAvailable(parentNode, cy);
   }
   // here we are sure to have a location even if it was not provided as argument
   // get or create the necessary layout
@@ -258,14 +260,14 @@ AuxiliaryUnit.addToParent = function (mainObj, parentNode, location, position, i
     case "right": mainObj.bbox.x = -50; break;
   }
   // add stateVar to layout, precomputing of relative coords will be triggered accordingly
-  var insertedPosition = AuxUnitLayout.addAuxUnit(layout, mainObj, position);
+  var insertedPosition = AuxUnitLayout.addAuxUnit(layout, cy, mainObj, position);
   return insertedPosition;
 }
 
-AuxiliaryUnit.removeFromParent = function (mainObj) {
-  var parent = getAuxUnitClass(mainObj).getParent(mainObj);
+AuxiliaryUnit.removeFromParent = function (mainObj, cy) {
+  var parent = getAuxUnitClass(mainObj).getParent(mainObj, cy);
   var parentLayout = parent.data('auxunitlayouts')[mainObj.anchorSide];
-  AuxUnitLayout.removeAuxUnit(parentLayout, mainObj);
+  AuxUnitLayout.removeAuxUnit(parentLayout, cy, mainObj);
   if (AuxUnitLayout.isEmpty(parentLayout)){
     delete parent.data('auxunitlayouts')[mainObj.anchorSide];
   }
@@ -274,8 +276,8 @@ AuxiliaryUnit.removeFromParent = function (mainObj) {
   statesandinfos.splice(index, 1);
 };
 
-AuxiliaryUnit.getPositionIndex = function(mainObj) {
-  return getAuxUnitClass(mainObj).getParent(mainObj).data('auxunitlayouts')[mainObj.anchorSide].units.indexOf(mainObj);
+AuxiliaryUnit.getPositionIndex = function(mainObj, cy) {
+  return getAuxUnitClass(mainObj).getParent(mainObj, cy).data('auxunitlayouts')[mainObj.anchorSide].units.indexOf(mainObj);
 };
 
 ns.AuxiliaryUnit = AuxiliaryUnit;
@@ -318,7 +320,7 @@ StateVariable.hasText = function(mainObj) {
   return (mainObj.state.value && mainObj.state.value != "") || (mainObj.state.variable && mainObj.state.variable != "");
 };
 
-StateVariable.drawShape = function(mainObj, context, x, y) {
+StateVariable.drawShape = function(mainObj, cy, context, x, y) {
   cytoscape.sbgn.drawRoundRectanglePath(context,
               x, y,
               mainObj.bbox.w, mainObj.bbox.h,
@@ -330,7 +332,7 @@ StateVariable.drawShape = function(mainObj, context, x, y) {
   context.stroke();
 };
 
-StateVariable.create = function(parentNode, value, variable, bbox, location, position, index) {
+StateVariable.create = function(parentNode, cy, value, variable, bbox, location, position, index) {
   // create the new state var of info
   var stateVar = StateVariable.construct();
   StateVariable.setParentRef(stateVar, parentNode);
@@ -341,19 +343,19 @@ StateVariable.create = function(parentNode, value, variable, bbox, location, pos
   stateVar.bbox = bbox;
 
   // link to layout
-  position = StateVariable.addToParent(stateVar, parentNode, location, position, index);
+  position = StateVariable.addToParent(stateVar, cy, parentNode, location, position, index);
 
   return {
-    index: StateVariable.getParent(stateVar).data('statesandinfos').indexOf(stateVar),
+    index: StateVariable.getParent(stateVar, cy).data('statesandinfos').indexOf(stateVar),
     location: stateVar.anchorSide,
     position: position
   }
 };
 
-StateVariable.remove = function (mainObj) {
-  var position = StateVariable.getPositionIndex(mainObj);
-  var index = StateVariable.getParent(mainObj).data('statesandinfos').indexOf(mainObj);
-  StateVariable.removeFromParent(mainObj);
+StateVariable.remove = function (mainObj, cy) {
+  var position = StateVariable.getPositionIndex(mainObj, cy);
+  var index = StateVariable.getParent(mainObj, cy).data('statesandinfos').indexOf(mainObj);
+  StateVariable.removeFromParent(mainObj, cy);
   //console.log("after remove", this.parent.data('auxunitlayouts'), this.parent.data('statesandinfos'));
   return {
     clazz: "state variable",
@@ -371,8 +373,8 @@ StateVariable.remove = function (mainObj) {
   };
 };
 
-StateVariable.copy = function(mainObj, newParent, newId) {
-  var newStateVar = AuxiliaryUnit.copy(mainObj, StateVariable.construct(), newParent, newId);
+StateVariable.copy = function(mainObj, cy, newParent, newId) {
+  var newStateVar = AuxiliaryUnit.copy(mainObj, cy, StateVariable.construct(), newParent, newId);
   newStateVar.state = jQuery.extend(true, {}, mainObj.state);
   newStateVar.stateVariableDefinition = mainObj.stateVariableDefinition;
   newStateVar.clazz = mainObj.clazz;
@@ -413,9 +415,9 @@ UnitOfInformation.hasText = function(mainObj) {
   return mainObj.label.text && mainObj.label.text != "";
 };
 
-UnitOfInformation.drawShape = function(mainObj, context, x, y) {
+UnitOfInformation.drawShape = function(mainObj, cy, context, x, y) {
   cytoscape.sbgn.UnitOfInformationShapeFn(context, x, y, mainObj.bbox.w, mainObj.bbox.h,
-                  getAuxUnitClass(mainObj).getParent(mainObj).data("class"));
+                  getAuxUnitClass(mainObj).getParent(mainObj, cy).data("class"));
   var tmp_ctxt = context.fillStyle;
   context.fillStyle = UnitOfInformation.defaultBackgroundColor;
   context.fill();
@@ -431,25 +433,25 @@ UnitOfInformation.drawShape = function(mainObj, context, x, y) {
  * @param [position] - its position in the order of elements placed on the same location
  * @param [index] - its index in the statesandinfos list
  */
-UnitOfInformation.create = function (parentNode, value, bbox, location, position, index) {
+UnitOfInformation.create = function (parentNode, cy, value, bbox, location, position, index) {
   // create the new unit of info
   var unit = UnitOfInformation.construct(value, parentNode);
   unit.bbox = bbox;
 
   //console.log("will insert on", location, position);
-  position = UnitOfInformation.addToParent(unit, parentNode, location, position, index);
+  position = UnitOfInformation.addToParent(unit, cy, parentNode, location, position, index);
 
   return {
-    index: UnitOfInformation.getParent(unit).data('statesandinfos').indexOf(unit),
+    index: UnitOfInformation.getParent(unit, cy).data('statesandinfos').indexOf(unit),
     location: unit.anchorSide,
     position: position
   }
 };
 
-UnitOfInformation.remove = function (mainObj) {
-  var position = UnitOfInformation.getPositionIndex(mainObj);
-  var index = UnitOfInformation.getParent(mainObj).data('statesandinfos').indexOf(mainObj);
-  UnitOfInformation.removeFromParent(mainObj);
+UnitOfInformation.remove = function (mainObj, cy) {
+  var position = UnitOfInformation.getPositionIndex(mainObj, cy);
+  var index = UnitOfInformation.getParent(mainObj, cy).data('statesandinfos').indexOf(mainObj);
+  UnitOfInformation.removeFromParent(mainObj, cy);
   //console.log("after remove", this.parent.data('auxunitlayouts'), this.parent.data('statesandinfos'));
   return {
     clazz: "unit of information",
@@ -466,8 +468,8 @@ UnitOfInformation.remove = function (mainObj) {
   };
 };
 
-UnitOfInformation.copy = function(mainObj, newParent, newId) {
-  var newUnitOfInfo = AuxiliaryUnit.copy(mainObj, UnitOfInformation.construct(), newParent, newId);
+UnitOfInformation.copy = function(mainObj, cy, newParent, newId) {
+  var newUnitOfInfo = AuxiliaryUnit.copy(mainObj, cy, UnitOfInformation.construct(), newParent, newId);
   newUnitOfInfo.label = jQuery.extend(true, {}, mainObj.label);
   newUnitOfInfo.clazz = mainObj.clazz;
   return newUnitOfInfo;
@@ -609,7 +611,7 @@ AuxUnitLayout.construct = function(parentNode, location, alignment) {
   return obj;
 };
 
-AuxUnitLayout.getParentNode = function(mainObj) {
+AuxUnitLayout.getParentNode = function(mainObj, cy) {
   var parentNode = mainObj.parentNode;
 
   // If parentNode is id of parent node rather than being itself get the parent node by that id
@@ -642,11 +644,11 @@ AuxUnitLayout.unitGap = 5;
 AuxUnitLayout.alwaysShowAuxUnits = false;
 AuxUnitLayout.maxUnitDisplayed = -1;
 
-AuxUnitLayout.update = function(mainObj, doForceUpdate) {
-  AuxUnitLayout.precomputeCoords(mainObj, doForceUpdate);
+AuxUnitLayout.update = function(mainObj, cy, doForceUpdate) {
+  AuxUnitLayout.precomputeCoords(mainObj, cy, doForceUpdate);
 };
 
-AuxUnitLayout.addAuxUnit = function(mainObj, unit, position) {
+AuxUnitLayout.addAuxUnit = function(mainObj, cy, unit, position) {
   if(typeof position != "undefined") {
     //console.log("add unit at positiion", position);
     mainObj.units.splice(position, 0, unit);
@@ -656,26 +658,26 @@ AuxUnitLayout.addAuxUnit = function(mainObj, unit, position) {
     position = mainObj.units.length - 1;
   }
 
-  AuxUnitLayout.updateLengthCache(mainObj);
-  AuxUnitLayout.update(mainObj, true);
+  AuxUnitLayout.updateLengthCache(mainObj, cy);
+  AuxUnitLayout.update(mainObj, cy, true);
   if (AuxUnitLayout.getAlwaysShowAuxUnits(mainObj)) {
     // set a minimum size according to both sides on the same orientation
-    AuxUnitLayout.setParentMinLength(mainObj);
+    AuxUnitLayout.setParentMinLength(mainObj, cy);
     // need to resize the parent in case the space was too small
-    AuxUnitLayout.resizeParent(mainObj, mainObj.lengthUsed);
+    AuxUnitLayout.resizeParent(mainObj, cy, mainObj.lengthUsed);
   }
   //cy.style().update(); // <- was it really necessary ?
   return position;
 };
 
-AuxUnitLayout.removeAuxUnit = function(mainObj, unit) {
+AuxUnitLayout.removeAuxUnit = function(mainObj, cy, unit) {
   var index = mainObj.units.indexOf(unit);
   mainObj.units.splice(index, 1);
-  AuxUnitLayout.updateLengthCache(mainObj);
-  AuxUnitLayout.update(mainObj, true);
+  AuxUnitLayout.updateLengthCache(mainObj, cy);
+  AuxUnitLayout.update(mainObj, cy, true);
   if (AuxUnitLayout.getAlwaysShowAuxUnits(mainObj)) {
     // set a minimum size according to both sides on the same orientation
-    AuxUnitLayout.setParentMinLength(mainObj);
+    AuxUnitLayout.setParentMinLength(mainObj, cy);
   }
   cy.style().update();
 };
@@ -684,7 +686,7 @@ AuxUnitLayout.removeAuxUnit = function(mainObj, unit) {
  * reorder boxes using their defined positions. From left to right and top to bottom.
  * this ensures that their order in the layout's list corresponds to the reality of the map.
  */
-AuxUnitLayout.reorderFromPositions = function(mainObj) {
+AuxUnitLayout.reorderFromPositions = function(mainObj, cy) {
   mainObj.units.sort(function(a, b) {
     if(mainObj.location == "top" || mainObj.location == "bottom") {
       if (a.bbox.x < b.bbox.x) {
@@ -705,8 +707,8 @@ AuxUnitLayout.reorderFromPositions = function(mainObj) {
     return 0;
   });
   //console.log("units after reoarder", this.units);
-  AuxUnitLayout.updateLengthCache(mainObj);
-  AuxUnitLayout.update(mainObj, true);
+  AuxUnitLayout.updateLengthCache(mainObj, cy);
+  AuxUnitLayout.update(mainObj, cy, true);
 };
 
 /**
@@ -714,7 +716,7 @@ AuxUnitLayout.reorderFromPositions = function(mainObj) {
  * can then be compared against the parent node's dimensions, to decide how many
  * aux units to draw.
  */
-AuxUnitLayout.updateLengthCache = function(mainObj) {
+AuxUnitLayout.updateLengthCache = function(mainObj, cy) {
   mainObj.renderLengthCache = [0];
   var previous = AuxUnitLayout.getOuterMargin(mainObj);
   for(var i=0; i < mainObj.units.length; i++) {
@@ -745,10 +747,10 @@ AuxUnitLayout.getDrawableUnitAmount = function(mainObj) {
   // get the length of the side on which we draw
   var availableSpace;
   if (AuxUnitLayout.isTorB(mainObj)) {
-    availableSpace = AuxUnitLayout.getParentNode(mainObj).outerWidth();
+    availableSpace = AuxUnitLayout.getParentNode(mainObj, cy).outerWidth();
   }
   else {
-    availableSpace = AuxUnitLayout.getParentNode(mainObj).outerHeight();
+    availableSpace = AuxUnitLayout.getParentNode(mainObj, cy).outerHeight();
   }
   // loop over the cached precomputed lengths
   for(var i=0; i < mainObj.renderLengthCache.length; i++) {
@@ -760,17 +762,17 @@ AuxUnitLayout.getDrawableUnitAmount = function(mainObj) {
   return mainObj.units.length;
 };
 
-AuxUnitLayout.setDisplayedUnits = function (mainObj) {
+AuxUnitLayout.setDisplayedUnits = function (mainObj, cy) {
   // get the length of the side on which we draw
   var availableSpace;
   if (AuxUnitLayout.isTorB(mainObj)) {
-    availableSpace = AuxUnitLayout.getParentNode(mainObj).outerWidth();
+    availableSpace = AuxUnitLayout.getParentNode(mainObj, cy).outerWidth();
     // due to corner of barrel shaped compartment decrease availableSpace -- no infobox on corners
-    if (AuxUnitLayout.getParentNode(mainObj).data("class") == "compartment")
+    if (AuxUnitLayout.getParentNode(mainObj, cy).data("class") == "compartment")
         availableSpace *= 0.8;
   }
   else {
-    availableSpace = AuxUnitLayout.getParentNode(mainObj).outerHeight();
+    availableSpace = AuxUnitLayout.getParentNode(mainObj, cy).outerHeight();
   }
 
   // there is always n+1 elements in the cachedLength for n units
@@ -789,8 +791,8 @@ AuxUnitLayout.setDisplayedUnits = function (mainObj) {
 };
 
 // TODO find a way to refactor, remove ugliness of top-bottom/left-right.
-AuxUnitLayout.precomputeCoords = function (mainObj, doForceUpdate) {
-  AuxUnitLayout.setDisplayedUnits(mainObj);
+AuxUnitLayout.precomputeCoords = function (mainObj, cy, doForceUpdate) {
+  AuxUnitLayout.setDisplayedUnits(mainObj, cy);
 
   var lengthUsed = AuxUnitLayout.getOuterMargin(mainObj);
   var finalLengthUsed = lengthUsed;
@@ -831,12 +833,12 @@ AuxUnitLayout.precomputeCoords = function (mainObj, doForceUpdate) {
   mainObj.lengthUsed = finalLengthUsed;
 };
 
-AuxUnitLayout.draw = function (mainObj, context) {
+AuxUnitLayout.draw = function (mainObj, cy, context) {
   for(var i=0; i < mainObj.units.length; i++) {
     var auxUnit = mainObj.units[i];
     if (auxUnit.isDisplayed) {
       // make each unit draw itself
-      getAuxUnitClass(auxUnit).draw(auxUnit, context);
+      getAuxUnitClass(auxUnit).draw(auxUnit, cy, context);
     }
   }
 };
@@ -876,8 +878,8 @@ AuxUnitLayout.selectNextAvailable = function(node) {
   return resultLocation;
 };
 
-AuxUnitLayout.resizeParent = function (mainObj, length) {
-  var parentNode = AuxUnitLayout.getParentNode(mainObj);
+AuxUnitLayout.resizeParent = function (mainObj, cy, length) {
+  var parentNode = AuxUnitLayout.getParentNode(mainObj, cy);
   if(AuxUnitLayout.isTorB(mainObj)) {
     if(parentNode.data('bbox').w < length) {
       cy.trigger("noderesize.resizestart", ["centerright", parentNode]);
@@ -902,8 +904,8 @@ AuxUnitLayout.isLorR = function (mainObj) {
   return mainObj.location == "left" || mainObj.location == "right";
 };
 
-AuxUnitLayout.setParentMinLength = function (mainObj) {
-  var parentNode = AuxUnitLayout.getParentNode(mainObj);
+AuxUnitLayout.setParentMinLength = function (mainObj, cy) {
+  var parentNode = AuxUnitLayout.getParentNode(mainObj, cy);
   var parentLayouts = parentNode.data('auxunitlayouts');
   switch(mainObj.location) {
     case "top":
@@ -966,7 +968,7 @@ AuxUnitLayout.getMaxUnitDisplayed = function (mainObj) {
 /*
  *  Duplicate a layout. Doesn't copy the units attribute, reset it instead.
  */
-AuxUnitLayout.copy = function(mainObj, newParent) {
+AuxUnitLayout.copy = function(mainObj, cy, newParent) {
   var newLayout = AuxUnitLayout.construct(newParent);
   // Copying the same reference to units would be inconsistent.
   // Duplicating owned units goes beyonnd the scope, because we need to assign

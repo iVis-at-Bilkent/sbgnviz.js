@@ -2,23 +2,13 @@
  * Text utilities for common usage
  */
 
-var optionUtilities = require('./option-utilities');
-var options = optionUtilities.getOptions();
-
 var textUtilities = {
   //TODO: use CSS's "text-overflow:ellipsis" style instead of function below?
   truncateText: function (textProp, font) {
     var context = document.createElement('canvas').getContext("2d");
     context.font = font;
-    
-    var fitLabelsToNodes = options.fitLabelsToNodes;
-    fitLabelsToNodes = typeof fitLabelsToNodes === 'function' ? fitLabelsToNodes.call() : fitLabelsToNodes;
-    
+
     var text = textProp.label || "";
-    //If fit labels to nodes is false do not truncate
-    if (fitLabelsToNodes == false) {
-      return text;
-    }
     var width;
     var len = text.length;
     var ellipsis = "..";
