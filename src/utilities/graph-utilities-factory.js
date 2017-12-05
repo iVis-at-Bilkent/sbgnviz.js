@@ -49,7 +49,7 @@ module.exports = function () {
     return graphUtilities.compoundSizesConsidered = true;
   };
 
-  graphUtilities.updateGraph = function(cyGraph) {
+  graphUtilities.updateGraph = function(cyGraph, callback) {
     console.log('cy update called');
 
     $(document).trigger( "updateGraphStart", cy );
@@ -102,6 +102,7 @@ module.exports = function () {
     }
 
     $(document).trigger( "updateGraphEnd", cy );
+    if (callback) callback();
   };
 
   graphUtilities.calculatePaddings = function(paddingPercent) {
