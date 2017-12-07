@@ -85,6 +85,9 @@ Register with libraries before creating instances
 `var instance = sbgnviz(options)`
 Creates an extension instance with the given options
 
+`instance.getCy(nodes)`
+Get the Cytoscape.js instance created for this Sbgnviz.js instance.
+
 `instance.expandNodes(nodes)`
 Expand given nodes. Requires expandCollapse extension and considers undoable option.
 
@@ -284,17 +287,17 @@ AuxUnitLayout.maxUnitDisplayed = 4;
 
 
 ## Events
-`$(document).on('sbgnvizLoadSampleStart', function(event, filename) { ... });` Triggered when a sample is being loaded. Aliases `sbgnvizLoadSample`.
+`$(document).on('sbgnvizLoadSampleStart', function(event, filename, cy) { ... });` Triggered when a sample is being loaded. Aliases `sbgnvizLoadSample`.
 
-`$(document).on('sbgnvizLoadFileStart', function(event, filename) { ... });` Triggered when an external sbgnml file is being loaded. Aliases `sbgnvizLoadFile`.
+`$(document).on('sbgnvizLoadFileStart', function(event, filename, cy) { ... });` Triggered when an external sbgnml file is being loaded. Aliases `sbgnvizLoadFile`.
 
-`$(document).on('sbgnvizLoadSampleEnd', function(event, filename) { ... });` Triggered when a sample is loaded
+`$(document).on('sbgnvizLoadSampleEnd', function(event, filename, cy) { ... });` Triggered when a sample is loaded
 
-`$(document).on('sbgnvizLoadFileEnd', function(event, filename) { ... });` Triggered when an external sbgnml file is loaded
+`$(document).on('sbgnvizLoadFileEnd', function(event, filename, cy) { ... });` Triggered when an external sbgnml file is loaded
 
-`$(document).on('updateGraphStart', function(event) { ... });` Triggered when the graph update is just started
+`$(document).on('updateGraphStart', function(event, cy) { ... });` Triggered when the graph update is just started
 
-`$(document).on('updateGraphEnd', function(event) { ... });` Triggered when the graph update is ended
+`$(document).on('updateGraphEnd', function(event, cy) { ... });` Triggered when the graph update is ended
 
 ## Dependencies
 
