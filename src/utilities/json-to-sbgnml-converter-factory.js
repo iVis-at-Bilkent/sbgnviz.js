@@ -265,31 +265,31 @@ module.exports = function () {
        });
     }
 
-    var newtExtString = "";
+    var sbgnvizExtString = "";
     var hasNewtExt = false;
 
     // add info for collapsed nodes
     if(node.data('collapsedChildren')) {
-       newtExtString += "<collapsed/>";
+       sbgnvizExtString += "<collapsed/>";
        hasNewtExt = true;
     }
 
     // add info for hidden nodes
     if(node.hidden()) {
-       newtExtString += "<hidden/>";
+       sbgnvizExtString += "<hidden/>";
        hasNewtExt = true;
     }
 
     // add info for nodes which has hidden neighbour
     if(node.data("thickBorder")) {
-       newtExtString += "<hasHiddenNeighbour/>";
+       sbgnvizExtString += "<hasHiddenNeighbour/>";
        hasNewtExt = true;
     }
 
     // add string to a new extension for this glyph
     if(hasNewtExt) {
        var extension = self.getOrCreateExtension(glyph);
-       extension.add("<newt>"+newtExtString+"</newt>");
+       extension.add("<sbgnviz>"+sbgnvizExtString+"</sbgnviz>");
     }
 
     // current glyph is done
@@ -375,7 +375,7 @@ module.exports = function () {
     // add info for hidden edges
     if(edge.hidden()) {
        var extension = self.getOrCreateExtension(arc);
-       extension.add("<newt><hidden/></newt>");
+       extension.add("<sbgnviz><hidden/></sbgnviz>");
     }
 
     return arc;

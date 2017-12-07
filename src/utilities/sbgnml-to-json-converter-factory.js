@@ -352,17 +352,17 @@ module.exports = function () {
       nodeObj = self.handleAnnotations(nodeObj, rdfElement);
     }
 
-    if (ele.extension && ele.extension.has("newt")){
-      parseString(ele.extension.get("newt"), function (err, result) {
-        if (result.newt.hidden){
+    if (ele.extension && ele.extension.has("sbgnviz")){
+      parseString(ele.extension.get("sbgnviz"), function (err, result) {
+        if (result.sbgnviz.hidden){
           styleObj.display = "none";
         }
-        if (result.newt.hasHiddenNeighbour){
+        if (result.sbgnviz.hasHiddenNeighbour){
           nodeObj.thickBorder = true;
         }
-        if (result.newt.collapsed){
-          nodeObj.positionBeforeSaving = {x : Number(result.newt.positionBeforeSaving[0].$.x),
-              y: Number(result.newt.positionBeforeSaving[0].$.y)};
+        if (result.sbgnviz.collapsed){
+          nodeObj.positionBeforeSaving = {x : Number(result.sbgnviz.positionBeforeSaving[0].$.x),
+              y: Number(result.sbgnviz.positionBeforeSaving[0].$.y)};
           nodeObj.collapse = true;
         }
       });
@@ -590,9 +590,9 @@ module.exports = function () {
       edgeObj = self.handleAnnotations(edgeObj, rdfElement);
     }
 
-    if (ele.extension && ele.extension.has("newt")){
-      parseString(ele.extension.get("newt"), function (err, result) {
-        if (result.newt.hidden){
+    if (ele.extension && ele.extension.has("sbgnviz")){
+      parseString(ele.extension.get("sbgnviz"), function (err, result) {
+        if (result.sbgnviz.hidden){
           styleObj.display = "none";
         }
       });
