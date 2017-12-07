@@ -7,6 +7,8 @@ module.exports = function () {
   var elementUtilities, graphUtilities;
 
   function sbgnmlToJson (param) {
+    optionUtilities = param.optionUtilities;
+    options = optionUtilities.getOptions();
     elementUtilities = param.elementUtilities;
     graphUtilities = param.graphUtilities;
   }
@@ -225,15 +227,15 @@ module.exports = function () {
   sbgnmlToJson.addParentInfoToNode = function (ele, nodeObj, parent, compartments) {
     var self = this;
     var compartmentRef = ele.compartmentRef;
+    
+    var assignDefaultParent = options.assignDefaultParent;
+    assignDefaultParent = typeof assignDefaultParent === 'function' ? assignDefaultParent.call() : assignDefaultParent;
 
     if (parent) {
       nodeObj.parent = parent;
-      return;
-    }
-
-    if (compartmentRef) {
+    } else if (compartmentRef) {
       nodeObj.parent = compartmentRef;
-    } else {
+    } else if(assignDefaultParent) {
       nodeObj.parent = '';
 
       // add compartment according to geometry

@@ -19,6 +19,10 @@ module.exports = function () {
     dynamicLabelSize: function () {
       return 'regular';
     },
+    // Whether to assign default parent to nodes 
+    assignDefaultParent: function () {
+      return false;
+    },
     // percentage used to calculate compound paddings
     compoundPadding: function () {
       return 10;
