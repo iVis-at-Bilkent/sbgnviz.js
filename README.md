@@ -85,7 +85,7 @@ Register with libraries before creating instances
 `var instance = sbgnviz(options)`
 Creates an extension instance with the given options
 
-`instance.getCy(nodes)`
+`instance.getCy()`
 Get the Cytoscape.js instance created for this Sbgnviz.js instance.
 
 `instance.expandNodes(nodes)`
