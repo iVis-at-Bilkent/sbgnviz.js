@@ -30,6 +30,10 @@ M. Sari, I. Bahceci, U. Dogrusoz, S.O. Sumer, B.A. Aksoy, O. Babur, E. Demir, "[
       dynamicLabelSize: function () {
         return 'regular';
       },
+      // Whether to assign default parent to nodes 
+      assignDefaultParent: function () {
+        return false;
+      },
       // percentage used to calculate compound paddings
       compoundPadding: function () {
         return 10;

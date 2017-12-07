@@ -49,9 +49,13 @@ module.exports = function () {
     return graphUtilities.compoundSizesConsidered = true;
   };
 
-  graphUtilities.updateGraph = function(cyGraph, callback) {
+  graphUtilities.updateGraph = function(cyGraph, callback, isLayoutRequired) {
     console.log('cy update called');
 
+    if(isLayoutRequired === undefined){
+      isLayoutRequired = false;
+    }
+    
     $(document).trigger( "updateGraphStart", cy );
     // Reset undo/redo stack and buttons when a new graph is loaded
     if (options.undoable) {
@@ -82,12 +86,21 @@ module.exports = function () {
     this.refreshPaddings(); // Recalculates/refreshes the compound paddings
     cy.endBatch();
 
-    var layout = cy.layout({
-      name: 'preset',
-      positions: positionMap,
-      fit: true,
-      padding: 50
-    });
+    if(!isLayoutRequired) {
+      var layout = cy.layout({
+        name: 'preset',
+        positions: positionMap,
+        fit: true,
+        padding: 50
+      });
+    }
+    else {
+      var layout = cy.layout({
+        name: 'cose-bilkent',
+        randomize: true,
+        animate: false
+      });
+    }
 
     // Check this for cytoscape.js backward compatibility
     if (layout && layout.run) {
