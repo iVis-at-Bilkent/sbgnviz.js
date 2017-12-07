@@ -271,6 +271,7 @@ module.exports = function () {
     // add info for collapsed nodes
     if(node.data('collapsedChildren')) {
        sbgnvizExtString += "<collapsed/>";
+       sbgnvizExtString += "<positionBeforeSaving x='" + node.position().x +"' y='" + node.position().y + "'/>";
        hasNewtExt = true;
     }
 

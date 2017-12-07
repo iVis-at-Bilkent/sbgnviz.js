@@ -111,8 +111,14 @@ module.exports = function () {
    setTimeout(function () {
      updateGraph(sbgnmlToJson.convert(xmlObject));
      // collapse nodes
-     if (cy.nodes("[collapse]").length > 0 ){
-       cy.expandCollapse('get').collapse(cy.nodes("[collapse]", {layoutBy: null}));
+     var nodesToCollapse = cy.nodes("[collapse]");
+     if (nodesToCollapse.length > 0 ){
+       cy.expandCollapse('get').collapse(nodesToCollapse, {layoutBy: null});
+
+       nodesToCollapse.forEach(function(ele, i, eles){
+         ele.position(ele.data("positionBeforeSaving"));
+       });
+       nodesToCollapse.removeData("positionBeforeSaving");
      }
      uiUtilities.endSpinner("load-spinner");
      $(document).trigger( "sbgnvizLoadSampleEnd", [ filename, cy ] ); // Trigger an event signaling that a sample is loaded
@@ -156,8 +162,14 @@ module.exports = function () {
 
        updateGraph(cyGraph);
        // collapse nodes
-       if (cy.nodes("[collapse]").length > 0 ){
-         cy.expandCollapse('get').collapse(cy.nodes("[collapse]"), {layoutBy: null});
+       var nodesToCollapse = cy.nodes("[collapse]");
+       if (nodesToCollapse.length > 0 ){
+         cy.expandCollapse('get').collapse(nodesToCollapse, {layoutBy: null});
+
+         nodesToCollapse.forEach(function(ele, i, eles){
+           ele.position(ele.data("positionBeforeSaving"));
+         });
+         nodesToCollapse.removeData("positionBeforeSaving");
        }
        uiUtilities.endSpinner("load-file-spinner");
        $(document).trigger( "sbgnvizLoadFileEnd", [ file.name, cy ] ); // Trigger an event signaling that a file is loaded
