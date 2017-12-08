@@ -228,14 +228,14 @@ module.exports = function () {
     var self = this;
     var compartmentRef = ele.compartmentRef;
     
-    var inferParentNodeOnLoad = options.inferParentNodeOnLoad;
-    inferParentNodeOnLoad = typeof inferParentNodeOnLoad === 'function' ? inferParentNodeOnLoad.call() : inferParentNodeOnLoad;
+    var inferNestingOnLoad = options.inferNestingOnLoad;
+    inferNestingOnLoad = typeof inferNestingOnLoad === 'function' ? inferNestingOnLoad.call() : inferNestingOnLoad;
 
     if (parent) {
       nodeObj.parent = parent;
     } else if (compartmentRef) {
       nodeObj.parent = compartmentRef;
-    } else if(inferParentNodeOnLoad) {
+    } else if(inferNestingOnLoad) {
       nodeObj.parent = '';
 
       // add compartment according to geometry

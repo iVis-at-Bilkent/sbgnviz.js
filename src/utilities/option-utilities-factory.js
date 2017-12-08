@@ -20,7 +20,7 @@ module.exports = function () {
       return 'regular';
     },
     // Whether to infer parent node on load 
-    inferParentNodeOnLoad: function () {
+    inferNestingOnLoad: function () {
       return false;
     },
     // percentage used to calculate compound paddings
