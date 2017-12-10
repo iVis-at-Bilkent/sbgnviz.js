@@ -4,6 +4,7 @@
  */
 
 var libUtilities = require('./lib-utilities');
+var tdToJson = require('./tab-delimeted-to-json-converter');
 var libs = libUtilities.getLibs();
 var jQuery = $ = libs.jQuery;
 
@@ -572,9 +573,14 @@ module.exports = function () {
    * Needs to be called after file is loaded - sbgnvizLoadFileEnd event
    * return: map properties as object
    */
-  mainUtilities.getMapProperties = function() {
-    return sbgnmlToJson.mapPropertiesToObj();
-   }
-
+mainUtilities.getMapProperties = function() {
+  if( sbgnmlToJson.map != undefined)
+   return sbgnmlToJson.mapPropertiesToObj();
+  else
+    {
+      elementUtilities.mapType = "AF";
+      return tdToJson.mapPropertiesToObj();
+    }
+ }
    return mainUtilities;
 };

@@ -3,6 +3,7 @@
 */
 
 var libUtilities = require('./lib-utilities');
+var tdToJson = require('./tab-delimeted-to-json-converter');
 var libs = libUtilities.getLibs();
 var jQuery = $ = libs.jQuery;
 var saveAs = libs.saveAs;
@@ -125,6 +126,59 @@ module.exports = function () {
    }, 0);
  };
 
+
+fileUtilities.loadTDFile = function(file, callback1){
+  console.log( "Starting load td file...");
+
+  var self = this;
+  uiUtilities.startSpinner("load-file-spinner");
+
+  var textType = /text.*/;
+
+  var reader = new FileReader();
+
+  reader.onload = function(e) {
+    //Get the text result of the file.
+    var text = this.result;
+
+    setTimeout( function() {
+    var graph;
+    try{
+      graph = tdToJson.convert(text);
+      $( document ).trigger( "sbgnvizLoadFile", [ file.name, cy ] ); // Aliases for sbgnvizLoadFileStart
+
+      $( document ).trigger( "sbgnvizLoadFileStart", [ file.name, cy ] ); 
+    } catch (err){
+      uiUtilities.endSpinner("load-file-spinner");
+      console.log( "Error found in parsing");
+      console.log(err);
+      return;
+    }
+    if( graph == false && typeof callback1 !== 'undefined') 
+    {  
+      uiUtilities.endSpinner("load-file-spinner");
+      callback1();
+      return;
+    }
+
+    updateGraph(graph);
+    // collapse nodes
+    var nodesToCollapse = cy.nodes("[collapse]");
+    if (nodesToCollapse.length > 0 ){
+     cy.expandCollapse('get').collapse(nodesToCollapse, {layoutBy: null});
+
+     nodesToCollapse.forEach(function(ele, i, eles){
+       ele.position(ele.data("positionBeforeSaving"));
+     });
+     nodesToCollapse.removeData("positionBeforeSaving");
+    }
+    uiUtilities.endSpinner("load-file-spinner");
+    $( document ).trigger( "sbgnvizLoadFileEnd", [ file.name, cy] ); // Trigger an event signaling that a file is loaded
+      //console.log( "Load file end done...");
+    }, 0);
+  };
+  reader.readAsText(file);
+};
  /*
    callback is a function remotely defined to add specific behavior that isn't implemented here.
    it is completely optional.
