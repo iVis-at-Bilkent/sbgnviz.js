@@ -3,7 +3,7 @@
 */
 
 var libUtilities = require('./lib-utilities');
-var tdToJson = require('./tab-delimeted-to-json-converter');
+var tdToJson = require('./tab-delimited-to-json-converter');
 var libs = libUtilities.getLibs();
 var jQuery = $ = libs.jQuery;
 var saveAs = libs.saveAs;
@@ -61,7 +61,7 @@ module.exports = function () {
  }
  // Helper functions End
 
- var sbgnmlToJson, jsonToSbgnml, uiUtilities, graphUtilities;
+ var sbgnmlToJson, jsonToSbgnml, uiUtilities, tdToJson, graphUtilities;
  var updateGraph;
  var options, cy;
 
@@ -69,6 +69,7 @@ module.exports = function () {
    sbgnmlToJson = param.sbgnmlToJsonConverter;
    jsonToSbgnml = param.jsonToSbgnmlConverter;
    uiUtilities = param.uiUtilities;
+   tdToJson = param.tdToJsonConverter;
    graphUtilities = param.graphUtilities;
    updateGraph = graphUtilities.updateGraph.bind(graphUtilities);
    options = param.optionUtilities.getOptions();
@@ -142,39 +143,34 @@ fileUtilities.loadTDFile = function(file, callback1){
     var text = this.result;
 
     setTimeout( function() {
-    var graph;
-    try{
-      graph = tdToJson.convert(text);
-      $( document ).trigger( "sbgnvizLoadFile", [ file.name, cy ] ); // Aliases for sbgnvizLoadFileStart
+      var graph;
+      try{
+        graph = tdToJson.convert(text);
+        $( document ).trigger( "sbgnvizLoadFile", [ file.name, cy ] ); // Aliases for sbgnvizLoadFileStart
 
-      $( document ).trigger( "sbgnvizLoadFileStart", [ file.name, cy ] ); 
-    } catch (err){
+        $( document ).trigger( "sbgnvizLoadFileStart", [ file.name, cy ] ); 
+      } catch (err){
+        uiUtilities.endSpinner("load-file-spinner");
+        console.log( "Error found in parsing");
+        console.log(err);
+        return;
+      }
+      if( !graph && typeof callback1 !== 'undefined') 
+      {  
+        uiUtilities.endSpinner("load-file-spinner");
+        callback1();
+        return;
+      }else if( !graph)
+      {
+        uiUtilities.endSpinner("load-file-spinner");
+        console.log( "Graph is not defined.");
+        return;
+      }
+
+      updateGraph(graph);
       uiUtilities.endSpinner("load-file-spinner");
-      console.log( "Error found in parsing");
-      console.log(err);
-      return;
-    }
-    if( graph == false && typeof callback1 !== 'undefined') 
-    {  
-      uiUtilities.endSpinner("load-file-spinner");
-      callback1();
-      return;
-    }
-
-    updateGraph(graph);
-    // collapse nodes
-    var nodesToCollapse = cy.nodes("[collapse]");
-    if (nodesToCollapse.length > 0 ){
-     cy.expandCollapse('get').collapse(nodesToCollapse, {layoutBy: null});
-
-     nodesToCollapse.forEach(function(ele, i, eles){
-       ele.position(ele.data("positionBeforeSaving"));
-     });
-     nodesToCollapse.removeData("positionBeforeSaving");
-    }
-    uiUtilities.endSpinner("load-file-spinner");
-    $( document ).trigger( "sbgnvizLoadFileEnd", [ file.name, cy] ); // Trigger an event signaling that a file is loaded
-      //console.log( "Load file end done...");
+      $( document ).trigger( "sbgnvizLoadFileEnd", [ file.name, cy] ); // Trigger an event signaling that a file is loaded
+        //console.log( "Load file end done...");
     }, 0);
   };
   reader.readAsText(file);

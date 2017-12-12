@@ -22,6 +22,7 @@
     // Other utilities
     var jsonToSbgnmlConverter = require('./utilities/json-to-sbgnml-converter-factory')();
     var sbgnmlToJsonConverter = require('./utilities/sbgnml-to-json-converter-factory')();
+    var tdToJsonConverter = require('./utilities/tab-delimited-to-json-converter-factory')();
     var classes = require('./utilities/classes');
 
     // Fill param object to use it utilities internally
@@ -36,6 +37,7 @@
     param.undoRedoActionFunctions = undoRedoActionFunctions;
     param.jsonToSbgnmlConverter = jsonToSbgnmlConverter;
     param.sbgnmlToJsonConverter = sbgnmlToJsonConverter;
+    param.tdToJsonConverter = tdToJsonConverter;
     param.classes = classes;
 
     // call constructors of objects with param
@@ -50,6 +52,7 @@
     undoRedoActionFunctions(param);
     jsonToSbgnmlConverter(param);
     sbgnmlToJsonConverter(param);
+    tdToJsonConverter(param);
 
     // set scratch pad for sbgnviz and init sbgnvizParams inside it
     sbgnCyInstance.getCy().scratch('_sbgnviz', {});

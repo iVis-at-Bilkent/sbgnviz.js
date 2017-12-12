@@ -734,6 +734,7 @@ module.exports = function () {
     var cytoscapeJsNodes = [];
     var cytoscapeJsEdges = [];
     var compartmentChildrenMap = {}; // Map compartments children temporarily
+    elementUtilities.fileFormat = 'sbgnml';
 
     var sbgn;
     try {

@@ -23,6 +23,7 @@ module.exports = function () {
 
   // initialize map type
   elementUtilities.mapType = undefined;
+  elementUtilities.fileFormat = undefined;
 
   //the list of the element classes handled by the tool
   elementUtilities.handledElements = {
