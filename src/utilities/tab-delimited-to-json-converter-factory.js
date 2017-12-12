@@ -7,12 +7,12 @@ module.exports = function() {
 	var elementUtilities;
 
 	function tdToJson(param) {
-    optionUtilities = param.optionUtilities;
-    options = optionUtilities.getOptions();
-    elementUtilities = param.elementUtilities;
-  	}
+		optionUtilities = param.optionUtilities;
+		options = optionUtilities.getOptions();
+		elementUtilities = param.elementUtilities;
+	}
 
-  	tdToJson.map = undefined;
+	tdToJson.map = undefined;
 
 	tdToJson.edgeTypes= { 
 		'positive influence': true, 
@@ -44,7 +44,7 @@ module.exports = function() {
 	tdToJson.validateNodeType = function( type){
 		var _type = type.replace('_', ' ').toLowerCase();
 		if( this.nodeTypes[_type] == true)
-	 		return true;
+			return true;
 		return false;
 	};
 
@@ -69,7 +69,6 @@ module.exports = function() {
 
 	tdToJson.convert = function( graphText){
 		elementUtilities.fileFormat = 'td';
-		console.log( elementUtilities.fileFormat);
 		if( graphText === undefined)
 		{
 			return { nodes: [], edges: []};
@@ -154,7 +153,6 @@ module.exports = function() {
 				var defaultHeight = undefined;
 				
 				if( elementUtilities.defaultProperties !== undefined){
-					console.log(newNode.data.class);
 					var defaultProperties = elementUtilities.defaultProperties[newNode.data.class];
 					defaultWidth = defaultProperties.width;
 					defaultHeight = defaultProperties.height;
@@ -201,7 +199,7 @@ module.exports = function() {
 			jsGraph.nodes = nodes;
 			jsGraph.edges = edges;
 			return jsGraph;
-	}
+		}
 	};
 
 	return tdToJson;

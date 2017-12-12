@@ -3,7 +3,6 @@
 */
 
 var libUtilities = require('./lib-utilities');
-var tdToJson = require('./tab-delimited-to-json-converter');
 var libs = libUtilities.getLibs();
 var jQuery = $ = libs.jQuery;
 var saveAs = libs.saveAs;

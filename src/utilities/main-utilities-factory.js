@@ -574,7 +574,6 @@ module.exports = function () {
    * return: map properties as object
    */
 mainUtilities.getMapProperties = function() {
-  console.log( elementUtilities.fileFormat);
   if( elementUtilities.fileFormat !== undefined){
     if( elementUtilities.fileFormat == 'sbgnml')
       return sbgnmlToJson.mapPropertiesToObj();
