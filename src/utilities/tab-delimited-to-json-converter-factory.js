@@ -24,47 +24,39 @@ module.exports = function() {
 	};
 
 	tdToJson.nodeTypes= {
-		'biological activity': true,
-		'macromolecule': true, 
-		'complex': true, 
-		'simple chemical': true, 
-		'unspecified entity': true, 
-		'nucleic acid feature': true,
-		'perturbing agent':true, 
-		'phenotype': true, 
-		'compartment': true, 
-		'submap': true, 
-		'tag': true, 
-		'and': true, 
-		'or': true, 
-		'not': true, 
-		'delay': true
+		'biological activity': 'BA plain',
+		'macromolecule': 'BA macromolecule', 
+		'complex': 'BA complex', 
+		'simple chemical': 'BA simple chemical', 
+		'unspecified entity': 'BA unspecified entity', 
+		'nucleic acid feature': 'BA nucleic acid feature',
+		'perturbing agent':'BA perturbing agent', 
+		'phenotype': 'phenotype', 
+		'compartment': 'compartment', 
+		'submap': 'submap', 
+		'tag': 'tag', 
+		'and': 'and', 
+		'or': 'or', 
+		'not': 'not', 
+		'delay': 'delay'
 	};
 
 	tdToJson.validateNodeType = function( type){
-		var _type = type.replace('_', ' ').toLowerCase();
-		if( this.nodeTypes[_type] == true)
-			return true;
-		return false;
+		var _type = type.replace(/_/g, ' ').toLowerCase();
+		return this.nodeTypes.hasOwnProperty(_type);
 	};
 
 	tdToJson.validateEdgeType = function( type){
-		var _type = type.replace('_', ' ').toLowerCase();
-		if( this.edgeTypes[_type] == true)
-			return true;
-		return false;
+		var _type = type.replace(/_/g, ' ').toLowerCase();
+		return this.edgeTypes.hasOwnProperty(_type);
 	};
 
 	tdToJson.convertTypeToClass = function( ele, type){
-		ele.data.class =  type.replace('_', ' ').toLowerCase();
+		ele.data.class =  this.nodeTypes[type.replace(/_/g, ' ').toLowerCase()];
 	};
 
 	tdToJson.mapPropertiesToObj = function(){
-		if( this.map.mapProperties){
-			var obj = {};
-			obj.mapProperties = this.map.mapProperties;
-			return obj;
-		}
+		return { mapProperties: this.map.mapProperties};
 	};
 
 	tdToJson.convert = function( graphText){
@@ -132,6 +124,7 @@ module.exports = function() {
 						id: nodeId,
 						label: nodeName,
 						statesandinfos: [],
+						ports: [],
 						bbox: {
 							x: parseFloat( posX),
 							y: parseFloat( posY)
