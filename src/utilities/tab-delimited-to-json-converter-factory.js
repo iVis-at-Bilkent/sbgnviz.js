@@ -51,8 +51,9 @@ module.exports = function() {
 		return this.edgeTypes.hasOwnProperty(_type);
 	};
 
-	tdToJson.convertTypeToClass = function( ele, type){
-		ele.data.class =  this.nodeTypes[type.replace(/_/g, ' ').toLowerCase()];
+	tdToJson.convertTypeToClass = function( ele, type, isNode){
+		var _type = type.replace(/_/g, ' ').toLowerCase();
+		ele.data.class = isNode ? this.nodeTypes[_type] : _type;
 	};
 
 	tdToJson.mapPropertiesToObj = function(){
@@ -133,7 +134,7 @@ module.exports = function() {
 				};
 
 				if( this.validateNodeType( nodeType))
-					this.convertTypeToClass( newNode, nodeType);
+					this.convertTypeToClass( newNode, nodeType, true);
 				else{
 					console.log( "Node type mismatched...");
 					return false;
