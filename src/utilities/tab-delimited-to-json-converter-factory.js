@@ -60,6 +60,24 @@ module.exports = function() {
 		return { mapProperties: this.map.mapProperties};
 	};
 
+	/**
+	 * Adds states and infobox information to given node
+	 * @param node : a node object
+	 */
+	tdToJson.addInfoBox = function(node){
+		var _class = node.data.class;
+		if (_class.startsWith("BA") && _class != "BA plain"){
+			var unitOfInformation = classes.UnitOfInformation.construct();
+			unitOfInformation.parent = node.data.id;
+			// file format does not contain bbox information, hence define them below
+			unitOfInformation.bbox = {x: 25, y: -50, w: 30, h: 12};
+			classes.UnitOfInformation.setAnchorSide(unitOfInformation);
+			node.data.statesandinfos = [unitOfInformation];
+		} else{
+			node.data.statesandinfos = [];
+		}
+	}
+
 	tdToJson.convert = function( graphText){
 		elementUtilities.fileFormat = 'td';
 		if( graphText === undefined)
@@ -124,7 +142,6 @@ module.exports = function() {
 					{
 						id: nodeId,
 						label: nodeName,
-						statesandinfos: [],
 						ports: [],
 						bbox: {
 							x: parseFloat( posX),
@@ -133,12 +150,14 @@ module.exports = function() {
 					}
 				};
 
-				if( this.validateNodeType( nodeType))
+				if( this.validateNodeType( nodeType)){
 					this.convertTypeToClass( newNode, nodeType, true);
-				else{
+					this.addInfoBox(newNode);
+				} else{
 					console.log( "Node type mismatched...");
 					return false;
 				}
+
 				if( parentID != '-1'){
 					newNode.data.parent = parentID;
 				}
