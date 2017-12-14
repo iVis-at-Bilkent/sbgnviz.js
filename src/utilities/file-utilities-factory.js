@@ -60,7 +60,7 @@ module.exports = function () {
  }
  // Helper functions End
 
- var sbgnmlToJson, jsonToSbgnml, uiUtilities, graphUtilities;
+ var sbgnmlToJson, jsonToSbgnml, uiUtilities, tdToJson, graphUtilities;
  var updateGraph;
  var options, cy;
 
@@ -68,6 +68,7 @@ module.exports = function () {
    sbgnmlToJson = param.sbgnmlToJsonConverter;
    jsonToSbgnml = param.jsonToSbgnmlConverter;
    uiUtilities = param.uiUtilities;
+   tdToJson = param.tdToJsonConverter;
    graphUtilities = param.graphUtilities;
    updateGraph = graphUtilities.updateGraph.bind(graphUtilities);
    options = param.optionUtilities.getOptions();
@@ -125,6 +126,54 @@ module.exports = function () {
    }, 0);
  };
 
+
+fileUtilities.loadTDFile = function(file, callback1){
+  console.log( "Starting load td file...");
+
+  var self = this;
+  uiUtilities.startSpinner("load-file-spinner");
+
+  var textType = /text.*/;
+
+  var reader = new FileReader();
+
+  reader.onload = function(e) {
+    //Get the text result of the file.
+    var text = this.result;
+
+    setTimeout( function() {
+      var graph;
+      try{
+        graph = tdToJson.convert(text);
+        $( document ).trigger( "sbgnvizLoadFile", [ file.name, cy ] ); // Aliases for sbgnvizLoadFileStart
+
+        $( document ).trigger( "sbgnvizLoadFileStart", [ file.name, cy ] ); 
+      } catch (err){
+        uiUtilities.endSpinner("load-file-spinner");
+        console.log( "Error found in parsing");
+        console.log(err);
+        return;
+      }
+      if( !graph && typeof callback1 !== 'undefined') 
+      {  
+        uiUtilities.endSpinner("load-file-spinner");
+        callback1();
+        return;
+      }else if( !graph)
+      {
+        uiUtilities.endSpinner("load-file-spinner");
+        console.log( "Graph is not defined.");
+        return;
+      }
+
+      updateGraph(graph);
+      uiUtilities.endSpinner("load-file-spinner");
+      $( document ).trigger( "sbgnvizLoadFileEnd", [ file.name, cy] ); // Trigger an event signaling that a file is loaded
+        //console.log( "Load file end done...");
+    }, 0);
+  };
+  reader.readAsText(file);
+};
  /*
    callback is a function remotely defined to add specific behavior that isn't implemented here.
    it is completely optional.

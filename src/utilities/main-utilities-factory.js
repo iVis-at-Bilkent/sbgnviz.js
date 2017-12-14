@@ -8,13 +8,14 @@ var libs = libUtilities.getLibs();
 var jQuery = $ = libs.jQuery;
 
 module.exports = function () {
-  var elementUtilities, jsonToSbgnml, sbgnmlToJson, optionUtilities, graphUtilities;
+  var elementUtilities, jsonToSbgnml, sbgnmlToJson, tdToJson, optionUtilities, graphUtilities;
   var cy, options;
 
   function mainUtilities (param) {
     elementUtilities = param.elementUtilities;
     jsonToSbgnml = param.jsonToSbgnmlConverter;
     sbgnmlToJson = param.sbgnmlToJsonConverter;
+    tdToJson = param.tdToJsonConverter;
     optionUtilities = param.optionUtilities;
     graphUtilities = param.graphUtilities;
     cy = param.sbgnCyInstance.getCy();
@@ -569,9 +570,20 @@ module.exports = function () {
    * Needs to be called after file is loaded - sbgnvizLoadFileEnd event
    * return: map properties as object
    */
-  mainUtilities.getMapProperties = function() {
-    return sbgnmlToJson.mapPropertiesToObj();
-   }
-
+mainUtilities.getMapProperties = function() {
+  if( elementUtilities.fileFormat !== undefined){
+    if( elementUtilities.fileFormat == 'sbgnml')
+      return sbgnmlToJson.mapPropertiesToObj();
+    else if( elementUtilities.fileFormat == 'td')
+      return tdToJson.mapPropertiesToObj();
+    else{
+      console.log( "File format mismatched!")
+      return
+    }
+  }else{
+    console.log( "File format is not defined!")
+    return;
+  }
+ }
    return mainUtilities;
 };
