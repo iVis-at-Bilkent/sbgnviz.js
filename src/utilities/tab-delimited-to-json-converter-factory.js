@@ -134,6 +134,8 @@ module.exports = function() {
 				var parentID = data[3];
 				var posX = ( data.length > 4) ? data[4] : "0"; //if posX not given
 				var posY = ( data.length > 5) ? data[5] : "0"; //if posY not given
+				var nodeWidth = ( data.length > 6) ? data[6] : undefined;
+				var nodeHeight = ( data.length > 7) ? data[7] : undefined;
 
 				//add parsed Node
 				var newNode = {
@@ -145,7 +147,9 @@ module.exports = function() {
 						ports: [],
 						bbox: {
 							x: parseFloat( posX),
-							y: parseFloat( posY)
+							y: parseFloat( posY),
+							w: nodeWidth,
+							h: nodeHeight
 						},
 					}
 				};
@@ -161,18 +165,6 @@ module.exports = function() {
 				if( parentID != '-1'){
 					newNode.data.parent = parentID;
 				}
-
-				var defaultWidth = undefined;
-				var defaultHeight = undefined;
-				
-				if( elementUtilities.defaultProperties !== undefined){
-					var defaultProperties = elementUtilities.defaultProperties[newNode.data.class];
-					defaultWidth = defaultProperties.width;
-					defaultHeight = defaultProperties.height;
-				}
-				
-				var nodeWidth = ( data.length > 6) ? data[6] : defaultWidth; //if width not given
-				var nodeHeight = ( data.length > 7)? data[7] : defaultHeight; //if height not given
 
 				nodes.push(newNode);
 
