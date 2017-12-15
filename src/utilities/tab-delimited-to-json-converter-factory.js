@@ -121,7 +121,10 @@ module.exports = function() {
 
 				//blank line indicates that nodes are finished
 				//so continue with edges
-				if( lines[i].length == 0 || lines[i] === ""){
+				if( lines[i].length === 0 || lines[i] === ""){
+					while( lines[i] === "" && i < lines.length){
+							i++;
+					}
 					edgesStartIndex = i + 2;
 					break;
 				}
