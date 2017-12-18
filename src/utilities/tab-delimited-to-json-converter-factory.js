@@ -99,7 +99,7 @@ module.exports = function() {
 
 			var formatVersion = lines[0];
 
-			if( formatVersion.length < 10 || formatVersion.substring(0,10) != "SBGNViz AF")
+			if( formatVersion.length < 10 || formatVersion.substring(0,10).toLowerCase() != 'sbgnviz af')
 			{
 				console.log( "Wrong file format!");
 				return false;
@@ -121,7 +121,10 @@ module.exports = function() {
 
 				//blank line indicates that nodes are finished
 				//so continue with edges
-				if( lines[i].length == 0 || lines[i] === ""){
+				if( lines[i].length === 0 || lines[i] === ""){
+					while( lines[i] === "" && i < lines.length){
+							i++;
+					}
 					edgesStartIndex = i + 2;
 					break;
 				}
@@ -129,6 +132,13 @@ module.exports = function() {
 				//Parse the node data
 				var data = lines[i].toString().split('\t'); //each data seperated by tab
 				var nodeName = data[0];
+
+				//If there is no blank line
+				if( nodeName.toString().toLowerCase() == '--edge_id'){
+					edgesStartIndex = i + 1;
+					break;
+				}
+
 				var nodeId = data[1];
 				var nodeType = data[2];
 				var parentID = data[3];
