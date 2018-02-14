@@ -493,6 +493,21 @@ module.exports = function () {
     cy.style().update();
   };
 
+  mainUtilities.zoomToSelected = function(eles){
+    if(eles.length === 0)
+      return;
+    var viewUtilities = cy.viewUtilities('get');
+
+    viewUtilities.zoomToSelected(eles);
+  }
+
+  //Marquee Zoom: zoom to specified area
+  mainUtilities.marqueeZoom = function(){
+    var viewUtilities = cy.viewUtilities('get');
+
+    viewUtilities.marqueeZoom();
+  }
+  
   // Performs layout by given layoutOptions. Considers 'undoable' option. However, by setting notUndoable parameter
   // to a truthy value you can force an undable layout operation independant of 'undoable' option.
   mainUtilities.performLayout = function(layoutOptions, notUndoable) {
