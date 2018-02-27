@@ -236,8 +236,9 @@ fileUtilities.loadTDFile = function(file, callback1){
 
  };
 
- fileUtilities.saveAsSbgnml = function(filename, renderInfo, mapProperties) {
-   var sbgnmlText = jsonToSbgnml.createSbgnml(filename, renderInfo, mapProperties);
+ // supported versions are either 0.2 or 0.3
+ fileUtilities.saveAsSbgnml = function(filename, version, renderInfo, mapProperties) {
+   var sbgnmlText = jsonToSbgnml.createSbgnml(filename, version, renderInfo, mapProperties);
    var blob = new Blob([sbgnmlText], {
      type: "text/plain;charset=utf-8;",
    });

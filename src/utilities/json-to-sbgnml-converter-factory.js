@@ -42,7 +42,13 @@ module.exports = function () {
     cy = param.sbgnCyInstance.getCy();
   }
 
-  jsonToSbgnml.createSbgnml = function(filename, renderInfo, mapProperties){
+  /*
+   version is either 0.2 or 0.3, 0.3 used as default if none provided.
+   Only difference right now is that <map> element doesn't have an id attribute in 0.2, and has on in 0.3.
+   Serious changes occur between the format version for submaps content. Those changes are not implemented yet.
+   TODO implement 0.3 changes when submap support is fully there.
+   */
+  jsonToSbgnml.createSbgnml = function(filename, version, renderInfo, mapProperties){
     var self = this;
     var mapID = textUtilities.getXMLValidId(filename);
     var hasExtension = false;
@@ -53,6 +59,17 @@ module.exports = function () {
     if (typeof renderInfo !== 'undefined') {
        hasExtension = true;
        hasRenderExtension = true;
+    }
+
+    if(typeof version === 'undefined') {
+      // default if not specified
+      version = "0.3";
+    }
+
+    // check version validity
+    if(version !== "0.2" && version !== "0.3") {
+      console.error("Invalid SBGN-ML version provided. Expected 0.2 or 0.3, got: " + version);
+      return "Error";
     }
 
     var mapLanguage;
@@ -69,8 +86,16 @@ module.exports = function () {
 
     //add headers
     xmlHeader = "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>\n";
-    var sbgn = new libsbgnjs.Sbgn({xmlns: 'http://sbgn.org/libsbgn/0.3'});
-    var map = new libsbgnjs.Map({language: mapLanguage, id: mapID});
+    var sbgn = new libsbgnjs.Sbgn({xmlns: 'http://sbgn.org/libsbgn/' + version});
+
+    var map;
+    if(version === "0.3") {
+      var map = new libsbgnjs.Map({language: mapLanguage, id: mapID});
+    }
+    else if(version === "0.2") {
+      var map = new libsbgnjs.Map({language: mapLanguage});
+    }
+
     if (hasExtension) { // extension is there
        var extension = new libsbgnjs.Extension();
        if (hasRenderExtension) {
@@ -112,7 +137,17 @@ module.exports = function () {
     });
 
     sbgn.addMap(map);
-    return prettyprint.xml(xmlHeader + sbgn.toXML());
+
+    /*
+      prettyprint puts a line break inside the root <sbgn> tag before the xmlns attribute.
+      This is perfecly valid, but Vanted doesn't like it and cannot load those files as is.
+      This line break is removed here to make Newt output directly compatible with Vanted. This issue will be reported
+      to the Vanted guys and hopefully fixed at some point. After that the following workaround can be removed.
+    */
+    xmlbody = prettyprint.xml(sbgn.toXML()).replace("<sbgn \n  xmlns=\"http://sbgn.org/libsbgn", "<sbgn xmlns=\"http://sbgn.org/libsbgn");
+
+    // return prettyprint.xml(xmlHeader + sbgn.toXML());
+    return xmlHeader + xmlbody;
   };
 
   // see createSbgnml for info on the structure of renderInfo
