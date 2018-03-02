@@ -82,6 +82,9 @@ edge.data('bendPointPositions');
 `sbgnviz.register(options)`
 Register with libraries before creating instances
 
+`sbgnviz.validMapProperties`
+A lookup object for valid map properties.
+
 `var instance = sbgnviz(options)`
 Creates an extension instance with the given options
 

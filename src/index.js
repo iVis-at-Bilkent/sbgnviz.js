@@ -94,6 +94,8 @@
     return api;
   };
 
+  sbgnviz.validMapProperties = require('./utilities/validMapProperties');
+
   sbgnviz.register = function (_libs) {
 
     var libs = {};
