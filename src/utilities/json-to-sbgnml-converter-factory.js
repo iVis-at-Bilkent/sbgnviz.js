@@ -125,7 +125,8 @@ module.exports = function () {
     });
     // add them to the map
     for(var i=0; i<glyphList.length; i++) {
-       glyphList[i].extension = null;
+       if (version === "plain")
+         glyphList[i].extension = null;
        map.addGlyph(glyphList[i]);
     }
     // get all arcs
@@ -135,7 +136,8 @@ module.exports = function () {
          ele = i;
        }
        var arc = self.getArcSbgnml(ele);
-       arc.extension = null;
+       if (version === "plain")
+         arc.extension = null;
        map.addArc(self.getArcSbgnml(ele));
     });
 
