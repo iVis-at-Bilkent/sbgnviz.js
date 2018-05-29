@@ -43,7 +43,7 @@ module.exports = function () {
   }
 
   /*
-   version is either 0.2 or 0.3, 0.3 used as default if none provided.
+   version is either 0.2 or 0.3 or plain, 0.3 used as default if none provided.
    Only difference right now is that <map> element doesn't have an id attribute in 0.2, and has on in 0.3.
    Serious changes occur between the format version for submaps content. Those changes are not implemented yet.
    TODO implement 0.3 changes when submap support is fully there.
@@ -67,8 +67,8 @@ module.exports = function () {
     }
 
     // check version validity
-    if(version !== "0.2" && version !== "0.3") {
-      console.error("Invalid SBGN-ML version provided. Expected 0.2 or 0.3, got: " + version);
+    if(version !== "0.2" && version !== "0.3" && "plain") {
+      console.error("Invalid SBGN-ML version provided. Expected 0.2, 0.3 or plain, got: " + version);
       return "Error";
     }
 
@@ -86,13 +86,13 @@ module.exports = function () {
 
     //add headers
     xmlHeader = "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>\n";
-    var sbgn = new libsbgnjs.Sbgn({xmlns: 'http://sbgn.org/libsbgn/' + version});
+    var sbgn = new libsbgnjs.Sbgn({xmlns: 'http://sbgn.org/libsbgn/' + (version === "plain") ? "0.2" : version});
 
     var map;
     if(version === "0.3") {
       var map = new libsbgnjs.Map({language: mapLanguage, id: mapID});
     }
-    else if(version === "0.2") {
+    else if(version === "0.2" || version === "plain") {
       var map = new libsbgnjs.Map({language: mapLanguage});
     }
 
@@ -125,6 +125,7 @@ module.exports = function () {
     });
     // add them to the map
     for(var i=0; i<glyphList.length; i++) {
+       glyphList[i].extension = null;
        map.addGlyph(glyphList[i]);
     }
     // get all arcs
@@ -133,6 +134,8 @@ module.exports = function () {
        if(typeof ele === "number") {
          ele = i;
        }
+       var arc = self.getArcSbgnml(ele);
+       arc.extension = null;
        map.addArc(self.getArcSbgnml(ele));
     });
 
