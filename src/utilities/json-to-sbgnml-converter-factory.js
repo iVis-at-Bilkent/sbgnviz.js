@@ -67,7 +67,7 @@ module.exports = function () {
     }
 
     // check version validity
-    if(version !== "0.2" && version !== "0.3" && "plain") {
+    if(version !== "0.2" && version !== "0.3" && version !== "plain") {
       console.error("Invalid SBGN-ML version provided. Expected 0.2, 0.3 or plain, got: " + version);
       return "Error";
     }
