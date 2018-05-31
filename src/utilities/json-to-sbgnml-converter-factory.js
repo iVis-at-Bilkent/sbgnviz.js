@@ -86,7 +86,8 @@ module.exports = function () {
 
     //add headers
     xmlHeader = "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>\n";
-    var sbgn = new libsbgnjs.Sbgn({xmlns: 'http://sbgn.org/libsbgn/' + (version === "plain") ? "0.2" : version});
+    var versionNo = (version === "plain") ? "0.2" : version;
+    var sbgn = new libsbgnjs.Sbgn({xmlns: 'http://sbgn.org/libsbgn/' + versionNo});
 
     var map;
     if(version === "0.3") {
