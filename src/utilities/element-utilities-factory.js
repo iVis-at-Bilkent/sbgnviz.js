@@ -715,12 +715,27 @@ module.exports = function () {
   */
   elementUtilities.setPortsOrdering = function( nodes, ordering, portDistance ) {
     /*
-    * Retursn if the given portId is porttarget of any of the given edges.
+    * Returns if the given portId is porttarget of any of the given edges.
     * These edges are expected to be the edges connected to the node associated with that port.
     */
     var isPortTargetOfAnyEdge = function(edges, portId) {
       for (var i = 0; i < edges.length; i++) {
         if (edges[i].data('porttarget') === portId) {
+          return true;
+        }
+      }
+
+      return false;
+    };
+
+
+    /*
+    * Returns if the given portId is portsource of any of the given edges.
+    * These edges are expected to be the edges connected to the node associated with that port.
+    */
+    var isPortSourceOfAnyEdge = function(edges, portId) {
+      for (var i = 0; i < edges.length; i++) {
+        if (edges[i].data('portsource') === portId) {
           return true;
         }
       }
@@ -755,7 +770,7 @@ module.exports = function () {
         var portsource, porttarget; // The ports which are portsource/porttarget of the connected edges
 
         // Determine the portsource and porttarget
-        if ( isPortTargetOfAnyEdge(connectedEdges, ports[0].id) ) {
+        if ( isPortTargetOfAnyEdge(connectedEdges, ports[0].id) || isPortSourceOfAnyEdge(connectedEdges, ports[1].id) ) {
           porttarget = ports[0];
           portsource = ports[1];
         }
