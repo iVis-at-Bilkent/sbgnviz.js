@@ -1138,8 +1138,8 @@ module.exports = function () {
     complex: function (context, centerX, centerY,
             width, height, cornerLength, cloneMarker, isMultimer, opacity) {
       if (cloneMarker != null) {
-        var cpX = cornerLength / width;
-        var cpY = cornerLength / height;
+        var cpX = (width >= 50) ? cornerLength / width : cornerLength / 50;
+        var cpY = (height >= 50) ? cornerLength / height : cornerLength / 50;
         var cloneWidth = width;
         var cloneHeight = height * cpY / 2;
         var cloneX = centerX;
