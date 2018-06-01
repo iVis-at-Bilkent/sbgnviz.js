@@ -1074,12 +1074,21 @@ module.exports = function () {
         var firstCircleCenterY = centerY;
         var secondCircleCenterX = centerX + width / 2 - cornerRadius;
         var secondCircleCenterY = centerY;
+        var bottomCircleCenterX = centerX;
+        var bottomCircleCenterY = centerY + height/2 - cornerRadius;
 
-        simpleChemicalLeftClone(context, firstCircleCenterX, firstCircleCenterY,
-                2 * cornerRadius, 2 * cornerRadius, cloneMarker, opacity);
-
-        simpleChemicalRightClone(context, secondCircleCenterX, secondCircleCenterY,
-                2 * cornerRadius, 2 * cornerRadius, cloneMarker, opacity);
+        if (width < height) {
+          simpleChemicalLeftClone(context, bottomCircleCenterX, bottomCircleCenterY,
+              2 * cornerRadius, 2 * cornerRadius, cloneMarker, opacity);
+          simpleChemicalRightClone(context, bottomCircleCenterX, bottomCircleCenterY,
+              2 * cornerRadius, 2 * cornerRadius, cloneMarker, opacity);
+        }
+        else {
+          simpleChemicalLeftClone(context, firstCircleCenterX, firstCircleCenterY,
+              2 * cornerRadius, 2 * cornerRadius, cloneMarker, opacity);
+          simpleChemicalRightClone(context, secondCircleCenterX, secondCircleCenterY,
+              2 * cornerRadius, 2 * cornerRadius, cloneMarker, opacity);
+        }
 
         var oldStyle = context.fillStyle;
         context.fillStyle = $$.sbgn.colors.clone;
