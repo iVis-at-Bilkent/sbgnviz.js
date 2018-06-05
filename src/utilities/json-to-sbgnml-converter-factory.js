@@ -328,12 +328,29 @@ module.exports = function () {
        hasNewtExt = true;
     }
 
+    // add info for background image
+    if(node._private.style['background-image']){
+        var img = node._private.style['background-image'];
+        var fit = node._private.style['background-fit'];
+        var opacity = node._private.style['background-image-opacity'];
+
+        sbgnvizExtString += "<backgroundImage img=\"" + img.strValue + "\" ";
+        if(fit){
+            sbgnvizExtString += " fit=\"" + fit.strValue + "\" ";
+        }
+        if(opacity){
+            sbgnvizExtString += " opacity=\"" + opacity.strValue + "\" ";
+        }
+        sbgnvizExtString += "/>";
+        hasNewtExt = true;
+    }
+
     // add string to a new extension for this glyph
     if(hasNewtExt) {
        var extension = self.getOrCreateExtension(glyph);
        extension.add("<sbgnviz>"+sbgnvizExtString+"</sbgnviz>");
     }
-
+    
     // current glyph is done
     glyphList.push(glyph);
 

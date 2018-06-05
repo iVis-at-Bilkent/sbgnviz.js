@@ -365,6 +365,13 @@ module.exports = function () {
               y: Number(result.sbgnviz.positionBeforeSaving[0].$.y)};
           nodeObj.collapse = true;
         }
+        if (result.sbgnviz.backgroundImage){
+          var bgImage = result.sbgnviz.backgroundImage[0].$;
+
+          styleObj['background-image'] = bgImage.img;
+          styleObj['background-fit'] = bgImage.fit;
+          styleObj['background-image-opacity'] = bgImage.opacity;
+        }
       });
     }
 
