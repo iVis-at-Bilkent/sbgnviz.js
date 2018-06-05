@@ -561,7 +561,10 @@ module.exports = function () {
 
     var edgeObj = {};
     var styleObj = {};
-    var bendPointPositions = self.getArcBendPointPositions(ele);
+    var bendPointPositions = [];
+    if (sourceAndTarget.source !== sourceAndTarget.target) {
+      bendPointPositions = self.getArcBendPointPositions(ele);
+    }
 
     edgeObj.id = ele.id || undefined;
     edgeObj.class = ele.class_;
