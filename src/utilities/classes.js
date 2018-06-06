@@ -344,12 +344,12 @@ StateVariable.create = function(parentNode, cy, value, variable, bbox, location,
 
   // link to layout
   position = StateVariable.addToParent(stateVar, cy, parentNode, location, position, index);
-
   return {
     index: StateVariable.getParent(stateVar, cy).data('statesandinfos').indexOf(stateVar),
     location: stateVar.anchorSide,
     position: position
   }
+
 };
 
 StateVariable.remove = function (mainObj, cy) {
@@ -639,10 +639,15 @@ AuxUnitLayout.setParentNodeRef = function(mainObj, parentNode) {
  * These options can be defined at the instance level. If it is found in an instance, then it
  * takes precedence. If not found, the following class' values are used.
  */
-AuxUnitLayout.outerMargin = 10;
+AuxUnitLayout.outerMargin = 5;
 AuxUnitLayout.unitGap = 5;
-AuxUnitLayout.alwaysShowAuxUnits = false;
+AuxUnitLayout.currentTopUnitGap = 5;
+AuxUnitLayout.currentBottomUnitGap = 5;
+AuxUnitLayout.currentLeftUnitGap = 5;
+AuxUnitLayout.currentRightUnitGap = 5;
+AuxUnitLayout.alwaysShowAuxUnits = true;
 AuxUnitLayout.maxUnitDisplayed = -1;
+AuxUnitLayout.lastPos = -1;
 
 AuxUnitLayout.update = function(mainObj, cy, doForceUpdate) {
   AuxUnitLayout.precomputeCoords(mainObj, cy, doForceUpdate);
@@ -659,14 +664,15 @@ AuxUnitLayout.addAuxUnit = function(mainObj, cy, unit, position) {
   }
 
   AuxUnitLayout.updateLengthCache(mainObj, cy);
-  AuxUnitLayout.update(mainObj, cy, true);
+  AuxUnitLayout.update(mainObj, cy, true);/*
   if (AuxUnitLayout.getAlwaysShowAuxUnits(mainObj)) {
     // set a minimum size according to both sides on the same orientation
     AuxUnitLayout.setParentMinLength(mainObj, cy);
     // need to resize the parent in case the space was too small
     AuxUnitLayout.resizeParent(mainObj, cy, mainObj.lengthUsed);
-  }
+  }*/
   //cy.style().update(); // <- was it really necessary ?
+  var parentNode = AuxUnitLayout.getParentNode(mainObj, cy);
   return position;
 };
 
@@ -674,11 +680,12 @@ AuxUnitLayout.removeAuxUnit = function(mainObj, cy, unit) {
   var index = mainObj.units.indexOf(unit);
   mainObj.units.splice(index, 1);
   AuxUnitLayout.updateLengthCache(mainObj, cy);
-  AuxUnitLayout.update(mainObj, cy, true);
+  AuxUnitLayout.update(mainObj, cy, true);/*
   if (AuxUnitLayout.getAlwaysShowAuxUnits(mainObj)) {
     // set a minimum size according to both sides on the same orientation
     AuxUnitLayout.setParentMinLength(mainObj, cy);
-  }
+  }*/
+  var parentNode = AuxUnitLayout.getParentNode(mainObj, cy);
   cy.style().update();
 };
 
@@ -764,6 +771,7 @@ AuxUnitLayout.getDrawableUnitAmount = function(mainObj) {
 
 AuxUnitLayout.setDisplayedUnits = function (mainObj, cy) {
   // get the length of the side on which we draw
+
   var availableSpace;
   if (AuxUnitLayout.isTorB(mainObj)) {
     availableSpace = AuxUnitLayout.getParentNode(mainObj, cy).outerWidth();
@@ -790,13 +798,197 @@ AuxUnitLayout.setDisplayedUnits = function (mainObj, cy) {
   }
 };
 
+
+AuxUnitLayout.getUsedWidth = function(node, tb){
+  var units = tb.units;
+  var totalWidth = 0;
+  for (var i = 0; i < units.length; i++) {
+    totalWidth += units[i].bbox.w;
+  }
+  return totalWidth;
+}
+
+AuxUnitLayout.getUsedHeight = function(node, tb){
+  var units = tb.units;
+  var totalHeight = 0;
+  for (var i = 0; i < units.length; i++) {
+    totalHeight += units[i].bbox.h;
+  }
+  return totalHeight;
+}
+
+AuxUnitLayout.getUsedLengthTB = function(node, tb){
+  var units = tb.units;
+  return AuxUnitLayout.getUsedWidth(node, tb) + (units.length +  1) * AuxUnitLayout.unitGap; //One gap for leftmost outer margin
+}
+
+AuxUnitLayout.getUsedLengthLR = function(node, tb){
+  var units = tb.units;
+  return AuxUnitLayout.getUsedHeight(node, tb) + (units.length +  1) * AuxUnitLayout.unitGap; //One gap for leftmost outer margin
+}
+
+AuxUnitLayout.fitUnits = function (node) {
+  var top = node.data('auxunitlayouts').top;
+  var bottom = node.data('auxunitlayouts').bottom;
+  var left = node.data('auxunitlayouts').left;
+  var right = node.data('auxunitlayouts').right;
+  //Get Parent node and find parent width
+  var parentWidth = node.data('bbox').w;
+  var parentHeight = node.data('bbox').h;
+
+  var usedLength;
+  var totalWidth;
+  var estimatedGap;
+  var units;
+  var addedShift;
+
+  if (top !== undefined) {
+    //If new unit adaed done reset unit gap
+    if(AuxUnitLayout.lastPos === "top"){
+      AuxUnitLayout.currentTopUnitGap = AuxUnitLayout.unitGap;
+      AuxUnitLayout.lastPos = -1;
+    }
+    //Find total top length
+    usedLength = AuxUnitLayout.getUsedLengthTB(node, top);
+    units = top.units;
+    //Compare the side lengths
+    if (parentWidth < usedLength) {
+      //If there is not enough space
+      //Estimate new margin & gap
+      totalWidth = AuxUnitLayout.getUsedWidth(node, top);
+      estimatedGap = (parentWidth - totalWidth) / (units.length + 1);
+      //Else scale by using available space, reducing margins and gaps.
+      //Check if new gap is enough to fit
+
+      units[0].bbox.x -= AuxUnitLayout.currentTopUnitGap - estimatedGap;
+
+      for (var i = 1; i < units.length; i++) { //Calculate new margins
+        units[i].bbox.x = units[i-1].bbox.x + units[i-1].bbox.w/2 + units[i].bbox.w/2 + estimatedGap;
+      }
+      AuxUnitLayout.currentTopUnitGap = estimatedGap;
+
+
+    }
+    else if(AuxUnitLayout.currentTopUnitGap < AuxUnitLayout.unitGap){
+      for (var i = 0; i < units.length; i++) { //Shift all units
+        units[i].bbox.x -= (AuxUnitLayout.currentTopUnitGap - AuxUnitLayout.unitGap) * (i+1);
+      }
+      AuxUnitLayout.currentTopUnitGap =  AuxUnitLayout.unitGap;
+    }
+  }
+
+  if (bottom !== undefined) {
+    //If new unit adaed done reset unit gap
+    if(AuxUnitLayout.lastPos === "bottom"){
+      AuxUnitLayout.currentBottomUnitGap = AuxUnitLayout.unitGap;
+      AuxUnitLayout.lastPos = -1;
+    }
+    //Find total currentBottomUnitGap length
+    usedLength = AuxUnitLayout.getUsedLengthTB(node, bottom);
+    units = bottom.units;
+    //Compare the side lengths
+    if (parentWidth < usedLength) {
+      //If there is not enough space
+      //Estimate new margin & gap
+      totalWidth = AuxUnitLayout.getUsedWidth(node, bottom);
+      estimatedGap = (parentWidth - totalWidth) / (units.length + 1);
+      //Else scale by using available space, reducing margins and gaps.
+      //Check if new gap is enough to fit
+
+      units[0].bbox.x -= AuxUnitLayout.currentBottomUnitGap - estimatedGap;
+
+      for (var i = 1; i < units.length; i++) { //Shift all units
+        units[i].bbox.x = units[i-1].bbox.x + units[i-1].bbox.w/2 + units[i].bbox.w/2 + estimatedGap;
+      }
+      AuxUnitLayout.currentBottomUnitGap = estimatedGap;
+
+
+    }
+    else if(AuxUnitLayout.currentBottomUnitGap < AuxUnitLayout.unitGap){
+      for (var i = 0; i < units.length; i++) { //Shift all units
+        units[i].bbox.x -= (AuxUnitLayout.currentBottomUnitGap - AuxUnitLayout.unitGap) * (i+1);
+      }
+      AuxUnitLayout.currentBottomUnitGap =  AuxUnitLayout.unitGap;
+    }
+  }
+
+  if (left !== undefined) {
+    //Find total left length
+    //If new unit adaed done reset unit gap
+    if(AuxUnitLayout.lastPos === "left"){
+      AuxUnitLayout.currentLeftUnitGap = AuxUnitLayout.unitGap;
+      AuxUnitLayout.lastPos = -1;
+    }
+    usedLength = AuxUnitLayout.getUsedLengthLR(node, left);
+    units = left.units;
+    //Compare the side lengths
+    if (parentHeight < usedLength) {
+      //If there is not enough space
+      //Estimate new margin & gap
+      totalHeight = AuxUnitLayout.getUsedHeight(node, left);
+      estimatedGap = (parentHeight - totalHeight) / (units.length + 1);
+      //Else scale by using available space, reducing margins and gaps.
+      //Check if new gap is enough to fit
+      units[0].bbox.y -= AuxUnitLayout.currentLeftUnitGap - estimatedGap;
+
+      for (var i = 1; i < units.length; i++) { //Shift all units
+        units[i].bbox.y = units[i-1].bbox.y + units[i-1].bbox.h/2 + units[i].bbox.h/2 + estimatedGap;
+      }
+      AuxUnitLayout.currentLeftUnitGap = estimatedGap;
+
+    }
+    else if(AuxUnitLayout.currentLeftUnitGap < AuxUnitLayout.unitGap){
+      for (var i = 0; i < units.length; i++) { //Shift all units
+        units[i].bbox.y -= (AuxUnitLayout.currentLeftUnitGap - AuxUnitLayout.unitGap) * (i+1);
+      }
+      AuxUnitLayout.currentLeftUnitGap =  AuxUnitLayout.unitGap;
+    }
+  }
+
+  if (right !== undefined) {
+    //Find total right length
+    usedLength = AuxUnitLayout.getUsedLengthLR(node, right);
+    units = right.units;
+    //If new unit adaed done reset unit gap
+    if(AuxUnitLayout.lastPos === "right"){
+      AuxUnitLayout.currentRightUnitGap = AuxUnitLayout.unitGap;
+      AuxUnitLayout.lastPos = -1;
+    }
+    //Compare the side lengths
+    if (parentHeight < usedLength) {
+      //If there is not enough space
+      //Estimate new margin & gap
+      totalHeight = AuxUnitLayout.getUsedHeight(node, right);
+      estimatedGap = (parentHeight - totalHeight) / (units.length + 1);
+      //Else scale by using available space, reducing margins and gaps.
+      //Check if new gap is enough to fit
+      units[0].bbox.y -= AuxUnitLayout.currentRightUnitGap - estimatedGap;
+
+      for (var i = 1; i < units.length; i++) { //Shift all units
+        units[i].bbox.y = units[i-1].bbox.y + units[i-1].bbox.h/2 + units[i].bbox.h/2 + estimatedGap;
+      }
+      AuxUnitLayout.currentRightUnitGap = estimatedGap;
+
+    }
+    else if(AuxUnitLayout.currentRightUnitGap < AuxUnitLayout.unitGap){
+      for (var i = 0; i < units.length; i++) { //Shift all units
+        units[i].bbox.y -= (AuxUnitLayout.currentRightUnitGap - AuxUnitLayout.unitGap) * (i+1);
+      }
+      AuxUnitLayout.currentRightUnitGap =  AuxUnitLayout.unitGap;
+    }
+  }
+};
+
+
+// Calculate total length used in a side
 // TODO find a way to refactor, remove ugliness of top-bottom/left-right.
 AuxUnitLayout.precomputeCoords = function (mainObj, cy, doForceUpdate) {
   AuxUnitLayout.setDisplayedUnits(mainObj, cy);
-
   var lengthUsed = AuxUnitLayout.getOuterMargin(mainObj);
   var finalLengthUsed = lengthUsed;
   var unitGap = AuxUnitLayout.getUnitGap(mainObj);
+  var parentNode = AuxUnitLayout.getParentNode(mainObj, cy);
+
   for(var i=0; i < mainObj.units.length; i++) {
     // change the coordinate system of the auxiliary unit according to the chosen layout
     var auxUnit = mainObj.units[i];
@@ -851,6 +1043,18 @@ AuxUnitLayout.unitCount = function(mainObj) {
   return mainObj.units.length;
 };
 
+AuxUnitLayout.unitLength = function(mainObj) {
+  var units = mainObj.units;
+  var rightMostPoint = 0;
+  for (var i = 0; i < units.length; i++) {
+    var box = units[i].bbox;
+    if (box.x + box.w / 2 > rightMostPoint){
+      rightMostPoint = box.x + box.w / 2;
+    }
+  }
+  return rightMostPoint;
+};
+
 /**
  * Auto choose the next layout. To add a new aux unit, for example.
  */
@@ -858,7 +1062,6 @@ AuxUnitLayout.selectNextAvailable = function(node) {
   var top = node.data('auxunitlayouts').top;
   var bottom = node.data('auxunitlayouts').bottom;
   var resultLocation = "top";
-
   // start by adding on top if free
   if(!top || AuxUnitLayout.isEmpty(top)) {
     resultLocation = "top";
@@ -868,13 +1071,14 @@ AuxUnitLayout.selectNextAvailable = function(node) {
   }
   else {
     // search for the side with the fewer units on it
-    if(AuxUnitLayout.unitCount(top) <= AuxUnitLayout.unitCount(bottom)) {
+    if(AuxUnitLayout.unitLength(top) <= AuxUnitLayout.unitLength(bottom)) {
       resultLocation = "top";
     }
     else {
       resultLocation = "bottom";
     }
   }
+  AuxUnitLayout.lastPos = resultLocation; //Set last used position
   return resultLocation;
 };
 
