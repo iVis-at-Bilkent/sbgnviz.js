@@ -357,7 +357,7 @@ module.exports = function () {
 
     cyBaseNodeShapes["simple chemical"] = {
       multimerPadding: 5,
-      draw: function (context, node) {
+      draw: function (context, node, imgObj) {
         var centerX = node._private.position.x;
         var centerY = node._private.position.y;
 
@@ -388,6 +388,13 @@ module.exports = function () {
                 width, height);
 
         context.stroke();
+
+        // draw background image
+        if(imgObj){
+          context.clip();
+          context.drawImage(imgObj.img, 0, 0, imgObj.imgW, imgObj.imgH, imgObj.x, imgObj.y, imgObj.w, imgObj.h );
+          context.restore();
+        }
 
         $$.sbgn.cloneMarker.simpleChemical(context, centerX, centerY,
                 width - padding, height - padding, cloneMarker, false,
@@ -460,7 +467,7 @@ module.exports = function () {
     cyBaseNodeShapes["macromolecule"] = {
       points: cyMath.generateUnitNgonPoints(4, 0),
       multimerPadding: 5,
-      draw: function (context, node) {
+      draw: function (context, node, imgObj) {
         var width = node.width();
         var height = node.height();
         var centerX = node._private.position.x;
@@ -494,6 +501,13 @@ module.exports = function () {
         context.fill();
 
         context.stroke();
+
+        // draw background image
+        if(imgObj){
+          context.clip();
+          context.drawImage(imgObj.img, 0, 0, imgObj.imgW, imgObj.imgH, imgObj.x, imgObj.y, imgObj.w, imgObj.h );
+          context.restore();
+        }
 
         $$.sbgn.cloneMarker.macromolecule(context, centerX, centerY,
                 width, height, cloneMarker, false,
@@ -569,7 +583,7 @@ module.exports = function () {
       points: [],
       multimerPadding: 5,
       cornerLength: 24,
-      draw: function (context, node) {
+      draw: function (context, node, imgObj) {
         var width = node.outerWidth() - parseFloat(node.css('border-width'));
         var height = node.outerHeight()- parseFloat(node.css('border-width'));
         var centerX = node._private.position.x;
@@ -579,7 +593,6 @@ module.exports = function () {
         var cornerLength = cyBaseNodeShapes["complex"].cornerLength;
         var multimerPadding = cyBaseNodeShapes["complex"].multimerPadding;
         var cloneMarker = node._private.data.clonemarker;
-
 
         cyBaseNodeShapes["complex"].points = $$.sbgn.generateComplexShapePoints(cornerLength,
                 width, height);
@@ -608,6 +621,13 @@ module.exports = function () {
         context.fill();
 
         context.stroke();
+        
+        // draw background image
+        if(imgObj){
+          context.clip();
+          context.drawImage(imgObj.img, 0, 0, imgObj.imgW, imgObj.imgH, imgObj.x, imgObj.y, imgObj.w, imgObj.h );
+          context.restore();
+        }
 
         $$.sbgn.cloneMarker.complex(context, centerX, centerY,
                 width, height, cornerLength, cloneMarker, false,
@@ -695,7 +715,7 @@ module.exports = function () {
     cyBaseNodeShapes["nucleic acid feature"] = {
       points: cyMath.generateUnitNgonPointsFitToSquare(4, 0),
       multimerPadding: 5,
-      draw: function (context, node) {
+      draw: function (context, node, imgObj) {
         var centerX = node._private.position.x;
         var centerY = node._private.position.y;
         ;
@@ -727,6 +747,13 @@ module.exports = function () {
                 centerY, cornerRadius);
 
         context.stroke();
+        
+        // draw background image
+        if(imgObj){
+          context.clip();
+          context.drawImage(imgObj.img, 0, 0, imgObj.imgW, imgObj.imgH, imgObj.x, imgObj.y, imgObj.w, imgObj.h );
+          context.restore();
+        }
 
         $$.sbgn.cloneMarker.nucleicAcidFeature(context, centerX, centerY,
                 width, height, cloneMarker, false,
@@ -797,7 +824,7 @@ module.exports = function () {
     };
     cyBaseNodeShapes["source and sink"] = {
       points: cyMath.generateUnitNgonPoints(4, 0),
-      draw: function (context, node) {
+      draw: function (context, node, imgObj) {
         var centerX = node._private.position.x;
         var centerY = node._private.position.y;
 
@@ -811,6 +838,13 @@ module.exports = function () {
                 width, height);
 
         context.stroke();
+        
+        // draw background image
+        if(imgObj){
+          context.clip();
+          context.drawImage(imgObj.img, 0, 0, imgObj.imgW, imgObj.imgH, imgObj.x, imgObj.y, imgObj.w, imgObj.h );
+          context.restore();
+        }
 
         context.beginPath();
         var scaleX = width * Math.sqrt(2) / 2, scaleY =  height * Math.sqrt(2) / 2;
@@ -828,7 +862,7 @@ module.exports = function () {
     };
     cyBaseNodeShapes["biological activity"] = {
       points: cyMath.generateUnitNgonPointsFitToSquare(4, 0),
-      draw: function (context, node) {
+      draw: function (context, node, imgObj) {
         var width = node.width();
         var height = node.height();
         var centerX = node._private.position.x;
@@ -842,6 +876,13 @@ module.exports = function () {
         context.fill();
 
         context.stroke();
+        
+        // draw background image
+        if(imgObj){
+          context.clip();
+          context.drawImage(imgObj.img, 0, 0, imgObj.imgW, imgObj.imgH, imgObj.x, imgObj.y, imgObj.w, imgObj.h );
+          context.restore();
+        }
 
         var oldStyle = context.fillStyle;
         $$.sbgn.forceOpacityToOne(node, context);
@@ -889,7 +930,7 @@ module.exports = function () {
 
       name: 'compartment',
       points: math.generateUnitNgonPointsFitToSquare( 4, 0 ),
-      draw: function( context, node){
+      draw: function( context, node, imgObj){
         var padding = parseInt(node.css('border-width'));
         var width = node.outerWidth() - padding;
         var height = node.outerHeight() - padding;
@@ -899,6 +940,13 @@ module.exports = function () {
         drawBarrelPath(context, centerX, centerY, width, height );
         context.fill();
         context.stroke();
+
+        // draw background image
+        if(imgObj){
+          context.clip();
+          context.drawImage(imgObj.img, 0, 0, imgObj.imgW, imgObj.imgH, imgObj.x, imgObj.y, imgObj.w, imgObj.h );
+          context.restore();
+        }
 
         var oldStyle = context.fillStyle;
         $$.sbgn.forceOpacityToOne(node, context);
@@ -1000,7 +1048,7 @@ module.exports = function () {
     };
     cyBaseNodeShapes["oldCompartment"] = {
       points: cyMath.generateUnitNgonPointsFitToSquare( 4, 0 ),
-      draw: function (context, node) {
+      draw: function (context, node, imgObj) {
         var padding = parseInt(node.css('border-width'));
         var width = node.outerWidth() - padding;
         var height = node.outerHeight() - padding;
@@ -1013,6 +1061,13 @@ module.exports = function () {
         context.fill();
 
         context.stroke();
+
+        // draw background image
+        if(imgObj){
+          context.clip();
+          context.drawImage(imgObj.img, 0, 0, imgObj.imgW, imgObj.imgH, imgObj.x, imgObj.y, imgObj.w, imgObj.h );
+          context.restore();
+        }
 
         var oldStyle = context.fillStyle;
         $$.sbgn.forceOpacityToOne(node, context);

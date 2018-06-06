@@ -279,7 +279,7 @@ fileUtilities.loadTDFile = function(file, callback1){
       var opt = {
         'background-image' : img,
         'background-fit' : 'contain',
-        'background-image-opacity' : '0.7px'
+        'background-image-opacity' : '1'
       };
       node.style(opt);
     }
