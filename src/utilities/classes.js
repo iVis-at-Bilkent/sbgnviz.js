@@ -828,6 +828,9 @@ AuxUnitLayout.getUsedLengthLR = function(node, tb){
 }
 
 AuxUnitLayout.fitUnits = function (node, location) {
+  if (node.data('auxunitlayouts') === undefined) {
+    return;
+  }
   if (location !== undefined) {
     AuxUnitLayout.lastPos = location;
   }
