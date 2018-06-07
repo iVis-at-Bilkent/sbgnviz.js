@@ -1330,6 +1330,89 @@ module.exports = function () {
     return margin;
   };
 
+  
+  // Set clone marker status of given nodes to the given status.
+  elementUtilities.setCloneMarkerStatus = function (node, status) {
+    if (status)
+        node.data('clonemarker', true);
+    else 
+        node.removeData('clonemarker');
+    
+    if(node.data('class') !== "unspecified entity" && node.data('class') !== "perturbing agent")
+        return;
+
+    var bgObj = {
+        'background-image': 'data:image/svg+xml;utf8,%3Csvg%20width%3D%22100%22%20height%3D%22100%22%20viewBox%3D%220%200%20100%20100%22%20style%3D%22fill%3Anone%3Bstroke%3Ablack%3Bstroke-width%3A0%3B%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20%3E%3Crect%20x%3D%220%22%20y%3D%220%22%20width%3D%22100%22%20height%3D%22100%22%20style%3D%22fill%3A%23a9a9a9%22/%3E%20%3C/svg%3E',
+        'background-position-x': '50%',
+        'background-position-y': '100%',
+        'background-width': '100%',
+        'background-height': '25%',
+        'background-fit': 'none',
+        'background-image-opacity': '0'
+    };
+    
+    var style = node._private.style;
+
+    var imgs = style['background-image'] ? style['background-image'].value : [];
+    var xPos = style['background-position-x'] ? style['background-position-x'].value : [];
+    var yPos = style['background-position-y'] ? style['background-position-y'].value : [];
+    var widths = style['background-width'] ? style['background-width'].value : []; 
+    var heights = style['background-height'] ? style['background-height'].value : [];
+    var fits = style['background-fit'] ? style['background-fit'].value : []; 
+    var opacities = style['background-image-opacity'] ? style['background-image-opacity'].value : []; 
+    
+    concatUnitToValues(xPos, "%");
+    concatUnitToValues(yPos, "%");
+    concatUnitToValues(heights, "%");
+    concatUnitToValues(widths, "%");
+
+    if(status){
+        var index = imgs.indexOf(bgObj['background-image']);
+        // Already exists; Make opacity non-zero
+        if( index > -1)
+            opacities[index] = node.css('background-opacity');
+        else{
+            imgs.push(bgObj['background-image']);
+            xPos.push(bgObj['background-position-x']);
+            yPos.push(bgObj['background-position-y']);
+            widths.push(bgObj['background-width']);
+            heights.push(bgObj['background-height']);
+            fits.push(bgObj['background-fit']);
+            opacities.push(node.css('background-opacity'));
+        }
+    }
+    else{
+        var index = imgs.indexOf(bgObj['background-image']);
+        // Already exists; Make opacity zero
+        if( index > -1)
+            opacities[index] = '0';
+    }
+
+    var newStyle = {
+        'background-image': imgs,
+        'background-position-x': xPos,
+        'background-position-y': yPos,
+        'background-width': widths,
+        'background-height': heights,
+        'background-fit': fits,
+        'background-image-opacity': opacities
+    }
+    
+    node.style(newStyle);
+
+    function concatUnitToValues(values, unit){
+        if(!values || values.length == 0)
+            return;
+        
+        for(var i = 0; i < values.length; i++){
+            if(values[i] && values[i] !== "" && values[i] !== "auto"){
+                var tmp = '' + values[i];
+                values[i] = tmp + unit;
+            }   
+        }
+    }
+  };
+
   // Section End
   // Stylesheet helpers
 

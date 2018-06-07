@@ -268,26 +268,5 @@ fileUtilities.loadTDFile = function(file, callback1){
      return sbgnmlToJson.convert(textToXmlObject(sbgnmlText));
  };
 
- fileUtilities.loadBackgroundImage = function(node, file) {
-
-  var reader = new FileReader();
-  reader.readAsDataURL(file);
-
-  reader.onload = function (e) {
-    var img = reader.result;
-    if(img){
-      var opt = {
-        'background-image' : img,
-        'background-fit' : 'contain',
-        'background-image-opacity' : '1'
-      };
-      node.style(opt);
-    }
-    else{
-      alert('Error: Image cannot be applied as background!');
-    }
-  };
- };
-
  return fileUtilities;
 };
