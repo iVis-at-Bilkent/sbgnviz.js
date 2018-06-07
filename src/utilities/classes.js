@@ -827,7 +827,10 @@ AuxUnitLayout.getUsedLengthLR = function(node, tb){
   return AuxUnitLayout.getUsedHeight(node, tb) + (units.length +  1) * AuxUnitLayout.unitGap; //One gap for leftmost outer margin
 }
 
-AuxUnitLayout.fitUnits = function (node) {
+AuxUnitLayout.fitUnits = function (node, location) {
+  if (location !== undefined) {
+    AuxUnitLayout.lastPos = location;
+  }
   var top = node.data('auxunitlayouts').top;
   var bottom = node.data('auxunitlayouts').bottom;
   var left = node.data('auxunitlayouts').left;
