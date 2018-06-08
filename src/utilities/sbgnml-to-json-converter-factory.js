@@ -368,13 +368,13 @@ module.exports = function () {
         if (result.sbgnviz.backgroundImage){
           var bgImage = result.sbgnviz.backgroundImage[0].$;
 
-          var img = bgImage.img ? bgImage.img.split() : [];
-          var fit = bgImage.fit ? bgImage.fit.split() : [];
-          var opacity = bgImage.opacity ? bgImage.opacity.split() : [];
-          var x = bgImage.x ? bgImage.x.split() : [];
-          var y = bgImage.y ? bgImage.y.split() : [];
-          var width = bgImage.width ? bgImage.width.split() : [];
-          var height = bgImage.height ? bgImage.height.split() : [];
+          var img = bgImage.img ? bgImage.img : "";
+          var fit = bgImage.fit ? bgImage.fit : "";
+          var opacity = bgImage.opacity ? bgImage.opacity : "";
+          var x = bgImage.x ? bgImage.x : "";
+          var y = bgImage.y ? bgImage.y : "";
+          var width = bgImage.width ? bgImage.width : "";
+          var height = bgImage.height ? bgImage.height : "";
 
           styleObj['background-image'] = img;
           styleObj['background-fit'] = fit;
@@ -385,13 +385,13 @@ module.exports = function () {
           styleObj['background-height'] = height;
 
           nodeObj['background-image'] = {
-            'background-image': img,
-            'background-fit': fit,
-            'background-image-opacity': opacity,
-            'background-position-x': x,
-            'background-position-y': y,
-            'background-width': width,
-            'background-height': height,
+            'background-image': img.split(" "),
+            'background-fit': fit.split(" "),
+            'background-image-opacity': opacity.split(" "),
+            'background-position-x': x.split(" "),
+            'background-position-y': y.split(" "),
+            'background-width': width.split(" "),
+            'background-height': height.split(" "),
           };
         }
       });

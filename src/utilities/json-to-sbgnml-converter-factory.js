@@ -329,7 +329,8 @@ module.exports = function () {
     }
 
     // add info for background image
-    if(node._private.style['background-image']){
+    var bgObj = node._private.style['background-image'];
+    if(bgObj && bgObj.value && bgObj.value.length > 0){
         var img = node._private.style['background-image'];
         var fit = node._private.style['background-fit'];
         var opacity = node._private.style['background-image-opacity'];
@@ -339,18 +340,59 @@ module.exports = function () {
         var height = node._private.style['background-height'];
 
         sbgnvizExtString += "<backgroundImage img=\"" + img.strValue + "\" ";
-        if(fit)
+        if(fit && fit.value.length > 0)
             sbgnvizExtString += " fit=\"" + fit.strValue + "\" ";
-        if(opacity)
+        if(opacity && opacity.value.length > 0)
             sbgnvizExtString += " opacity=\"" + opacity.strValue + "\" ";
-        if(x)
-            sbgnvizExtString += " x=\"" + x.strValue + "\" ";
-        if(y)
-            sbgnvizExtString += " y=\"" + y.strValue + "\" ";
-        if(width)
-            sbgnvizExtString += " width=\"" + width.strValue + "\" ";
-        if(heigth)
-            sbgnvizExtString += " height=\"" + height.strValue + "\" ";
+        if(x && x.value.length > 0){
+            var units = x.units;
+            var tmp = "";
+            for(var i = 0; i < units.length; i++){
+                if(units[i] && units[i] !== "")
+                    tmp += "" + x.value[i] + units[i] + " ";
+                else
+                    tmp += "" + x.value[i] + " ";
+                     
+            }
+            
+            sbgnvizExtString += " x=\"" + tmp + "\" ";
+        }
+        if(y && y.value.length > 0){
+            var units = y.units;
+            var tmp = "";
+            for(var i = 0; i < units.length; i++){
+                if(units[i] && units[i] !== "")
+                    tmp += "" + y.value[i] + units[i] + " ";
+                else
+                    tmp += "" + y.value[i] + " "; 
+            }
+            
+            sbgnvizExtString += " y=\"" + tmp + "\" ";
+        }
+        if(width && width.value.length > 0){
+            var units = width.units;
+            var tmp = "";
+            for(var i = 0; i < units.length; i++){
+                if(units[i] && units[i] !== "")
+                    tmp += "" + width.value[i] + units[i] + " ";
+                else
+                    tmp += "" + width.value[i] + " "; 
+            }
+            
+            sbgnvizExtString += " width=\"" + tmp + "\" ";
+        }
+        if(height && height.value.length > 0){
+            var units = height.units;
+            var tmp = "";
+            for(var i = 0; i < units.length; i++){
+                if(units[i] && units[i] !== "")
+                    tmp += "" + height.value[i] + units[i] + " ";
+                else
+                    tmp += "" + height.value[i] + " "; 
+            }
+
+            sbgnvizExtString += " height=\"" + tmp + "\" ";
+        }
         
         sbgnvizExtString += "/>";
         hasNewtExt = true;
