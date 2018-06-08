@@ -333,14 +333,25 @@ module.exports = function () {
         var img = node._private.style['background-image'];
         var fit = node._private.style['background-fit'];
         var opacity = node._private.style['background-image-opacity'];
+        var x = node._private.style['background-position-x'];
+        var y = node._private.style['background-position-y'];
+        var width = node._private.style['background-width'];
+        var height = node._private.style['background-height'];
 
         sbgnvizExtString += "<backgroundImage img=\"" + img.strValue + "\" ";
-        if(fit){
+        if(fit)
             sbgnvizExtString += " fit=\"" + fit.strValue + "\" ";
-        }
-        if(opacity){
+        if(opacity)
             sbgnvizExtString += " opacity=\"" + opacity.strValue + "\" ";
-        }
+        if(x)
+            sbgnvizExtString += " x=\"" + x.strValue + "\" ";
+        if(y)
+            sbgnvizExtString += " y=\"" + y.strValue + "\" ";
+        if(width)
+            sbgnvizExtString += " width=\"" + width.strValue + "\" ";
+        if(heigth)
+            sbgnvizExtString += " height=\"" + height.strValue + "\" ";
+        
         sbgnvizExtString += "/>";
         hasNewtExt = true;
     }

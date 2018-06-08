@@ -368,9 +368,31 @@ module.exports = function () {
         if (result.sbgnviz.backgroundImage){
           var bgImage = result.sbgnviz.backgroundImage[0].$;
 
-          styleObj['background-image'] = bgImage.img;
-          styleObj['background-fit'] = bgImage.fit;
-          styleObj['background-image-opacity'] = bgImage.opacity;
+          var img = bgImage.img ? bgImage.img.split() : [];
+          var fit = bgImage.fit ? bgImage.fit.split() : [];
+          var opacity = bgImage.opacity ? bgImage.opacity.split() : [];
+          var x = bgImage.x ? bgImage.x.split() : [];
+          var y = bgImage.y ? bgImage.y.split() : [];
+          var width = bgImage.width ? bgImage.width.split() : [];
+          var height = bgImage.height ? bgImage.height.split() : [];
+
+          styleObj['background-image'] = img;
+          styleObj['background-fit'] = fit;
+          styleObj['background-image-opacity'] = opacity;
+          styleObj['background-position-x'] = x;
+          styleObj['background-position-y'] = y;
+          styleObj['background-width'] = width;
+          styleObj['background-height'] = height;
+
+          nodeObj['background-image'] = {
+            'background-image': img,
+            'background-fit': fit,
+            'background-image-opacity': opacity,
+            'background-position-x': x,
+            'background-position-y': y,
+            'background-width': width,
+            'background-height': height,
+          };
         }
       });
     }

@@ -1399,6 +1399,7 @@ module.exports = function () {
     }
     
     node.style(newStyle);
+    node.data('background-image', newStyle);
 
     function concatUnitToValues(values, unit){
         if(!values || values.length == 0)
