@@ -48,6 +48,7 @@ AuxiliaryUnit.construct = function(parent) {
   obj.coordType = "relativeToCenter";
   obj.anchorSide = null;
   obj.isDisplayed = false;
+  obj.dashed = false;
 
   return obj;
 };
@@ -86,7 +87,7 @@ AuxiliaryUnit.copy = function (mainObj, cy, existingInstance, newParent, newId) 
   newUnit.coordType = mainObj.coordType;
   newUnit.anchorSide = mainObj.anchorSide;
   newUnit.isDisplayed = mainObj.isDisplayed;
-
+  newUnit.dashed = mainObj.dashed;
   return newUnit;
 };
 
@@ -94,7 +95,12 @@ AuxiliaryUnit.copy = function (mainObj, cy, existingInstance, newParent, newId) 
 AuxiliaryUnit.draw = function(mainObj, cy, context) {
   var unitClass = getAuxUnitClass(mainObj);
   var coords = unitClass.getAbsoluteCoord(mainObj, cy);
-
+  if (mainObj.dashed === true) {
+    context.setLineDash([2,2]);
+  }
+  else {
+    context.setLineDash([]);
+  }
   unitClass.drawShape(mainObj, cy, context, coords.x, coords.y);
   if (unitClass.hasText(mainObj, cy)) {
     unitClass.drawText(mainObj, cy, context, coords.x, coords.y);
@@ -187,6 +193,57 @@ AuxiliaryUnit.getAbsoluteCoord = function(mainObj, cy) {
   }
 };
 
+AuxiliaryUnit.convertToAbsoluteCoord = function(mainObj, relX, relY, cy) {
+  var parent = getAuxUnitClass(mainObj).getParent(mainObj, cy);
+  if(mainObj.coordType == "relativeToCenter") {
+    var absX = relX * (parent.outerWidth() - parent._private.data['border-width']) / 100 + parent._private.position.x;
+    var absY = relY  * (parent.outerHeight() - parent._private.data['border-width']) / 100 + parent._private.position.y;
+    return {x: absX, y: absY};
+  }
+  else if(mainObj.coordType == "relativeToSide") {
+    if (mainObj.anchorSide == "top" || mainObj.anchorSide == "bottom") {
+      var absX = parent._private.position.x - (parent.outerWidth() - parent._private.data['border-width']) / 2 + relX;
+      var absY = relY  * (parent.outerHeight() - parent._private.data['border-width']) / 100 + parent._private.position.y;
+    }
+    else {
+      var absY = parent._private.position.y - (parent.outerHeight() - parent._private.data['border-width']) / 2 + relY ;
+      var absX = relX * (parent.outerWidth() - parent._private.data['border-width']) / 100 + parent._private.position.x;
+    }
+
+  // due to corner of barrel shaped compartment shift absX to right
+  if (parent.data("class") == "compartment"){
+      absX += parent.outerWidth() * 0.1;
+  };
+    return {x: absX, y: absY};
+  }
+};
+
+AuxiliaryUnit.convertToRelativeCoord = function(mainObj, absX, absY, cy){
+  var parent = getAuxUnitClass(mainObj).getParent(mainObj, cy);
+  // due to corner of barrel shaped compartment shift absX to right
+
+  if(mainObj.coordType == "relativeToCenter") {
+    var relX = (absX - parent._private.position.x) * 100 / (parent.outerWidth() - parent._private.data['border-width']);
+    var relY = (absY - parent._private.position.y) * 100 / (parent.outerHeight() - parent._private.data['border-width']);
+    return {x: relX, y: relY};
+  }
+  else if(mainObj.coordType == "relativeToSide") {
+    if (parent.data("class") == "compartment"){
+        absX -= parent.outerWidth() * 0.1;
+    };
+    if (mainObj.anchorSide == "top" || mainObj.anchorSide == "bottom") {
+      var relX = absX - parent._private.position.x + (parent.outerWidth() - parent._private.data['border-width']) / 2;
+      var relY = (absY - parent._private.position.y) * 100 / (parent.outerHeight() - parent._private.data['border-width']);
+    }
+    else {
+      var relY = absY - parent._private.position.y + (parent.outerHeight() - parent._private.data['border-width']) / 2;
+      var relX = (absX - parent._private.position.x) * 100 / (parent.outerWidth() - parent._private.data['border-width']);
+    }
+
+    return {x: relX, y: relY};
+  }
+};
+
 AuxiliaryUnit.setAnchorSide = function(mainObj, parentBbox) {
   if(mainObj.coordType == "relativeToCenter") {
     var thisX = mainObj.bbox.x;
@@ -251,6 +308,7 @@ AuxiliaryUnit.addToParent = function (mainObj, cy, parentNode, location, positio
   if(!parentNode.data('auxunitlayouts')[location]) {
     parentNode.data('auxunitlayouts')[location] = AuxUnitLayout.construct(parentNode, location);
   }
+
   var layout = parentNode.data('auxunitlayouts')[location];
   mainObj.anchorSide = location;
   switch(location) {
@@ -841,7 +899,6 @@ AuxUnitLayout.fitUnits = function (node, location) {
   //Get Parent node and find parent width
   var parentWidth = node.data('bbox').w;
   var parentHeight = node.data('bbox').h;
-
   var usedLength;
   var totalWidth;
   var estimatedGap;
@@ -1041,6 +1098,54 @@ AuxUnitLayout.draw = function (mainObj, cy, context) {
   }
 };
 
+AuxUnitLayout.modifyUnits = function(parentNode, unit, oldLocation, cy){
+  var location = unit.anchorSide;
+  var posX = unit.bbox.x;
+  var posY = unit.bbox.y;
+  if (!parentNode.data('auxunitlayouts')[oldLocation]) {
+    parentNode.data('auxunitlayouts')[oldLocation] = AuxUnitLayout.construct(parentNode, oldLocation);
+  }
+  var oldAuxUnit = parentNode.data('auxunitlayouts')[oldLocation];
+  var deleteUnits = oldAuxUnit.units;
+
+  //Delete from old location
+  var deleteIndex;
+  for (var i = 0; i < deleteUnits.length; i++) {
+    if(deleteUnits[i] === unit) {
+      deleteIndex = i;
+      break;
+    }
+  }
+  deleteUnits.splice(deleteIndex, 1);
+  AuxUnitLayout.updateLengthCache(oldAuxUnit, cy);
+  AuxUnitLayout.update(oldAuxUnit, cy, true);
+  AuxUnitLayout.fitUnits(parentNode, oldLocation);
+  //If new is not constructed contruct interval
+  if (!parentNode.data('auxunitlayouts')[location]) {
+    parentNode.data('auxunitlayouts')[location] = AuxUnitLayout.construct(parentNode, location);
+  }
+  var insertAuxUnit = insertUnits = parentNode.data('auxunitlayouts')[location];
+  var insertUnits = insertAuxUnit.units;
+
+  var index = 0;
+  //Insert into new unit array
+  if (location === "top" || location === "bottom") {
+    while ( insertUnits[index] !== undefined && posX > insertUnits[index].bbox.x) {
+      index++;
+    }
+  }
+  else {
+    while ( insertUnits[index] !== undefined && posY > insertUnits[index].bbox.y) {
+      index++;
+    }
+  }
+  insertUnits.splice(index, 0, unit);
+
+  AuxUnitLayout.updateLengthCache(insertAuxUnit, cy);
+  AuxUnitLayout.update(insertAuxUnit, cy, true);
+  AuxUnitLayout.fitUnits(parentNode, location);
+};
+
 AuxUnitLayout.isEmpty = function(mainObj) {
   return mainObj.units.length == 0;
 };
@@ -1060,6 +1165,23 @@ AuxUnitLayout.unitLength = function(mainObj) {
   }
   return rightMostPoint;
 };
+
+//Get Unit Gaps
+AuxUnitLayout.getCurrentTopGap = function(){
+  return AuxUnitLayout.currentTopUnitGap;
+}
+
+AuxUnitLayout.getCurrentBottomGap = function(){
+  return AuxUnitLayout.currentBottomUnitGap;
+}
+
+AuxUnitLayout.getCurrentLeftGap = function(){
+  return AuxUnitLayout.currentLeftUnitGap;
+}
+
+AuxUnitLayout.getCurrentRightGap = function(){
+  return AuxUnitLayout.currentRightUnitGap;
+}
 
 /**
  * Auto choose the next layout. To add a new aux unit, for example.
