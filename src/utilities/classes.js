@@ -170,19 +170,27 @@ AuxiliaryUnit.drawText = function(mainObj, cy, context, centerX, centerY) {
 
 AuxiliaryUnit.getAbsoluteCoord = function(mainObj, cy) {
   var parent = getAuxUnitClass(mainObj).getParent(mainObj, cy);
+  var position = parent.position();
+  if (mainObj === undefined || parent === undefined || position === undefined) {
+    return;
+  }
+  var borderWidth = parent.data()["border-width"];
+  if ( borderWidth === undefined) {
+    return;
+  }
   if(mainObj.coordType == "relativeToCenter") {
-    var absX = mainObj.bbox.x * (parent.outerWidth() - parent._private.data['border-width']) / 100 + parent._private.position.x;
-    var absY = mainObj.bbox.y * (parent.outerHeight() - parent._private.data['border-width']) / 100 + parent._private.position.y;
+    var absX = mainObj.bbox.x * (parent.outerWidth() - borderWidth) / 100 + position.x;
+    var absY = mainObj.bbox.y * (parent.outerHeight() - borderWidth) / 100 + position.y;
     return {x: absX, y: absY};
   }
   else if(mainObj.coordType == "relativeToSide") {
     if (mainObj.anchorSide == "top" || mainObj.anchorSide == "bottom") {
-      var absX = parent._private.position.x - (parent.outerWidth() - parent._private.data['border-width']) / 2 + mainObj.bbox.x;
-      var absY = mainObj.bbox.y * (parent.outerHeight() - parent._private.data['border-width']) / 100 + parent._private.position.y;
+      var absX = position.x - (parent.outerWidth() - borderWidth) / 2 + mainObj.bbox.x;
+      var absY = mainObj.bbox.y * (parent.outerHeight() - borderWidth) / 100 + position.y;
     }
     else {
-      var absY = parent._private.position.y - (parent.outerHeight() - parent._private.data['border-width']) / 2 + mainObj.bbox.y;
-      var absX = mainObj.bbox.x * (parent.outerWidth() - parent._private.data['border-width']) / 100 + parent._private.position.x;
+      var absY = position.y - (parent.outerHeight() - borderWidth) / 2 + mainObj.bbox.y;
+      var absX = mainObj.bbox.x * (parent.outerWidth() - borderWidth) / 100 + position.x;
     }
 
   // due to corner of barrel shaped compartment shift absX to right
