@@ -220,7 +220,32 @@ module.exports = function () {
 	        }
 	        // ensure that each layout has statesandinfos in correct order according to their initial positions
 	        for(var location in node.data('auxunitlayouts')) {
-	          classes.AuxUnitLayout.reorderFromPositions(node.data('auxunitlayouts')[location], cy);
+						var unit = node.data('auxunitlayouts')[location];
+	          classes.AuxUnitLayout.reorderFromPositions(unit, cy);
+						var units = unit.units;
+						var coordsFirst = classes.AuxiliaryUnit.getAbsoluteCoord(units[0], cy);
+						var coordsLast = classes.AuxiliaryUnit.getAbsoluteCoord(units[units.length-1], cy);
+						var gap = classes.AuxUnitLayout.unitGap;
+						if (units.length > 0) { //For any case of removal
+							if (location === "top" || location === "bottom") {
+								var parentX1 = node.position().x - node.data("bbox").w/2;
+								var parentX2 = node.position().x + node.data("bbox").w/2;
+								var firstX1 = coordsFirst.x - units[0].bbox.w/2;
+								var lastX2 = coordsLast.x + units[units.length-1].bbox.w/2;
+								if (parentX1 + gap > firstX1 || parentX2 - gap < lastX2) {
+										classes.AuxUnitLayout.fitUnits(node, location);
+								}
+							}
+							else {
+								var parentY1 = node.position().y - node.data("bbox").w/2;
+								var parentY2 = node.position().y + node.data("bbox").w/2 ;
+								var firstY1 = coordsFirst.y - units[0].bbox.h/2;
+								var lastY2 = coordsLast.y + units[units.length-1].bbox.h/2;
+								if (parentY1 + gap > firstY1 || parentY2 - gap < lastY2) {
+										classes.AuxUnitLayout.fitUnits(node, location);
+								}
+							}
+						}
 	        }
 	      });
 	      cy.endBatch();
