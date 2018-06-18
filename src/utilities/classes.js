@@ -226,13 +226,21 @@ AuxiliaryUnit.convertToAbsoluteCoord = function(mainObj, relX, relY, cy) {
   }
 };
 
-AuxiliaryUnit.convertToRelativeCoord = function(mainObj, absX, absY, cy){
-  var parent = getAuxUnitClass(mainObj).getParent(mainObj, cy);
-  // due to corner of barrel shaped compartment shift absX to right
-
+AuxiliaryUnit.convertToRelativeCoord = function(mainObj, absX, absY, cy, parentNode){
+  if (mainObj === undefined) {
+    return;
+  }
+  if (parentNode !== undefined) {
+    var parent = parentNode;
+  }
+  else {
+    var parent = getAuxUnitClass(mainObj).getParent(mainObj, cy);
+  }
+  var position = parent.position();
+  var borderWidth = parent.data()['border-width'];
   if(mainObj.coordType == "relativeToCenter") {
-    var relX = (absX - parent._private.position.x) * 100 / (parent.outerWidth() - parent._private.data['border-width']);
-    var relY = (absY - parent._private.position.y) * 100 / (parent.outerHeight() - parent._private.data['border-width']);
+    var relX = (absX - position.x) * 100 / (parent.outerWidth() - borderWidth);
+    var relY = (absY - position.y) * 100 / (parent.outerHeight() - borderWidth);
     return {x: relX, y: relY};
   }
   else if(mainObj.coordType == "relativeToSide") {
@@ -240,12 +248,12 @@ AuxiliaryUnit.convertToRelativeCoord = function(mainObj, absX, absY, cy){
         absX -= parent.outerWidth() * 0.1;
     };
     if (mainObj.anchorSide == "top" || mainObj.anchorSide == "bottom") {
-      var relX = absX - parent._private.position.x + (parent.outerWidth() - parent._private.data['border-width']) / 2;
-      var relY = (absY - parent._private.position.y) * 100 / (parent.outerHeight() - parent._private.data['border-width']);
+      var relX = absX - position.x + (parent.outerWidth() - borderWidth) / 2;
+      var relY = (absY - position.y) * 100 / (parent.outerHeight() - borderWidth);
     }
     else {
-      var relY = absY - parent._private.position.y + (parent.outerHeight() - parent._private.data['border-width']) / 2;
-      var relX = (absX - parent._private.position.x) * 100 / (parent.outerWidth() - parent._private.data['border-width']);
+      var relY = absY - position.y + (parent.outerHeight() - borderWidth) / 2;
+      var relX = (absX - position.x) * 100 / (parent.outerWidth() - borderWidth);
     }
 
     return {x: relX, y: relY};
@@ -893,160 +901,88 @@ AuxUnitLayout.getUsedLengthLR = function(node, tb){
   return AuxUnitLayout.getUsedHeight(node, tb) + (units.length +  1) * AuxUnitLayout.unitGap; //One gap for leftmost outer margin
 }
 
-AuxUnitLayout.fitUnits = function (node, location) {
+AuxUnitLayout.setCurrentGap = function (location, value){
+  if (location === "top") {
+    AuxUnitLayout.currentTopUnitGap = value;
+  }
+  else if (location === "bottom") {
+    AuxUnitLayout.currentBottomUnitGap = value;
+  }
+  else if (location === "right") {
+    AuxUnitLayout.currentRightUnitGap = value;
+  }
+  else {
+    AuxUnitLayout.currentLeftUnitGap = value;
+  }
+};
+
+AuxUnitLayout.fitUnits = function (node) {
   if (node.data('auxunitlayouts') === undefined) {
     return;
   }
-  if (location !== undefined) {
-    AuxUnitLayout.lastPos = location;
+  if ((node.data("class") === "compartment" || node.data("class") === "complex")
+    && node._private.children !== undefined && node._private.children.length !== 0) {
+    var parentWidth =  node._private.autoWidth;
+    var parentHeight =  node._private.autoHeight;
+    var padding = node._private.autoPadding;
   }
-  var top = node.data('auxunitlayouts').top;
-  var bottom = node.data('auxunitlayouts').bottom;
-  var left = node.data('auxunitlayouts').left;
-  var right = node.data('auxunitlayouts').right;
+  else {
+    var parentWidth = node.data("bbox").w;
+    var parentHeight = node.data("bbox").h;
+    var padding = 0;
+  }
+  var position = node.position();
+  var parentX1 = position.x - parentWidth/2;
+  var parentX2 = position.x + parentWidth/2;
+  var parentY1 = position.y - parentHeight/2;
+  var parentY2 = position.y + parentHeight/2;
   //Get Parent node and find parent width
-  var parentWidth = node.data('bbox').w;
-  var parentHeight = node.data('bbox').h;
   var usedLength;
   var totalWidth;
   var estimatedGap;
   var units;
-  var addedShift;
-
-  if (top !== undefined) {
-    //If new unit adaed done reset unit gap
-    if(AuxUnitLayout.lastPos === "top"){
-      AuxUnitLayout.currentTopUnitGap = AuxUnitLayout.unitGap;
-      AuxUnitLayout.lastPos = -1;
+  var locations = ["top", "bottom", "left", "right"];
+  for (var index = 0; index < locations.length; index++) {
+    var location = locations[index];
+    var auxUnit = node.data('auxunitlayouts')[location];
+    if (auxUnit === undefined) {
+      continue;
     }
-    //Find total top length
-    usedLength = AuxUnitLayout.getUsedLengthTB(node, top);
-    units = top.units;
-    //Compare the side lengths
-    if (parentWidth < usedLength) {
-      //If there is not enough space
-      //Estimate new margin & gap
-      totalWidth = AuxUnitLayout.getUsedWidth(node, top);
+    if ( location === "top" || location === "bottom") {
+      usedLength = AuxUnitLayout.getUsedLengthTB(node, auxUnit);
+      units = auxUnit.units;
+      var firstPosition = AuxiliaryUnit.convertToRelativeCoord(units[0], parentX1, parentY1, undefined, node);//Position of the first unit
+      totalWidth = AuxUnitLayout.getUsedWidth(node, auxUnit);
       estimatedGap = (parentWidth - totalWidth) / (units.length + 1);
-      //Else scale by using available space, reducing margins and gaps.
-      //Check if new gap is enough to fit
-
-      units[0].bbox.x -= AuxUnitLayout.currentTopUnitGap - estimatedGap;
-
+      if (estimatedGap > AuxUnitLayout.unitGap) {
+        estimatedGap = AuxUnitLayout.unitGap;
+      }
+      units[0].bbox.x = firstPosition.x + estimatedGap + units[0].bbox.w/2;
       for (var i = 1; i < units.length; i++) { //Calculate new margins
-        units[i].bbox.x = units[i-1].bbox.x + units[i-1].bbox.w/2 + units[i].bbox.w/2 + estimatedGap;
+        units[i].bbox.x = units[i-1].bbox.x + units[i-1].bbox.w/2 + estimatedGap + units[i].bbox.w/2;
       }
-      AuxUnitLayout.currentTopUnitGap = estimatedGap;
-
-
+      AuxUnitLayout.setCurrentGap(location, estimatedGap);
     }
-    else if(AuxUnitLayout.currentTopUnitGap < AuxUnitLayout.unitGap){
-      for (var i = 0; i < units.length; i++) { //Shift all units
-        units[i].bbox.x -= (AuxUnitLayout.currentTopUnitGap - AuxUnitLayout.unitGap) * (i+1);
-      }
-      AuxUnitLayout.currentTopUnitGap =  AuxUnitLayout.unitGap;
-    }
-  }
-
-  if (bottom !== undefined) {
-    //If new unit adaed done reset unit gap
-    if(AuxUnitLayout.lastPos === "bottom"){
-      AuxUnitLayout.currentBottomUnitGap = AuxUnitLayout.unitGap;
-      AuxUnitLayout.lastPos = -1;
-    }
-    //Find total currentBottomUnitGap length
-    usedLength = AuxUnitLayout.getUsedLengthTB(node, bottom);
-    units = bottom.units;
-    //Compare the side lengths
-    if (parentWidth < usedLength) {
-      //If there is not enough space
-      //Estimate new margin & gap
-      totalWidth = AuxUnitLayout.getUsedWidth(node, bottom);
-      estimatedGap = (parentWidth - totalWidth) / (units.length + 1);
-      //Else scale by using available space, reducing margins and gaps.
-      //Check if new gap is enough to fit
-
-      units[0].bbox.x -= AuxUnitLayout.currentBottomUnitGap - estimatedGap;
-
-      for (var i = 1; i < units.length; i++) { //Shift all units
-        units[i].bbox.x = units[i-1].bbox.x + units[i-1].bbox.w/2 + units[i].bbox.w/2 + estimatedGap;
-      }
-      AuxUnitLayout.currentBottomUnitGap = estimatedGap;
-
-
-    }
-    else if(AuxUnitLayout.currentBottomUnitGap < AuxUnitLayout.unitGap){
-      for (var i = 0; i < units.length; i++) { //Shift all units
-        units[i].bbox.x -= (AuxUnitLayout.currentBottomUnitGap - AuxUnitLayout.unitGap) * (i+1);
-      }
-      AuxUnitLayout.currentBottomUnitGap =  AuxUnitLayout.unitGap;
-    }
-  }
-
-  if (left !== undefined) {
-    //Find total left length
-    //If new unit adaed done reset unit gap
-    if(AuxUnitLayout.lastPos === "left"){
-      AuxUnitLayout.currentLeftUnitGap = AuxUnitLayout.unitGap;
-      AuxUnitLayout.lastPos = -1;
-    }
-    usedLength = AuxUnitLayout.getUsedLengthLR(node, left);
-    units = left.units;
-    //Compare the side lengths
-    if (parentHeight < usedLength) {
-      //If there is not enough space
-      //Estimate new margin & gap
-      totalHeight = AuxUnitLayout.getUsedHeight(node, left);
+    else {
+      //Find total left length
+      usedLength = AuxUnitLayout.getUsedLengthLR(node, auxUnit);
+      units = auxUnit.units;
+      var firstPosition = AuxiliaryUnit.convertToRelativeCoord(units[0], parentX1, parentY1, undefined, node);//Position of the first unit
+      //Compare the side lengths
+      totalHeight = AuxUnitLayout.getUsedHeight(node, auxUnit);
       estimatedGap = (parentHeight - totalHeight) / (units.length + 1);
+      if (estimatedGap > AuxUnitLayout.unitGap) {
+        estimatedGap = AuxUnitLayout.unitGap;
+      }
       //Else scale by using available space, reducing margins and gaps.
       //Check if new gap is enough to fit
-      units[0].bbox.y -= AuxUnitLayout.currentLeftUnitGap - estimatedGap;
-
-      for (var i = 1; i < units.length; i++) { //Shift all units
-        units[i].bbox.y = units[i-1].bbox.y + units[i-1].bbox.h/2 + units[i].bbox.h/2 + estimatedGap;
+      units[0].bbox.y = firstPosition.y + estimatedGap + units[0].bbox.h/2;
+      for (var i = 1; i < units.length; i++) { //Calculate new margins
+        units[i].bbox.y = units[i-1].bbox.y + units[i-1].bbox.h/2 + estimatedGap + units[i].bbox.h/2;
       }
       AuxUnitLayout.currentLeftUnitGap = estimatedGap;
-
     }
-    else if(AuxUnitLayout.currentLeftUnitGap < AuxUnitLayout.unitGap){
-      for (var i = 0; i < units.length; i++) { //Shift all units
-        units[i].bbox.y -= (AuxUnitLayout.currentLeftUnitGap - AuxUnitLayout.unitGap) * (i+1);
-      }
-      AuxUnitLayout.currentLeftUnitGap =  AuxUnitLayout.unitGap;
-    }
-  }
-
-  if (right !== undefined) {
-    //Find total right length
-    usedLength = AuxUnitLayout.getUsedLengthLR(node, right);
-    units = right.units;
-    //If new unit adaed done reset unit gap
-    if(AuxUnitLayout.lastPos === "right"){
-      AuxUnitLayout.currentRightUnitGap = AuxUnitLayout.unitGap;
-      AuxUnitLayout.lastPos = -1;
-    }
-    //Compare the side lengths
-    if (parentHeight < usedLength) {
-      //If there is not enough space
-      //Estimate new margin & gap
-      totalHeight = AuxUnitLayout.getUsedHeight(node, right);
-      estimatedGap = (parentHeight - totalHeight) / (units.length + 1);
-      //Else scale by using available space, reducing margins and gaps.
-      //Check if new gap is enough to fit
-      units[0].bbox.y -= AuxUnitLayout.currentRightUnitGap - estimatedGap;
-
-      for (var i = 1; i < units.length; i++) { //Shift all units
-        units[i].bbox.y = units[i-1].bbox.y + units[i-1].bbox.h/2 + units[i].bbox.h/2 + estimatedGap;
-      }
-      AuxUnitLayout.currentRightUnitGap = estimatedGap;
-
-    }
-    else if(AuxUnitLayout.currentRightUnitGap < AuxUnitLayout.unitGap){
-      for (var i = 0; i < units.length; i++) { //Shift all units
-        units[i].bbox.y -= (AuxUnitLayout.currentRightUnitGap - AuxUnitLayout.unitGap) * (i+1);
-      }
-      AuxUnitLayout.currentRightUnitGap =  AuxUnitLayout.unitGap;
-    }
+    AuxUnitLayout.setCurrentGap(location, estimatedGap);
   }
 };
 
