@@ -715,12 +715,27 @@ module.exports = function () {
   */
   elementUtilities.setPortsOrdering = function( nodes, ordering, portDistance ) {
     /*
-    * Retursn if the given portId is porttarget of any of the given edges.
+    * Returns if the given portId is porttarget of any of the given edges.
     * These edges are expected to be the edges connected to the node associated with that port.
     */
     var isPortTargetOfAnyEdge = function(edges, portId) {
       for (var i = 0; i < edges.length; i++) {
         if (edges[i].data('porttarget') === portId) {
+          return true;
+        }
+      }
+
+      return false;
+    };
+
+
+    /*
+    * Returns if the given portId is portsource of any of the given edges.
+    * These edges are expected to be the edges connected to the node associated with that port.
+    */
+    var isPortSourceOfAnyEdge = function(edges, portId) {
+      for (var i = 0; i < edges.length; i++) {
+        if (edges[i].data('portsource') === portId) {
           return true;
         }
       }
@@ -755,7 +770,7 @@ module.exports = function () {
         var portsource, porttarget; // The ports which are portsource/porttarget of the connected edges
 
         // Determine the portsource and porttarget
-        if ( isPortTargetOfAnyEdge(connectedEdges, ports[0].id) ) {
+        if ( isPortTargetOfAnyEdge(connectedEdges, ports[0].id) || isPortSourceOfAnyEdge(connectedEdges, ports[1].id) ) {
           porttarget = ports[0];
           portsource = ports[1];
         }
@@ -1313,6 +1328,66 @@ module.exports = function () {
       margin -= 2;
 
     return margin;
+  };
+
+  
+  // Set clone marker status of given nodes to the given status.
+  elementUtilities.setCloneMarkerStatus = function (node, status) {
+    if (status)
+        node.data('clonemarker', true);
+    else 
+        node.removeData('clonemarker');
+    
+    if(node.data('class') !== "unspecified entity" && node.data('class') !== "perturbing agent")
+        return;
+
+    var bgObj = {
+        'background-image': 'data:image/svg+xml;utf8,%3Csvg%20width%3D%22100%22%20height%3D%22100%22%20viewBox%3D%220%200%20100%20100%22%20style%3D%22fill%3Anone%3Bstroke%3Ablack%3Bstroke-width%3A0%3B%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20%3E%3Crect%20x%3D%220%22%20y%3D%220%22%20width%3D%22100%22%20height%3D%22100%22%20style%3D%22fill%3A%23a9a9a9%22/%3E%20%3C/svg%3E',
+        'background-position-x': '50%',
+        'background-position-y': '100%',
+        'background-width': '100%',
+        'background-height': '25%',
+        'background-fit': 'none',
+        'background-image-opacity': '0'
+    };
+    
+    var imgs = node.data('background-image') ? node.data('background-image').split(" ") : [];
+    var xPos = node.data('background-position-x') ? node.data('background-position-x').split(" ") : [];
+    var yPos = node.data('background-position-y') ? node.data('background-position-y').split(" ") : [];
+    var widths = node.data('background-width') ? node.data('background-width').split(" ") : [];
+    var heights = node.data('background-height') ? node.data('background-height').split(" ") : [];
+    var fits = node.data('background-fit') ? node.data('background-fit').split(" ") : [];
+    var opacities = node.data('background-image-opacity') ? ("" + node.data('background-image-opacity')).split(" ") : [];
+
+    if(status){
+        var index = imgs.indexOf(bgObj['background-image']);
+        // Already exists; Make opacity non-zero
+        if( index > -1)
+            opacities[index] = node.css('background-opacity');
+        else{
+            imgs.push(bgObj['background-image']);
+            xPos.push(bgObj['background-position-x']);
+            yPos.push(bgObj['background-position-y']);
+            widths.push(bgObj['background-width']);
+            heights.push(bgObj['background-height']);
+            fits.push(bgObj['background-fit']);
+            opacities.push(node.css('background-opacity'));
+        }
+    }
+    else{
+        var index = imgs.indexOf(bgObj['background-image']);
+        // Already exists; Make opacity zero
+        if( index > -1)
+            opacities[index] = '0';
+    }
+
+    node.data('background-image', imgs.join(" "));
+    node.data('background-position-x', xPos.join(" "));
+    node.data('background-position-y', yPos.join(" "));
+    node.data('background-width', widths.join(" "));
+    node.data('background-height', heights.join(" "));
+    node.data('background-fit', fits.join(" "));
+    node.data('background-image-opacity', opacities.join(" "));
   };
 
   // Section End

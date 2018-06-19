@@ -82,6 +82,9 @@ edge.data('bendPointPositions');
 `sbgnviz.register(options)`
 Register with libraries before creating instances
 
+`sbgnviz.validMapProperties`
+A lookup object for valid map properties.
+
 `var instance = sbgnviz(options)`
 Creates an extension instance with the given options
 
@@ -178,8 +181,8 @@ Loads the given sbgnml file. Optionally apply a callback function upon loading. 
 `instance.loadSBGNMLText(textData)`
 Loads a graph from the given text data in sbgnml format.
 
-`instance.saveAsSbgnml(filename)`
-Exports the current graph to an sbgnml file with the given filename.
+`instance.saveAsSbgnml(filename[, version])`
+Exports the current graph to an sbgnml file with the given filename. A SBGN-ML version can be provided, either 0.2 or 0.3. No version defaults to 0.3.
 
 `instance.enablePorts()`
 Enable node ports.

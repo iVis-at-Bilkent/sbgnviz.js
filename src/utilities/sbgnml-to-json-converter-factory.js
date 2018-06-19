@@ -561,7 +561,10 @@ module.exports = function () {
 
     var edgeObj = {};
     var styleObj = {};
-    var bendPointPositions = self.getArcBendPointPositions(ele);
+    var bendPointPositions = [];
+    if (sourceAndTarget.source !== sourceAndTarget.target) {
+      bendPointPositions = self.getArcBendPointPositions(ele);
+    }
 
     edgeObj.id = ele.id || undefined;
     edgeObj.class = ele.class_;
@@ -609,6 +612,14 @@ module.exports = function () {
     for (var i=0; i < colorList.length; i++) {
       colorIDToValue[colorList[i].id] = colorList[i].value;
     }
+    // get all background image id references to their value
+    if(renderInformation.listOfBackgroundImages){
+      var imageList = renderInformation.listOfBackgroundImages.backgroundImages;
+      var imageIDToValue = {};
+      for (var i=0; i < imageList.length; i++) {
+        imageIDToValue[imageList[i].id] = imageList[i].value;
+      }
+    }
 
     // convert style list to elementId-indexed object pointing to style
     // also convert color references to color values
@@ -624,6 +635,10 @@ module.exports = function () {
       }
       if (renderGroup.fill != null) {
         renderGroup.fill = colorIDToValue[renderGroup.fill];
+      }
+      // convert background image references
+      if (renderGroup.backgroundImage != null && imageIDToValue) {
+        renderGroup.backgroundImage = imageIDToValue[renderGroup.backgroundImage];
       }
 
       var idList = style.idList.split(' ');
@@ -698,6 +713,41 @@ module.exports = function () {
       var vtextAnchor = elementIDToStyle[node.data['id']].vtextAnchor;
       if (vtextAnchor) {
         node.data['text-valign'] = vtextAnchor;
+      }
+
+      var backgroundImage = elementIDToStyle[node.data['id']].backgroundImage;
+      if (backgroundImage) {
+        node.data['background-image'] = backgroundImage;
+      }
+
+      var backgroundFit = elementIDToStyle[node.data['id']].backgroundFit;
+      if (backgroundFit) {
+        node.data['background-fit'] = backgroundFit;
+      }
+
+      var backgroundPosX = elementIDToStyle[node.data['id']].backgroundPosX;
+      if (backgroundPosX) {
+        node.data['background-position-x'] = backgroundPosX;
+      }
+
+      var backgroundPosY = elementIDToStyle[node.data['id']].backgroundPosY;
+      if (backgroundPosY) {
+        node.data['background-position-y'] = backgroundPosY;
+      }
+
+      var backgroundWidth = elementIDToStyle[node.data['id']].backgroundWidth;
+      if (backgroundWidth) {
+        node.data['background-width'] = backgroundWidth;
+      }
+
+      var backgroundHeight = elementIDToStyle[node.data['id']].backgroundHeight;
+      if (backgroundHeight) {
+        node.data['background-height'] = backgroundHeight;
+      }
+
+      var backgroundImageOpacity = elementIDToStyle[node.data['id']].backgroundImageOpacity;
+      if (backgroundImageOpacity) {
+        node.data['background-image-opacity'] = backgroundImageOpacity;
       }
     }
 

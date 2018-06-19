@@ -82,6 +82,13 @@ module.exports = function () {
 
    // this is to remove the beginning of the pngContent: data:img/png;base64,
    var b64data = pngContent.substr(pngContent.indexOf(",") + 1);
+  
+   // lower quality when response is empty
+   if(!b64data || b64data === ""){
+     pngContent = cy.png({maxWidth: 15000, maxHeight: 15000, full: true});
+     b64data = pngContent.substr(pngContent.indexOf(",") + 1);
+   }
+
    saveAs(b64toBlob(b64data, "image/png"), filename || "network.png");
  };
 
@@ -90,6 +97,13 @@ module.exports = function () {
 
    // this is to remove the beginning of the pngContent: data:img/png;base64,
    var b64data = jpgContent.substr(jpgContent.indexOf(",") + 1);
+  
+   // lower quality when response is empty
+   if(!b64data || b64data === ""){
+     jpgContent = cy.jpg({maxWidth: 15000, maxHeight: 15000, full: true});
+     b64data = jpgContent.substr(jpgContent.indexOf(",") + 1);
+   }
+
    saveAs(b64toBlob(b64data, "image/jpg"), filename || "network.jpg");
  };
 
@@ -236,8 +250,9 @@ fileUtilities.loadTDFile = function(file, callback1){
 
  };
 
- fileUtilities.saveAsSbgnml = function(filename, renderInfo, mapProperties) {
-   var sbgnmlText = jsonToSbgnml.createSbgnml(filename, renderInfo, mapProperties);
+ // supported versions are either 0.2 or 0.3
+ fileUtilities.saveAsSbgnml = function(filename, version, renderInfo, mapProperties) {
+   var sbgnmlText = jsonToSbgnml.createSbgnml(filename, version, renderInfo, mapProperties);
    var blob = new Blob([sbgnmlText], {
      type: "text/plain;charset=utf-8;",
    });

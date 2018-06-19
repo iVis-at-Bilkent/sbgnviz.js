@@ -42,7 +42,13 @@ module.exports = function () {
     cy = param.sbgnCyInstance.getCy();
   }
 
-  jsonToSbgnml.createSbgnml = function(filename, renderInfo, mapProperties){
+  /*
+   version is either 0.2 or 0.3 or plain, 0.3 used as default if none provided.
+   Only difference right now is that <map> element doesn't have an id attribute in 0.2, and has on in 0.3.
+   Serious changes occur between the format version for submaps content. Those changes are not implemented yet.
+   TODO implement 0.3 changes when submap support is fully there.
+   */
+  jsonToSbgnml.createSbgnml = function(filename, version, renderInfo, mapProperties){
     var self = this;
     var mapID = textUtilities.getXMLValidId(filename);
     var hasExtension = false;
@@ -53,6 +59,17 @@ module.exports = function () {
     if (typeof renderInfo !== 'undefined') {
        hasExtension = true;
        hasRenderExtension = true;
+    }
+
+    if(typeof version === 'undefined') {
+      // default if not specified
+      version = "0.3";
+    }
+
+    // check version validity
+    if(version !== "0.2" && version !== "0.3" && version !== "plain") {
+      console.error("Invalid SBGN-ML version provided. Expected 0.2, 0.3 or plain, got: " + version);
+      return "Error";
     }
 
     var mapLanguage;
@@ -69,8 +86,17 @@ module.exports = function () {
 
     //add headers
     xmlHeader = "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>\n";
-    var sbgn = new libsbgnjs.Sbgn({xmlns: 'http://sbgn.org/libsbgn/0.3'});
-    var map = new libsbgnjs.Map({language: mapLanguage, id: mapID});
+    var versionNo = (version === "plain") ? "0.2" : version;
+    var sbgn = new libsbgnjs.Sbgn({xmlns: 'http://sbgn.org/libsbgn/' + versionNo});
+
+    var map;
+    if(version === "0.3") {
+      var map = new libsbgnjs.Map({language: mapLanguage, id: mapID});
+    }
+    else if(version === "0.2" || version === "plain") {
+      var map = new libsbgnjs.Map({language: mapLanguage});
+    }
+
     if (hasExtension) { // extension is there
        var extension = new libsbgnjs.Extension();
        if (hasRenderExtension) {
@@ -100,6 +126,8 @@ module.exports = function () {
     });
     // add them to the map
     for(var i=0; i<glyphList.length; i++) {
+       if (version === "plain")
+         glyphList[i].extension = null;
        map.addGlyph(glyphList[i]);
     }
     // get all arcs
@@ -108,11 +136,24 @@ module.exports = function () {
        if(typeof ele === "number") {
          ele = i;
        }
+       var arc = self.getArcSbgnml(ele);
+       if (version === "plain")
+         arc.extension = null;
        map.addArc(self.getArcSbgnml(ele));
     });
 
     sbgn.addMap(map);
-    return prettyprint.xml(xmlHeader + sbgn.toXML());
+
+    /*
+      prettyprint puts a line break inside the root <sbgn> tag before the xmlns attribute.
+      This is perfecly valid, but Vanted doesn't like it and cannot load those files as is.
+      This line break is removed here to make Newt output directly compatible with Vanted. This issue will be reported
+      to the Vanted guys and hopefully fixed at some point. After that the following workaround can be removed.
+    */
+    xmlbody = prettyprint.xml(sbgn.toXML()).replace("<sbgn \n  xmlns=\"http://sbgn.org/libsbgn", "<sbgn xmlns=\"http://sbgn.org/libsbgn");
+
+    // return prettyprint.xml(xmlHeader + sbgn.toXML());
+    return xmlHeader + xmlbody;
   };
 
   // see createSbgnml for info on the structure of renderInfo
@@ -131,6 +172,14 @@ module.exports = function () {
       }
       renderInformation.setListOfColorDefinitions(listOfColorDefinitions);
 
+      // populate list of background images
+      var listOfBackgroundImages = new renderExtension.ListOfBackgroundImages();
+      for (var img in renderInfo.images) {
+          var backgroundImage = new renderExtension.BackgroundImage({id: renderInfo.images[img], value: img});
+          listOfBackgroundImages.addBackgroundImage(backgroundImage);
+      }
+      renderInformation.setListOfBackgroundImages(listOfBackgroundImages);
+
       // populates styles
       var listOfStyles = new renderExtension.ListOfStyles();
       for (var key in renderInfo.styles) {
@@ -143,7 +192,14 @@ module.exports = function () {
               fontStyle: style.properties.fontStyle,
               fill: style.properties.fill, // fill color
               stroke: style.properties.stroke, // stroke color
-              strokeWidth: style.properties.strokeWidth
+              strokeWidth: style.properties.strokeWidth,
+              backgroundImage: style.properties.backgroundImage,
+              backgroundFit: style.properties.backgroundFit,
+              backgroundPosX: style.properties.backgroundPosX,
+              backgroundPosY: style.properties.backgroundPosY,
+              backgroundWidth: style.properties.backgroundWidth,
+              backgroundHeight: style.properties.backgroundHeight,
+              backgroundImageOpacity: style.properties.backgroundImageOpacity,
           });
           xmlStyle.setRenderGroup(g);
           listOfStyles.addStyle(xmlStyle);
@@ -292,7 +348,7 @@ module.exports = function () {
        var extension = self.getOrCreateExtension(glyph);
        extension.add("<sbgnviz>"+sbgnvizExtString+"</sbgnviz>");
     }
-
+    
     // current glyph is done
     glyphList.push(glyph);
 
