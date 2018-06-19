@@ -1351,20 +1351,13 @@ module.exports = function () {
         'background-image-opacity': '0'
     };
     
-    var style = node._private.style;
-
-    var imgs = style['background-image'] ? style['background-image'].value : [];
-    var xPos = style['background-position-x'] ? style['background-position-x'].value : [];
-    var yPos = style['background-position-y'] ? style['background-position-y'].value : [];
-    var widths = style['background-width'] ? style['background-width'].value : []; 
-    var heights = style['background-height'] ? style['background-height'].value : [];
-    var fits = style['background-fit'] ? style['background-fit'].value : []; 
-    var opacities = style['background-image-opacity'] ? style['background-image-opacity'].value : []; 
-    
-    concatUnitToValues(xPos, "%");
-    concatUnitToValues(yPos, "%");
-    concatUnitToValues(heights, "%");
-    concatUnitToValues(widths, "%");
+    var imgs = node.data('background-image') ? node.data('background-image').split(" ") : [];
+    var xPos = node.data('background-position-x') ? node.data('background-position-x').split(" ") : [];
+    var yPos = node.data('background-position-y') ? node.data('background-position-y').split(" ") : [];
+    var widths = node.data('background-width') ? node.data('background-width').split(" ") : [];
+    var heights = node.data('background-height') ? node.data('background-height').split(" ") : [];
+    var fits = node.data('background-fit') ? node.data('background-fit').split(" ") : [];
+    var opacities = node.data('background-image-opacity') ? ("" + node.data('background-image-opacity')).split(" ") : [];
 
     if(status){
         var index = imgs.indexOf(bgObj['background-image']);
@@ -1388,30 +1381,13 @@ module.exports = function () {
             opacities[index] = '0';
     }
 
-    var newStyle = {
-        'background-image': imgs,
-        'background-position-x': xPos,
-        'background-position-y': yPos,
-        'background-width': widths,
-        'background-height': heights,
-        'background-fit': fits,
-        'background-image-opacity': opacities
-    }
-    
-    node.style(newStyle);
-    node.data('background-image', newStyle);
-
-    function concatUnitToValues(values, unit){
-        if(!values || values.length == 0)
-            return;
-        
-        for(var i = 0; i < values.length; i++){
-            if(values[i] && values[i] !== "" && values[i] !== "auto"){
-                var tmp = '' + values[i];
-                values[i] = tmp + unit;
-            }   
-        }
-    }
+    node.data('background-image', imgs.join(" "));
+    node.data('background-position-x', xPos.join(" "));
+    node.data('background-position-y', yPos.join(" "));
+    node.data('background-width', widths.join(" "));
+    node.data('background-height', heights.join(" "));
+    node.data('background-fit', fits.join(" "));
+    node.data('background-image-opacity', opacities.join(" "));
   };
 
   // Section End

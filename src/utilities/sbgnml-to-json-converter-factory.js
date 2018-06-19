@@ -365,35 +365,6 @@ module.exports = function () {
               y: Number(result.sbgnviz.positionBeforeSaving[0].$.y)};
           nodeObj.collapse = true;
         }
-        if (result.sbgnviz.backgroundImage){
-          var bgImage = result.sbgnviz.backgroundImage[0].$;
-
-          var img = bgImage.img ? bgImage.img : "";
-          var fit = bgImage.fit ? bgImage.fit : "";
-          var opacity = bgImage.opacity ? bgImage.opacity : "";
-          var x = bgImage.x ? bgImage.x : "";
-          var y = bgImage.y ? bgImage.y : "";
-          var width = bgImage.width ? bgImage.width : "";
-          var height = bgImage.height ? bgImage.height : "";
-
-          styleObj['background-image'] = img;
-          styleObj['background-fit'] = fit;
-          styleObj['background-image-opacity'] = opacity;
-          styleObj['background-position-x'] = x;
-          styleObj['background-position-y'] = y;
-          styleObj['background-width'] = width;
-          styleObj['background-height'] = height;
-
-          nodeObj['background-image'] = {
-            'background-image': img.split(" "),
-            'background-fit': fit.split(" "),
-            'background-image-opacity': opacity.split(" "),
-            'background-position-x': x.split(" "),
-            'background-position-y': y.split(" "),
-            'background-width': width.split(" "),
-            'background-height': height.split(" "),
-          };
-        }
       });
     }
 
@@ -641,6 +612,12 @@ module.exports = function () {
     for (var i=0; i < colorList.length; i++) {
       colorIDToValue[colorList[i].id] = colorList[i].value;
     }
+    // get all background image id references to their value
+    var imageList = renderInformation.listOfBackgroundImages.backgroundImages;
+    var imageIDToValue = {};
+    for (var i=0; i < imageList.length; i++) {
+      imageIDToValue[imageList[i].id] = imageList[i].value;
+    }
 
     // convert style list to elementId-indexed object pointing to style
     // also convert color references to color values
@@ -656,6 +633,10 @@ module.exports = function () {
       }
       if (renderGroup.fill != null) {
         renderGroup.fill = colorIDToValue[renderGroup.fill];
+      }
+      // convert background image references
+      if (renderGroup.backgroundImage != null) {
+        renderGroup.backgroundImage = imageIDToValue[renderGroup.backgroundImage];
       }
 
       var idList = style.idList.split(' ');
@@ -730,6 +711,41 @@ module.exports = function () {
       var vtextAnchor = elementIDToStyle[node.data['id']].vtextAnchor;
       if (vtextAnchor) {
         node.data['text-valign'] = vtextAnchor;
+      }
+
+      var backgroundImage = elementIDToStyle[node.data['id']].backgroundImage;
+      if (backgroundImage) {
+        node.data['background-image'] = backgroundImage;
+      }
+
+      var backgroundFit = elementIDToStyle[node.data['id']].backgroundFit;
+      if (backgroundFit) {
+        node.data['background-fit'] = backgroundFit;
+      }
+
+      var backgroundPosX = elementIDToStyle[node.data['id']].backgroundPosX;
+      if (backgroundPosX) {
+        node.data['background-position-x'] = backgroundPosX;
+      }
+
+      var backgroundPosY = elementIDToStyle[node.data['id']].backgroundPosY;
+      if (backgroundPosY) {
+        node.data['background-position-y'] = backgroundPosY;
+      }
+
+      var backgroundWidth = elementIDToStyle[node.data['id']].backgroundWidth;
+      if (backgroundWidth) {
+        node.data['background-width'] = backgroundWidth;
+      }
+
+      var backgroundHeight = elementIDToStyle[node.data['id']].backgroundHeight;
+      if (backgroundHeight) {
+        node.data['background-height'] = backgroundHeight;
+      }
+
+      var backgroundImageOpacity = elementIDToStyle[node.data['id']].backgroundImageOpacity;
+      if (backgroundImageOpacity) {
+        node.data['background-image-opacity'] = backgroundImageOpacity;
       }
     }
 

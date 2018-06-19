@@ -172,6 +172,14 @@ module.exports = function () {
       }
       renderInformation.setListOfColorDefinitions(listOfColorDefinitions);
 
+      // populate list of background images
+      var listOfBackgroundImages = new renderExtension.ListOfBackgroundImages();
+      for (var img in renderInfo.images) {
+          var backgroundImage = new renderExtension.BackgroundImage({id: renderInfo.images[img], value: img});
+          listOfBackgroundImages.addBackgroundImage(backgroundImage);
+      }
+      renderInformation.setListOfBackgroundImages(listOfBackgroundImages);
+
       // populates styles
       var listOfStyles = new renderExtension.ListOfStyles();
       for (var key in renderInfo.styles) {
@@ -184,7 +192,14 @@ module.exports = function () {
               fontStyle: style.properties.fontStyle,
               fill: style.properties.fill, // fill color
               stroke: style.properties.stroke, // stroke color
-              strokeWidth: style.properties.strokeWidth
+              strokeWidth: style.properties.strokeWidth,
+              backgroundImage: style.properties.backgroundImage,
+              backgroundFit: style.properties.backgroundFit,
+              backgroundPosX: style.properties.backgroundPosX,
+              backgroundPosY: style.properties.backgroundPosY,
+              backgroundWidth: style.properties.backgroundWidth,
+              backgroundHeight: style.properties.backgroundHeight,
+              backgroundImageOpacity: style.properties.backgroundImageOpacity,
           });
           xmlStyle.setRenderGroup(g);
           listOfStyles.addStyle(xmlStyle);
@@ -326,76 +341,6 @@ module.exports = function () {
     if(node.data("thickBorder")) {
        sbgnvizExtString += "<hasHiddenNeighbour/>";
        hasNewtExt = true;
-    }
-
-    // add info for background image
-    var bgObj = node._private.style['background-image'];
-    if(bgObj && bgObj.value && bgObj.value.length > 0){
-        var img = node._private.style['background-image'];
-        var fit = node._private.style['background-fit'];
-        var opacity = node._private.style['background-image-opacity'];
-        var x = node._private.style['background-position-x'];
-        var y = node._private.style['background-position-y'];
-        var width = node._private.style['background-width'];
-        var height = node._private.style['background-height'];
-
-        sbgnvizExtString += "<backgroundImage img=\"" + img.strValue + "\" ";
-        if(fit && fit.value.length > 0)
-            sbgnvizExtString += " fit=\"" + fit.strValue + "\" ";
-        if(opacity && opacity.value.length > 0)
-            sbgnvizExtString += " opacity=\"" + opacity.strValue + "\" ";
-        if(x && x.value.length > 0){
-            var units = x.units;
-            var tmp = "";
-            for(var i = 0; i < units.length; i++){
-                if(units[i] && units[i] !== "")
-                    tmp += "" + x.value[i] + units[i] + " ";
-                else
-                    tmp += "" + x.value[i] + " ";
-                     
-            }
-            
-            sbgnvizExtString += " x=\"" + tmp + "\" ";
-        }
-        if(y && y.value.length > 0){
-            var units = y.units;
-            var tmp = "";
-            for(var i = 0; i < units.length; i++){
-                if(units[i] && units[i] !== "")
-                    tmp += "" + y.value[i] + units[i] + " ";
-                else
-                    tmp += "" + y.value[i] + " "; 
-            }
-            
-            sbgnvizExtString += " y=\"" + tmp + "\" ";
-        }
-        if(width && width.value.length > 0){
-            var units = width.units;
-            var tmp = "";
-            for(var i = 0; i < units.length; i++){
-                if(units[i] && units[i] !== "")
-                    tmp += "" + width.value[i] + units[i] + " ";
-                else
-                    tmp += "" + width.value[i] + " "; 
-            }
-            
-            sbgnvizExtString += " width=\"" + tmp + "\" ";
-        }
-        if(height && height.value.length > 0){
-            var units = height.units;
-            var tmp = "";
-            for(var i = 0; i < units.length; i++){
-                if(units[i] && units[i] !== "")
-                    tmp += "" + height.value[i] + units[i] + " ";
-                else
-                    tmp += "" + height.value[i] + " "; 
-            }
-
-            sbgnvizExtString += " height=\"" + tmp + "\" ";
-        }
-        
-        sbgnvizExtString += "/>";
-        hasNewtExt = true;
     }
 
     // add string to a new extension for this glyph
