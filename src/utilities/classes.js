@@ -948,6 +948,9 @@ AuxUnitLayout.fitUnits = function (node) {
     if (auxUnit === undefined) {
       continue;
     }
+    if (auxUnit.units.length <= 0 || !auxUnit.units) {
+      continue;
+    }
     if ( location === "top" || location === "bottom") {
       usedLength = AuxUnitLayout.getUsedLengthTB(node, auxUnit);
       units = auxUnit.units;
@@ -1063,7 +1066,6 @@ AuxUnitLayout.modifyUnits = function(parentNode, unit, oldLocation, cy){
   deleteUnits.splice(deleteIndex, 1);
   AuxUnitLayout.updateLengthCache(oldAuxUnit, cy);
   AuxUnitLayout.update(oldAuxUnit, cy, true);
-  AuxUnitLayout.fitUnits(parentNode, oldLocation);
   //If new is not constructed contruct interval
   if (!parentNode.data('auxunitlayouts')[location]) {
     parentNode.data('auxunitlayouts')[location] = AuxUnitLayout.construct(parentNode, location);
@@ -1087,7 +1089,7 @@ AuxUnitLayout.modifyUnits = function(parentNode, unit, oldLocation, cy){
 
   AuxUnitLayout.updateLengthCache(insertAuxUnit, cy);
   AuxUnitLayout.update(insertAuxUnit, cy, true);
-  AuxUnitLayout.fitUnits(parentNode, location);
+  AuxUnitLayout.fitUnits(parentNode);
 };
 
 AuxUnitLayout.isEmpty = function(mainObj) {
