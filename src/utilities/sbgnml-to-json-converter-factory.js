@@ -613,10 +613,12 @@ module.exports = function () {
       colorIDToValue[colorList[i].id] = colorList[i].value;
     }
     // get all background image id references to their value
-    var imageList = renderInformation.listOfBackgroundImages.backgroundImages;
-    var imageIDToValue = {};
-    for (var i=0; i < imageList.length; i++) {
-      imageIDToValue[imageList[i].id] = imageList[i].value;
+    if(renderInformation.listOfBackgroundImages){
+      var imageList = renderInformation.listOfBackgroundImages.backgroundImages;
+      var imageIDToValue = {};
+      for (var i=0; i < imageList.length; i++) {
+        imageIDToValue[imageList[i].id] = imageList[i].value;
+      }
     }
 
     // convert style list to elementId-indexed object pointing to style
@@ -635,7 +637,7 @@ module.exports = function () {
         renderGroup.fill = colorIDToValue[renderGroup.fill];
       }
       // convert background image references
-      if (renderGroup.backgroundImage != null) {
+      if (renderGroup.backgroundImage != null && imageIDToValue) {
         renderGroup.backgroundImage = imageIDToValue[renderGroup.backgroundImage];
       }
 
