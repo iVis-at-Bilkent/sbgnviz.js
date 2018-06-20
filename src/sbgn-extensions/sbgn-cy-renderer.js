@@ -393,6 +393,7 @@ module.exports = function () {
         if(imgObj){
           context.clip();
           context.drawImage(imgObj.img, 0, 0, imgObj.imgW, imgObj.imgH, imgObj.x, imgObj.y, imgObj.w, imgObj.h );
+          context.restore();
         }
 
         $$.sbgn.cloneMarker.simpleChemical(context, centerX, centerY,
@@ -505,6 +506,7 @@ module.exports = function () {
         if(imgObj){
           context.clip();
           context.drawImage(imgObj.img, 0, 0, imgObj.imgW, imgObj.imgH, imgObj.x, imgObj.y, imgObj.w, imgObj.h );
+          context.restore();
         }
 
         $$.sbgn.cloneMarker.macromolecule(context, centerX, centerY,
@@ -624,6 +626,7 @@ module.exports = function () {
         if(imgObj){
           context.clip();
           context.drawImage(imgObj.img, 0, 0, imgObj.imgW, imgObj.imgH, imgObj.x, imgObj.y, imgObj.w, imgObj.h );
+          context.restore();
         }
 
         $$.sbgn.cloneMarker.complex(context, centerX, centerY,
@@ -749,6 +752,7 @@ module.exports = function () {
         if(imgObj){
           context.clip();
           context.drawImage(imgObj.img, 0, 0, imgObj.imgW, imgObj.imgH, imgObj.x, imgObj.y, imgObj.w, imgObj.h );
+          context.restore();
         }
 
         $$.sbgn.cloneMarker.nucleicAcidFeature(context, centerX, centerY,
@@ -839,6 +843,7 @@ module.exports = function () {
         if(imgObj){
           context.clip();
           context.drawImage(imgObj.img, 0, 0, imgObj.imgW, imgObj.imgH, imgObj.x, imgObj.y, imgObj.w, imgObj.h );
+          context.restore();
         }
 
         context.beginPath();
@@ -876,6 +881,7 @@ module.exports = function () {
         if(imgObj){
           context.clip();
           context.drawImage(imgObj.img, 0, 0, imgObj.imgW, imgObj.imgH, imgObj.x, imgObj.y, imgObj.w, imgObj.h );
+          context.restore();
         }
 
         var oldStyle = context.fillStyle;
@@ -939,6 +945,7 @@ module.exports = function () {
         if(imgObj){
           context.clip();
           context.drawImage(imgObj.img, 0, 0, imgObj.imgW, imgObj.imgH, imgObj.x, imgObj.y, imgObj.w, imgObj.h );
+          context.restore();
         }
 
         var oldStyle = context.fillStyle;
@@ -1059,6 +1066,7 @@ module.exports = function () {
         if(imgObj){
           context.clip();
           context.drawImage(imgObj.img, 0, 0, imgObj.imgW, imgObj.imgH, imgObj.x, imgObj.y, imgObj.w, imgObj.h );
+          context.restore();
         }
 
         var oldStyle = context.fillStyle;
