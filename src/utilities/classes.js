@@ -921,17 +921,9 @@ AuxUnitLayout.fitUnits = function (node) {
   if (node.data('auxunitlayouts') === undefined) {
     return;
   }
-  if ((node.data("class") === "compartment" || node.data("class") === "complex")
-    && node._private.children !== undefined && node._private.children.length !== 0) {
-    var parentWidth =  node._private.autoWidth;
-    var parentHeight =  node._private.autoHeight;
-    var padding = node._private.autoPadding;
-  }
-  else {
-    var parentWidth = node.data("bbox").w;
-    var parentHeight = node.data("bbox").h;
-    var padding = 0;
-  }
+  var parentWidth = node.width();
+  var parentHeight = node.height();
+  var padding = node.padding();
   var position = node.position();
   var parentX1 = position.x - parentWidth/2;
   var parentX2 = position.x + parentWidth/2;
