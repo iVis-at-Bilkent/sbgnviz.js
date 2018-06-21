@@ -95,7 +95,8 @@ AuxiliaryUnit.copy = function (mainObj, cy, existingInstance, newParent, newId) 
 AuxiliaryUnit.draw = function(mainObj, cy, context) {
   var unitClass = getAuxUnitClass(mainObj);
   var coords = unitClass.getAbsoluteCoord(mainObj, cy);
-  if (mainObj.dashed === true) {
+  var parent = getAuxUnitClass(mainObj).getParent(mainObj, cy);
+  if (mainObj.dashed === true || parent.hasClass('cy-expand-collapse-collapsed-node')) {
     context.setLineDash([2,2]);
   }
   else {
