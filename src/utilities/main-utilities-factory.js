@@ -33,9 +33,13 @@ module.exports = function () {
     // graphUtilities.disablePorts();
 
     // TODO do this by using extension API
-    cy.$('.edgebendediting-hasbendpoints').removeClass('edgebendediting-hasbendpoints');
-    edges.scratch('cyedgebendeditingWeights', []);
-    edges.scratch('cyedgebendeditingDistances', []);
+    // removes all bendpoints for all edges in cytoscape instance
+    for(var i = 0; i < edges.length; i++){
+      var edge = edges[i];
+      edge.removeClass('edgebendediting-hasbendpoints');
+      edge.data('cyedgebendeditingDistances', []);
+      edge.data('cyedgebendeditingWeights', []);
+    }
 
     parents.removeData('minWidth');
     parents.removeData('minHeight');
