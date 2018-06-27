@@ -45,7 +45,7 @@ AuxiliaryUnit.construct = function(parent) {
 
   obj.id = null;
   obj.bbox = null;
-  obj.coordType = "relativeToCenter";
+  obj.coordType = "relativeToSide";
   obj.anchorSide = null;
   obj.isDisplayed = false;
   obj.dashed = false;
@@ -244,7 +244,7 @@ AuxiliaryUnit.convertToRelativeCoord = function(mainObj, absX, absY, cy, parentN
     var relY = (absY - position.y) * 100 / (parent.outerHeight() - borderWidth);
     return {x: relX, y: relY};
   }
-  else if(mainObj.coordType == "relativeToSide") {
+  else {
     if (parent.data("class") == "compartment"){
         absX -= parent.outerWidth() * 0.1;
     };
@@ -261,46 +261,21 @@ AuxiliaryUnit.convertToRelativeCoord = function(mainObj, absX, absY, cy, parentN
   }
 };
 
-AuxiliaryUnit.setAnchorSide = function(mainObj, parentBbox) {
-  if(mainObj.coordType == "relativeToCenter") {
-    var thisX = mainObj.bbox.x;
-    var thisY = mainObj.bbox.y;
-    if(thisY > 45) {
-      mainObj.anchorSide = "bottom";
-      mainObj.bbox.y = 50;
-    }
-    else if (thisY < -45) {
-      mainObj.anchorSide = "top";
-      mainObj.bbox.y = -50;
-    }
-    else if (thisY >= 0) {
-      if (thisX > 45) {
-        mainObj.anchorSide = "right";
-        mainObj.bbox.x = 50;
-      }
-      else if (thisX < -45) {
-        mainObj.anchorSide = "left";
-        mainObj.bbox.x = -50;
-      }
-      else {
-        mainObj.anchorSide = "bottom";
-        mainObj.bbox.y = 50;
-      }
-    }
-    else {
-      if (thisX > 45) {
-        mainObj.anchorSide = "right";
-        mainObj.bbox.x = 50;
-      }
-      else if (thisX < -45) {
-        mainObj.anchorSide = "left";
-        mainObj.bbox.x = -50;
-      }
-      else {
-        mainObj.anchorSide = "top";
-        mainObj.bbox.y = -50;
-      }
-    }
+AuxiliaryUnit.setAnchorSide = function(mainObj) {
+
+  var thisX = mainObj.bbox.x;
+  var thisY = mainObj.bbox.y;
+  if(thisY === -50) {
+    mainObj.anchorSide = "top";
+  }
+  else if (thisX === -50) {
+    mainObj.anchorSide = "left";
+  }
+  else if (thisY === 50) {
+    mainObj.anchorSide = "bottom";
+  }
+  else {
+    mainObj.anchorSide = "right";
   }
 };
 
@@ -724,11 +699,11 @@ AuxUnitLayout.alwaysShowAuxUnits = true;
 AuxUnitLayout.maxUnitDisplayed = -1;
 AuxUnitLayout.lastPos = -1;
 
-AuxUnitLayout.update = function(mainObj, cy, doForceUpdate) {
-  AuxUnitLayout.precomputeCoords(mainObj, cy, doForceUpdate);
+AuxUnitLayout.update = function(mainObj, cy) {
+  //AuxUnitLayout.precomputeCoords(mainObj, cy);
 };
 
-AuxUnitLayout.addAuxUnit = function(mainObj, cy, unit, position) {
+AuxUnitLayout.addAuxUnit = function(mainObj, cy, unit, position, preComputed) {
   if(typeof position != "undefined") {
     //console.log("add unit at positiion", position);
     mainObj.units.splice(position, 0, unit);
@@ -737,25 +712,49 @@ AuxUnitLayout.addAuxUnit = function(mainObj, cy, unit, position) {
     mainObj.units.push(unit);
     position = mainObj.units.length - 1;
   }
-
-  AuxUnitLayout.updateLengthCache(mainObj, cy);
-  AuxUnitLayout.update(mainObj, cy, true);/*
-  if (AuxUnitLayout.getAlwaysShowAuxUnits(mainObj)) {
+  if (preComputed === undefined || preComputed === false) {
+    AuxUnitLayout.computeCoords(mainObj, cy, unit);
+    var parentNode = AuxUnitLayout.getParentNode(mainObj, cy);
+    AuxUnitLayout.fitUnits(parentNode, cy, mainObj.location);
+  }
+  //AuxUnitLayout.updateLengthCache(mainObj, cy);
+  //AuxUnitLayout.update(mainObj, cy, true);
+  /*if (AuxUnitLayout.getAlwaysShowAuxUnits(mainObj)) {
     // set a minimum size according to both sides on the same orientation
     AuxUnitLayout.setParentMinLength(mainObj, cy);
     // need to resize the parent in case the space was too small
     AuxUnitLayout.resizeParent(mainObj, cy, mainObj.lengthUsed);
   }*/
   //cy.style().update(); // <- was it really necessary ?
-  var parentNode = AuxUnitLayout.getParentNode(mainObj, cy);
   return position;
+};
+
+AuxUnitLayout.computeCoords = function(mainObj, cy, unit){
+  AuxUnitLayout.setDisplayedUnits(mainObj, cy);
+  var location = mainObj.location;
+  var node = AuxUnitLayout.getParentNode(mainObj, cy);
+  if (location === "top" || location === "bottom") {
+    var position = node.position();
+    var parentWidth = node.data('bbox').w;
+    var parentX1 = position.x - parentWidth/2;
+    var parentX2 = position.x + parentWidth/2;
+    if (mainObj.units.length === 1) {
+      var relativeCoords = AuxiliaryUnit.convertToRelativeCoord(unit, (parentX1) + AuxUnitLayout.getCurrentGap(location), 50, cy);
+      unit.bbox.x = relativeCoords.x + unit.bbox.w/2;
+    }
+    else {
+      var lastUnit = mainObj.units.length - 2;//Get the position of the last unit
+      unit.bbox.x = mainObj.units[lastUnit].bbox.x +  mainObj.units[lastUnit].bbox.w/2 + unit.bbox.w/2 + AuxUnitLayout.getCurrentGap(location);
+    }
+    unit.bbox.y = (location === "top") ? (-50) : 50;
+  }//We don't have the right or left addition cases yet
 };
 
 AuxUnitLayout.removeAuxUnit = function(mainObj, cy, unit) {
   var index = mainObj.units.indexOf(unit);
   mainObj.units.splice(index, 1);
-  AuxUnitLayout.updateLengthCache(mainObj, cy);
-  AuxUnitLayout.update(mainObj, cy, true);/*
+  //AuxUnitLayout.updateLengthCache(mainObj, cy);
+  /*AuxUnitLayout.update(mainObj, cy, true);
   if (AuxUnitLayout.getAlwaysShowAuxUnits(mainObj)) {
     // set a minimum size according to both sides on the same orientation
     AuxUnitLayout.setParentMinLength(mainObj, cy);
@@ -789,8 +788,8 @@ AuxUnitLayout.reorderFromPositions = function(mainObj, cy) {
     return 0;
   });
   //console.log("units after reoarder", this.units);
-  AuxUnitLayout.updateLengthCache(mainObj, cy);
-  AuxUnitLayout.update(mainObj, cy, true);
+  /*AuxUnitLayout.updateLengthCache(mainObj, cy);
+  AuxUnitLayout.update(mainObj, cy, true);*/
 };
 
 /**
@@ -917,10 +916,81 @@ AuxUnitLayout.setCurrentGap = function (location, value){
   }
 };
 
-AuxUnitLayout.fitUnits = function (node) {
+AuxUnitLayout.getCurrentGap = function (location){
+  if (location === "top") {
+    return AuxUnitLayout.currentTopUnitGap;
+  }
+  else if (location === "bottom") {
+    return AuxUnitLayout.currentBottomUnitGap;
+  }
+  else if (location === "right") {
+    return AuxUnitLayout.currentRightUnitGap;
+  }
+  else {
+    return AuxUnitLayout.currentLeftUnitGap;
+  }
+};
+
+AuxUnitLayout.checkFit = function (node, cy, forceCheck){
+  var fitLocations = [];
+  for(var location in node.data('auxunitlayouts')) {
+    if (forceCheck !== undefined && location !== forceCheck) {
+      continue;
+    }
+    if (AuxUnitLayout.getCurrentGap(location) < AuxUnitLayout.unitGap) {
+      fitLocations.push(location);
+      continue;
+    }
+    var unit = node.data('auxunitlayouts')[location];
+    var units = unit.units;
+    if (units.length === 0) {
+      continue;
+    }
+    var firstUnit = units[0];
+    var lastUnit = units[units.length-1];
+    var coordsFirst = AuxiliaryUnit.convertToAbsoluteCoord(firstUnit, firstUnit.bbox.x, firstUnit.bbox.y, cy);
+    var coordsLast = AuxiliaryUnit.convertToAbsoluteCoord(lastUnit, lastUnit.bbox.x, lastUnit.bbox.y, cy);
+    var gap = AuxUnitLayout.getCurrentGap(location);
+    if (units.length > 0) { //For any case of removal
+      if (location === "top" || location === "bottom") {
+        var parentX1 = node.position().x - node.width()/2;
+        var parentX2 = node.position().x + node.width()/2;
+        var firstX1 = coordsFirst.x - firstUnit.bbox.w/2;
+        var lastX2 = coordsLast.x + lastUnit.bbox.w/2;
+        if (parentX1 + gap > firstX1 || parentX2 - gap < lastX2) {
+            fitLocations.push(location);
+        }
+      }
+      else {
+        var parentY1 = node.position().y - node.height()/2;
+        var parentY2 = node.position().y + node.height()/2 ;
+        var firstY1 = coordsFirst.y - firstUnit.bbox.h/2;
+        var lastY2 = coordsLast.y + lastUnit.bbox.h/2;
+        if (parentY1 + gap > firstY1 || parentY2 - gap < lastY2) {
+            fitLocations.push(location);
+        }
+      }
+    }
+  }
+  return fitLocations;
+};
+
+AuxUnitLayout.fitUnits = function (node, cy, fitLocation, forceFit) {
   if (node.data('auxunitlayouts') === undefined) {
     return;
   }
+
+  if (forceFit === true) {
+    var locations = ["top", "bottom", "right", "left"];
+  }
+  else {
+    var locations = AuxUnitLayout.checkFit(node, cy, fitLocation); //Check which nodes are not fitting
+  }
+
+  if (locations.length === 0) {
+    return;
+  }
+
   var parentWidth = node.width();
   var parentHeight = node.height();
   var padding = node.padding();
@@ -929,12 +999,11 @@ AuxUnitLayout.fitUnits = function (node) {
   var parentX2 = position.x + parentWidth/2;
   var parentY1 = position.y - parentHeight/2;
   var parentY2 = position.y + parentHeight/2;
+
   //Get Parent node and find parent width
   var usedLength;
-  var totalWidth;
   var estimatedGap;
-  var units;
-  var locations = ["top", "bottom", "left", "right"];
+
   for (var index = 0; index < locations.length; index++) {
     var location = locations[index];
     var auxUnit = node.data('auxunitlayouts')[location];
@@ -944,11 +1013,11 @@ AuxUnitLayout.fitUnits = function (node) {
     if (auxUnit.units.length <= 0 || !auxUnit.units) {
       continue;
     }
+    var units = auxUnit.units;
+    var firstPosition = AuxiliaryUnit.convertToRelativeCoord(units[0], parentX1, parentY1, undefined, node);//Position of the first unit
     if ( location === "top" || location === "bottom") {
       usedLength = AuxUnitLayout.getUsedLengthTB(node, auxUnit);
-      units = auxUnit.units;
-      var firstPosition = AuxiliaryUnit.convertToRelativeCoord(units[0], parentX1, parentY1, undefined, node);//Position of the first unit
-      totalWidth = AuxUnitLayout.getUsedWidth(node, auxUnit);
+      var totalWidth = AuxUnitLayout.getUsedWidth(node, auxUnit);
       estimatedGap = (parentWidth - totalWidth) / (units.length + 1);
       if (estimatedGap > AuxUnitLayout.unitGap) {
         estimatedGap = AuxUnitLayout.unitGap;
@@ -962,10 +1031,8 @@ AuxUnitLayout.fitUnits = function (node) {
     else {
       //Find total left length
       usedLength = AuxUnitLayout.getUsedLengthLR(node, auxUnit);
-      units = auxUnit.units;
-      var firstPosition = AuxiliaryUnit.convertToRelativeCoord(units[0], parentX1, parentY1, undefined, node);//Position of the first unit
       //Compare the side lengths
-      totalHeight = AuxUnitLayout.getUsedHeight(node, auxUnit);
+      var totalHeight = AuxUnitLayout.getUsedHeight(node, auxUnit);
       estimatedGap = (parentHeight - totalHeight) / (units.length + 1);
       if (estimatedGap > AuxUnitLayout.unitGap) {
         estimatedGap = AuxUnitLayout.unitGap;
@@ -980,6 +1047,7 @@ AuxUnitLayout.fitUnits = function (node) {
     }
     AuxUnitLayout.setCurrentGap(location, estimatedGap);
   }
+  cy.forceRender();
 };
 
 
@@ -1031,10 +1099,7 @@ AuxUnitLayout.precomputeCoords = function (mainObj, cy, doForceUpdate) {
 AuxUnitLayout.draw = function (mainObj, cy, context) {
   for(var i=0; i < mainObj.units.length; i++) {
     var auxUnit = mainObj.units[i];
-    if (auxUnit.isDisplayed) {
-      // make each unit draw itself
       getAuxUnitClass(auxUnit).draw(auxUnit, cy, context);
-    }
   }
 };
 
@@ -1057,8 +1122,6 @@ AuxUnitLayout.modifyUnits = function(parentNode, unit, oldLocation, cy){
     }
   }
   deleteUnits.splice(deleteIndex, 1);
-  AuxUnitLayout.updateLengthCache(oldAuxUnit, cy);
-  AuxUnitLayout.update(oldAuxUnit, cy, true);
   //If new is not constructed contruct interval
   if (!parentNode.data('auxunitlayouts')[location]) {
     parentNode.data('auxunitlayouts')[location] = AuxUnitLayout.construct(parentNode, location);
@@ -1079,10 +1142,6 @@ AuxUnitLayout.modifyUnits = function(parentNode, unit, oldLocation, cy){
     }
   }
   insertUnits.splice(index, 0, unit);
-
-  AuxUnitLayout.updateLengthCache(insertAuxUnit, cy);
-  AuxUnitLayout.update(insertAuxUnit, cy, true);
-  AuxUnitLayout.fitUnits(parentNode);
 };
 
 AuxUnitLayout.isEmpty = function(mainObj) {

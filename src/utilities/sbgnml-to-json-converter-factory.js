@@ -135,23 +135,12 @@ module.exports = function () {
   };
 
   sbgnmlToJson.stateAndInfoBboxProp = function (ele, parentBbox) {
-    var xPos = parseFloat(parentBbox.x);
-    var yPos = parseFloat(parentBbox.y);
-
     // don't copy directly ele.box because it contains other things than x y w h
     var bbox = {};
     bbox.x = ele.bbox.x;
     bbox.y = ele.bbox.y;
     bbox.w = ele.bbox.w;
     bbox.h = ele.bbox.h;
-
-    // set positions as center
-    bbox.x = parseFloat(bbox.x) + parseFloat(bbox.w) / 2 - xPos;
-    bbox.y = parseFloat(bbox.y) + parseFloat(bbox.h) / 2 - yPos;
-
-    bbox.x = bbox.x / parseFloat(parentBbox.w) * 100;
-    bbox.y = bbox.y / parseFloat(parentBbox.h) * 100;
-
     return bbox;
   };
 
@@ -207,7 +196,7 @@ module.exports = function () {
           'text': (glyph.label && glyph.label.text) || undefined
         };
         unitOfInformation.bbox = self.stateAndInfoBboxProp(glyph, parentBbox);
-        classes.UnitOfInformation.setAnchorSide(unitOfInformation);
+        //classes.UnitOfInformation.setAnchorSide(unitOfInformation);
         stateAndInfoArray.push(unitOfInformation);
       } else if (glyph.class_ === 'state variable') {
         var stateVariable = classes.StateVariable.construct();
@@ -216,7 +205,7 @@ module.exports = function () {
         stateVariable.state.value = (state && state.value) || undefined;
         stateVariable.state.variable = (state && state.variable) || undefined;
         stateVariable.bbox = self.stateAndInfoBboxProp(glyph, parentBbox);
-        classes.StateVariable.setAnchorSide(stateVariable);
+        //classes.StateVariable.setAnchorSide(stateVariable);
         stateAndInfoArray.push(stateVariable);
       }
     }
