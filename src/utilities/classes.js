@@ -760,7 +760,9 @@ AuxUnitLayout.removeAuxUnit = function(mainObj, cy, unit) {
     AuxUnitLayout.setParentMinLength(mainObj, cy);
   }*/
   var parentNode = AuxUnitLayout.getParentNode(mainObj, cy);
-  cy.style().update();
+
+  //TODO find a way to elimate this redundancy to update info-box positions
+  parentNode.data('border-width', parentNode.data('border-width'));
 };
 
 /**
@@ -1047,7 +1049,10 @@ AuxUnitLayout.fitUnits = function (node, cy, fitLocation, forceFit) {
     }
     AuxUnitLayout.setCurrentGap(location, estimatedGap);
   }
-  cy.forceRender();
+
+  //TODO find a way to elimate this redundancy to update info-box positions
+  node.data('border-width', node.data('border-width'));
+
 };
 
 
