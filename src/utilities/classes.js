@@ -977,21 +977,7 @@ AuxUnitLayout.checkFit = function (node, cy, forceCheck){
   return fitLocations;
 };
 
-AuxUnitLayout.fitUnits = function (node, cy, fitLocation, forceFit) {
-  if (node.data('auxunitlayouts') === undefined) {
-    return;
-  }
-
-  if (forceFit === true) {
-    var locations = ["top", "bottom", "right", "left"];
-  }
-  else {
-    var locations = AuxUnitLayout.checkFit(node, cy, fitLocation); //Check which nodes are not fitting
-  }
-
-  if (locations.length === 0) {
-    return;
-  }
+AuxUnitLayout.fitUnits = function (node, cy, locations) {
 
   var parentWidth = node.width();
   var parentHeight = node.height();
