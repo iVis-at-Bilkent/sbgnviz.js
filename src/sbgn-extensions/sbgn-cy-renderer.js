@@ -105,7 +105,7 @@ module.exports = function () {
 	    cyBaseNodeShapes['roundrectangle'].draw(context, x, y, width, height);
     }
     else if ( type == "BA simple chemical"){
-	    cyBaseNodeShapes['ellipse'].draw(context, x, y, width/2, width/2);
+	    drawRoundRectanglePath(context, x, y, width, height,Math.min(width / 2, height / 2, 15));
     }
     else if ( type == "BA nucleic acid feature"){
 	    var cornerRadius = cyMath.getRoundRectangleRadius(width, height);
