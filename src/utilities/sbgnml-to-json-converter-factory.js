@@ -816,13 +816,13 @@ module.exports = function () {
       // store glyph members of compartments here.
       var compartmentRef = glyph.compartmentRef;
 
-      if (glyph.class_ === 'compartment') {
+      /*if (glyph.class_ === 'compartment') {
         if (compartmentChildrenMap[glyph.id] === undefined) {
           compartmentChildrenMap[glyph.id] = [];
         }
 
         glyph.glyphMembers = compartmentChildrenMap[glyph.id];
-      }
+      }*/
 
       if (compartmentRef) {
         if (compartmentChildrenMap[compartmentRef] === undefined) {
