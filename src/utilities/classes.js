@@ -265,13 +265,13 @@ AuxiliaryUnit.setAnchorSide = function(mainObj) {
 
   var thisX = mainObj.bbox.x;
   var thisY = mainObj.bbox.y;
-  if(thisY === -50) {
+  if(thisY === -50 || thisY < -48 ) {
     mainObj.anchorSide = "top";
   }
   else if (thisX === -50) {
     mainObj.anchorSide = "left";
   }
-  else if (thisY === 50) {
+  else if (thisY === 50 || thisY > 48) {
     mainObj.anchorSide = "bottom";
   }
   else {
@@ -736,8 +736,14 @@ AuxUnitLayout.computeCoords = function(mainObj, cy, unit){
   if (location === "top" || location === "bottom") {
     var position = node.position();
     var parentWidth = node.data('bbox').w;
-    var parentX1 = position.x - parentWidth/2;
-    var parentX2 = position.x + parentWidth/2;
+    var padding = node.padding();
+    var parentWidth = node.width();
+    var parentHeight = node.height();
+    var parentX1 = position.x - parentWidth/2 - padding;
+    var parentX2 = position.x + parentWidth/2 + padding;
+    var parentY1 = position.y - parentHeight/2 - padding;
+    var parentY2 = position.y + parentHeight/2 + padding;
+
     if (mainObj.units.length === 1) {
       var relativeCoords = AuxiliaryUnit.convertToRelativeCoord(unit, (parentX1) + AuxUnitLayout.getCurrentGap(location), 50, cy);
       unit.bbox.x = relativeCoords.x + unit.bbox.w/2;
@@ -746,7 +752,13 @@ AuxUnitLayout.computeCoords = function(mainObj, cy, unit){
       var lastUnit = mainObj.units.length - 2;//Get the position of the last unit
       unit.bbox.x = mainObj.units[lastUnit].bbox.x +  mainObj.units[lastUnit].bbox.w/2 + unit.bbox.w/2 + AuxUnitLayout.getCurrentGap(location);
     }
-    unit.bbox.y = (location === "top") ? (-50) : 50;
+    if (location === "top") {
+      var relativeCoords = AuxiliaryUnit.convertToRelativeCoord(unit, (parentX1) + AuxUnitLayout.getCurrentGap(location), parentY1, cy);
+    }
+    else {
+      var relativeCoords = AuxiliaryUnit.convertToRelativeCoord(unit, (parentX1) + AuxUnitLayout.getCurrentGap(location), parentY2, cy);
+    }
+    unit.bbox.y = relativeCoords.y;
   }//We don't have the right or left addition cases yet
 };
 
@@ -953,10 +965,11 @@ AuxUnitLayout.checkFit = function (node, cy, forceCheck){
     var coordsFirst = AuxiliaryUnit.convertToAbsoluteCoord(firstUnit, firstUnit.bbox.x, firstUnit.bbox.y, cy);
     var coordsLast = AuxiliaryUnit.convertToAbsoluteCoord(lastUnit, lastUnit.bbox.x, lastUnit.bbox.y, cy);
     var gap = AuxUnitLayout.getCurrentGap(location);
+    var padding = node.padding();
     if (units.length > 0) { //For any case of removal
       if (location === "top" || location === "bottom") {
-        var parentX1 = node.position().x - node.width()/2;
-        var parentX2 = node.position().x + node.width()/2;
+        var parentX1 = node.position().x - node.width()/2 - padding;
+        var parentX2 = node.position().x + node.width()/2 + padding;
         var firstX1 = coordsFirst.x - firstUnit.bbox.w/2;
         var lastX2 = coordsLast.x + lastUnit.bbox.w/2;
         if (parentX1 + gap > firstX1 || parentX2 - gap < lastX2) {
@@ -964,8 +977,8 @@ AuxUnitLayout.checkFit = function (node, cy, forceCheck){
         }
       }
       else {
-        var parentY1 = node.position().y - node.height()/2;
-        var parentY2 = node.position().y + node.height()/2 ;
+        var parentY1 = node.position().y - node.height()/2 - padding;
+        var parentY2 = node.position().y + node.height()/2 + padding;
         var firstY1 = coordsFirst.y - firstUnit.bbox.h/2;
         var lastY2 = coordsLast.y + lastUnit.bbox.h/2;
         if (parentY1 + gap > firstY1 || parentY2 - gap < lastY2) {
@@ -983,10 +996,10 @@ AuxUnitLayout.fitUnits = function (node, cy, locations) {
   var parentHeight = node.height();
   var padding = node.padding();
   var position = node.position();
-  var parentX1 = position.x - parentWidth/2;
-  var parentX2 = position.x + parentWidth/2;
-  var parentY1 = position.y - parentHeight/2;
-  var parentY2 = position.y + parentHeight/2;
+  var parentX1 = position.x - parentWidth/2 - padding;
+  var parentX2 = position.x + parentWidth/2 + padding;
+  var parentY1 = position.y - parentHeight/2 - padding;
+  var parentY2 = position.y + parentHeight/2 + padding;
 
   //Get Parent node and find parent width
   var usedLength;
