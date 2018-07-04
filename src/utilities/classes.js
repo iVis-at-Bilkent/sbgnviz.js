@@ -752,13 +752,7 @@ AuxUnitLayout.computeCoords = function(mainObj, cy, unit){
       var lastUnit = mainObj.units.length - 2;//Get the position of the last unit
       unit.bbox.x = mainObj.units[lastUnit].bbox.x +  mainObj.units[lastUnit].bbox.w/2 + unit.bbox.w/2 + AuxUnitLayout.getCurrentGap(location);
     }
-    if (location === "top") {
-      var relativeCoords = AuxiliaryUnit.convertToRelativeCoord(unit, (parentX1) + AuxUnitLayout.getCurrentGap(location), parentY1, cy);
-    }
-    else {
-      var relativeCoords = AuxiliaryUnit.convertToRelativeCoord(unit, (parentX1) + AuxUnitLayout.getCurrentGap(location), parentY2, cy);
-    }
-    unit.bbox.y = relativeCoords.y;
+    unit.bbox.y = (location === "top") ? -50 : 50;
   }//We don't have the right or left addition cases yet
 };
 
