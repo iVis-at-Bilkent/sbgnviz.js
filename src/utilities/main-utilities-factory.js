@@ -439,7 +439,8 @@ module.exports = function () {
     // If this function is being called we can assume that view utilities extension is on use
     var viewUtilities = cy.viewUtilities('get');
 
-    nodesToHighlight = elementUtilities.extendNodeList(nodesToHighlight);
+    // Use this line for smart search
+    // nodesToHighlight = elementUtilities.extendNodeList(nodesToHighlight);
 
     if (options.undoable) {
       cy.undoRedo().do("highlight", nodesToHighlight);
