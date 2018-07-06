@@ -271,14 +271,16 @@ AuxiliaryUnit.setAnchorSide = function(mainObj, node) {
   var height = (node.data('class') == "compartment"|| node.data('class') == "complex") ? node.data('bbox').h : node.height();
   var outerWidth = node.outerWidth() + (width - node.width());
   var extraCompartmentPadding = (node.data("class") == "compartment") ? (-outerWidth * 0.1) : 0;
-  var parentX1 = node.position().x - width / 2 - extraCompartmentPadding;
-  var parentY1 = node.position().y - height/ 2;
-  var parentY2 = node.position().y + height/ 2;
+  var parentX = (node.data('class') == "compartment" || node.data('class') == "complex") ? node.data('bbox').x : node.position().x;
+  var parentY = (node.data('class') == "compartment" || node.data('class') == "complex") ? node.data('bbox').y : node.position().y;
+  var parentX1 = parentX - width / 2 - extraCompartmentPadding;
+  var parentY1 = parentY - height/ 2;
+  var parentY2 = parentY + height/ 2;
 
-  if (thisY + thisH/2 <= parentY1){
+  if (thisY + thisH/2 == parentY1){
     mainObj.anchorSide = "top";
   }
-  else if (thisY + thisH/2 >= parentY2) {
+  else if (thisY + thisH/2 == parentY2) {
     mainObj.anchorSide = "bottom";
   }
   else if(thisX + thisW/2 <= parentX1) {
