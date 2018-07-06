@@ -261,22 +261,33 @@ AuxiliaryUnit.convertToRelativeCoord = function(mainObj, absX, absY, cy, parentN
   }
 };
 
-AuxiliaryUnit.setAnchorSide = function(mainObj) {
+AuxiliaryUnit.setAnchorSide = function(mainObj, node) {
 
   var thisX = mainObj.bbox.x;
   var thisY = mainObj.bbox.y;
-  if(thisY === -50 || thisY < -48 ) {
+  var thisH = mainObj.bbox.h;
+  var thisW = mainObj.bbox.w;
+  var width = (node.data('class') == "compartment" || node.data('class') == "complex") ? node.data('bbox').w : node.width();
+  var height = (node.data('class') == "compartment"|| node.data('class') == "complex") ? node.data('bbox').h : node.height();
+  var outerWidth = node.outerWidth() + (width - node.width());
+  var extraCompartmentPadding = (node.data("class") == "compartment") ? (-outerWidth * 0.1) : 0;
+  var parentX1 = node.position().x - width / 2 - extraCompartmentPadding;
+  var parentY1 = node.position().y - height/ 2;
+  var parentY2 = node.position().y + height/ 2;
+
+  if (thisY + thisH/2 <= parentY1){
     mainObj.anchorSide = "top";
   }
-  else if (thisX === -50) {
-    mainObj.anchorSide = "left";
-  }
-  else if (thisY === 50 || thisY > 48) {
+  else if (thisY + thisH/2 >= parentY2) {
     mainObj.anchorSide = "bottom";
+  }
+  else if(thisX + thisW/2 <= parentX1) {
+    mainObj.anchorSide = "left";
   }
   else {
     mainObj.anchorSide = "right";
   }
+
 };
 
 AuxiliaryUnit.addToParent = function (mainObj, cy, parentNode, location, position, index) {

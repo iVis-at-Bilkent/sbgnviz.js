@@ -212,9 +212,13 @@ module.exports = function () {
 	          var statesandinfos = node.data('statesandinfos')[i];
 						var bbox = statesandinfos.bbox;
 						var position = node.position();
-			      bbox.x = (bbox.x - position.x + bbox.w/2) * 100 / node.width();
-			      bbox.y = (bbox.y - position.y + bbox.h/2) * 100 / node.height();
-						classes.AuxiliaryUnit.setAnchorSide(statesandinfos);
+						var width = (node.data('class') == "compartment" || node.data('class') == "complex") ? node.data('bbox').w : node.width();
+						var height = (node.data('class') == "compartment" || node.data('class') == "complex") ? node.data('bbox').h : node.height();
+						var parentX = (node.data('class') == "compartment" || node.data('class') == "complex") ? node.data('bbox').x : position.x;
+						var parentY = (node.data('class') == "compartment" || node.data('class') == "complex") ? node.data('bbox').y : position.y;
+						classes.AuxiliaryUnit.setAnchorSide(statesandinfos, node);
+						bbox.x = (bbox.x - parentX + bbox.w/2) * 100 / width;
+						bbox.y = (bbox.y - parentY + bbox.h/2) * 100 / height;
 	          var location = statesandinfos.anchorSide; // top bottom right left
 	          var layouts = node.data('auxunitlayouts');
 	          if(!layouts[location]) { // layout doesn't exist yet for this location
