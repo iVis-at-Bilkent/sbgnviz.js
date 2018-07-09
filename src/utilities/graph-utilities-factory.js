@@ -114,7 +114,7 @@ module.exports = function () {
       cy.edgeBendEditing('get').initBendPoints(cy.edges());
     }
 
-    $(document).trigger( "updateGraphEnd", cy );
+    $(document).trigger( "updateGraphEnd", [cy, isLayoutRequired]);
     if (callback) callback();
   };
 
