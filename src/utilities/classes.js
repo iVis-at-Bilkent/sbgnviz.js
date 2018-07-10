@@ -277,13 +277,13 @@ AuxiliaryUnit.setAnchorSide = function(mainObj, node) {
   var parentY1 = parentY - height/ 2;
   var parentY2 = parentY + height/ 2;
 
-  if (thisY + thisH/2 == parentY1){
+  if ((thisY + thisH/2).toFixed(2) == (parentY1).toFixed(2)){
     mainObj.anchorSide = "top";
   }
-  else if (thisY + thisH/2 == parentY2) {
+  else if ((thisY + thisH/2).toFixed(2) == (parentY2).toFixed(2)) {
     mainObj.anchorSide = "bottom";
   }
-  else if(thisX + thisW/2 <= parentX1) {
+  else if((thisX + thisW/2).toFixed(2) <= (parentX1).toFixed(2)) {
     mainObj.anchorSide = "left";
   }
   else {
