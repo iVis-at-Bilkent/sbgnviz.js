@@ -251,9 +251,11 @@ module.exports = function () {
 
 	        }
 
-					var locations = classes.AuxUnitLayout.checkFit(node, cy);
-					if (locations !== undefined && locations.length > 0) {
-						classes.AuxUnitLayout.fitUnits(node, cy, locations);
+					if (isLayoutRequired === true) {
+						var locations = classes.AuxUnitLayout.checkFit(node, cy);
+						if (locations !== undefined && locations.length > 0) {
+							classes.AuxUnitLayout.fitUnits(node, cy, locations);
+						}
 					}
 	      });
 	      cy.endBatch();
