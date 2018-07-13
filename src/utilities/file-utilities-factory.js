@@ -41,6 +41,7 @@ module.exports = function () {
    else {
      xhttp = new ActiveXObject("Microsoft.XMLHTTP");
    }
+   xhttp.overrideMimeType('application/xml');
    xhttp.open("GET", fullFilePath, false);
    xhttp.send();
    return xhttp.responseXML;
