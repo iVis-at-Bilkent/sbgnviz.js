@@ -190,6 +190,7 @@ module.exports = function () {
               fontFamily: style.properties.fontFamily,
               fontWeight: style.properties.fontWeight,
               fontStyle: style.properties.fontStyle,
+              fontColor: style.properties.fontColor,
               fill: style.properties.fill, // fill color
               stroke: style.properties.stroke, // stroke color
               strokeWidth: style.properties.strokeWidth,

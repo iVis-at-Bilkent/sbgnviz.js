@@ -694,6 +694,11 @@ module.exports = function () {
         node.data['font-weight'] = fontWeight;
       }
 
+      var fontColor = elementIDToStyle[node.data['id']].fontColor;
+      if (fontColor) {
+        node.data['color'] = fontColor;
+      }
+
       var textAnchor = elementIDToStyle[node.data['id']].textAnchor;
       if (textAnchor) {
         node.data['text-halign'] = textAnchor;
