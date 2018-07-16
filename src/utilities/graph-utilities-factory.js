@@ -19,7 +19,7 @@ module.exports = function () {
 
   // TODO make these initial values user options instead of hardcoding them here
   graphUtilities.portsEnabled = true;
-  graphUtilities.compoundSizesConsidered = false;
+  graphUtilities.compoundSizesConsidered = true;
 
   graphUtilities.disablePorts = function() {
     graphUtilities.portsEnabled = false;
