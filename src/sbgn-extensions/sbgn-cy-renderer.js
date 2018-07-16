@@ -85,7 +85,7 @@ module.exports = function () {
   };
 
   $$.sbgn.colors = {
-    clone: "#a9a9a9"
+    clone: "#838383"
   };
 
   $$.sbgn.drawStateAndInfos = function (node, context, centerX, centerY) {
