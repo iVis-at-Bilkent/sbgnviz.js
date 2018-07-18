@@ -49,13 +49,13 @@ module.exports = function () {
     return graphUtilities.compoundSizesConsidered = true;
   };
 
-  graphUtilities.updateGraph = function(cyGraph, callback, isLayoutRequired) {
+  graphUtilities.updateGraph = function(cyGraph, callback, isLayoutRequired, tileInfoBoxes) {
     console.log('cy update called');
 
     if(isLayoutRequired === undefined){
       isLayoutRequired = false;
     }
-    
+
     $(document).trigger( "updateGraphStart", cy );
     // Reset undo/redo stack and buttons when a new graph is loaded
     if (options.undoable) {
@@ -114,7 +114,9 @@ module.exports = function () {
       cy.edgeBendEditing('get').initBendPoints(cy.edges());
     }
 
-    $(document).trigger( "updateGraphEnd", [cy, isLayoutRequired]);
+
+
+    $(document).trigger( "updateGraphEnd", [cy, (isLayoutRequired || tileInfoBoxes)]);
     if (callback) callback();
   };
 

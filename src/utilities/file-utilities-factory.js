@@ -243,9 +243,9 @@ fileUtilities.loadTDFile = function(file, callback1){
    reader.readAsText(file);
  };
 
- fileUtilities.loadSBGNMLText = function(textData){
+ fileUtilities.loadSBGNMLText = function(textData, tileInfoBoxes){
      setTimeout(function () {
-         updateGraph(sbgnmlToJson.convert(textToXmlObject(textData)));
+         updateGraph(sbgnmlToJson.convert(textToXmlObject(textData)), undefined, undefined, tileInfoBoxes);
          uiUtilities.endSpinner("load-file-spinner");
      }, 0);
 
