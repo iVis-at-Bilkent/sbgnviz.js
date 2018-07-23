@@ -373,21 +373,26 @@ module.exports = function () {
           $$.sbgn.drawSimpleChemical(context, centerX + multimerPadding,
                   centerY + multimerPadding, width, height);
 
-          context.stroke();
+          var borderWidth = node.pstyle( 'border-width' ).pfValue;
+          if( borderWidth > 0 ){
+            context.stroke();
+          }
 
           $$.sbgn.cloneMarker.simpleChemical(context,
                   centerX + multimerPadding, centerY + multimerPadding,
                   width - padding, height - padding, cloneMarker, true,
                   node.css('background-opacity'));
 
-          //context.stroke();
         }
 
         $$.sbgn.drawSimpleChemical(context,
                 centerX, centerY,
                 width, height);
 
-        context.stroke();
+        var borderWidth = node.pstyle( 'border-width' ).pfValue;
+        if( borderWidth > 0 ){
+          context.stroke();
+        }
 
         // draw background image
         if(imgObj){
@@ -485,14 +490,15 @@ module.exports = function () {
                   width, height);
 
           context.fill();
-          context.stroke();
+          var borderWidth = node.pstyle( 'border-width' ).pfValue;
+          if( borderWidth > 0 ){
+            context.stroke();
+          }
 
           $$.sbgn.cloneMarker.macromolecule(context,
                   centerX + multimerPadding, centerY + multimerPadding,
                   width, height, cloneMarker, true,
                   node.css('background-opacity'));
-
-          //context.stroke();
         }
 
         drawRoundRectanglePath(context,
@@ -500,7 +506,10 @@ module.exports = function () {
                 width, height);
         context.fill();
 
-        context.stroke();
+        var borderWidth = node.pstyle( 'border-width' ).pfValue;
+        if( borderWidth > 0 ){
+          context.stroke();
+        }
 
         // draw background image
         if(imgObj){
@@ -605,14 +614,15 @@ module.exports = function () {
                   width, height, cyBaseNodeShapes["complex"].points);
           context.fill();
 
-          context.stroke();
+          var borderWidth = node.pstyle( 'border-width' ).pfValue;
+          if( borderWidth > 0 ){
+            context.stroke();
+          }
 
           $$.sbgn.cloneMarker.complex(context,
                   centerX + multimerPadding, centerY + multimerPadding,
                   width, height, cornerLength, cloneMarker, true,
                   node.css('background-opacity'));
-
-          //context.stroke();
         }
 
         drawPolygonPath(context,
@@ -620,7 +630,10 @@ module.exports = function () {
                 width, height, cyBaseNodeShapes["complex"].points);
         context.fill();
 
-        context.stroke();
+        var borderWidth = node.pstyle( 'border-width' ).pfValue;
+        if( borderWidth > 0 ){
+          context.stroke();
+        }
         
         // draw background image
         if(imgObj){
@@ -733,21 +746,26 @@ module.exports = function () {
                   centerX + multimerPadding,
                   centerY + multimerPadding, cornerRadius);
 
-          context.stroke();
+          var borderWidth = node.pstyle( 'border-width' ).pfValue;
+          if( borderWidth > 0 ){
+            context.stroke();
+          }
 
           $$.sbgn.cloneMarker.nucleicAcidFeature(context,
                   centerX + multimerPadding, centerY + multimerPadding,
                   width, height, cloneMarker, true,
                   node.css('background-opacity'));
 
-          //context.stroke();
         }
 
         $$.sbgn.drawNucAcidFeature(context, width, height, centerX,
                 centerY, cornerRadius);
 
-        context.stroke();
-        
+        var borderWidth = node.pstyle( 'border-width' ).pfValue;
+        if( borderWidth > 0 ){
+          context.stroke();
+        }
+
         // draw background image
         if(imgObj){
           context.clip();
@@ -837,8 +855,11 @@ module.exports = function () {
         $$.sbgn.drawEllipse(context, centerX, centerY,
                 width, height);
 
-        context.stroke();
-        
+        var borderWidth = node.pstyle( 'border-width' ).pfValue;
+        if( borderWidth > 0 ){
+          context.stroke();
+        }
+
         // draw background image
         if(imgObj){
           context.clip();
@@ -853,8 +874,10 @@ module.exports = function () {
         context.lineTo(centerX + scaleX * pts[6], centerY + scaleY * pts[7]);
         context.closePath();
 
-
-        context.stroke();
+        var borderWidth = node.pstyle( 'border-width' ).pfValue;
+        if( borderWidth > 0 ){
+          context.stroke();
+        }
 
       },
       intersectLine: cyBaseNodeShapes["ellipse"].intersectLine,
@@ -875,7 +898,10 @@ module.exports = function () {
                 width, height, cyBaseNodeShapes["biological activity"].points);
         context.fill();
 
-        context.stroke();
+        var borderWidth = node.pstyle( 'border-width' ).pfValue;
+        if( borderWidth > 0 ){
+          context.stroke();
+        }
         
         // draw background image
         if(imgObj){
@@ -939,7 +965,10 @@ module.exports = function () {
 
         drawBarrelPath(context, centerX, centerY, width, height );
         context.fill();
-        context.stroke();
+        var borderWidth = node.pstyle( 'border-width' ).pfValue;
+        if( borderWidth > 0 ){
+          context.stroke();
+        }
 
         // draw background image
         if(imgObj){
@@ -1060,7 +1089,10 @@ module.exports = function () {
                 width, height);
         context.fill();
 
-        context.stroke();
+        var borderWidth = node.pstyle( 'border-width' ).pfValue;
+        if( borderWidth > 0 ){
+          context.stroke();
+        }
 
         // draw background image
         if(imgObj){
@@ -1182,7 +1214,6 @@ module.exports = function () {
 
         context.fillStyle = oldStyle;
         context.globalAlpha = oldGlobalAlpha;
-        //context.stroke();
       }
     },
     macromolecule: function (context, centerX, centerY,
@@ -1215,7 +1246,6 @@ module.exports = function () {
         context.fillStyle = oldStyle;
         context.globalAlpha = oldGlobalAlpha;
 
-//                context.stroke();
       }
     }
   };
