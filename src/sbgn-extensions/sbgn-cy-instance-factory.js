@@ -407,8 +407,6 @@ module.exports = function () {
 	          })
 	          .selector("node[class='compartment']")
 	          .css({
-	            'border-width': 3.25,
-	            'background-opacity': 0,
 	            'text-valign': 'bottom',
 	            'text-halign': 'center',
 	            'text-margin-y' : -1 * options.extraCompartmentPadding,
