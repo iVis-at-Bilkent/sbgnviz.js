@@ -392,7 +392,10 @@ StateVariable.drawShape = function(mainObj, cy, context, x, y) {
   context.fillStyle = StateVariable.defaultBackgroundColor;
   context.fill();
   context.fillStyle = tmp_ctxt;
-  context.stroke();
+
+  var parent = getAuxUnitClass(mainObj).getParent(mainObj, cy);
+  if(parent.pstyle( 'border-width' ).pfValue > 0)
+    context.stroke();
 };
 
 StateVariable.create = function(parentNode, cy, value, variable, bbox, location, position, index) {
@@ -485,7 +488,10 @@ UnitOfInformation.drawShape = function(mainObj, cy, context, x, y) {
   context.fillStyle = UnitOfInformation.defaultBackgroundColor;
   context.fill();
   context.fillStyle = tmp_ctxt;
-  context.stroke();
+  
+  var parent = getAuxUnitClass(mainObj).getParent(mainObj, cy);
+  if(parent.pstyle( 'border-width' ).pfValue > 0)
+    context.stroke();
 };
 
 /**
