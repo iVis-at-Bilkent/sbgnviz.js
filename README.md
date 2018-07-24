@@ -207,10 +207,40 @@ Ends any spinner having a css class with the given name. Requires 'fontawesome.c
 
 `instance.elementUtilities`
 General and sbgn specific utilities for cytoscape elements. These are exposed for the users who builds an extension
-library of sbgnviz. Most users will not need to use this. It includes the followings.
+library of sbgnviz. Most users will not need to use this. It includes the followings:
 
+* `getDefaultProperties(sbgnclass)` Access the default properties for elements of given sbgnclass. If sbgnclass parameter is not defined it returns the whole map where the default properties are mapped to sbgnclasses. These properties are considered upon element creation. The special fields are the followings.<br>
+   'width': The default width<br>
+   'height': The default height<br>
+   'font-size': The default font size<br>
+   'font-family': The default font family<br>
+   'font-style': The default font style<br>
+   'font-weight': The default font weight<br>
+   'background-color': The default background color<br>
+   'background-opacity': The default background opacity<br>
+   'border-width': The default border width<br>
+   'border-color': The default border color
+* `setDefaultProperties(sbgnclass, props)` Updates the default properties map of given sbgnclass by the given properties.
  * `getTopMostNodes(nodes)` This method returns the nodes non of whose ancestors is not in given nodes.
  * `allHaveTheSameParent(nodes)` This method checks if all of the given nodes have the same parent assuming that the size of  nodes is not 0.
+ * `isValidParent(nodeClass, parentClass)` Returns if the elements with the given parent class can be parent of the elements with the given node class.
+ * `getCommonProperty(nodes, width, height, useAspectRatio)` Get common properties of given elements. Returns null if the given element list is empty or the property is not common for all elements.
+    dataOrCss parameter specify whether to check the property on data or css. The default value for it is data. If propertyName parameter is given as a function instead of a string representing the
+    property name then use what that function returns.
+ * `trueForAllElements(elements, fcn)` Returns if the function returns a truthy value for all of the given elements.
+ * `canHaveSBGNCardinality(ele)` Returns whether the given element or elements with the given class can have sbgncardinality.
+ * `canHaveSBGNLabel(ele)` Returns whether the given element or elements with the given class can have sbgnlabel.
+ * `isBiologicalActivity(ele)` Returns whether the given elements class is a subtype of biological activity. Parameter would correspond to the class itself as well.
+ * `canHaveUnitOfInformation(ele)` Returns whether the given element or elements with the given class have unit of information.
+ * `canHaveStateVariable(ele)` Returns whether the given element or elements with the given class have state variable.
+ * `mustBeSquare(ele)` Returns whether the given element or elements with the given class should have the same width and height.
+ * `someMustNotBeSquare(ele)` Returns whether the given element or elements with the given class must not be in square shape.
+ * `canBeCloned(ele)` Returns whether the given element or elements with the given class can be cloned.
+ * `canBeMultimer(ele)` Returns whether the given element or elements with the given class can be multimer.
+ * `isEPNClass(ele)` Returns whether the given class is an EPN class or the given element is an EPN.
+ * `isPNClass(ele)` Returns whether the given class is an PN class or the given element is an PN.
+ * `isLogicalOperator(ele)` Returns whether the given class is a logical operator class or the given element is a logical operator.
+ * `convenientToEquivalence(ele)` Returns whether the given class or the class of the given element is an equivalance class.
  * `moveNodes(positionDiff, nodes)` This method moves given nodes by the given position difference.
  * `convertToModelPosition(renderedPosition)` This method calculates the modal position of the given rendered position by considering current the pan and zoom level of the graph.
  * `getProcessesOfSelected()` Returns the processes of the selected nodes.

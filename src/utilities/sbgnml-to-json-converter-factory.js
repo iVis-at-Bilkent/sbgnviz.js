@@ -4,13 +4,19 @@ var libUtilities = require('./lib-utilities');
 var classes = require('./classes');
 
 module.exports = function () {
-  var elementUtilities, graphUtilities;
+  var elementUtilities, graphUtilities, handledElements;
 
   function sbgnmlToJson (param) {
     optionUtilities = param.optionUtilities;
     options = optionUtilities.getOptions();
     elementUtilities = param.elementUtilities;
     graphUtilities = param.graphUtilities;
+
+    handledElements = {};
+
+    elementUtilities.elementTypes.forEach( function( type ) {
+      handledElements[ type ] = true;
+    } );
   }
 
   sbgnmlToJson.insertedNodes = {};
@@ -276,6 +282,17 @@ module.exports = function () {
     self.addParentInfoToNode(ele, nodeObj, parent, compartments);
     // add language info, this will always be the mapType
     nodeObj.language = elementUtilities.mapType;
+    // add default properties of the node type to element data
+    // these props would be overriden by style properties of element
+    // stored in the file
+    var defaultProps = elementUtilities.getDefaultProperties( nodeObj.class );
+
+    Object.keys( defaultProps ).forEach( function( prop ) {
+      // skip width and height
+      if ( prop !== 'width' && prop !== 'height' ) {
+        nodeObj[ prop ] = defaultProps[ prop ];
+      }
+    } );
 
     // add clone information
     if (ele.clone) {
@@ -416,7 +433,7 @@ module.exports = function () {
 
   sbgnmlToJson.traverseNodes = function (ele, jsonArray, parent, compartments) {
     var elId = ele.id;
-    if (!elementUtilities.handledElements[ele.class_]) {
+    if (!handledElements[ele.class_]) {
       return;
     }
     this.insertedNodes[elId] = true;
@@ -537,7 +554,7 @@ module.exports = function () {
   };
 
   sbgnmlToJson.addCytoscapeJsEdge = function (ele, jsonArray, xmlObject) {
-    if (!elementUtilities.handledElements[ele.class_]) {
+    if (!handledElements[ele.class_]) {
       return;
     }
 

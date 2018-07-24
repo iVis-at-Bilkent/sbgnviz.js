@@ -268,14 +268,9 @@ module.exports = function () {
 	          .css({
 	            'text-valign': 'center',
 	            'text-halign': 'center',
-	            'border-width': 1.25,
-	            'border-color': '#555',
-	            'background-color': '#ffffff',
-	            'background-opacity': 0.5,
 	            'text-opacity': 1,
 	            'opacity': 1,
-	            'padding': 0,
-	            'text-wrap': 'wrap'
+	            'padding': 0
 	          })
 	          .selector("node[class]")
 	          .css({
@@ -285,10 +280,92 @@ module.exports = function () {
 	            'content': function (ele) {
 	              return elementUtilities.getElementContent(ele);
 	            },
-	            'font-size': function (ele) {
-	              return elementUtilities.getLabelTextSize(ele);
-	            },
-	          })
+							'font-size': function (ele) {
+			          // If node labels are expected to be adjusted automatically or element cannot have label
+			          // or ele.data('font-size') is not defined return elementUtilities.getLabelTextSize()
+								// else return ele.data('font-size')
+			          var opt = options.adjustNodeLabelFontSizeAutomatically;
+			          var adjust = typeof opt === 'function' ? opt() : opt;
+
+			          if (!adjust && ele.data('font-size') != undefined) {
+			            return ele.data('font-size');
+			          }
+
+			          return elementUtilities.getLabelTextSize(ele);
+			        }
+			      })
+			      .selector("node[class][font-family]")
+			      .style({
+			        'font-family': function( ele ) {
+								return ele.data('font-family');
+							}
+			      })
+			      .selector("node[class][font-style]")
+			      .style({
+			        'font-style': function( ele ) {
+								return ele.data('font-style')
+							}
+			      })
+			      .selector("node[class][font-weight]")
+			      .style({
+			        'font-weight': function( ele ) {
+								return ele.data('font-weight');
+							}
+			      })
+			      .selector("node[class][color]")
+			      .style({
+			        'color': function( ele ) {
+								return ele.data('color');
+							}
+			      })
+			      .selector("node[class][background-color]")
+			      .style({
+			        'background-color': function( ele ) {
+								return ele.data('background-color');
+							}
+			      })
+			      .selector("node[class][background-opacity]")
+			      .style({
+			        'background-opacity': function( ele ) {
+								return ele.data('background-opacity');
+							}
+			      })
+			      .selector("node[class][border-width]")
+			      .style({
+			        'border-width': function( ele ) {
+								return ele.data('border-width');
+							}
+			      })
+			      .selector("node[class][border-color]")
+			      .style({
+			        'border-color': function( ele ) {
+								return ele.data('border-color');
+							}
+			      })
+			      .selector("node[class][text-wrap]")
+			      .style({
+			        'text-wrap': function( ele ) {
+								return ele.data('text-wrap');
+							}
+			      })
+						.selector("edge[class][line-color]")
+			      .style({
+			        'line-color': function( ele ) {
+								return ele.data('line-color');
+							},
+			        'source-arrow-color': function( ele ) {
+								return ele.data('line-color');
+							},
+			        'target-arrow-color': function( ele ) {
+								return ele.data('line-color');
+							}
+			      })
+			      .selector("edge[class][width]")
+			      .style({
+			        'width': function( ele ) {
+								return ele.data('width');
+							}
+			      })
 	          .selector("node[class='association'],[class='dissociation'],[class='and'],[class='or'],[class='not'],[class='process'],[class='omitted process'],[class='uncertain process']")
 	          .css({
 	            'shape-polygon-points': function(ele) {
@@ -345,8 +422,6 @@ module.exports = function () {
 	          })
 	          .selector("node[class='submap']")
 	          .css({
-	            'border-width': 2.25,
-	            'background-opacity': 0,
 	            'text-valign': 'bottom',
 	            'text-halign': 'center',
 	            'text-margin-y' : -1 * options.extraCompartmentPadding,
@@ -429,10 +504,8 @@ module.exports = function () {
 	          .selector("edge")
 	          .css({
 	            'curve-style': 'bezier',
-	            'line-color': '#555',
 	            'target-arrow-fill': 'hollow',
 	            'source-arrow-fill': 'hollow',
-	            'width': 1.25,
 	            'target-arrow-color': '#555',
 	            'source-arrow-color': '#555',
 	            'text-border-color': function (ele) {
