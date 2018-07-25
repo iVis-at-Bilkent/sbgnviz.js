@@ -1916,7 +1916,7 @@ module.exports = function () {
       'border-width': 1.25,
       'border-color': '#555',
       'background-color': '#ffffff',
-      'background-opacity': 0.5,
+      'background-opacity': 1,
       'text-wrap': 'wrap'
     };
   };
@@ -2029,6 +2029,12 @@ module.exports = function () {
 
   elementUtilities.nodeTypes.forEach( function( type ) {
     defaultProperties[ type ] = $.extend( {}, getDefaultNodeProperties(), getDefaultSize( type ) );
+  } );
+
+  elementUtilities.compoundNodeTypes.forEach( function( type ) {
+    defaultProperties[ type ] = $.extend( defaultProperties[ type ], {
+      'background-opacity': 0.5
+    } );
   } );
 
   $.extend( defaultProperties['association'], {
