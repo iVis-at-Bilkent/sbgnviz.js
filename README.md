@@ -387,8 +387,8 @@ Thanks to JetBrains for an [Open Source License](https://www.jetbrains.com/buy/o
 
 ## Team
 
-  * [Hasan Balci](https://github.com/hasanbalci), [Kaan Sancak](https://github.com/kaansancak), [Ahmet Candiroglu](https://github.com/ahmetcandiroglu), and [Ugur Dogrusoz](https://github.com/ugurdogrusoz) of [i-Vis at Bilkent University](http://www.cs.bilkent.edu.tr/~ivis), [Metin Can Siper](https://github.com/metincansiper) of the Demir Lab at [OHSU](http://www.ohsu.edu/), and [Ludovic Roy](https://github.com/royludo) of [EISBM](http://eisbm.org)
+  * [Hasan Balci](https://github.com/hasanbalci), [Kaan Sancak](https://github.com/kaansancak), [Ahmet Candiroglu](https://github.com/ahmetcandiroglu), and [Ugur Dogrusoz](https://github.com/ugurdogrusoz) of [i-Vis at Bilkent University](http://www.cs.bilkent.edu.tr/~ivis), and [Metin Can Siper](https://github.com/metincansiper) of the Demir Lab at [OHSU](http://www.ohsu.edu/)
   
 #### Alumni
 
-  * [Ilkin Safarli](https://github.com/kinimesi), [Leonard Dervishi](https://github.com/leonarddrv), Alper Karacelik, Selim Firat Yilmaz, Istemi Bahceci, Mecit Sari, Ayhun Tekat, M.Furkan Sahin
+  * [Ilkin Safarli](https://github.com/kinimesi), [Ludovic Roy](https://github.com/royludo), [Leonard Dervishi](https://github.com/leonarddrv), Alper Karacelik, Selim Firat Yilmaz, Istemi Bahceci, Mecit Sari, Ayhun Tekat, M.Furkan Sahin
