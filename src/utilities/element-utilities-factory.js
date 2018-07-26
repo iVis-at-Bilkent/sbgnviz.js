@@ -550,7 +550,7 @@ module.exports = function () {
   elementUtilities.isEPNClass = function (ele) {
     var sbgnclass = elementUtilities.getPureSbgnClass( ele );
 
-    return inArray( sbgnclass, epnTypes );
+    return inArray( sbgnclass, elementUtilities.epnTypes );
   };
 
   // Returns whether the given element is a PN
