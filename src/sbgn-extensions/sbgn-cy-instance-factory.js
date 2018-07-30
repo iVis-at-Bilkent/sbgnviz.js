@@ -449,15 +449,15 @@ module.exports = function () {
 	          .selector("node:parent[minHeightBiasTop]")
 	          .css({
 	            'min-height-bias-top': function(ele) {
-	              var min = ele.data('minHeightBiasTop');
-	              return (min > 0 ? min : 100) + '%';
+	              var min = parseFloat(ele.data('minHeightBiasTop'));
+	              return (min >= 0 ? min : 100) + '%';
 	            }
 	          })
 	          .selector("node:parent[minHeightBiasBottom]")
 	          .css({
 	            'min-height-bias-bottom': function(ele) {
-	              var min = ele.data('minHeightBiasBottom');
-	              return (min > 0 ? min : 100) + '%';
+	              var min = parseFloat(ele.data('minHeightBiasBottom'));
+	              return (min >= 0 ? min : 100) + '%';
 	            }
 	          })
 	          .selector("node:parent[minWidth]")
@@ -473,15 +473,15 @@ module.exports = function () {
 	          .selector("node:parent[minWidthBiasLeft]")
 	          .css({
 	            'min-width-bias-left': function(ele) {
-	              var min = ele.data('minWidthBiasLeft');
-	              return (min > 0 ? min : 100) + '%';
+	              var min = parseFloat(ele.data('minWidthBiasLeft'));
+	              return (min >= 0 ? min : 100) + '%';
 	            }
 	          })
 	          .selector("node:parent[minWidthBiasRight]")
 	          .css({
 	            'min-width-bias-right': function(ele) {
-	              var min = ele.data('minWidthBiasRight');
-	              return (min > 0 ? min : 100) + '%';
+	              var min = parseFloat(ele.data('minWidthBiasRight'));
+	              return (min >= 0 ? min : 100) + '%';
 	            }
 	          })
 	          .selector("node.cy-expand-collapse-collapsed-node")
