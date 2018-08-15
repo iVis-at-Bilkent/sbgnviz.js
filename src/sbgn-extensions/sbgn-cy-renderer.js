@@ -1009,6 +1009,64 @@ module.exports = function () {
     return []; // if nothing
   };
 
+  //this function gives the intersections of any line with the upper half of perturbing agent
+  $$.sbgn.perturbingAgentIntersectLine = function (
+          x1, y1, x2, y2, nodeX, nodeY, width, height, padding) {
+
+    var halfWidth = width / 2;
+    var halfHeight = height / 2;
+
+    // Check intersections with straight line segments
+    var straightLineIntersections = [];
+
+    // Top segment, left to right
+    {
+      var topStartX = nodeX - halfWidth - padding;
+      var topStartY = nodeY - halfHeight - padding;
+      var topEndX = nodeX + halfWidth + padding;
+      var topEndY = topStartY;
+
+      var intersection = cyMath.finiteLinesIntersect(
+              x1, y1, x2, y2, topStartX, topStartY, topEndX, topEndY, false);
+
+      if (intersection.length > 0) {
+        straightLineIntersections = straightLineIntersections.concat(intersection);
+      }
+    }
+
+    // Right segment, top to bottom
+    {
+      var rightStartX = nodeX + halfWidth + padding;
+      var rightStartY = nodeY - halfHeight - padding;
+      var rightEndX = rightStartX - halfWidth/2;
+      var rightEndY = nodeY + padding;
+
+      var intersection = cyMath.finiteLinesIntersect(
+              x1, y1, x2, y2, rightStartX, rightStartY, rightEndX, rightEndY, false);
+
+      if (intersection.length > 0) {
+        straightLineIntersections = straightLineIntersections.concat(intersection);
+      }
+    }
+
+    // Left segment, top to bottom
+    {
+      var leftStartX = nodeX - halfWidth - padding;
+      var leftStartY = nodeY - halfHeight - padding;
+      var leftEndX = leftStartX + halfWidth/2;
+      var leftEndY = nodeY + padding;
+
+      var intersection = cyMath.finiteLinesIntersect(
+              x1, y1, x2, y2, leftStartX, leftStartY, leftEndX, leftEndY, false);
+
+      if (intersection.length > 0) {
+        straightLineIntersections = straightLineIntersections.concat(intersection);
+      }
+    }
+
+    return straightLineIntersections;
+  };
+
   //this function gives the intersections of any line with a round rectangle
   $$.sbgn.roundRectangleIntersectLine = function (
           x1, y1, x2, y2, nodeX, nodeY, width, height, cornerRadius, padding) {
@@ -1231,10 +1289,8 @@ module.exports = function () {
               infoBoxWidth / 4);
         }
         else if (node.data("class") == "BA perturbing agent"){
-          var points = $$.sbgn.generatePerturbingAgentPoints();
-          currIntersections = cyMath.polygonIntersectLine(
-            x, y, points, coord.x, coord.y, infoBoxWidth / 2,
-            infoBoxHeight / 2, padding );
+          currIntersections = $$.sbgn.perturbingAgentIntersectLine(x, y, centerX, centerY,
+              coord.x, coord.y, infoBoxWidth, infoBoxHeight, padding);
         }
         else {
           currIntersections = $$.sbgn.roundRectangleIntersectLine(x, y, centerX, centerY,
