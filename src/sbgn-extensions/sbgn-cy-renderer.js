@@ -695,6 +695,9 @@ module.exports = function () {
     "oldCompartment": $$.sbgn.drawRoundRectangle
   };
 
+  // To define an extra drawing for the node that is rendered at the very end,
+  // even after the node background image is drawn.
+  // E.g. cross lines of "source and sink" nodes.
   $$.sbgn.extraDraw = {
     "source and sink": $$.sbgn.drawCrossLine
   };
