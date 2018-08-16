@@ -504,8 +504,6 @@ module.exports = function () {
 	            'curve-style': 'bezier',
 	            'target-arrow-fill': 'hollow',
 	            'source-arrow-fill': 'hollow',
-	            'target-arrow-color': '#555',
-	            'source-arrow-color': '#555',
 	            'text-border-color': function (ele) {
 	              if (ele.selected()) {
 	                return selectionColor;
