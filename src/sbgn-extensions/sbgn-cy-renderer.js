@@ -15,6 +15,15 @@ var classes = require('../utilities/classes');
 module.exports = function () {
   var $$ = cytoscape;
 
+  /*
+  * Taken from cytoscape.js and modified so that it can be utilized from sbgnviz
+  * in a flexable way. It is needed because the sbgnviz shapes would need to stroke
+  * border more than once as they would have infoboxes, multimers etc.
+  * Extends the style properties of node with the given ones then strokes the border.
+  * Would needed to be slightly updated during cytoscape upgrades if related function in
+  * Cytoscape.js is updated. Information about where is the related function is located
+  * can be found in the file that list the changes done in ivis cytoscape fork.
+  */
   $$.sbgn.drawBorder = function({ context, node, borderWidth, borderColor, borderStyle, borderOpacity }) {
 
     borderWidth = borderWidth || ( node && parseFloat( node.css( 'border-width' ) ) );
