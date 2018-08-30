@@ -95,13 +95,7 @@ AuxiliaryUnit.copy = function (mainObj, cy, existingInstance, newParent, newId) 
 AuxiliaryUnit.draw = function(mainObj, cy, context) {
   var unitClass = getAuxUnitClass(mainObj);
   var coords = unitClass.getAbsoluteCoord(mainObj, cy);
-  var parent = getAuxUnitClass(mainObj).getParent(mainObj, cy);
-  if (mainObj.dashed === true || parent.hasClass('cy-expand-collapse-collapsed-node')) {
-    context.setLineDash([2,2]);
-  }
-  else {
-    context.setLineDash([]);
-  }
+
   unitClass.drawShape(mainObj, cy, context, coords.x, coords.y);
   if (unitClass.hasText(mainObj, cy)) {
     unitClass.drawText(mainObj, cy, context, coords.x, coords.y);
@@ -394,8 +388,8 @@ StateVariable.drawShape = function(mainObj, cy, context, x, y) {
   context.fillStyle = tmp_ctxt;
 
   var parent = getAuxUnitClass(mainObj).getParent(mainObj, cy);
-  if(parent.pstyle( 'border-width' ).pfValue > 0)
-    context.stroke();
+  var borderStyle = mainObj.dashed ? 'dashed' : undefined;
+  cytoscape.sbgn.drawBorder( { context, node: parent, borderStyle } );
 };
 
 StateVariable.create = function(parentNode, cy, value, variable, bbox, location, position, index) {
@@ -488,10 +482,10 @@ UnitOfInformation.drawShape = function(mainObj, cy, context, x, y) {
   context.fillStyle = UnitOfInformation.defaultBackgroundColor;
   context.fill();
   context.fillStyle = tmp_ctxt;
-  
+
   var parent = getAuxUnitClass(mainObj).getParent(mainObj, cy);
-  if(parent.pstyle( 'border-width' ).pfValue > 0)
-    context.stroke();
+  var borderStyle = mainObj.dashed ? 'dashed' : undefined;
+  cytoscape.sbgn.drawBorder( { context, node: parent, borderStyle } );
 };
 
 /**
