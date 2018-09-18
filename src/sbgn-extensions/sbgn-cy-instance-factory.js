@@ -110,7 +110,107 @@ module.exports = function () {
 	    ur.action("setPortsOrdering", undoRedoActionFunctions.setPortsOrdering, undoRedoActionFunctions.setPortsOrdering);
 	  }
 
+		var initElementData = function (ele) {
+
+      var eleclass = ele.data('class');
+      if (!eleclass) {
+        return;
+      }
+      eleclass = elementUtilities.demultimerizeClass(eleclass);
+
+      var classProperties = elementUtilities.getDefaultProperties(eleclass);
+
+      cy.batch(function () {
+
+        if (ele.isNode()) {
+
+      		if (classProperties['width'] && !ele.data('bbox').w) {
+            ele.data('bbox').w = classProperties['width'];
+          }
+          if (classProperties['height'] && !ele.data('bbox').h) {
+            ele.data('bbox').h = classProperties['height'];
+          }
+
+          if (!ele.data('font-size') && classProperties['font-size']) {
+            ele.data('font-size', classProperties['font-size']);
+          }
+          if (!ele.data('font-family') && classProperties['font-family']) {
+            ele.data('font-family', classProperties['font-family']);
+          }
+          if (!ele.data('font-style') && classProperties['font-style']) {
+            ele.data('font-style', classProperties['font-style']);
+          }
+          if (!ele.data('font-weight') && classProperties['font-weight']) {
+            ele.data('font-weight', classProperties['font-weight']);
+          }
+          if (!ele.data('color') && classProperties['color']) {
+            ele.data('color', classProperties['color']);
+          }
+          if (!ele.data('background-color') && classProperties['background-color']) {
+            ele.data('background-color', classProperties['background-color']);
+          }
+          if (!ele.data('background-opacity') && classProperties['background-opacity']) {
+            ele.data('background-opacity', classProperties['background-opacity']);
+          }
+          if (!ele.data('border-color') && classProperties['border-color']) {
+            ele.data('border-color', classProperties['border-color']);
+          }
+          if (!ele.data('border-width') && classProperties['border-width']) {
+            ele.data('border-width', classProperties['border-width']);
+          }
+          if (!ele.data('text-wrap') && classProperties['text-wrap']) {
+            ele.data('text-wrap', classProperties['text-wrap']);
+          }
+
+          if (ele.data('init') && ele.data('background-image') === undefined && classProperties['background-image']) {
+            ele.data('background-image', classProperties['background-image']);
+          }
+          if (ele.data('init') && ele.data('background-fit') === undefined && classProperties['background-fit']) {
+            ele.data('background-fit', classProperties['background-fit']);
+          }
+          if (ele.data('init') && ele.data('background-position-x') === undefined && classProperties['background-position-x']) {
+            ele.data('background-position-x', classProperties['background-position-x']);
+          }
+          if (ele.data('init') && ele.data('background-position-y') === undefined && classProperties['background-position-y']) {
+            ele.data('background-position-y', classProperties['background-position-y']);
+          }
+          if (ele.data('init') && ele.data('background-width') === undefined && classProperties['background-width']) {
+            ele.data('background-width', classProperties['background-width']);
+          }
+          if (ele.data('init') && ele.data('background-height') === undefined && classProperties['background-height']) {
+            ele.data('background-height', classProperties['background-height']);
+          }
+          if (ele.data('init') && ele.data('background-image-opacity') === undefined && classProperties['background-image-opacity']) {
+            ele.data('background-image-opacity', classProperties['background-image-opacity']);
+          }
+
+          if(!ele.data('init')){
+            ele.data('init', true);
+          }
+
+        }
+
+        else if (ele.isEdge()) {
+
+          if (!ele.data('width') && classProperties['width']) {
+            ele.data('width', classProperties['width']);
+          }
+          if (!ele.data('line-color') && classProperties['line-color']) {
+            ele.data('line-color', classProperties['line-color']);
+          }
+
+        }
+				
+      });
+    };
+
 	  function bindCyEvents() {
+
+			cy.on("add", function (event) {
+        var ele = event.cyTarget || event.target;
+        initElementData(ele);
+      });
+
 	    cy.on('tapend', 'node', function (event) {
 	      cy.style().update();
 	    });
