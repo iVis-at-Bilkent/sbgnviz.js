@@ -143,6 +143,8 @@ module.exports = function () {
     'simple chemical': true,
     'biological activity': true,
     'compartment': true,
+    'protein': true,
+    'small molecule': true
   };
 
   var totallyOverridenNodeShapes = $$.sbgn.totallyOverridenNodeShapes = {
@@ -152,6 +154,8 @@ module.exports = function () {
     'complex': true,
     'biological activity': true,
     'compartment': true,
+    'protein': true,
+    'small molecule': true
   };
 
   var canHaveInfoBoxShapes = $$.sbgn.canHaveInfoBoxShapes = {
@@ -160,7 +164,9 @@ module.exports = function () {
     'nucleic acid feature': true,
     'complex': true,
     'biological activity': true,
-    'compartment': true
+    'compartment': true,
+    'protein': true,
+    'small molecule': true
   };
 
   var canBeMultimerShapes = $$.sbgn.canBeMultimerShapes = {
@@ -696,7 +702,9 @@ module.exports = function () {
     "source and sink": $$.sbgn.drawEllipse,
     "biological activity": $$.sbgn.drawBiologicalActivity,
     "compartment": $$.sbgn.drawBarrel,
-    "oldCompartment": $$.sbgn.drawRoundRectangle
+    "oldCompartment": $$.sbgn.drawRoundRectangle,
+    "protein": $$.sbgn.drawRoundRectangle,
+    "small molecule": $$.sbgn.drawRoundRectangle
   };
 
   // To define an extra drawing for the node that is rendered at the very end,
@@ -741,6 +749,16 @@ module.exports = function () {
       return cyMath.roundRectangleIntersectLine(
         x, y, centerX, centerY, width, height, padding
       );
+    },
+    "protein": function( centerX, centerY, width, height, x, y, padding ) {
+      return cyMath.roundRectangleIntersectLine(
+        x, y, centerX, centerY, width, height, padding
+      );
+    },
+    "small molecule": function( centerX, centerY, width, height, x, y, padding ) {
+      return cyMath.roundRectangleIntersectLine(
+        x, y, centerX, centerY, width, height, padding
+      );
     }
   };
 
@@ -769,6 +787,12 @@ module.exports = function () {
       return cyBaseNodeShapes["barrel"].checkPoint( x, y, padding, width, height, centerX, centerY );
     },
     "oldCompartment": function( x, y, padding, width, height, centerX, centerY ) {
+      return cyBaseNodeShapes["roundrectangle"].checkPoint( x, y, padding, width, height, centerX, centerY );
+    },
+    "protein": function( x, y, padding, width, height, centerX, centerY ) {
+      return cyBaseNodeShapes["roundrectangle"].checkPoint( x, y, padding, width, height, centerX, centerY );
+    },
+    "small molecule": function( x, y, padding, width, height, centerX, centerY ) {
       return cyBaseNodeShapes["roundrectangle"].checkPoint( x, y, padding, width, height, centerX, centerY );
     }
   };

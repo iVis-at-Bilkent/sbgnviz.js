@@ -31,6 +31,7 @@ module.exports = function () {
 
   elementUtilities.PD = {}; // namespace for all PD specific stuff
   elementUtilities.AF = {}; // namespace for all AF specific stuff
+  elementUtilities.SIF = {}; // namespace for all SIF specific stuff
 
 
   /*
@@ -317,6 +318,89 @@ module.exports = function () {
     },
   }
 
+  elementUtilities.SIF.connectivityConstraints = {
+    "controls-state-change-of": {
+      "protein": {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "small molecule": {asSource: {},   asTarget: {}}
+    },
+    "controls-transport-of": {
+      "protein": {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "small molecule": {asSource: {},   asTarget: {}}
+    },
+    "controls-phosphorylation-of": {
+      "protein": {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "small molecule": {asSource: {},   asTarget: {}}
+    },
+    "controls-expression-of": {
+      "protein": {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "small molecule": {asSource: {},   asTarget: {}}
+    },
+    "catalysis-precedes": {
+      "protein": {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "small molecule": {asSource: {},   asTarget: {}}
+    },
+    "in-complex-with": {
+      "protein": {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "small molecule": {asSource: {},   asTarget: {}}
+    },
+    "interacts-with": {
+      "protein": {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "small molecule": {asSource: {},   asTarget: {}}
+    },
+    "neighbor-of": {
+      "protein": {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "small molecule": {asSource: {},   asTarget: {}}
+    },
+    "consumption-controled-by": {
+      "protein": {asSource: {},   asTarget: {isAllowed: true}},
+      "small molecule": {asSource: {isAllowed: true},   asTarget: {}}
+    },
+    "controls-production-of": {
+      "protein": {asSource: {isAllowed: true},   asTarget: {}},
+      "small molecule": {asSource: {},   asTarget: {isAllowed: true}}
+    },
+    "controls-transport-of-chemical": {
+      "protein": {asSource: {isAllowed: true},   asTarget: {}},
+      "small molecule": {asSource: {},   asTarget: {isAllowed: true}}
+    },
+    "chemical-affects": {
+      "protein": {asSource: {},   asTarget: {isAllowed: true}},
+      "small molecule": {asSource: {isAllowed: true},   asTarget: {}}
+    },
+    "reacts-with": {
+      "protein": {asSource: {},   asTarget: {}},
+      "small molecule": {asSource: {isAllowed: true},   asTarget: {isAllowed: true}}
+    },
+    "used-to-produce": {
+      "protein": {asSource: {},   asTarget: {}},
+      "small molecule": {asSource: {isAllowed: true},   asTarget: {isAllowed: true}}
+    },
+    "activates": {
+      "protein": {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "small molecule": {asSource: {},   asTarget: {}}
+    },
+    "inhibits": {
+      "protein": {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "small molecule": {asSource: {},   asTarget: {}}
+    },
+    "phosphorylates": {
+      "protein": {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "small molecule": {asSource: {},   asTarget: {}}
+    },
+    "dephosphorylates": {
+      "protein": {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "small molecule": {asSource: {},   asTarget: {}}
+    },
+    "upregulates-expression": {
+      "protein": {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "small molecule": {asSource: {},   asTarget: {}}
+    },
+    "downregulates-expression": {
+      "protein": {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "small molecule": {asSource: {},   asTarget: {}}
+    },
+  };
+
   elementUtilities.logicalOperatorTypes = ['and', 'or', 'not', 'delay'];
   elementUtilities.processTypes = ['process', 'omitted process', 'uncertain process',
     'association', 'dissociation', 'phenotype'];
@@ -326,6 +410,7 @@ module.exports = function () {
   elementUtilities.epnTypes = ['macromolecule', 'nucleic acid feature', 'simple chemical',
     'source and sink', 'unspecified entity',
     'perturbing agent', 'complex'];
+  elementUtilities.sifTypes = ['protein', 'small molecule'];
   elementUtilities.otherNodeTypes = ['compartment', 'tag', 'submap'];
 
   elementUtilities.nodeTypes = elementUtilities.epnTypes
@@ -342,7 +427,15 @@ module.exports = function () {
   elementUtilities.edgeTypes = ['consumption', 'production', 'modulation',
     'stimulation', 'catalysis', 'inhibition', 'necessary stimulation',
     'logic arc', 'equivalence arc', 'unknown influence', 'positive influence',
-    'negative influence'];
+    'negative influence', 'controls-state-change-of',
+    'controls-transport-of', 'controls-phosphorylation-of',
+    'controls-expression-of', 'catalysis-precedes', 'in-complex-with',
+    'interacts-with', 'neighbor-of', 'consumption-controled-by',
+    'controls-production-of', 'controls-transport-of-chemical',
+    'chemical-affects', 'reacts-with', 'used-to-produce',
+    'activates', 'inhibits', 'phosphorylates', 'dephosphorylates',
+    'upregulates-expression', 'downregulates-expression'
+  ];
 
   elementUtilities.elementTypes = elementUtilities.nodeTypes
     .concat( elementUtilities.edgeTypes );
@@ -822,6 +915,18 @@ module.exports = function () {
 
   // SBGN specific utilities
 
+  elementUtilities.getArrayLineStyle = function (ele) {
+    var sbgnclass = elementUtilities.getPureSbgnClass( ele );
+
+    switch (sbgnclass) {
+      case 'controls-expression-of': case 'upregulates-expression':
+      case 'downregulates-expression':
+        return 'dashed';
+      default:
+        return 'solid';
+    }
+  };
+
   elementUtilities.getCyShape = function (ele) {
       var _class = ele.data('class');
       // Get rid of rectangle postfix to have the actual node class
@@ -843,7 +948,7 @@ module.exports = function () {
           return 'biological activity';
       }
 
-      if (_class == 'submap'){
+      if (_class == 'submap' || _class == 'topology group'){
           return 'rectangle';
       }
 
@@ -873,22 +978,28 @@ module.exports = function () {
 
   elementUtilities.getCyArrowShape = function(ele) {
       var _class = ele.data('class');
-      if (_class == 'necessary stimulation') {
+
+      switch ( _class ) {
+        case 'necessary stimulation':
           return 'triangle-cross';
-      }
-      if (_class == 'inhibition' || _class == 'negative influence') {
+        case 'inhibition': case 'negative influence': case 'inhibits':
+        case 'downregulates-expression': case 'dephosphorylates':
           return 'tee';
-      }
-      if (_class == 'catalysis') {
+        case 'catalysis':
           return 'circle';
-      }
-      if (_class == 'stimulation' || _class == 'production' || _class == 'positive influence') {
+        case 'stimulation': case 'production': case 'positive influence':
+        case 'activates': case 'phosphorylates': case 'upregulates-expression':
+        case 'controls-state-change-of': case 'chemical-affects':
+        case 'controls-transport-of': case 'controls-phosphorylation-of':
+        case 'controls-expression-of': case 'catalysis-precedes':
+        case 'consumption-controled-by': case 'controls-production-of':
+        case 'controls-transport-of-chemical': case 'used-to-produce':
           return 'triangle';
-      }
-      if (_class == 'modulation' || _class == 'unknown influence') {
+        case 'modulation': case 'unknown influence':
           return 'diamond';
+        default:
+          return 'none';
       }
-      return 'none';
   };
 
   elementUtilities.getElementContent = function(ele) {
@@ -1993,6 +2104,14 @@ module.exports = function () {
     'tag': {
       width: 35,
       height: 35
+    },
+    'protein': {
+      width: 60,
+      height: 30
+    },
+    'small molecule': {
+      width: 48,
+      height: 24
     }
   };
 
@@ -2042,6 +2161,7 @@ module.exports = function () {
   } );
 
   elementUtilities.epnTypes
+    .concat( elementUtilities.sifTypes )
     .concat( elementUtilities.otherNodeTypes )
     .concat( ['phenotype'] )
     .forEach( function( type ) {
