@@ -1,6 +1,6 @@
 {
   "name": "sbgnviz",
-  "version": "4.0.3",
+  "version": "4.2.0",
   "description": "SBGNPD visualization library",
   "main": "src/index.js",
   "licence": "LGPL-3.0",
@@ -23,7 +23,7 @@
     "cytoscape": "iVis-at-Bilkent/cytoscape.js#unstable"
   },
   "dependencies": {
-    "libsbgn.js": "^0.1.3",
+    "libsbgn.js": "github:sbgn/libsbgn.js#master",
     "pretty-data": "^0.40.0",
     "xml2js": "^0.4.17"
   },

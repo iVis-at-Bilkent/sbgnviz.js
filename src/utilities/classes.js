@@ -1,64 +1,130 @@
-var cyRenderer = require('../sbgn-extensions/sbgn-cy-renderer');
+
 var libs = require('../utilities/lib-utilities').getLibs();
 var jQuery = $ = libs.jQuery;
 var cytoscape = libs.cytoscape;
-var optionUtilities = require('./option-utilities');
-var options = optionUtilities.getOptions();
+// var optionUtilities = require('./option-utilities');
+// var options = optionUtilities.getOptions();
 var truncate = require('./text-utilities').truncate;
 
 var ns = {};
 
+// Keep in mind that for each method 'mainObj' parameter refers to the main object for which the operation will be done.
+// It refers to the object that could be refered by 'this' while there was prototyping in these classes.
+// For example AuxiliaryUnit.copy(mainObj, existingInstance, newParent, newId) copies the variable passed by 'mainObj'
+// parameter and in this case 'mainObj' can be considered as `the object to be copied`
+
+// The old constructors are replaced by 'construct()' methods while removing prototyping from the classes.
+
+// 'AuxiliaryUnit' and 'AuxUnitLayout' objects keep the id of their parent nodes instead of the nodes themselves to avoid circular references.
+// To maintain this property related methods to get and set parent nodes should be used instead of directly accessing the parent object.
+
+// Also, there is a parent-child relationship between the AuxiliaryUnit class and StateVariable and UnitOfInformation
+// classes. While calling a method of AuxiliaryUnit class that method should be called from
+// the actual class of related auxilary unit (Would be StateVariable or UnitOfInformation. This is needed to prevent conflictions when the
+// methods of AuxiliaryUnit class is overriden by these classes). That class can be obtained by calling 'getAuxUnitClass(mainObj)'
+// method for the auxilary unit object.
+
+var getAuxUnitClass = function(unit) {
+  // Unit parameter may pass the unit itself or the type of the unit check it
+  var unitType = typeof unit === 'string' ? unit : unit.clazz;
+  // Retrieve and return unit class according to the unit type
+  var className = unitType === 'state variable' ? 'StateVariable' : 'UnitOfInformation';
+  return ns[className];
+};
+
+ns.getAuxUnitClass = getAuxUnitClass; // Expose getAuxUnitClass method
+
+var AuxiliaryUnit = {};
 
 // -------------- AuxiliaryUnit -------------- //
-var AuxiliaryUnit = function (parent) {
-  this.parent = parent;
-  this.id = null;
-  this.bbox = null;
-  this.coordType = "relativeToCenter";
-  this.anchorSide = null;
-  this.isDisplayed = false;
+// constructs a new auxiliary unit object and returns it
+AuxiliaryUnit.construct = function(parent) {
+  var obj = {};
+
+  AuxiliaryUnit.setParentRef(obj, parent);
+
+  obj.id = null;
+  obj.bbox = null;
+  obj.coordType = "relativeToCenter";
+  obj.anchorSide = null;
+  obj.isDisplayed = false;
+  obj.dashed = false;
+
+  return obj;
 };
+
+AuxiliaryUnit.getParent = function(mainObj, cy) {
+  var parent = mainObj.parent;
+  // If parent variable stores the id of parent instead of the actual parent get the actual parent by id
+  if (typeof parent === 'string') {
+    return cy.getElementById(parent);
+  }
+
+  return parent;
+};
+
+AuxiliaryUnit.setParentRef = function(mainObj, newParent) {
+  if (mainObj && newParent) {
+    // Reference to id instead of the node itself to avaoid circular reference
+    mainObj.parent = typeof newParent === 'string' ? newParent : newParent.id();
+  }
+}
+
 AuxiliaryUnit.defaultBackgroundColor = "#ffffff";
 
 /*
  * Return a new AuxiliaryUnit object. A new parent reference and new id can
  * optionnally be passed.
  */
-AuxiliaryUnit.prototype.copy = function (existingInstance, newParent, newId) {
-  var newUnit = existingInstance ? existingInstance : new AuxiliaryUnit();
-  newUnit.parent = newParent ? newParent : this.parent;
-  newUnit.id = newId ? newId : this.id;
-  newUnit.bbox = jQuery.extend(true, {}, this.bbox);
-  newUnit.coordType = this.coordType;
-  newUnit.anchorSide = this.anchorSide;
-  newUnit.isDisplayed = this.isDisplayed;
+AuxiliaryUnit.copy = function (mainObj, cy, existingInstance, newParent, newId) {
+  var newUnit = existingInstance ? existingInstance : AuxiliaryUnit.construct();
+
+  var parentToSet = newParent || getAuxUnitClass(mainObj).getParent(mainObj, cy);
+  AuxiliaryUnit.setParentRef(newUnit, parentToSet);
+
+  newUnit.id = newId ? newId : mainObj.id;
+  newUnit.bbox = jQuery.extend(true, {}, mainObj.bbox);
+  newUnit.coordType = mainObj.coordType;
+  newUnit.anchorSide = mainObj.anchorSide;
+  newUnit.isDisplayed = mainObj.isDisplayed;
+  newUnit.dashed = mainObj.dashed;
   return newUnit;
 };
 
 // draw the auxiliary unit at its position
-AuxiliaryUnit.prototype.draw = function(context) {
-  var coords = this.getAbsoluteCoord();
-
-  this.drawShape(context, coords.x, coords.y);
-  if (this.hasText()) {
-    this.drawText(context, coords.x, coords.y);
+AuxiliaryUnit.draw = function(mainObj, cy, context) {
+  var unitClass = getAuxUnitClass(mainObj);
+  var coords = unitClass.getAbsoluteCoord(mainObj, cy);
+  if (mainObj.dashed === true) {
+    context.setLineDash([2,2]);
   }
-  this.isDisplayed = true;
+  else {
+    context.setLineDash([]);
+  }
+  unitClass.drawShape(mainObj, cy, context, coords.x, coords.y);
+  if (unitClass.hasText(mainObj, cy)) {
+    unitClass.drawText(mainObj, cy, context, coords.x, coords.y);
+  }
+  mainObj.isDisplayed = true;
 };
 
 // to be implemented by children
-AuxiliaryUnit.prototype.getText = function() {
+AuxiliaryUnit.getText = function(mainObj, cy) {
   throw new Error("Abstract method!");
 };
-AuxiliaryUnit.prototype.hasText = function() {
+AuxiliaryUnit.hasText = function(mainObj, cy) {
   throw new Error("Abstract method!");
 };
-AuxiliaryUnit.prototype.drawShape = function(context, x, y) {
+AuxiliaryUnit.drawShape = function(mainObj, cy, context, x, y) {
   throw new Error("Abstract method!");
 };
 
 // draw the statesOrInfo's label at given position
-AuxiliaryUnit.prototype.drawText = function(context, centerX, centerY) {
+AuxiliaryUnit.drawText = function(mainObj, cy, context, centerX, centerY) {
+  // access the sbgnvizParams set for cy
+  var options = cy.scratch('_sbgnviz').sbgnvizParams.optionUtilities.getOptions();
+  var unitClass = getAuxUnitClass(mainObj);
+  var parent = unitClass.getParent(mainObj, cy);
   var fontSize = 9; // parseInt(textProp.height / 1.5);
 
   // part of : $$.sbgn.drawText(context, textProp);
@@ -71,27 +137,27 @@ AuxiliaryUnit.prototype.drawText = function(context, centerX, centerY) {
   context.textAlign = "center";
   context.textBaseline = "middle";
   context.fillStyle = "#0f0f0f";
-  context.globalAlpha = this.parent.css('text-opacity') * this.parent.css('opacity'); // ?
+  context.globalAlpha = parent.css('text-opacity') * parent.css('opacity'); // ?
 
   var text;
   if(options.fitLabelsToInfoboxes()){
     // here we memoize the truncated text into _textCache,
     // as it is not something that changes so much
-    text = this.getText();
-    var key = text + context.font + this.bbox.w;
-    if(this._textCache && this._textCache[key]) {
-      text = this._textCache[key];
+    text = unitClass.getText(mainObj, cy);
+    var key = text + context.font + mainObj.bbox.w;
+    if(mainObj._textCache && mainObj._textCache[key]) {
+      text = mainObj._textCache[key];
     }
     else {
-      text = truncate(this.getText(), context.font, this.bbox.w);
-      if(!this._textCache) {
-        this._textCache = {};
+      text = truncate(unitClass.getText(mainObj, cy), context.font, mainObj.bbox.w);
+      if(!mainObj._textCache) {
+        mainObj._textCache = {};
       }
-      this._textCache[key] = text;
+      mainObj._textCache[key] = text;
     }
   }
   else {
-    text = this.getText();
+    text = unitClass.getText(mainObj, cy);
   }
 
   context.fillText(text, centerX, centerY);
@@ -102,120 +168,190 @@ AuxiliaryUnit.prototype.drawText = function(context, centerX, centerY) {
   context.globalAlpha = oldOpacity;
 };
 
-AuxiliaryUnit.prototype.getAbsoluteCoord = function() {
-  if(this.coordType == "relativeToCenter") {
-    var absX = this.bbox.x * (this.parent.outerWidth() - this.parent._private.data['border-width']) / 100 + this.parent._private.position.x;
-    var absY = this.bbox.y * (this.parent.outerHeight() - this.parent._private.data['border-width']) / 100 + this.parent._private.position.y;
+AuxiliaryUnit.getAbsoluteCoord = function(mainObj, cy) {
+  var parent = getAuxUnitClass(mainObj).getParent(mainObj, cy);
+  var position = parent.position();
+  if (mainObj === undefined || parent === undefined || position === undefined) {
+    return;
+  }
+  var borderWidth = parent.data()["border-width"];
+  if ( borderWidth === undefined) {
+    return;
+  }
+  if(mainObj.coordType == "relativeToCenter") {
+    var absX = mainObj.bbox.x * (parent.outerWidth() - borderWidth) / 100 + position.x;
+    var absY = mainObj.bbox.y * (parent.outerHeight() - borderWidth) / 100 + position.y;
     return {x: absX, y: absY};
   }
-  else if(this.coordType == "relativeToSide") {
-    if (this.anchorSide == "top" || this.anchorSide == "bottom") {
-      var absX = this.parent._private.position.x - (this.parent.outerWidth() - this.parent._private.data['border-width']) / 2 + this.bbox.x;
-      var absY = this.bbox.y * (this.parent.outerHeight() - this.parent._private.data['border-width']) / 100 + this.parent._private.position.y;
+  else if(mainObj.coordType == "relativeToSide") {
+    if (mainObj.anchorSide == "top" || mainObj.anchorSide == "bottom") {
+      var absX = position.x - (parent.outerWidth() - borderWidth) / 2 + mainObj.bbox.x;
+      var absY = mainObj.bbox.y * (parent.outerHeight() - borderWidth) / 100 + position.y;
     }
     else {
-      var absY = this.parent._private.position.y - (this.parent.outerHeight() - this.parent._private.data['border-width']) / 2 + this.bbox.y;
-      var absX = this.bbox.x * (this.parent.outerWidth() - this.parent._private.data['border-width']) / 100 + this.parent._private.position.x;
+      var absY = position.y - (parent.outerHeight() - borderWidth) / 2 + mainObj.bbox.y;
+      var absX = mainObj.bbox.x * (parent.outerWidth() - borderWidth) / 100 + position.x;
     }
 
   // due to corner of barrel shaped compartment shift absX to right
-  if (this.parent.data("class") == "compartment"){
-      absX += this.parent.outerWidth() * 0.1;
+  if (parent.data("class") == "compartment"){
+      absX += parent.outerWidth() * 0.1;
   };
     return {x: absX, y: absY};
   }
 };
 
-AuxiliaryUnit.prototype.setAnchorSide = function(parentBbox) {
-  if(this.coordType == "relativeToCenter") {
-    var thisX = this.bbox.x;
-    var thisY = this.bbox.y;
+AuxiliaryUnit.convertToAbsoluteCoord = function(mainObj, relX, relY, cy) {
+  var parent = getAuxUnitClass(mainObj).getParent(mainObj, cy);
+  if(mainObj.coordType == "relativeToCenter") {
+    var absX = relX * (parent.outerWidth() - parent._private.data['border-width']) / 100 + parent._private.position.x;
+    var absY = relY  * (parent.outerHeight() - parent._private.data['border-width']) / 100 + parent._private.position.y;
+    return {x: absX, y: absY};
+  }
+  else if(mainObj.coordType == "relativeToSide") {
+    if (mainObj.anchorSide == "top" || mainObj.anchorSide == "bottom") {
+      var absX = parent._private.position.x - (parent.outerWidth() - parent._private.data['border-width']) / 2 + relX;
+      var absY = relY  * (parent.outerHeight() - parent._private.data['border-width']) / 100 + parent._private.position.y;
+    }
+    else {
+      var absY = parent._private.position.y - (parent.outerHeight() - parent._private.data['border-width']) / 2 + relY ;
+      var absX = relX * (parent.outerWidth() - parent._private.data['border-width']) / 100 + parent._private.position.x;
+    }
+
+  // due to corner of barrel shaped compartment shift absX to right
+  if (parent.data("class") == "compartment"){
+      absX += parent.outerWidth() * 0.1;
+  };
+    return {x: absX, y: absY};
+  }
+};
+
+AuxiliaryUnit.convertToRelativeCoord = function(mainObj, absX, absY, cy, parentNode){
+  if (mainObj === undefined) {
+    return;
+  }
+  if (parentNode !== undefined) {
+    var parent = parentNode;
+  }
+  else {
+    var parent = getAuxUnitClass(mainObj).getParent(mainObj, cy);
+  }
+  var position = parent.position();
+  var borderWidth = parent.data()['border-width'];
+  if(mainObj.coordType == "relativeToCenter") {
+    var relX = (absX - position.x) * 100 / (parent.outerWidth() - borderWidth);
+    var relY = (absY - position.y) * 100 / (parent.outerHeight() - borderWidth);
+    return {x: relX, y: relY};
+  }
+  else if(mainObj.coordType == "relativeToSide") {
+    if (parent.data("class") == "compartment"){
+        absX -= parent.outerWidth() * 0.1;
+    };
+    if (mainObj.anchorSide == "top" || mainObj.anchorSide == "bottom") {
+      var relX = absX - position.x + (parent.outerWidth() - borderWidth) / 2;
+      var relY = (absY - position.y) * 100 / (parent.outerHeight() - borderWidth);
+    }
+    else {
+      var relY = absY - position.y + (parent.outerHeight() - borderWidth) / 2;
+      var relX = (absX - position.x) * 100 / (parent.outerWidth() - borderWidth);
+    }
+
+    return {x: relX, y: relY};
+  }
+};
+
+AuxiliaryUnit.setAnchorSide = function(mainObj, parentBbox) {
+  if(mainObj.coordType == "relativeToCenter") {
+    var thisX = mainObj.bbox.x;
+    var thisY = mainObj.bbox.y;
     if(thisY > 45) {
-      this.anchorSide = "bottom";
-      this.bbox.y = 50;
+      mainObj.anchorSide = "bottom";
+      mainObj.bbox.y = 50;
     }
     else if (thisY < -45) {
-      this.anchorSide = "top";
-      this.bbox.y = -50;
+      mainObj.anchorSide = "top";
+      mainObj.bbox.y = -50;
     }
-    else if (thisY => 0) {
+    else if (thisY >= 0) {
       if (thisX > 45) {
-        this.anchorSide = "right";
-        this.bbox.x = 50;
+        mainObj.anchorSide = "right";
+        mainObj.bbox.x = 50;
       }
       else if (thisX < -45) {
-        this.anchorSide = "left";
-        this.bbox.x = -50;
+        mainObj.anchorSide = "left";
+        mainObj.bbox.x = -50;
       }
       else {
-        this.anchorSide = "bottom";
-        this.bbox.y = 50;
+        mainObj.anchorSide = "bottom";
+        mainObj.bbox.y = 50;
       }
     }
     else {
       if (thisX > 45) {
-        this.anchorSide = "right";
-        this.bbox.x = 50;
+        mainObj.anchorSide = "right";
+        mainObj.bbox.x = 50;
       }
       else if (thisX < -45) {
-        this.anchorSide = "left";
-        this.bbox.x = -50;
+        mainObj.anchorSide = "left";
+        mainObj.bbox.x = -50;
       }
       else {
-        this.anchorSide = "top";
-        this.bbox.y = -50;
+        mainObj.anchorSide = "top";
+        mainObj.bbox.y = -50;
       }
     }
   }
 };
 
-AuxiliaryUnit.prototype.addToParent = function (parentNode, location, position, index) {
+AuxiliaryUnit.addToParent = function (mainObj, cy, parentNode, location, position, index) {
 
   // add state var to the parent's statesandinfos
   if(typeof index != "undefined") { // specific index provided (for undo/redo consistency)
-    parentNode.data('statesandinfos').splice(index, 0, this);
+    parentNode.data('statesandinfos').splice(index, 0, mainObj);
   }
   else {
-    parentNode.data('statesandinfos').push(this);
+    parentNode.data('statesandinfos').push(mainObj);
   }
 
   if(!parentNode.data('auxunitlayouts')) { // ensure minimal initialization
     parentNode.data('auxunitlayouts', {});
   }
   if(!location) { // location not provided, need to define it automatically
-    location = AuxUnitLayout.selectNextAvailable(parentNode);
+    location = AuxUnitLayout.selectNextAvailable(parentNode, cy);
   }
   // here we are sure to have a location even if it was not provided as argument
   // get or create the necessary layout
   if(!parentNode.data('auxunitlayouts')[location]) {
-    parentNode.data('auxunitlayouts')[location] = new ns.AuxUnitLayout(parentNode, location);
+    parentNode.data('auxunitlayouts')[location] = AuxUnitLayout.construct(parentNode, location);
   }
+
   var layout = parentNode.data('auxunitlayouts')[location];
-  this.anchorSide = location;
+  mainObj.anchorSide = location;
   switch(location) {
-    case "top": this.bbox.y = -50; break;
-    case "bottom": this.bbox.y = 50; break;
-    case "left": this.bbox.x = -50; break;
-    case "right": this.bbox.x = -50; break;
+    case "top": mainObj.bbox.y = -50; break;
+    case "bottom": mainObj.bbox.y = 50; break;
+    case "left": mainObj.bbox.x = -50; break;
+    case "right": mainObj.bbox.x = -50; break;
   }
   // add stateVar to layout, precomputing of relative coords will be triggered accordingly
-  var insertedPosition = layout.addAuxUnit(this, position);
+  var insertedPosition = AuxUnitLayout.addAuxUnit(layout, cy, mainObj, position);
   return insertedPosition;
 }
 
-AuxiliaryUnit.prototype.removeFromParent = function () {
-  var parentLayout = this.parent.data('auxunitlayouts')[this.anchorSide];
-  parentLayout.removeAuxUnit(this);
-  if (parentLayout.isEmpty()){
-    delete this.parent.data('auxunitlayouts')[this.anchorSide];
+AuxiliaryUnit.removeFromParent = function (mainObj, cy) {
+  var parent = getAuxUnitClass(mainObj).getParent(mainObj, cy);
+  var parentLayout = parent.data('auxunitlayouts')[mainObj.anchorSide];
+  AuxUnitLayout.removeAuxUnit(parentLayout, cy, mainObj);
+  if (AuxUnitLayout.isEmpty(parentLayout)){
+    delete parent.data('auxunitlayouts')[mainObj.anchorSide];
   }
-  var statesandinfos = this.parent.data('statesandinfos');
-  var index  = statesandinfos.indexOf(this);
+  var statesandinfos = parent.data('statesandinfos');
+  var index  = statesandinfos.indexOf(mainObj);
   statesandinfos.splice(index, 1);
 };
 
-AuxiliaryUnit.prototype.getPositionIndex = function() {
-  return this.parent.data('auxunitlayouts')[this.anchorSide].units.indexOf(this);
+AuxiliaryUnit.getPositionIndex = function(mainObj, cy) {
+  return getAuxUnitClass(mainObj).getParent(mainObj, cy).data('auxunitlayouts')[mainObj.anchorSide].units.indexOf(mainObj);
 };
 
 ns.AuxiliaryUnit = AuxiliaryUnit;
@@ -225,86 +361,97 @@ ns.AuxiliaryUnit = AuxiliaryUnit;
 /**
  * parent has to be a stateful EPN (complex, macromolecule or nucleic acid)
  */
-var StateVariable = function (value, stateVariableDefinition, parent) {
-  AuxiliaryUnit.call(this, parent);
-  this.state = {};
-  this.state.value = value;
-  this.state.variable = null;
-  this.stateVariableDefinition = stateVariableDefinition;
-  this.clazz = "state variable";
+
+var StateVariable = {};
+
+// StateVariable extends AuxiliaryUnit by inheriting each static property of it
+for (var prop in AuxiliaryUnit) {
+  StateVariable[prop] = AuxiliaryUnit[prop];
+}
+
+// Construct a state variable object by extending default behaviours of a AuxiliaryUnit object and returns that object
+StateVariable.construct = function(value, stateVariableDefinition, parent) {
+  var obj = AuxiliaryUnit.construct(parent);
+  obj.state = {};
+  obj.state.value = value;
+  obj.state.variable = null;
+  obj.stateVariableDefinition = stateVariableDefinition;
+  obj.clazz = "state variable";
+
+  return obj;
 };
-StateVariable.prototype = Object.create(AuxiliaryUnit.prototype);
-StateVariable.prototype.constructor = StateVariable;
+
 StateVariable.shapeRadius = 15;
 
-StateVariable.prototype.getText = function() {
-  var stateValue = this.state.value || '';
-  var stateVariable = this.state.variable ? "@" + this.state.variable : "";
+StateVariable.getText = function(mainObj) {
+  var stateValue = mainObj.state.value || '';
+  var stateVariable = mainObj.state.variable ? "@" + mainObj.state.variable : "";
 
   return stateValue + stateVariable;
 };
 
-StateVariable.prototype.hasText = function() {
-  return (this.state.value && this.state.value != "") || (this.state.variable && this.state.variable != "");
+StateVariable.hasText = function(mainObj) {
+  return (mainObj.state.value && mainObj.state.value != "") || (mainObj.state.variable && mainObj.state.variable != "");
 };
 
-StateVariable.prototype.drawShape = function(context, x, y) {
+StateVariable.drawShape = function(mainObj, cy, context, x, y) {
   cytoscape.sbgn.drawRoundRectanglePath(context,
               x, y,
-              this.bbox.w, this.bbox.h,
-              Math.min(this.bbox.w / 2, this.bbox.h / 2, StateVariable.shapeRadius));
+              mainObj.bbox.w, mainObj.bbox.h,
+              Math.min(mainObj.bbox.w / 2, mainObj.bbox.h / 2, StateVariable.shapeRadius));
   var tmp_ctxt = context.fillStyle;
-  context.fillStyle = AuxiliaryUnit.defaultBackgroundColor;
+  context.fillStyle = StateVariable.defaultBackgroundColor;
   context.fill();
   context.fillStyle = tmp_ctxt;
   context.stroke();
 };
 
-StateVariable.create = function(parentNode, value, variable, bbox, location, position, index) {
+StateVariable.create = function(parentNode, cy, value, variable, bbox, location, position, index) {
   // create the new state var of info
-  var stateVar = new ns.StateVariable();
-  stateVar.parent = parentNode;
+  var stateVar = StateVariable.construct();
+  StateVariable.setParentRef(stateVar, parentNode);
+
   stateVar.value = value;
   stateVar.variable = variable;
   stateVar.state = {value: value, variable: variable};
   stateVar.bbox = bbox;
 
   // link to layout
-  position = stateVar.addToParent(parentNode, location, position, index);
-
+  position = StateVariable.addToParent(stateVar, cy, parentNode, location, position, index);
   return {
-    index: stateVar.parent.data('statesandinfos').indexOf(stateVar),
+    index: StateVariable.getParent(stateVar, cy).data('statesandinfos').indexOf(stateVar),
     location: stateVar.anchorSide,
     position: position
   }
+
 };
 
-StateVariable.prototype.remove = function () {
-  var position = this.getPositionIndex();
-  var index = this.parent.data('statesandinfos').indexOf(this);
-  this.removeFromParent();
+StateVariable.remove = function (mainObj, cy) {
+  var position = StateVariable.getPositionIndex(mainObj, cy);
+  var index = StateVariable.getParent(mainObj, cy).data('statesandinfos').indexOf(mainObj);
+  StateVariable.removeFromParent(mainObj, cy);
   //console.log("after remove", this.parent.data('auxunitlayouts'), this.parent.data('statesandinfos'));
   return {
     clazz: "state variable",
     state: {
-      value: this.state.value,
-      variable: this.state.variable
+      value: mainObj.state.value,
+      variable: mainObj.state.variable
     },
     bbox: {
-      w: this.bbox.w,
-      h: this.bbox.h
+      w: mainObj.bbox.w,
+      h: mainObj.bbox.h
     },
-    location: this.anchorSide,
+    location: mainObj.anchorSide,
     position: position,
     index: index
   };
 };
 
-StateVariable.prototype.copy = function(newParent, newId) {
-  var newStateVar = AuxiliaryUnit.prototype.copy.call(this, new StateVariable(), newParent, newId);
-  newStateVar.state = jQuery.extend(true, {}, this.state);
-  newStateVar.stateVariableDefinition = this.stateVariableDefinition;
-  newStateVar.clazz = this.clazz;
+StateVariable.copy = function(mainObj, cy, newParent, newId) {
+  var newStateVar = AuxiliaryUnit.copy(mainObj, cy, StateVariable.construct(), newParent, newId);
+  newStateVar.state = jQuery.extend(true, {}, mainObj.state);
+  newStateVar.stateVariableDefinition = mainObj.stateVariableDefinition;
+  newStateVar.clazz = mainObj.clazz;
   return newStateVar;
 };
 
@@ -314,50 +461,39 @@ ns.StateVariable = StateVariable;
 // -------------- UnitOfInformation -------------- //
 /**
  * parent can be an EPN, compartment or subunit
- * The shape can vary and can be provided to the constructor. By default, it will be rendered with the shape 
- * of PD units of information.
- * To provide a custom shape, 2 functions must be passed:
- *  - shapeFn: the shape function itself, the function that will be called to render the shape
- *             The prototype should be: fn(context, x, y, [some other arguments])
- *  - shapeArgsFn: prototype function(self), it should return an array of arguments that will be passed to shapeFn
- *                 See example as the default below.
- *  To render the shape, we will simply do: shapeFn.apply(null, [context, x, y] + rest of the list provided by shapeArgsFn() )
  */
-var UnitOfInformation = function (value, parent, shapeFn, shapeArgsFn) {
-  AuxiliaryUnit.call(this, parent);
-  this.label = {text: value}; // from legacy code, contains {text: }
-  this.clazz = "unit of information";
-  if(shapeFn && shapeArgsFn) {
-    this.shapeFn = shapeFn;
-    this.shapeArgsFn = shapeArgsFn;
-  }
-  else { // default shape is rectangle
-    this.shapeFn = function(c,x,y,w,h){
-      cytoscape.baseNodeShapes['rectangle'].draw(c, x, y, w, h)
-    };
 
-    this.shapeArgsFn = function (self) {
-      return [self.bbox.w, self.bbox.h, 0];
-    };
-  }
+var UnitOfInformation = {};
+
+// UnitOfInformation extends AuxiliaryUnit by inheriting each static property of it
+for (var prop in AuxiliaryUnit) {
+  UnitOfInformation[prop] = AuxiliaryUnit[prop];
+}
+
+// Constructs a UnitOfInformation object by extending properties of an AuxiliaryUnit object and return that object
+UnitOfInformation.construct = function(value, parent) {
+  var obj = AuxiliaryUnit.construct(parent);
+  obj.label = {text: value}; // from legacy code, contains {text: }
+  obj.clazz = "unit of information";
+
+  return obj;
 };
-UnitOfInformation.prototype = Object.create(AuxiliaryUnit.prototype);
-UnitOfInformation.prototype.constructor = UnitOfInformation;
+
 UnitOfInformation.shapeRadius = 4;
 
-UnitOfInformation.prototype.getText = function() {
-  return this.label.text;
+UnitOfInformation.getText = function(mainObj) {
+  return mainObj.label.text;
 };
 
-UnitOfInformation.prototype.hasText = function() {
-  return this.label.text && this.label.text != "";
+UnitOfInformation.hasText = function(mainObj) {
+  return mainObj.label.text && mainObj.label.text != "";
 };
 
-UnitOfInformation.prototype.drawShape = function(context, x, y) {
-  var args = [context, x, y].concat(this.shapeArgsFn(this));
-  this.shapeFn.apply(null, args);
+UnitOfInformation.drawShape = function(mainObj, cy, context, x, y) {
+  cytoscape.sbgn.UnitOfInformationShapeFn(context, x, y, mainObj.bbox.w, mainObj.bbox.h,
+                  getAuxUnitClass(mainObj).getParent(mainObj, cy).data("class"));
   var tmp_ctxt = context.fillStyle;
-  context.fillStyle = AuxiliaryUnit.defaultBackgroundColor;
+  context.fillStyle = UnitOfInformation.defaultBackgroundColor;
   context.fill();
   context.fillStyle = tmp_ctxt;
   context.stroke();
@@ -371,47 +507,45 @@ UnitOfInformation.prototype.drawShape = function(context, x, y) {
  * @param [position] - its position in the order of elements placed on the same location
  * @param [index] - its index in the statesandinfos list
  */
-UnitOfInformation.create = function (parentNode, value, bbox, location, position, index, shapeFn, shapeArgsFn) {
+UnitOfInformation.create = function (parentNode, cy, value, bbox, location, position, index) {
   // create the new unit of info
-  var unit = new ns.UnitOfInformation(value, parentNode, shapeFn, shapeArgsFn);
+  var unit = UnitOfInformation.construct(value, parentNode);
   unit.bbox = bbox;
 
   //console.log("will insert on", location, position);
-  position = unit.addToParent(parentNode, location, position, index);
+  position = UnitOfInformation.addToParent(unit, cy, parentNode, location, position, index);
 
   return {
-    index: unit.parent.data('statesandinfos').indexOf(unit),
+    index: UnitOfInformation.getParent(unit, cy).data('statesandinfos').indexOf(unit),
     location: unit.anchorSide,
     position: position
   }
 };
 
-UnitOfInformation.prototype.remove = function () {
-  var position = this.getPositionIndex();
-  var index = this.parent.data('statesandinfos').indexOf(this);
-  this.removeFromParent();
+UnitOfInformation.remove = function (mainObj, cy) {
+  var position = UnitOfInformation.getPositionIndex(mainObj, cy);
+  var index = UnitOfInformation.getParent(mainObj, cy).data('statesandinfos').indexOf(mainObj);
+  UnitOfInformation.removeFromParent(mainObj, cy);
   //console.log("after remove", this.parent.data('auxunitlayouts'), this.parent.data('statesandinfos'));
   return {
     clazz: "unit of information",
     label: {
-      text: this.label.text
+      text: mainObj.label.text
     },
     bbox: {
-      w: this.bbox.w,
-      h: this.bbox.h
+      w: mainObj.bbox.w,
+      h: mainObj.bbox.h
     },
-    location: this.anchorSide,
+    location: mainObj.anchorSide,
     position: position,
     index: index
   };
 };
 
-UnitOfInformation.prototype.copy = function(newParent, newId) {
-  var newUnitOfInfo = AuxiliaryUnit.prototype.copy.call(this, new UnitOfInformation(), newParent, newId);
-  newUnitOfInfo.label = jQuery.extend(true, {}, this.label);
-  newUnitOfInfo.clazz = this.clazz;
-  newUnitOfInfo.shapeFn = this.shapeFn;
-  newUnitOfInfo.shapeArgsFn = this.shapeArgsFn;
+UnitOfInformation.copy = function(mainObj, cy, newParent, newId) {
+  var newUnitOfInfo = AuxiliaryUnit.copy(mainObj, cy, UnitOfInformation.construct(), newParent, newId);
+  newUnitOfInfo.label = jQuery.extend(true, {}, mainObj.label);
+  newUnitOfInfo.clazz = mainObj.clazz;
   return newUnitOfInfo;
 };
 
@@ -423,39 +557,45 @@ ns.UnitOfInformation = UnitOfInformation;
  * The type of the EPN, for example there can be severals myosin EPN, but only one myosin EntityType
  * This class will hold the information regarding state variable, that are shared between all myosins
  */
-var EntityType = function (name, EPN) {
-  this.name = name; // normally the same as its EPNs
-  this.stateVariableDefinitions = []; // 0 or many shared state definitions
-  this.EPNs = []; // there should always be at least 1 element, else no reason to exist
+
+var EntityType = {};
+
+// Constructs an EntityType object and returns it
+EntityType.construct = function(name, EPN) {
+  var obj = {};
+  obj.name = name; // normally the same as its EPNs
+  obj.stateVariableDefinitions = []; // 0 or many shared state definitions
+  obj.EPNs = []; // there should always be at least 1 element, else no reason to exist
+  return obj;
 };
 
-EntityType.prototype.createNewDefinitionFor = function (stateVar) {
-  var newDefinition = new ns.StateVariableDefinition();
-  newDefinition.entityType = this;
+EntityType.createNewDefinitionFor = function (mainObj, stateVar) {
+  var newDefinition = StateVariableDefinition.construct();
+  newDefinition.entityType = mainObj;
   newDefinition.stateVariables.push(stateVar);
 
   stateVar.stateVariableDefinition = newDefinition;
-  stateVar.parent.data('entityType', this);
-  this.stateVariableDefinitions.push(newDefinition);
+  stateVar.parent.data('entityType', mainObj);
+  mainObj.stateVariableDefinitions.push(newDefinition);
 };
 
-EntityType.prototype.assignStateVariable = function (stateVar) {
+EntityType.assignStateVariable = function (mainObj, stateVar) {
   // first trivial case, no stateDefinition yet for this entityType, so this is a new one
-  if (this.stateVariableDefinitions.length == 0) {
-    this.createNewDefinitionFor(stateVar);
+  if (mainObj.stateVariableDefinitions.length == 0) {
+    EntityType.createNewDefinitionFor(mainObj, stateVar);
   }
   else { // if definitions are already present, we need to match those to the current stateVariable
-    for(var i=0; i < this.stateVariableDefinitions.length; i++) {
-      var matchStateDef = this.stateVariableDefinitions[i];
-      if (matchStateDef.matchStateVariable(stateVar)){
+    for(var i=0; i < mainObj.stateVariableDefinitions.length; i++) {
+      var matchStateDef = mainObj.stateVariableDefinitions[i];
+      if (StateVariableDefinition.matchStateVariable(matchStateDef, stateVar)){
         matchStateDef.stateVariables.push(stateVar);
         stateVar.stateVariableDefinition = matchStateDef;
-        stateVar.parent.data('entityType', this);
+        stateVar.parent.data('entityType', mainObj);
         return;
       }
     }
     // if nothing was matched among the current stateVarDef of this entityType, create new one
-    this.createNewDefinitionFor(stateVar);
+    EntityType.createNewDefinitionFor(mainObj, stateVar);
   }
 };
 
@@ -467,28 +607,34 @@ ns.EntityType = EntityType;
  * The state variable definition is something shared across different EPNs
  * The concerned EPNs are linked through the entitype reference
  */
-var StateVariableDefinition = function (name, entityType) {
-  this.name = name;
-  this.entityType = entityType; // reference to owning entity type
-  this.stateVariables = []; // there should always be at least 1 element, else no reason to exist
+
+var StateVariableDefinition = {};
+
+// Constructs a new StateVariableDefinition object and returns it
+StateVariableDefinition.construct = function(name, entityType) {
+  var obj = {};
+  obj.name = name;
+  obj.entityType = entityType; // reference to owning entity type
+  obj.stateVariables = []; // there should always be at least 1 element, else no reason to exist
+  return obj;
 };
 
 /**
  * returns an array of elements that share this state definition
  */
-StateVariableDefinition.prototype.getConcernedEPNs = function() {
-  return this.entityType.EPNs;
+StateVariableDefinition.getConcernedEPNs = function(mainObj) {
+  return mainObj.entityType.EPNs;
 };
 
 /**
  * Guess if the provided stateVariable belongs to this stateVarDefinition
- * We consider it does, if either the statevar.value or statevar.variable are matching one 
+ * We consider it does, if either the statevar.value or statevar.variable are matching one
  * if the statevar in the set of the StateVarDef
  * This is because we normally compare only stateVariables from the same entityType
  */
-StateVariableDefinition.prototype.matchStateVariable = function(stateVar) {
-  for(var i=0; i < this.stateVariables.length; i++) {
-    var matchStateVar = this.stateVariables[i];
+StateVariableDefinition.matchStateVariable = function(mainObj, stateVar) {
+  for(var i=0; i < mainObj.stateVariables.length; i++) {
+    var matchStateVar = mainObj.stateVariables[i];
     // Don't match a stateVar against another one from the same element.
     // If 2 statevar on the same element, then they have to belong to 2 different stateVarDefinitions
     if(matchStateVar.parent === stateVar.parent) {
@@ -518,19 +664,45 @@ ns.StateVariableDefinition = StateVariableDefinition;
 /**
  * Responsible for laying out the auxiliary units contained on a same edge
  */
-var AuxUnitLayout = function (parentNode, location, alignment) {
-  this.units = [];
-  this.location = location;
-  this.alignment = alignment || "left"; // this was intended to be used, but it isn't for now
-  this.parentNode = parentNode;
-  this.renderLengthCache = [];
-  this.lengthUsed = 0;
+
+var AuxUnitLayout = {};
+
+AuxUnitLayout.construct = function(parentNode, location, alignment) {
+  var obj = {};
+  obj.units = [];
+  obj.location = location;
+  obj.alignment = alignment || "left"; // this was intended to be used, but it isn't for now
+  AuxUnitLayout.setParentNodeRef(obj, parentNode);
+
+  obj.renderLengthCache = [];
+  obj.lengthUsed = 0;
 
   // specific rules for the layout
   if(parentNode.data('class') == "simple chemical") {
-    this.outerMargin = 3;
+    obj.outerMargin = 3;
   }
+
+  return obj;
 };
+
+AuxUnitLayout.getParentNode = function(mainObj, cy) {
+  var parentNode = mainObj.parentNode;
+
+  // If parentNode is id of parent node rather than being itself get the parent node by that id
+  if (typeof parentNode === 'string') {
+    return cy.getElementById(parentNode)
+  }
+
+  return parentNode;
+};
+
+AuxUnitLayout.setParentNodeRef = function(mainObj, parentNode) {
+  if (mainObj && parentNode) {
+    // Keep id of parent node to avaoid circular references
+    mainObj.parentNode = typeof parentNode === 'string' ? parentNode : parentNode.id();
+  }
+}
+
 /**
  * outerMargin: the left and right space left between the side of the node, and the first (and last) box
  * unitGap: the space between the auxiliary units
@@ -538,49 +710,56 @@ var AuxUnitLayout = function (parentNode, location, alignment) {
  * forcing a minimum size for the node
  * maxUnitDisplayed: show at most this amount of units, even when there is enough space
  *
- * These options can be defined at the instance level. If it is found in an instance, then it 
+ * These options can be defined at the instance level. If it is found in an instance, then it
  * takes precedence. If not found, the following class' values are used.
  */
-AuxUnitLayout.outerMargin = 10;
+AuxUnitLayout.outerMargin = 5;
 AuxUnitLayout.unitGap = 5;
-AuxUnitLayout.alwaysShowAuxUnits = false;
+AuxUnitLayout.currentTopUnitGap = 5;
+AuxUnitLayout.currentBottomUnitGap = 5;
+AuxUnitLayout.currentLeftUnitGap = 5;
+AuxUnitLayout.currentRightUnitGap = 5;
+AuxUnitLayout.alwaysShowAuxUnits = true;
 AuxUnitLayout.maxUnitDisplayed = -1;
+AuxUnitLayout.lastPos = -1;
 
-AuxUnitLayout.prototype.update = function(doForceUpdate) {
-  this.precomputeCoords(doForceUpdate);
+AuxUnitLayout.update = function(mainObj, cy, doForceUpdate) {
+  AuxUnitLayout.precomputeCoords(mainObj, cy, doForceUpdate);
 };
 
-AuxUnitLayout.prototype.addAuxUnit = function(unit, position) {
+AuxUnitLayout.addAuxUnit = function(mainObj, cy, unit, position) {
   if(typeof position != "undefined") {
     //console.log("add unit at positiion", position);
-    this.units.splice(position, 0, unit);
+    mainObj.units.splice(position, 0, unit);
   }
   else {
-    this.units.push(unit);
-    position = this.units.length - 1;
+    mainObj.units.push(unit);
+    position = mainObj.units.length - 1;
   }
 
-  this.updateLengthCache();
-  this.update(true);
-  if (this.getAlwaysShowAuxUnits()) {
+  AuxUnitLayout.updateLengthCache(mainObj, cy);
+  AuxUnitLayout.update(mainObj, cy, true);/*
+  if (AuxUnitLayout.getAlwaysShowAuxUnits(mainObj)) {
     // set a minimum size according to both sides on the same orientation
-    this.setParentMinLength();
+    AuxUnitLayout.setParentMinLength(mainObj, cy);
     // need to resize the parent in case the space was too small
-    this.resizeParent(this.lengthUsed);
-  }
+    AuxUnitLayout.resizeParent(mainObj, cy, mainObj.lengthUsed);
+  }*/
   //cy.style().update(); // <- was it really necessary ?
+  var parentNode = AuxUnitLayout.getParentNode(mainObj, cy);
   return position;
 };
 
-AuxUnitLayout.prototype.removeAuxUnit = function(unit) {
-  var index = this.units.indexOf(unit);
-  this.units.splice(index, 1);
-  this.updateLengthCache();
-  this.update(true);
-  if (this.getAlwaysShowAuxUnits()) {
+AuxUnitLayout.removeAuxUnit = function(mainObj, cy, unit) {
+  var index = mainObj.units.indexOf(unit);
+  mainObj.units.splice(index, 1);
+  AuxUnitLayout.updateLengthCache(mainObj, cy);
+  AuxUnitLayout.update(mainObj, cy, true);/*
+  if (AuxUnitLayout.getAlwaysShowAuxUnits(mainObj)) {
     // set a minimum size according to both sides on the same orientation
-    this.setParentMinLength();
-  }
+    AuxUnitLayout.setParentMinLength(mainObj, cy);
+  }*/
+  var parentNode = AuxUnitLayout.getParentNode(mainObj, cy);
   cy.style().update();
 };
 
@@ -588,10 +767,9 @@ AuxUnitLayout.prototype.removeAuxUnit = function(unit) {
  * reorder boxes using their defined positions. From left to right and top to bottom.
  * this ensures that their order in the layout's list corresponds to the reality of the map.
  */
-AuxUnitLayout.prototype.reorderFromPositions = function() {
-  var self = this;
-  this.units.sort(function(a, b) {
-    if(self.location == "top" || self.location == "bottom") {
+AuxUnitLayout.reorderFromPositions = function(mainObj, cy) {
+  mainObj.units.sort(function(a, b) {
+    if(mainObj.location == "top" || mainObj.location == "bottom") {
       if (a.bbox.x < b.bbox.x) {
         return -1;
       }
@@ -610,8 +788,8 @@ AuxUnitLayout.prototype.reorderFromPositions = function() {
     return 0;
   });
   //console.log("units after reoarder", this.units);
-  this.updateLengthCache();
-  this.update(true);
+  AuxUnitLayout.updateLengthCache(mainObj, cy);
+  AuxUnitLayout.update(mainObj, cy, true);
 };
 
 /**
@@ -619,19 +797,19 @@ AuxUnitLayout.prototype.reorderFromPositions = function() {
  * can then be compared against the parent node's dimensions, to decide how many
  * aux units to draw.
  */
-AuxUnitLayout.prototype.updateLengthCache = function() {
-  this.renderLengthCache = [0];
-  var previous = this.getOuterMargin();
-  for(var i=0; i < this.units.length; i++) {
+AuxUnitLayout.updateLengthCache = function(mainObj, cy) {
+  mainObj.renderLengthCache = [0];
+  var previous = AuxUnitLayout.getOuterMargin(mainObj);
+  for(var i=0; i < mainObj.units.length; i++) {
     var currentLength;
-    if(this.isTorB()) {
-      currentLength = this.units[i].bbox.w;
+    if(AuxUnitLayout.isTorB(mainObj)) {
+      currentLength = mainObj.units[i].bbox.w;
     }
     else {
-      currentLength = this.units[i].bbox.h;
+      currentLength = mainObj.units[i].bbox.h;
     }
-    this.renderLengthCache.push(previous + currentLength + this.getOuterMargin());
-    previous += currentLength + this.getUnitGap();
+    mainObj.renderLengthCache.push(previous + currentLength + AuxUnitLayout.getOuterMargin(mainObj));
+    previous += currentLength + AuxUnitLayout.getUnitGap(mainObj);
   }
 };
 
@@ -641,71 +819,192 @@ AuxUnitLayout.prototype.updateLengthCache = function() {
  * The number returned says: we are able to draw the N first units of the lists.
  * Unused for now.
  */
-AuxUnitLayout.prototype.getDrawableUnitAmount = function() {
-  if(this.getAlwaysShowAuxUnits()) {
+AuxUnitLayout.getDrawableUnitAmount = function(mainObj) {
+  if(AuxUnitLayout.getAlwaysShowAuxUnits(mainObj)) {
     // bypass all this
-    return this.units.length;
+    return mainObj.units.length;
   }
 
   // get the length of the side on which we draw
   var availableSpace;
-  if (this.isTorB()) {
-    availableSpace = this.parentNode.outerWidth();
+  if (AuxUnitLayout.isTorB(mainObj)) {
+    availableSpace = AuxUnitLayout.getParentNode(mainObj, cy).outerWidth();
   }
   else {
-    availableSpace = this.parentNode.outerHeight();
+    availableSpace = AuxUnitLayout.getParentNode(mainObj, cy).outerHeight();
   }
   // loop over the cached precomputed lengths
-  for(var i=0; i < this.renderLengthCache.length; i++) {
-    if(this.renderLengthCache[i] > availableSpace) {
+  for(var i=0; i < mainObj.renderLengthCache.length; i++) {
+    if(mainObj.renderLengthCache[i] > availableSpace) {
       // stop if we overflow
       return i - 1;
     }
   }
-  return this.units.length;
+  return mainObj.units.length;
 };
 
-AuxUnitLayout.prototype.setDisplayedUnits = function () {
+AuxUnitLayout.setDisplayedUnits = function (mainObj, cy) {
   // get the length of the side on which we draw
+
   var availableSpace;
-  if (this.isTorB()) {
-    availableSpace = this.parentNode.outerWidth();
+  if (AuxUnitLayout.isTorB(mainObj)) {
+    availableSpace = AuxUnitLayout.getParentNode(mainObj, cy).outerWidth();
     // due to corner of barrel shaped compartment decrease availableSpace -- no infobox on corners
-    if (this.parentNode.data("class") == "compartment")
+    if (AuxUnitLayout.getParentNode(mainObj, cy).data("class") == "compartment")
         availableSpace *= 0.8;
   }
   else {
-    availableSpace = this.parentNode.outerHeight();
+    availableSpace = AuxUnitLayout.getParentNode(mainObj, cy).outerHeight();
   }
 
   // there is always n+1 elements in the cachedLength for n units
-  var alwaysShowAuxUnits = this.getAlwaysShowAuxUnits();
-  var maxUnitDisplayed = this.getMaxUnitDisplayed();
-  for(var i=0; i < this.units.length; i++) {
-    if((this.renderLengthCache[i+1] <= availableSpace // do we have enough space?
+  var alwaysShowAuxUnits = AuxUnitLayout.getAlwaysShowAuxUnits(mainObj);
+  var maxUnitDisplayed = AuxUnitLayout.getMaxUnitDisplayed(mainObj);
+  for(var i=0; i < mainObj.units.length; i++) {
+    if((mainObj.renderLengthCache[i+1] <= availableSpace // do we have enough space?
       && (maxUnitDisplayed == -1 || i < maxUnitDisplayed)) // is there no limit? or are we under that limit?
       || alwaysShowAuxUnits) { // do we always want to show everything regardless?
-      this.units[i].isDisplayed = true;
+      mainObj.units[i].isDisplayed = true;
     }
     else {
-      this.units[i].isDisplayed = false;
+      mainObj.units[i].isDisplayed = false;
     }
   }
 };
 
-// TODO find a way to refactor, remove ugliness of top-bottom/left-right.
-AuxUnitLayout.prototype.precomputeCoords = function (doForceUpdate) {
-  this.setDisplayedUnits();
 
-  var lengthUsed = this.getOuterMargin();
+AuxUnitLayout.getUsedWidth = function(node, tb){
+  var units = tb.units;
+  var totalWidth = 0;
+  for (var i = 0; i < units.length; i++) {
+    totalWidth += units[i].bbox.w;
+  }
+  return totalWidth;
+}
+
+AuxUnitLayout.getUsedHeight = function(node, tb){
+  var units = tb.units;
+  var totalHeight = 0;
+  for (var i = 0; i < units.length; i++) {
+    totalHeight += units[i].bbox.h;
+  }
+  return totalHeight;
+}
+
+AuxUnitLayout.getUsedLengthTB = function(node, tb){
+  var units = tb.units;
+  return AuxUnitLayout.getUsedWidth(node, tb) + (units.length +  1) * AuxUnitLayout.unitGap; //One gap for leftmost outer margin
+}
+
+AuxUnitLayout.getUsedLengthLR = function(node, tb){
+  var units = tb.units;
+  return AuxUnitLayout.getUsedHeight(node, tb) + (units.length +  1) * AuxUnitLayout.unitGap; //One gap for leftmost outer margin
+}
+
+AuxUnitLayout.setCurrentGap = function (location, value){
+  if (location === "top") {
+    AuxUnitLayout.currentTopUnitGap = value;
+  }
+  else if (location === "bottom") {
+    AuxUnitLayout.currentBottomUnitGap = value;
+  }
+  else if (location === "right") {
+    AuxUnitLayout.currentRightUnitGap = value;
+  }
+  else {
+    AuxUnitLayout.currentLeftUnitGap = value;
+  }
+};
+
+AuxUnitLayout.fitUnits = function (node) {
+  if (node.data('auxunitlayouts') === undefined) {
+    return;
+  }
+  if ((node.data("class") === "compartment" || node.data("class") === "complex")
+    && node._private.children !== undefined && node._private.children.length !== 0) {
+    var parentWidth =  node._private.autoWidth;
+    var parentHeight =  node._private.autoHeight;
+    var padding = node._private.autoPadding;
+  }
+  else {
+    var parentWidth = node.data("bbox").w;
+    var parentHeight = node.data("bbox").h;
+    var padding = 0;
+  }
+  var position = node.position();
+  var parentX1 = position.x - parentWidth/2;
+  var parentX2 = position.x + parentWidth/2;
+  var parentY1 = position.y - parentHeight/2;
+  var parentY2 = position.y + parentHeight/2;
+  //Get Parent node and find parent width
+  var usedLength;
+  var totalWidth;
+  var estimatedGap;
+  var units;
+  var locations = ["top", "bottom", "left", "right"];
+  for (var index = 0; index < locations.length; index++) {
+    var location = locations[index];
+    var auxUnit = node.data('auxunitlayouts')[location];
+    if (auxUnit === undefined) {
+      continue;
+    }
+    if (auxUnit.units.length <= 0 || !auxUnit.units) {
+      continue;
+    }
+    if ( location === "top" || location === "bottom") {
+      usedLength = AuxUnitLayout.getUsedLengthTB(node, auxUnit);
+      units = auxUnit.units;
+      var firstPosition = AuxiliaryUnit.convertToRelativeCoord(units[0], parentX1, parentY1, undefined, node);//Position of the first unit
+      totalWidth = AuxUnitLayout.getUsedWidth(node, auxUnit);
+      estimatedGap = (parentWidth - totalWidth) / (units.length + 1);
+      if (estimatedGap > AuxUnitLayout.unitGap) {
+        estimatedGap = AuxUnitLayout.unitGap;
+      }
+      units[0].bbox.x = firstPosition.x + estimatedGap + units[0].bbox.w/2;
+      for (var i = 1; i < units.length; i++) { //Calculate new margins
+        units[i].bbox.x = units[i-1].bbox.x + units[i-1].bbox.w/2 + estimatedGap + units[i].bbox.w/2;
+      }
+      AuxUnitLayout.setCurrentGap(location, estimatedGap);
+    }
+    else {
+      //Find total left length
+      usedLength = AuxUnitLayout.getUsedLengthLR(node, auxUnit);
+      units = auxUnit.units;
+      var firstPosition = AuxiliaryUnit.convertToRelativeCoord(units[0], parentX1, parentY1, undefined, node);//Position of the first unit
+      //Compare the side lengths
+      totalHeight = AuxUnitLayout.getUsedHeight(node, auxUnit);
+      estimatedGap = (parentHeight - totalHeight) / (units.length + 1);
+      if (estimatedGap > AuxUnitLayout.unitGap) {
+        estimatedGap = AuxUnitLayout.unitGap;
+      }
+      //Else scale by using available space, reducing margins and gaps.
+      //Check if new gap is enough to fit
+      units[0].bbox.y = firstPosition.y + estimatedGap + units[0].bbox.h/2;
+      for (var i = 1; i < units.length; i++) { //Calculate new margins
+        units[i].bbox.y = units[i-1].bbox.y + units[i-1].bbox.h/2 + estimatedGap + units[i].bbox.h/2;
+      }
+      AuxUnitLayout.currentLeftUnitGap = estimatedGap;
+    }
+    AuxUnitLayout.setCurrentGap(location, estimatedGap);
+  }
+};
+
+
+// Calculate total length used in a side
+// TODO find a way to refactor, remove ugliness of top-bottom/left-right.
+AuxUnitLayout.precomputeCoords = function (mainObj, cy, doForceUpdate) {
+  AuxUnitLayout.setDisplayedUnits(mainObj, cy);
+  var lengthUsed = AuxUnitLayout.getOuterMargin(mainObj);
   var finalLengthUsed = lengthUsed;
-  var unitGap = this.getUnitGap();
-  for(var i=0; i < this.units.length; i++) {
+  var unitGap = AuxUnitLayout.getUnitGap(mainObj);
+  var parentNode = AuxUnitLayout.getParentNode(mainObj, cy);
+
+  for(var i=0; i < mainObj.units.length; i++) {
     // change the coordinate system of the auxiliary unit according to the chosen layout
-    var auxUnit = this.units[i];
+    var auxUnit = mainObj.units[i];
     if (auxUnit.coordType != "relativeToSide" || doForceUpdate) {
       if (auxUnit.coordType == "relativeToCenter" || doForceUpdate) {
-        if(this.isTorB()) {
+        if(AuxUnitLayout.isTorB(mainObj)) {
           //auxUnit.bbox.y = 0;
           auxUnit.bbox.x = lengthUsed + auxUnit.bbox.w / 2;
         }
@@ -714,10 +1013,10 @@ AuxUnitLayout.prototype.precomputeCoords = function (doForceUpdate) {
           auxUnit.bbox.y = lengthUsed + auxUnit.bbox.h / 2;
         }
       }
-      auxUnit.coordType = "relativeToSide"; 
+      auxUnit.coordType = "relativeToSide";
     }
 
-    if(this.isTorB()) {
+    if(AuxUnitLayout.isTorB(mainObj)) {
       //auxUnit.bbox.y = 0;
       lengthUsed += auxUnit.bbox.w + unitGap;
     }
@@ -731,28 +1030,104 @@ AuxUnitLayout.prototype.precomputeCoords = function (doForceUpdate) {
     }
   }
   // adjust the length, should be composed of outerMargin on the end, not unitGap
-  finalLengthUsed = finalLengthUsed - unitGap + this.getOuterMargin();
+  finalLengthUsed = finalLengthUsed - unitGap + AuxUnitLayout.getOuterMargin(mainObj);
 
-  this.lengthUsed = finalLengthUsed;
+  mainObj.lengthUsed = finalLengthUsed;
 };
 
-AuxUnitLayout.prototype.draw = function (context) {
-  for(var i=0; i < this.units.length; i++) {
-    var auxUnit = this.units[i];
+AuxUnitLayout.draw = function (mainObj, cy, context) {
+  for(var i=0; i < mainObj.units.length; i++) {
+    var auxUnit = mainObj.units[i];
     if (auxUnit.isDisplayed) {
       // make each unit draw itself
-      auxUnit.draw(context);
+      getAuxUnitClass(auxUnit).draw(auxUnit, cy, context);
     }
   }
 };
 
-AuxUnitLayout.prototype.isEmpty = function() {
-  return this.units.length == 0;
+AuxUnitLayout.modifyUnits = function(parentNode, unit, oldLocation, cy){
+  var location = unit.anchorSide;
+  var posX = unit.bbox.x;
+  var posY = unit.bbox.y;
+  if (!parentNode.data('auxunitlayouts')[oldLocation]) {
+    parentNode.data('auxunitlayouts')[oldLocation] = AuxUnitLayout.construct(parentNode, oldLocation);
+  }
+  var oldAuxUnit = parentNode.data('auxunitlayouts')[oldLocation];
+  var deleteUnits = oldAuxUnit.units;
+
+  //Delete from old location
+  var deleteIndex;
+  for (var i = 0; i < deleteUnits.length; i++) {
+    if(deleteUnits[i] === unit) {
+      deleteIndex = i;
+      break;
+    }
+  }
+  deleteUnits.splice(deleteIndex, 1);
+  AuxUnitLayout.updateLengthCache(oldAuxUnit, cy);
+  AuxUnitLayout.update(oldAuxUnit, cy, true);
+  //If new is not constructed contruct interval
+  if (!parentNode.data('auxunitlayouts')[location]) {
+    parentNode.data('auxunitlayouts')[location] = AuxUnitLayout.construct(parentNode, location);
+  }
+  var insertAuxUnit = insertUnits = parentNode.data('auxunitlayouts')[location];
+  var insertUnits = insertAuxUnit.units;
+
+  var index = 0;
+  //Insert into new unit array
+  if (location === "top" || location === "bottom") {
+    while ( insertUnits[index] !== undefined && posX > insertUnits[index].bbox.x) {
+      index++;
+    }
+  }
+  else {
+    while ( insertUnits[index] !== undefined && posY > insertUnits[index].bbox.y) {
+      index++;
+    }
+  }
+  insertUnits.splice(index, 0, unit);
+
+  AuxUnitLayout.updateLengthCache(insertAuxUnit, cy);
+  AuxUnitLayout.update(insertAuxUnit, cy, true);
+  AuxUnitLayout.fitUnits(parentNode);
 };
 
-AuxUnitLayout.prototype.unitCount = function() {
-  return this.units.length;
+AuxUnitLayout.isEmpty = function(mainObj) {
+  return mainObj.units.length == 0;
 };
+
+AuxUnitLayout.unitCount = function(mainObj) {
+  return mainObj.units.length;
+};
+
+AuxUnitLayout.unitLength = function(mainObj) {
+  var units = mainObj.units;
+  var rightMostPoint = 0;
+  for (var i = 0; i < units.length; i++) {
+    var box = units[i].bbox;
+    if (box.x + box.w / 2 > rightMostPoint){
+      rightMostPoint = box.x + box.w / 2;
+    }
+  }
+  return rightMostPoint;
+};
+
+//Get Unit Gaps
+AuxUnitLayout.getCurrentTopGap = function(){
+  return AuxUnitLayout.currentTopUnitGap;
+}
+
+AuxUnitLayout.getCurrentBottomGap = function(){
+  return AuxUnitLayout.currentBottomUnitGap;
+}
+
+AuxUnitLayout.getCurrentLeftGap = function(){
+  return AuxUnitLayout.currentLeftUnitGap;
+}
+
+AuxUnitLayout.getCurrentRightGap = function(){
+  return AuxUnitLayout.currentRightUnitGap;
+}
 
 /**
  * Auto choose the next layout. To add a new aux unit, for example.
@@ -761,54 +1136,56 @@ AuxUnitLayout.selectNextAvailable = function(node) {
   var top = node.data('auxunitlayouts').top;
   var bottom = node.data('auxunitlayouts').bottom;
   var resultLocation = "top";
-
   // start by adding on top if free
-  if(!top || top.isEmpty()) {
+  if(!top || AuxUnitLayout.isEmpty(top)) {
     resultLocation = "top";
   }
-  else if(!bottom || bottom.isEmpty()) {
+  else if(!bottom || AuxUnitLayout.isEmpty(bottom)) {
     resultLocation = "bottom";
   }
   else {
     // search for the side with the fewer units on it
-    if(top.unitCount() <= bottom.unitCount()) {
+    if(AuxUnitLayout.unitLength(top) <= AuxUnitLayout.unitLength(bottom)) {
       resultLocation = "top";
     }
     else {
       resultLocation = "bottom";
     }
   }
+  AuxUnitLayout.lastPos = resultLocation; //Set last used position
   return resultLocation;
 };
 
-AuxUnitLayout.prototype.resizeParent = function (length) {
-  if(this.isTorB()) {
-    if(this.parentNode.data('bbox').w < length) {
-      cy.trigger("noderesize.resizestart", ["centerright", this.parentNode]);
-      this.parentNode.data('bbox').w = length;
-      cy.trigger("noderesize.resizeend", ["centerright", this.parentNode]);
+AuxUnitLayout.resizeParent = function (mainObj, cy, length) {
+  var parentNode = AuxUnitLayout.getParentNode(mainObj, cy);
+  if(AuxUnitLayout.isTorB(mainObj)) {
+    if(parentNode.data('bbox').w < length) {
+      cy.trigger("noderesize.resizestart", ["centerright", parentNode]);
+      parentNode.data('bbox').w = length;
+      cy.trigger("noderesize.resizeend", ["centerright", parentNode]);
     }
   }
   else {
-    if(this.parentNode.data('bbox').h < length) {
-      cy.trigger("noderesize.resizestart", ["bottomcenter", this.parentNode]);
-      this.parentNode.data('bbox').h = length;
-      cy.trigger("noderesize.resizeend", ["bottomcenter", this.parentNode]);
+    if(parentNode.data('bbox').h < length) {
+      cy.trigger("noderesize.resizestart", ["bottomcenter", parentNode]);
+      parentNode.data('bbox').h = length;
+      cy.trigger("noderesize.resizeend", ["bottomcenter", parentNode]);
     }
   }
 };
 
-AuxUnitLayout.prototype.isTorB = function () {
-  return this.location == "top" || this.location == "bottom";
+AuxUnitLayout.isTorB = function (mainObj) {
+  return mainObj.location == "top" || mainObj.location == "bottom";
 };
 
-AuxUnitLayout.prototype.isLorR = function () {
-  return this.location == "left" || this.location == "right";
+AuxUnitLayout.isLorR = function (mainObj) {
+  return mainObj.location == "left" || mainObj.location == "right";
 };
 
-AuxUnitLayout.prototype.setParentMinLength = function () {
-  var parentLayouts = this.parentNode.data('auxunitlayouts');
-  switch(this.location) {
+AuxUnitLayout.setParentMinLength = function (mainObj, cy) {
+  var parentNode = AuxUnitLayout.getParentNode(mainObj, cy);
+  var parentLayouts = parentNode.data('auxunitlayouts');
+  switch(mainObj.location) {
     case "top":
       var compareVal = parentLayouts.bottom ? parentLayouts.bottom.lengthUsed : 0;
       break;
@@ -822,44 +1199,44 @@ AuxUnitLayout.prototype.setParentMinLength = function () {
       var compareVal = parentLayouts.left ? parentLayouts.left.lengthUsed : 0;
       break;
   }
-  if(this.isTorB()) {
-    this.parentNode.data('resizeMinWidth', Math.max(this.lengthUsed, compareVal));
+  if(AuxUnitLayout.isTorB(mainObj)) {
+    parentNode.data('resizeMinWidth', Math.max(mainObj.lengthUsed, compareVal));
   }
   else {
-    this.parentNode.data('resizeMinHeight', Math.max(this.lengthUsed, compareVal));
+    parentNode.data('resizeMinHeight', Math.max(mainObj.lengthUsed, compareVal));
   }
 };
 
-AuxUnitLayout.prototype.getOuterMargin = function () {
-  if(typeof this.outerMargin !== "undefined" && this.outerMargin !== null) {
-    return this.outerMargin;
+AuxUnitLayout.getOuterMargin = function (mainObj) {
+  if(typeof mainObj.outerMargin !== "undefined" && mainObj.outerMargin !== null) {
+    return mainObj.outerMargin;
   }
   else {
     return AuxUnitLayout.outerMargin;
   }
 };
 
-AuxUnitLayout.prototype.getUnitGap = function () {
-  if(typeof this.unitGap !== "undefined" && this.unitGap !== null) {
-    return this.unitGap;
+AuxUnitLayout.getUnitGap = function (mainObj) {
+  if(typeof mainObj.unitGap !== "undefined" && mainObj.unitGap !== null) {
+    return mainObj.unitGap;
   }
   else {
     return AuxUnitLayout.unitGap;
   }
 };
 
-AuxUnitLayout.prototype.getAlwaysShowAuxUnits = function () {
-  if(typeof this.alwaysShowAuxUnits !== "undefined" && this.alwaysShowAuxUnits !== null) {
-    return this.alwaysShowAuxUnits;
+AuxUnitLayout.getAlwaysShowAuxUnits = function (mainObj) {
+  if(typeof mainObj.alwaysShowAuxUnits !== "undefined" && mainObj.alwaysShowAuxUnits !== null) {
+    return mainObj.alwaysShowAuxUnits;
   }
   else {
     return AuxUnitLayout.alwaysShowAuxUnits;
   }
 };
 
-AuxUnitLayout.prototype.getMaxUnitDisplayed = function () {
-  if(typeof this.maxUnitDisplayed !== "undefined" && this.maxUnitDisplayed !== null) {
-    return this.maxUnitDisplayed;
+AuxUnitLayout.getMaxUnitDisplayed = function (mainObj) {
+  if(typeof mainObj.maxUnitDisplayed !== "undefined" && mainObj.maxUnitDisplayed !== null) {
+    return mainObj.maxUnitDisplayed;
   }
   else {
     return AuxUnitLayout.maxUnitDisplayed;
@@ -869,30 +1246,30 @@ AuxUnitLayout.prototype.getMaxUnitDisplayed = function () {
 /*
  *  Duplicate a layout. Doesn't copy the units attribute, reset it instead.
  */
-AuxUnitLayout.prototype.copy = function(newParent) {
-  var newLayout = new AuxUnitLayout(newParent);
+AuxUnitLayout.copy = function(mainObj, cy, newParent) {
+  var newLayout = AuxUnitLayout.construct(newParent);
   // Copying the same reference to units would be inconsistent.
   // Duplicating owned units goes beyonnd the scope, because we need to assign
   // ids that are tied to the global cound of units of a node.
   // So duplicating units is something that should be properly done outside of this function.
   // TODO that is a bit dirty, find a nice modular way to arrange that
   newLayout.units = [];
-  newLayout.location = this.location;
-  newLayout.alignment = this.alignment;
-  newLayout.parentNode = newParent;
-  newLayout.renderLengthCache = this.renderLengthCache;
-  newLayout.lengthUsed = this.lengthUsed;
-  if(typeof this.outerMargin !== "undefined") {
-    newLayout.outerMargin = this.outerMargin;
+  newLayout.location = mainObj.location;
+  newLayout.alignment = mainObj.alignment;
+  AuxUnitLayout.setParentNodeRef(newLayout, newParent);
+  newLayout.renderLengthCache = mainObj.renderLengthCache;
+  newLayout.lengthUsed = mainObj.lengthUsed;
+  if(typeof mainObj.outerMargin !== "undefined") {
+    newLayout.outerMargin = mainObj.outerMargin;
   }
-  if(typeof this.unitGap !== "undefined") {
-    newLayout.unitGap = this.unitGap;
+  if(typeof mainObj.unitGap !== "undefined") {
+    newLayout.unitGap = mainObj.unitGap;
   }
-  if(typeof this.alwaysShowAuxUnits !== "undefined") {
-    newLayout.alwaysShowAuxUnits = this.alwaysShowAuxUnits;
+  if(typeof mainObj.alwaysShowAuxUnits !== "undefined") {
+    newLayout.alwaysShowAuxUnits = mainObj.alwaysShowAuxUnits;
   }
-  if(typeof this.maxUnitDisplayed !== "undefined") {
-    newLayout.maxUnitDisplayed = this.maxUnitDisplayed;
+  if(typeof mainObj.maxUnitDisplayed !== "undefined") {
+    newLayout.maxUnitDisplayed = mainObj.maxUnitDisplayed;
   }
   return newLayout;
 };
