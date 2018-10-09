@@ -417,6 +417,7 @@ module.exports = function () {
     .concat( elementUtilities.logicalOperatorTypes )
     .concat( elementUtilities.processTypes )
     .concat( elementUtilities.biologicalActivityTypes )
+    .concat( elementUtilities.sifTypes )
     .concat( elementUtilities.otherNodeTypes );
 
   elementUtilities.compoundNodeTypes = ['complex', 'compartment', 'submap'];
@@ -556,7 +557,7 @@ module.exports = function () {
             || sbgnclass == 'complex' || sbgnclass == 'simple chemical multimer'
             || sbgnclass == 'macromolecule multimer' || sbgnclass == 'nucleic acid feature multimer'
             || sbgnclass == 'complex multimer' || (sbgnclass.startsWith('BA') && sbgnclass != "BA plain")
-            || sbgnclass == 'compartment') {
+            || sbgnclass == 'compartment' || sbgnclass == 'protein' || sbgnclass == 'small molecule') {
       return true;
     }
     return false;
@@ -954,7 +955,8 @@ module.exports = function () {
 
       // We need to define new node shapes with their class names for these nodes
       if (_class == 'source and sink' || _class == 'nucleic acid feature' || _class == 'macromolecule'
-              || _class == 'simple chemical' || _class == 'complex' || _class == 'biological activity') {
+              || _class == 'simple chemical' || _class == 'complex' || _class == 'biological activity'
+              || _class == 'small molecule' || _class == 'protein' ) {
           return _class;
       }
 

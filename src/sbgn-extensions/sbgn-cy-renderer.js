@@ -475,7 +475,7 @@ module.exports = function () {
 
   cyStyleProperties.types.nodeShape.enums.push(
     'source and sink', 'nucleic acid feature', 'complex', 'macromolecule',
-    'simple chemical', 'biological activity', 'compartment'
+    'simple chemical', 'biological activity', 'compartment', 'protein', 'small molecule'
   );
 
   $$.sbgn.registerSbgnNodeShapes = function () {
@@ -611,7 +611,7 @@ module.exports = function () {
 
     var shapeNames = [ "simple chemical", "macromolecule", "complex",
       "nucleic acid feature", "source and sink", "biological activity",
-      "compartment", "oldCompartment"
+      "compartment", "oldCompartment", "protein", "small molecule"
     ];
 
     shapeNames.forEach( function( shapeName ) {
@@ -751,15 +751,17 @@ module.exports = function () {
       );
     },
     "protein": function( centerX, centerY, width, height, x, y, padding ) {
-      return cyMath.roundRectangleIntersectLine(
-        x, y, centerX, centerY, width, height, padding
+      return $$.sbgn.roundRectangleIntersectLine( x, y, centerX, centerY, centerX, centerY,
+        width, height,
+        cyMath.getRoundRectangleRadius(width, height), padding
       );
     },
     "small molecule": function( centerX, centerY, width, height, x, y, padding ) {
-      return cyMath.roundRectangleIntersectLine(
-        x, y, centerX, centerY, width, height, padding
+      return $$.sbgn.roundRectangleIntersectLine( x, y, centerX, centerY, centerX, centerY,
+        width, height,
+        cyMath.getRoundRectangleRadius(width, height), padding
       );
-    }
+    },
   };
 
   $$.sbgn.plainCheckPoint = {

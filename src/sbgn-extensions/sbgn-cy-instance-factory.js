@@ -616,9 +616,6 @@ module.exports = function () {
 	              }
 	              return ele.css('line-color');
 	            },
-							'line-style': function (ele) {
-	              return elementUtilities.getArrayLineStyle(ele);
-	            }
 	            'arrow-scale': 1.25
 	          })
 	          .selector("edge.cy-expand-collapse-meta-edge")
@@ -678,6 +675,9 @@ module.exports = function () {
 	            },
 	            'target-endpoint': function(ele) {
 	              return elementUtilities.getEndPoint(ele, 'target');
+	            },
+							'line-style': function (ele) {
+	              return elementUtilities.getArrayLineStyle(ele);
 	            }
 	          })
 	          .selector("edge[class='inhibition'],[class='negative influence']")
