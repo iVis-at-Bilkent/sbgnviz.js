@@ -1,6 +1,7 @@
 var libsbgnjs = require('libsbgn.js');
 var parseString = require('xml2js').parseString;
 var libUtilities = require('./lib-utilities');
+var jQuery = $ = libs.jQuery;
 var classes = require('./classes');
 
 module.exports = function () {
@@ -287,10 +288,20 @@ module.exports = function () {
     // stored in the file
     var defaultProps = elementUtilities.getDefaultProperties( nodeObj.class );
 
-    Object.keys( defaultProps ).forEach( function( prop ) {
+    function getProp( props, name ) {
+      var prop = props[ name ];
+
+      if ( typeof prop !== null && typeof prop === 'object' ) {
+        return $.extend( {}, prop );
+      }
+
+      return prop;
+    }
+
+    Object.keys( defaultProps ).forEach( function( name ) {
       // skip width and height
-      if ( prop !== 'width' && prop !== 'height' ) {
-        nodeObj[ prop ] = defaultProps[ prop ];
+      if ( name !== 'width' && name !== 'height' ) {
+        nodeObj[ name ] = getProp( defaultProps, name );
       }
     } );
 

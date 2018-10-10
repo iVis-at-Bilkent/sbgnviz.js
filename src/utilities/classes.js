@@ -70,8 +70,6 @@ AuxiliaryUnit.setParentRef = function(mainObj, newParent) {
   }
 }
 
-AuxiliaryUnit.defaultBackgroundColor = "#ffffff";
-
 /*
  * Return a new AuxiliaryUnit object. A new parent reference and new id can
  * optionnally be passed.
@@ -111,7 +109,19 @@ AuxiliaryUnit.hasText = function(mainObj, cy) {
   throw new Error("Abstract method!");
 };
 AuxiliaryUnit.drawShape = function(mainObj, cy, context, x, y) {
-  throw new Error("Abstract method!");
+  cytoscape.sbgn.drawInfoBox(context, x, y, mainObj.bbox.w, mainObj.bbox.h,
+                              mainObj.shapeName);
+
+  var tmp_ctxt = context.fillStyle;
+  context.fillStyle = mainObj.backgroundColor;
+  context.fill();
+  context.fillStyle = tmp_ctxt;
+
+  var parent = getAuxUnitClass(mainObj).getParent(mainObj, cy);
+  var borderStyle = mainObj.dashed ? 'dashed' : undefined;
+  var borderWidth = mainObj.borderWidth;
+  var borderColor = mainObj.borderColor;
+  cytoscape.sbgn.drawBorder( { context, node: parent, borderStyle, borderColor, borderWidth } );
 };
 
 // draw the statesOrInfo's label at given position
@@ -120,7 +130,6 @@ AuxiliaryUnit.drawText = function(mainObj, cy, context, centerX, centerY) {
   var options = cy.scratch('_sbgnviz').sbgnvizParams.optionUtilities.getOptions();
   var unitClass = getAuxUnitClass(mainObj);
   var parent = unitClass.getParent(mainObj, cy);
-  var fontSize = 9; // parseInt(textProp.height / 1.5);
 
   // part of : $$.sbgn.drawText(context, textProp);
   // save style before modification
@@ -128,10 +137,11 @@ AuxiliaryUnit.drawText = function(mainObj, cy, context, centerX, centerY) {
   var oldStyle = context.fillStyle;
   var oldOpacity = context.globalAlpha;
 
-  context.font = fontSize + "px Arial";
+  context.font = mainObj.fontStyle + " " + mainObj.fontWeight + " "
+                  + mainObj.fontSize + "px " + mainObj.fontFamily;
+  context.fillStyle = mainObj.textColor;
   context.textAlign = "center";
   context.textBaseline = "middle";
-  context.fillStyle = "#0f0f0f";
   context.globalAlpha = parent.css('text-opacity') * parent.css('opacity'); // ?
 
   var text;
@@ -364,6 +374,8 @@ StateVariable.construct = function(value, stateVariableDefinition, parent) {
   return obj;
 };
 
+// TODO: What to do with shapeRadius now? Look like they assignmets here are
+// no more used
 StateVariable.shapeRadius = 15;
 
 StateVariable.getText = function(mainObj) {
@@ -375,21 +387,6 @@ StateVariable.getText = function(mainObj) {
 
 StateVariable.hasText = function(mainObj) {
   return (mainObj.state.value && mainObj.state.value != "") || (mainObj.state.variable && mainObj.state.variable != "");
-};
-
-StateVariable.drawShape = function(mainObj, cy, context, x, y) {
-  cytoscape.sbgn.drawRoundRectanglePath(context,
-              x, y,
-              mainObj.bbox.w, mainObj.bbox.h,
-              Math.min(mainObj.bbox.w / 2, mainObj.bbox.h / 2, StateVariable.shapeRadius));
-  var tmp_ctxt = context.fillStyle;
-  context.fillStyle = StateVariable.defaultBackgroundColor;
-  context.fill();
-  context.fillStyle = tmp_ctxt;
-
-  var parent = getAuxUnitClass(mainObj).getParent(mainObj, cy);
-  var borderStyle = mainObj.dashed ? 'dashed' : undefined;
-  cytoscape.sbgn.drawBorder( { context, node: parent, borderStyle } );
 };
 
 StateVariable.create = function(parentNode, cy, value, variable, bbox, location, position, index) {
@@ -473,19 +470,6 @@ UnitOfInformation.getText = function(mainObj) {
 
 UnitOfInformation.hasText = function(mainObj) {
   return mainObj.label.text && mainObj.label.text != "";
-};
-
-UnitOfInformation.drawShape = function(mainObj, cy, context, x, y) {
-  cytoscape.sbgn.UnitOfInformationShapeFn(context, x, y, mainObj.bbox.w, mainObj.bbox.h,
-                  getAuxUnitClass(mainObj).getParent(mainObj, cy).data("class"));
-  var tmp_ctxt = context.fillStyle;
-  context.fillStyle = UnitOfInformation.defaultBackgroundColor;
-  context.fill();
-  context.fillStyle = tmp_ctxt;
-
-  var parent = getAuxUnitClass(mainObj).getParent(mainObj, cy);
-  var borderStyle = mainObj.dashed ? 'dashed' : undefined;
-  cytoscape.sbgn.drawBorder( { context, node: parent, borderStyle } );
 };
 
 /**

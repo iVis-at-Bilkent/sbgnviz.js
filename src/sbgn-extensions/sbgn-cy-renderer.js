@@ -200,29 +200,35 @@ module.exports = function () {
     context.closePath();
   };
 
-  $$.sbgn.UnitOfInformationShapeFn = function (context, x, y, width, height, type) {
-
-    if ( type == "BA macromolecule"){
-	    cyBaseNodeShapes['roundrectangle'].draw(context, x, y, width, height);
-    }
-    else if ( type == "BA simple chemical"){
-	    drawRoundRectanglePath(context, x, y, width, height,Math.min(width / 2, height / 2, 15));
-    }
-    else if ( type == "BA nucleic acid feature"){
-	    $$.sbgn.drawBottomRoundRectangle(context, x, y, width, height);
-    }
-    else if ( type == "BA unspecified entity"){
-	    cyBaseNodeShapes['ellipse'].draw(context, x, y, width, height);
-    }
-    else if ( type == "BA complex"){
-      $$.sbgn.drawComplex( context, x, y, width, height, height / 2 );
-    }
-    else if ( type == "BA perturbing agent"){
-	    var points = $$.sbgn.generatePerturbingAgentPoints();
-	    drawPolygonPath(context, x, y, width, height, points);
-    }
-    else{
-	    cyBaseNodeShapes['rectangle'].draw(context, x, y, width, height);
+  $$.sbgn.drawInfoBox = function(context, x, y, width, height, shapeName) {
+    switch (shapeName) {
+      // macromolecule
+      case 'roundrectangle':
+        cyBaseNodeShapes['roundrectangle'].draw(context, x, y, width, height);
+        break;
+      // nucleic acid feature
+      case 'bottomroundrectangle':
+        $$.sbgn.drawBottomRoundRectangle(context, x, y, width, height);
+        break;
+      // unspecified entity
+      case 'ellipse':
+        cyBaseNodeShapes['ellipse'].draw(context, x, y, width, height);
+        break;
+      case 'complex':
+        $$.sbgn.drawComplex( context, x, y, width, height, height / 2 );
+        break;
+      case 'perturbing agent':
+        var points = $$.sbgn.generatePerturbingAgentPoints();
+        drawPolygonPath(context, x, y, width, height, points);
+        break;
+      // default unit of info shape
+      case 'rectangle':
+        cyBaseNodeShapes['rectangle'].draw(context, x, y, width, height);
+        break;
+      // state variable, simple chemical
+      case 'stadium':
+        $$.sbgn.drawRoundRectanglePath(context, x, y, width, height, Math.min(width / 2, height / 2, 15));
+        break;
     }
   };
 

@@ -2148,8 +2148,27 @@ module.exports = function () {
     };
   };
 
+  var getDefaultInfoboxProperties = function() {
+    return {
+      'font-size': 9,
+      'font-family': 'Arial',
+      'font-style': 'normal',
+      'font-weight': 'normal',
+      'color': '#0f0f0f',
+      'border-width': 2.25,
+      'border-color': '#555',
+      'background-color': '#ffffff'
+    };
+  };
+
   elementUtilities.nodeTypes.forEach( function( type ) {
     defaultProperties[ type ] = $.extend( {}, getDefaultNodeProperties(), getDefaultSize( type ) );
+    if (elementUtilities.canHaveStateVariable( ele )) {
+      defaultProperties[ type ].stateVar = getDefaultInfoboxProperties();
+    }
+    if (elementUtilities.canHaveUnitOfInformation( ele )) {
+      defaultProperties[ type ].unitOfInfo = getDefaultInfoboxProperties();
+    }
   } );
 
   elementUtilities.compoundNodeTypes.forEach( function( type ) {
