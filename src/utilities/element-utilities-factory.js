@@ -640,6 +640,12 @@ module.exports = function () {
     return inArray( sbgnclass, elementUtilities.biologicalActivityTypes );
   };
 
+  elementUtilities.isSIFNode = function( ele ) {
+    var sbgnclass = elementUtilities.getPureSbgnClass( ele );
+
+    return inArray( sbgnclass, elementUtilities.sifTypes );
+  };
+
   // Returns whether the given element is an EPN
   elementUtilities.isEPNClass = function (ele) {
     var sbgnclass = elementUtilities.getPureSbgnClass( ele );
@@ -1113,6 +1119,57 @@ module.exports = function () {
     }
 
     return this.getDynamicLabelTextSize(ele);
+  };
+
+  elementUtilities.getStateVarShapeOptions = function(ele) {
+    if ( !elementUtilities.canHaveStateVariable( ele ) ) {
+      return null;
+    }
+    
+    return 'stadium';
+  };
+
+  elementUtilities.getUnitOfInfoShapeOptions = function(ele) {
+    var type = elementUtilities.getPureSbgnClass(ele);
+
+    if ( !elementUtilities.canHaveUnitOfInformation( type ) ) {
+      return null;
+    }
+
+    var opts = null;
+
+    if ( elementUtilities.isSIFNode( type ) ) {
+      opts = ['rectangle', 'stadium'];
+    }
+    else if ( elementUtilities.isBiologicalActivity( type ) ) {
+      switch (type) {
+        case 'BA macromolecule':
+          opts = ['roundrectangle'];
+          break;
+        case 'BA nucleic acid feature':
+          opts = ['bottomroundrectangle']
+          break;
+        case 'BA unspecified entity':
+          opts = ['ellipse'];
+          break;
+        case 'BA complex':
+          opts = ['complex'];
+          break;
+        case 'BA perturbing agent':
+          opts = ['perturbing agent'];
+          break;
+        case 'BA simple chemical'
+          opts = ['stadium'];
+          break;
+        default:
+          break;
+      }
+    }
+    else {
+      opts = ['rectangle'];
+    }
+
+    return opts;
   };
 
   elementUtilities.getCardinalityDistance = function (ele) {
