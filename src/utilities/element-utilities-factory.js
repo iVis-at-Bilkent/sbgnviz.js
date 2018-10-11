@@ -1147,7 +1147,7 @@ module.exports = function () {
           opts = ['roundrectangle'];
           break;
         case 'BA nucleic acid feature':
-          opts = ['bottomroundrectangle']
+          opts = ['bottomroundrectangle'];
           break;
         case 'BA unspecified entity':
           opts = ['ellipse'];
@@ -1158,7 +1158,7 @@ module.exports = function () {
         case 'BA perturbing agent':
           opts = ['perturbing agent'];
           break;
-        case 'BA simple chemical'
+        case 'BA simple chemical':
           opts = ['stadium'];
           break;
         default:
@@ -2211,20 +2211,32 @@ module.exports = function () {
       'font-family': 'Arial',
       'font-style': 'normal',
       'font-weight': 'normal',
-      'color': '#0f0f0f',
+      'font-color': '#0f0f0f',
       'border-width': 2.25,
       'border-color': '#555',
       'background-color': '#ffffff'
     };
   };
 
+  var getDefaultStateVarShapeName = function() {
+    return 'rectangle';
+  };
+
+  var getDefaultUnitOfInfoShapeName = function() {
+    return 'stadium';
+  };
+
   elementUtilities.nodeTypes.forEach( function( type ) {
     defaultProperties[ type ] = $.extend( {}, getDefaultNodeProperties(), getDefaultSize( type ) );
-    if (elementUtilities.canHaveStateVariable( ele )) {
-      defaultProperties[ type ][ 'state variable' ] = getDefaultInfoboxProperties();
+    if (elementUtilities.canHaveStateVariable( type )) {
+      var props = getDefaultInfoboxProperties();
+      props[ 'shape-name' ] = getDefaultStateVarShapeName();
+      defaultProperties[ type ][ 'state variable' ] = props;
     }
-    if (elementUtilities.canHaveUnitOfInformation( ele )) {
-      defaultProperties[ type ][ 'unit of information' ] = getDefaultInfoboxProperties();
+    if (elementUtilities.canHaveUnitOfInformation( type )) {
+      var props = getDefaultInfoboxProperties();
+      props[ 'shape-name' ] = getDefaultUnitOfInfoShapeName();
+      defaultProperties[ type ][ 'unit of information' ] = props;
     }
   } );
 

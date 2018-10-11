@@ -48,7 +48,7 @@ AuxiliaryUnit.construct = function(parent) {
   obj.coordType = "relativeToSide";
   obj.anchorSide = null;
   obj.isDisplayed = false;
-  obj.dashed = false;
+  obj.style = null;
 
   return obj;
 };
@@ -85,7 +85,7 @@ AuxiliaryUnit.copy = function (mainObj, cy, existingInstance, newParent, newId) 
   newUnit.coordType = mainObj.coordType;
   newUnit.anchorSide = mainObj.anchorSide;
   newUnit.isDisplayed = mainObj.isDisplayed;
-  newUnit.dashed = mainObj.dashed;
+  newUnit.style = mainObj.style;
   return newUnit;
 };
 
@@ -109,18 +109,22 @@ AuxiliaryUnit.hasText = function(mainObj, cy) {
   throw new Error("Abstract method!");
 };
 AuxiliaryUnit.drawShape = function(mainObj, cy, context, x, y) {
+  var style = mainObj.style;
   cytoscape.sbgn.drawInfoBox(context, x, y, mainObj.bbox.w, mainObj.bbox.h,
-                              mainObj.shapeName);
+                              style.shapeName);
 
   var tmp_ctxt = context.fillStyle;
-  context.fillStyle = mainObj.backgroundColor;
+  context.fillStyle = style.backgroundColor;
   context.fill();
   context.fillStyle = tmp_ctxt;
 
   var parent = getAuxUnitClass(mainObj).getParent(mainObj, cy);
-  var borderStyle = mainObj.dashed ? 'dashed' : undefined;
-  var borderWidth = mainObj.borderWidth;
-  var borderColor = mainObj.borderColor;
+  var borderStyle = style.dashed ? 'dashed' : undefined;
+  var borderWidth = style.borderWidth;
+  // Selected nodes have a specific border color so infobox should have the same
+  // border color when the node is selected. May need to be updated if style of
+  // selected nodes is updated in a different way.
+  var borderColor = parent.selected() ? null : style.borderColor;
   cytoscape.sbgn.drawBorder( { context, node: parent, borderStyle, borderColor, borderWidth } );
 };
 
@@ -130,6 +134,7 @@ AuxiliaryUnit.drawText = function(mainObj, cy, context, centerX, centerY) {
   var options = cy.scratch('_sbgnviz').sbgnvizParams.optionUtilities.getOptions();
   var unitClass = getAuxUnitClass(mainObj);
   var parent = unitClass.getParent(mainObj, cy);
+  var style = mainObj.style;
 
   // part of : $$.sbgn.drawText(context, textProp);
   // save style before modification
@@ -137,9 +142,9 @@ AuxiliaryUnit.drawText = function(mainObj, cy, context, centerX, centerY) {
   var oldStyle = context.fillStyle;
   var oldOpacity = context.globalAlpha;
 
-  context.font = mainObj.fontStyle + " " + mainObj.fontWeight + " "
-                  + mainObj.fontSize + "px " + mainObj.fontFamily;
-  context.fillStyle = mainObj.textColor;
+  context.font = style.fontStyle + " " + style.fontWeight + " "
+                  + style.fontSize + "px " + style.fontFamily;
+  context.fillStyle = style.textColor;
   context.textAlign = "center";
   context.textBaseline = "middle";
   context.globalAlpha = parent.css('text-opacity') * parent.css('opacity'); // ?
@@ -389,7 +394,7 @@ StateVariable.hasText = function(mainObj) {
   return (mainObj.state.value && mainObj.state.value != "") || (mainObj.state.variable && mainObj.state.variable != "");
 };
 
-StateVariable.create = function(parentNode, cy, value, variable, bbox, location, position, index) {
+StateVariable.create = function(parentNode, cy, value, variable, bbox, location, position, style, index) {
   // create the new state var of info
   var stateVar = StateVariable.construct();
   StateVariable.setParentRef(stateVar, parentNode);
@@ -398,6 +403,7 @@ StateVariable.create = function(parentNode, cy, value, variable, bbox, location,
   stateVar.variable = variable;
   stateVar.state = {value: value, variable: variable};
   stateVar.bbox = bbox;
+  stateVar.style = style;
 
   // link to layout
   position = StateVariable.addToParent(stateVar, cy, parentNode, location, position, index);
@@ -480,10 +486,11 @@ UnitOfInformation.hasText = function(mainObj) {
  * @param [position] - its position in the order of elements placed on the same location
  * @param [index] - its index in the statesandinfos list
  */
-UnitOfInformation.create = function (parentNode, cy, value, bbox, location, position, index) {
+UnitOfInformation.create = function (parentNode, cy, value, bbox, location, position, style, index) {
   // create the new unit of info
   var unit = UnitOfInformation.construct(value, parentNode);
   unit.bbox = bbox;
+  unit.style = style;
 
   //console.log("will insert on", location, position);
   position = UnitOfInformation.addToParent(unit, cy, parentNode, location, position, index);

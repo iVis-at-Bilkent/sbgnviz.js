@@ -1,6 +1,7 @@
 var libsbgnjs = require('libsbgn.js');
 var parseString = require('xml2js').parseString;
 var libUtilities = require('./lib-utilities');
+var libs = libUtilities.getLibs();
 var jQuery = $ = libs.jQuery;
 var classes = require('./classes');
 
@@ -223,7 +224,7 @@ module.exports = function () {
   sbgnmlToJson.addParentInfoToNode = function (ele, nodeObj, parent, compartments) {
     var self = this;
     var compartmentRef = ele.compartmentRef;
-    
+
     var inferNestingOnLoad = options.inferNestingOnLoad;
     inferNestingOnLoad = typeof inferNestingOnLoad === 'function' ? inferNestingOnLoad.call() : inferNestingOnLoad;
 
