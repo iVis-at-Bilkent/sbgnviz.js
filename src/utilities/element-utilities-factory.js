@@ -2164,10 +2164,10 @@ module.exports = function () {
   elementUtilities.nodeTypes.forEach( function( type ) {
     defaultProperties[ type ] = $.extend( {}, getDefaultNodeProperties(), getDefaultSize( type ) );
     if (elementUtilities.canHaveStateVariable( ele )) {
-      defaultProperties[ type ].stateVar = getDefaultInfoboxProperties();
+      defaultProperties[ type ][ 'state variable' ] = getDefaultInfoboxProperties();
     }
     if (elementUtilities.canHaveUnitOfInformation( ele )) {
-      defaultProperties[ type ].unitOfInfo = getDefaultInfoboxProperties();
+      defaultProperties[ type ][ 'unit of information' ] = getDefaultInfoboxProperties();
     }
   } );
 
