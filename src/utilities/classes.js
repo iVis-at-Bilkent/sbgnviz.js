@@ -111,20 +111,20 @@ AuxiliaryUnit.hasText = function(mainObj, cy) {
 AuxiliaryUnit.drawShape = function(mainObj, cy, context, x, y) {
   var style = mainObj.style;
   cytoscape.sbgn.drawInfoBox(context, x, y, mainObj.bbox.w, mainObj.bbox.h,
-                              style.shapeName);
+                              style['shape-name']);
 
   var tmp_ctxt = context.fillStyle;
-  context.fillStyle = style.backgroundColor;
+  context.fillStyle = style['background-color'];
   context.fill();
   context.fillStyle = tmp_ctxt;
 
   var parent = getAuxUnitClass(mainObj).getParent(mainObj, cy);
   var borderStyle = style.dashed ? 'dashed' : undefined;
-  var borderWidth = style.borderWidth;
+  var borderWidth = style['border-width'];
   // Selected nodes have a specific border color so infobox should have the same
   // border color when the node is selected. May need to be updated if style of
   // selected nodes is updated in a different way.
-  var borderColor = parent.selected() ? null : style.borderColor;
+  var borderColor = parent.selected() ? null : style['border-color'];
   cytoscape.sbgn.drawBorder( { context, node: parent, borderStyle, borderColor, borderWidth } );
 };
 
@@ -142,9 +142,9 @@ AuxiliaryUnit.drawText = function(mainObj, cy, context, centerX, centerY) {
   var oldStyle = context.fillStyle;
   var oldOpacity = context.globalAlpha;
 
-  context.font = style.fontStyle + " " + style.fontWeight + " "
-                  + style.fontSize + "px " + style.fontFamily;
-  context.fillStyle = style.textColor;
+  context.font = style['font-style'] + " " + style['font-weight'] + " "
+                  + style['font-size'] + "px " + style['font-family'];
+  context.fillStyle = style['font-color'];
   context.textAlign = "center";
   context.textBaseline = "middle";
   context.globalAlpha = parent.css('text-opacity') * parent.css('opacity'); // ?

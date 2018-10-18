@@ -183,10 +183,16 @@ module.exports = function () {
 
     for (var i = 0; i < childGlyphs.length; i++) {
       var glyph = childGlyphs[i];
+
+      if (glyph.class_ !== 'unit of information' && glyph.class_ !== 'state variable') {
+        continue;
+      }
+
       var info = {};
+      var infobox;
 
       if (glyph.class_ === 'unit of information') {
-        var unitOfInformation = classes.UnitOfInformation.construct();
+        infobox = classes.UnitOfInformation.construct();
         if(glyph.entity) {
           // change the parent class according to its true class of biological activity
           switch(glyph.entity.name) {
@@ -198,27 +204,32 @@ module.exports = function () {
             case 'complex':               parent.class = "BA complex"; break;
           }
         }
-
-        unitOfInformation.id = glyph.id || undefined;
-        unitOfInformation.label = {
+        infobox.label = {
           'text': (glyph.label && glyph.label.text) || undefined
         };
-        unitOfInformation.bbox = self.stateAndInfoBboxProp(glyph, parentBbox);
-        //classes.UnitOfInformation.setAnchorSide(unitOfInformation);
-        stateAndInfoArray.push(unitOfInformation);
       } else if (glyph.class_ === 'state variable') {
-        var stateVariable = classes.StateVariable.construct();
-        stateVariable.id = glyph.id || undefined;
+        infobox = classes.StateVariable.construct();
+
         var state = glyph.state;
-        stateVariable.state.value = (state && state.value) || undefined;
-        stateVariable.state.variable = (state && state.variable) || undefined;
-        stateVariable.bbox = self.stateAndInfoBboxProp(glyph, parentBbox);
-        //classes.StateVariable.setAnchorSide(stateVariable);
-        stateAndInfoArray.push(stateVariable);
+        infobox.state.value = (state && state.value) || undefined;
+        infobox.state.variable = (state && state.variable) || undefined;
       }
+
+      infobox.id = glyph.id || undefined;
+      infobox.bbox = self.stateAndInfoBboxProp(glyph, parentBbox);
+      infobox.style = self.getDefaultStateAndInfoStyle(glyph, parent.class);
+      //classes.StateVariable.setAnchorSide(infobox);
+      stateAndInfoArray.push(infobox);
     }
 
     return stateAndInfoArray;
+  };
+
+  sbgnmlToJson.getDefaultStateAndInfoStyle = function(gylph, parentClass) {
+    var defaultProps = elementUtilities.getDefaultProperties( parentClass );
+    var infoboxStyle = $.extend( {}, defaultProps[ gylph.class_ ] );
+
+    return infoboxStyle;
   };
 
   sbgnmlToJson.addParentInfoToNode = function (ele, nodeObj, parent, compartments) {
@@ -299,9 +310,16 @@ module.exports = function () {
       return prop;
     }
 
+    // list of properties to skip
+    var propsToSkip = {
+      'width': true,
+      'height': true,
+      'state variable': true,
+      'unit of information': true
+    };
+
     Object.keys( defaultProps ).forEach( function( name ) {
-      // skip width and height
-      if ( name !== 'width' && name !== 'height' ) {
+      if ( !propsToSkip[ name ] ) {
         nodeObj[ name ] = getProp( defaultProps, name );
       }
     } );

@@ -1125,8 +1125,8 @@ module.exports = function () {
     if ( !elementUtilities.canHaveStateVariable( ele ) ) {
       return null;
     }
-    
-    return 'stadium';
+
+    return ['stadium'];
   };
 
   elementUtilities.getUnitOfInfoShapeOptions = function(ele) {
@@ -2219,16 +2219,17 @@ module.exports = function () {
   };
 
   var getDefaultStateVarShapeName = function() {
-    return 'rectangle';
+    return 'stadium';
   };
 
   var getDefaultUnitOfInfoShapeName = function() {
-    return 'stadium';
+    return 'rectangle';
   };
 
   elementUtilities.nodeTypes.forEach( function( type ) {
     defaultProperties[ type ] = $.extend( {}, getDefaultNodeProperties(), getDefaultSize( type ) );
     if (elementUtilities.canHaveStateVariable( type )) {
+      // TODO: maybe take clazz as parameter and set shape name according to it
       var props = getDefaultInfoboxProperties();
       props[ 'shape-name' ] = getDefaultStateVarShapeName();
       defaultProperties[ type ][ 'state variable' ] = props;
