@@ -61,7 +61,7 @@ module.exports = function () {
  }
  // Helper functions End
 
- var sbgnmlToJson, jsonToSbgnml, uiUtilities, tdToJson, graphUtilities;
+ var sbgnmlToJson, jsonToSbgnml, uiUtilities, tdToJson, sifToJson, graphUtilities;
  var updateGraph;
  var options, cy;
 
@@ -70,6 +70,7 @@ module.exports = function () {
    jsonToSbgnml = param.jsonToSbgnmlConverter;
    uiUtilities = param.uiUtilities;
    tdToJson = param.tdToJsonConverter;
+   sifToJson = param.sifToJsonConverter;
    graphUtilities = param.graphUtilities;
    updateGraph = graphUtilities.updateGraph.bind(graphUtilities);
    options = param.optionUtilities.getOptions();
@@ -83,7 +84,7 @@ module.exports = function () {
 
    // this is to remove the beginning of the pngContent: data:img/png;base64,
    var b64data = pngContent.substr(pngContent.indexOf(",") + 1);
-  
+
    // lower quality when response is empty
    if(!b64data || b64data === ""){
      pngContent = cy.png({maxWidth: 15000, maxHeight: 15000, full: true});
@@ -98,7 +99,7 @@ module.exports = function () {
 
    // this is to remove the beginning of the pngContent: data:img/png;base64,
    var b64data = jpgContent.substr(jpgContent.indexOf(",") + 1);
-  
+
    // lower quality when response is empty
    if(!b64data || b64data === ""){
      jpgContent = cy.jpg({maxWidth: 15000, maxHeight: 15000, full: true});
@@ -141,6 +142,55 @@ module.exports = function () {
    }, 0);
  };
 
+ // TODO: there are a lot of code replications in such load functions, it can be handled
+ // with the help of some base functions.
+ fileUtilities.loadSIFFile = function(file, callback1){
+   console.log( "Starting load sif file...");
+
+   var self = this;
+   uiUtilities.startSpinner("load-file-spinner");
+
+   var textType = /text.*/;
+
+   var reader = new FileReader();
+
+   reader.onload = function(e) {
+     //Get the text result of the file.
+     var text = this.result;
+
+     setTimeout( function() {
+       var graph;
+       try{
+         graph = sifToJson.convert(text);
+         $( document ).trigger( "sbgnvizLoadFile", [ file.name, cy ] ); // Aliases for sbgnvizLoadFileStart
+
+         $( document ).trigger( "sbgnvizLoadFileStart", [ file.name, cy ] );
+       } catch (err){
+         uiUtilities.endSpinner("load-file-spinner");
+         console.log( "Error found in parsing");
+         console.log(err);
+         return;
+       }
+       if( !graph && typeof callback1 !== 'undefined')
+       {
+         uiUtilities.endSpinner("load-file-spinner");
+         callback1();
+         return;
+       }else if( !graph)
+       {
+         uiUtilities.endSpinner("load-file-spinner");
+         console.log( "Graph is not defined.");
+         return;
+       }
+
+       updateGraph(graph);
+       uiUtilities.endSpinner("load-file-spinner");
+       $( document ).trigger( "sbgnvizLoadFileEnd", [ file.name, cy] ); // Trigger an event signaling that a file is loaded
+         //console.log( "Load file end done...");
+     }, 0);
+   };
+   reader.readAsText(file);
+ };
 
 fileUtilities.loadTDFile = function(file, callback1){
   console.log( "Starting load td file...");
@@ -162,15 +212,15 @@ fileUtilities.loadTDFile = function(file, callback1){
         graph = tdToJson.convert(text);
         $( document ).trigger( "sbgnvizLoadFile", [ file.name, cy ] ); // Aliases for sbgnvizLoadFileStart
 
-        $( document ).trigger( "sbgnvizLoadFileStart", [ file.name, cy ] ); 
+        $( document ).trigger( "sbgnvizLoadFileStart", [ file.name, cy ] );
       } catch (err){
         uiUtilities.endSpinner("load-file-spinner");
         console.log( "Error found in parsing");
         console.log(err);
         return;
       }
-      if( !graph && typeof callback1 !== 'undefined') 
-      {  
+      if( !graph && typeof callback1 !== 'undefined')
+      {
         uiUtilities.endSpinner("load-file-spinner");
         callback1();
         return;
@@ -206,7 +256,7 @@ fileUtilities.loadTDFile = function(file, callback1){
      var text = this.result;
 
      setTimeout(function () {
-       
+
        if (typeof callback1 !== 'undefined') callback1(text);
 
        var cyGraph;

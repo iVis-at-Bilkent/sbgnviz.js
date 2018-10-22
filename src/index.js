@@ -23,6 +23,7 @@
     var jsonToSbgnmlConverter = require('./utilities/json-to-sbgnml-converter-factory')();
     var sbgnmlToJsonConverter = require('./utilities/sbgnml-to-json-converter-factory')();
     var tdToJsonConverter = require('./utilities/tab-delimited-to-json-converter-factory')();
+    var sifToJsonConverter = require('./utilities/sif-to-json-converter-factory')();
     var classes = require('./utilities/classes');
 
     // Fill param object to use it utilities internally
@@ -38,6 +39,7 @@
     param.jsonToSbgnmlConverter = jsonToSbgnmlConverter;
     param.sbgnmlToJsonConverter = sbgnmlToJsonConverter;
     param.tdToJsonConverter = tdToJsonConverter;
+    param.sifToJsonConverter = sifToJsonConverter;
     param.classes = classes;
 
     // call constructors of objects with param
@@ -53,6 +55,7 @@
     jsonToSbgnmlConverter(param);
     sbgnmlToJsonConverter(param);
     tdToJsonConverter(param);
+    sifToJsonConverter(param);
 
     // set scratch pad for sbgnviz and init sbgnvizParams inside it
     sbgnCyInstance.getCy().scratch('_sbgnviz', {});
