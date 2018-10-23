@@ -819,7 +819,7 @@ module.exports = function () {
     var glyphs = map.glyphs;
     var arcs = map.arcs;
 
-    var i;
+    var i;sbgnmlToJson
     for (i = 0; i < glyphs.length; i++) {
       var glyph = glyphs[i];
 
@@ -864,6 +864,18 @@ module.exports = function () {
     this.insertedNodes = {};
 
     return cytoscapeJsGraph;
+  };
+  
+    sbgnmlToJson.doSchematronValidation = function(xmlObject) {
+   	var errors;
+	    try {
+     		 var xmlString = new XMLSerializer().serializeToString(xmlObject);
+      		errors = libsbgnjs.Sbgn.doSchematronValidation(xmlString);
+   	   }
+    	  catch (err) {
+      		throw new Error("Could not do validation. "+ err);
+    	  }
+	  return errors;
   };
 
   return sbgnmlToJson;
