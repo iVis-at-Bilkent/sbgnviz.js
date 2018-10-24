@@ -25,6 +25,7 @@
     var tdToJsonConverter = require('./utilities/tab-delimited-to-json-converter-factory')();
     var sifToJsonConverter = require('./utilities/sif-to-json-converter-factory')();
     var classes = require('./utilities/classes');
+    var tdParser = require('./utilities/tab-delimeted-parser');
 
     // Fill param object to use it utilities internally
     param.optionUtilities = optionUtilities;
@@ -91,8 +92,9 @@
     // Expose get cy function to enable accessing related cy instance
     api.getCy = sbgnCyInstance.getCy;
 
-    // Expose classes
+    // Expose some utilities directly here
     api.classes = classes;
+    api.tdParser = tdParser;
 
     return api;
   };

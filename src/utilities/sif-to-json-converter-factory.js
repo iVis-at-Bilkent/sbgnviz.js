@@ -1,3 +1,5 @@
+var tdParser = require('./tab-delimeted-parser');
+
 function strToSet( str ) {
   var set = {};
   var list = str ? str.split( ';' ) : [];
@@ -7,15 +9,6 @@ function strToSet( str ) {
   } );
 
   return set;
-}
-
-function getLinesArray( content ) {
-  var separator = /\r?\n|\r/;
-  return content.split( separator );
-}
-
-function getTabsArray( line ) {
-  return line.split( '\t' );
 }
 
 function getEmptyGraphData() {
@@ -49,10 +42,10 @@ module.exports = function() {
       return sifToJson.graphData;
     }
 
-    var lines = getLinesArray( graphText.toString() );
+    var lines = tdParser.getLinesArray( graphText.toString() );
 
     lines.forEach( function( line ) {
-      var tabs = getTabsArray( line );
+      var tabs = tdParser.getTabsArray( line );
 
       var srcName = tabs[ 0 ];
       var edgeType = tabs[ 1 ];

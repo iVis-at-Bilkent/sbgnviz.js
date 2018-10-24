@@ -145,7 +145,7 @@ module.exports = function () {
  // TODO: there are a lot of code replications in such load functions, it can be handled
  // with the help of some base functions.
  fileUtilities.loadSIFFile = function(file, callback1){
-   console.log( "Starting load sif file...");
+   console.log( "Starting load td file...");
 
    var self = this;
    uiUtilities.startSpinner("load-file-spinner");
