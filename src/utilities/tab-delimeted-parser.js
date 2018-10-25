@@ -7,7 +7,10 @@ tdParser.getTabsArray = function( line ) {
 
 tdParser.getLinesArray = function( content ) {
   var separator = /\r?\n|\r/;
-  return content.split( separator );
+  var notEmpty = function( line ) {
+    return line !== '';
+  };
+  return content.split( separator ).filter( notEmpty );
 };
 
 module.exports = tdParser;

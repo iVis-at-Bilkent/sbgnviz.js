@@ -29,6 +29,8 @@ module.exports = function() {
     sifToJson.keyToEdge = {};
   }
 
+  sifToJson.defaultNodeType = 'protein';
+
   sifToJson.mergeGraphData = function() {
     return [ ...sifToJson.graphData.nodes, ...sifToJson.graphData.edges ];
   };
@@ -47,21 +49,31 @@ module.exports = function() {
     lines.forEach( function( line ) {
       var tabs = tdParser.getTabsArray( line );
 
-      var srcName = tabs[ 0 ];
-      var edgeType = tabs[ 1 ];
-      var tgtName = tabs[ 2 ];
-      var pcIDSet = strToSet( tabs[ 3 ] );
-      var siteLocSet = strToSet( tabs[ 4 ] );
+      // line represents a node
+      if ( tabs.length === 1 ) {
+        var nodeName = tabs[ 0 ];
+        // create the node if does not exist yet
+        // if the node is just created it will have the default node class
+        sifToJson.getOrCreateNode( nodeName );
+      }
+      // line represents an edge and the connected nodes
+      else {
+        var srcName = tabs[ 0 ];
+        var edgeType = tabs[ 1 ];
+        var tgtName = tabs[ 2 ];
+        var pcIDSet = strToSet( tabs[ 3 ] );
+        var siteLocSet = strToSet( tabs[ 4 ] );
 
-      var srcClass = sifToJson.getNodeClass( edgeType, 'src' );
-      var tgtClass = sifToJson.getNodeClass( edgeType, 'tgt' );
+        var srcClass = sifToJson.getNodeClass( edgeType, 'src' );
+        var tgtClass = sifToJson.getNodeClass( edgeType, 'tgt' );
 
-      // create nodes if they do not exist yet
-      sifToJson.getOrCreateNode( srcName, srcClass );
-      sifToJson.getOrCreateNode( tgtName, tgtClass );
+        // create nodes if they do not exist yet
+        // if the node already exists the node type and so the default values
+        // will be updated
+        sifToJson.getOrCreateNode( srcName, srcClass );
+        sifToJson.getOrCreateNode( tgtName, tgtClass );
 
-      // if line contains a non-existing edge create it
-      if( srcName && edgeType && tgtName ) {
+        // create the edge if it does not exist yet
         sifToJson.getOrCreateEdge( srcName, edgeType, tgtName, pcIDSet, siteLocSet );
       }
     } );
@@ -91,27 +103,43 @@ module.exports = function() {
   };
 
   sifToJson.getOrCreateNode = function( name, className ) {
+    className = className || sifToJson.defaultNodeType;
     var node = sifToJson.getNodeByName( name );
+
     var defaults = elementUtilities.getDefaultProperties( className );
+
+    var updateWithDefaults = function() {
+      node.data.bbox.w = defaults.width;
+      node.data.bbox.h = defaults.height;
+    };
 
     if ( node == undefined ) {
       var uid = elementUtilities.generateUUID();
       node = {};
+
       node.data = {
         id: uid,
         label: name,
         class: className,
         bbox: {
-          w: defaults.width,
-          h: defaults.height,
           x: 0,
           y: 0
         },
         statesandinfos: []
       };
 
+      updateWithDefaults();
+
       sifToJson.mapNodeToName( node, name );
       sifToJson.graphData.nodes.push( node );
+    }
+    // if node the old node class is the default one and the given class name is
+    // different than it then we can assume that the node is created without included
+    // in an edge so we should update the node class and defaults according to the
+    // new node class
+    else if ( node.class !== className && node.class === sifToJson.defaultNodeType ) {
+      node.data.class = className;
+      updateWithDefaults();
     }
 
     return node;
