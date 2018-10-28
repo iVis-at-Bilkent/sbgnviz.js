@@ -870,7 +870,7 @@ module.exports = function () {
    	var errors;
 	    try {
      		 var xmlString = new XMLSerializer().serializeToString(xmlObject);
-      		errors = libsbgnjs.Sbgn.doSchematronValidation(xmlString);
+      		 errors = libsbgnjs.Sbgn.doSchematronValidation(xmlString);
    	   }
     	  catch (err) {
       		throw new Error("Could not do validation. "+ err);
