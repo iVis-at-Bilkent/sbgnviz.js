@@ -2133,6 +2133,29 @@ module.exports = function () {
     };
   };
 
+  var defaultSifEdgeColorMap = {
+    'neighbor-of': 'rgb(100, 120, 100)',
+    'interacts-with': 'rgb(255, 192, 203)',
+    'in-complex-with': 'rgb(150, 150, 150)',
+    'controls-state-change-of': 'rgb(50, 100, 150)',
+    'controls-transport-of': 'rgb(100, 100, 150)',
+    'controls-phosphorylation-of': 'rgb(100, 150, 100)',
+    'catalysis-precedes': 'rgb(150, 50, 150)',
+    'controls-expression-of': 'rgb(50, 150, 50)',
+    'consumption-controled-by': 'rgb(100, 120, 80)',
+    'controls-production-of': 'rgb(50, 120, 100)',
+    'controls-transport-of-chemical': 'rgb(80, 130, 100)',
+    'chemical-affects': 'rgb(100, 80, 80)',
+    'reacts-with': 'rgb(70, 120, 80)',
+    'used-to-produce': 'rgb(70, 80, 120)',
+    'phosphorylates': 'rgb(0, 150, 0)',
+    'dephosphorylates': 'rgb(150, 0, 0)',
+    'upregulates-expression': 'rgb(0, 150, 0)',
+    'downregulates-expression': 'rgb(150, 0, 0)',
+    'activates': 'rgb(0, 150, 200)',
+    'inhibits': 'rgb(200, 0, 170)'
+  };
+
   var defaultSizeMap = {
     'macromolecule': {
       width: 60,
@@ -2232,25 +2255,27 @@ module.exports = function () {
     };
   };
 
-  var getDefaultStateVarShapeName = function() {
+  var getDefaultStateVarShapeName = function( type ) {
     return 'stadium';
   };
 
-  var getDefaultUnitOfInfoShapeName = function() {
+  var getDefaultUnitOfInfoShapeName = function( type ) {
+    if ( type == 'protein' ) {
+      return 'stadium';
+    }
     return 'rectangle';
   };
 
   elementUtilities.nodeTypes.forEach( function( type ) {
     defaultProperties[ type ] = $.extend( {}, getDefaultNodeProperties(), getDefaultSize( type ) );
     if (elementUtilities.canHaveStateVariable( type )) {
-      // TODO: maybe take clazz as parameter and set shape name according to it
       var props = getDefaultInfoboxProperties();
-      props[ 'shape-name' ] = getDefaultStateVarShapeName();
+      props[ 'shape-name' ] = getDefaultStateVarShapeName( type );
       defaultProperties[ type ][ 'state variable' ] = props;
     }
     if (elementUtilities.canHaveUnitOfInformation( type )) {
       var props = getDefaultInfoboxProperties();
-      props[ 'shape-name' ] = getDefaultUnitOfInfoShapeName();
+      props[ 'shape-name' ] = getDefaultUnitOfInfoShapeName( type );
       defaultProperties[ type ][ 'unit of information' ] = props;
     }
   } );
@@ -2285,6 +2310,10 @@ module.exports = function () {
 
   elementUtilities.edgeTypes.forEach( function( type ) {
     defaultProperties[ type ] = getDefaultEdgeProperties();
+
+    if ( defaultSifEdgeColorMap[ type ] ) {
+      defaultProperties[ type ][ 'line-color' ] = defaultSifEdgeColorMap[ type ];
+    }
   } );
 
   elementUtilities.getDefaultProperties = function( sbgnclass ) {

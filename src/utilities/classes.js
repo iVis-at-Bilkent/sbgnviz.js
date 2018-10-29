@@ -379,10 +379,6 @@ StateVariable.construct = function(value, stateVariableDefinition, parent) {
   return obj;
 };
 
-// TODO: What to do with shapeRadius now? Look like they assignmets here are
-// no more used
-StateVariable.shapeRadius = 15;
-
 StateVariable.getText = function(mainObj) {
   var stateValue = mainObj.state.value || '';
   var stateVariable = mainObj.state.variable ? "@" + mainObj.state.variable : "";
@@ -467,8 +463,6 @@ UnitOfInformation.construct = function(value, parent) {
 
   return obj;
 };
-
-UnitOfInformation.shapeRadius = 4;
 
 UnitOfInformation.getText = function(mainObj) {
   return mainObj.label.text;

@@ -1,8 +1,8 @@
 var tdParser = require('./tab-delimeted-parser');
 
-function strToSet( str ) {
+function strToSet( str, splitBy ) {
   var set = {};
-  var list = str ? str.split( ';' ) : [];
+  var list = str ? str.split( splitBy ) : [];
 
   list.forEach( function( member ) {
     set[ member ] = true;
@@ -61,8 +61,8 @@ module.exports = function() {
         var srcName = tabs[ 0 ];
         var edgeType = tabs[ 1 ];
         var tgtName = tabs[ 2 ];
-        var pcIDSet = strToSet( tabs[ 3 ] );
-        var siteLocSet = strToSet( tabs[ 4 ] );
+        var pcIDSet = strToSet( tabs[ 3 ], /;| / );
+        var siteLocSet = strToSet( tabs[ 4 ], ';' );
 
         var srcClass = sifToJson.getNodeClass( edgeType, 'src' );
         var tgtClass = sifToJson.getNodeClass( edgeType, 'tgt' );
