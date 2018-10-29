@@ -127,124 +127,58 @@ module.exports = function () {
 
    setTimeout(function () {
      updateGraph(sbgnmlToJson.convert(xmlObject));
-     // collapse nodes
-     var nodesToCollapse = cy.nodes("[collapse]");
-     if (nodesToCollapse.length > 0 ){
-       cy.expandCollapse('get').collapse(nodesToCollapse, {layoutBy: null});
 
-       nodesToCollapse.forEach(function(ele, i, eles){
-         ele.position(ele.data("positionBeforeSaving"));
-       });
-       nodesToCollapse.removeData("positionBeforeSaving");
-     }
+     fileUtilities.collapseMarkedNodes();
+
      uiUtilities.endSpinner("load-spinner");
      $(document).trigger( "sbgnvizLoadSampleEnd", [ filename, cy ] ); // Trigger an event signaling that a sample is loaded
    }, 0);
  };
 
- // TODO: there are a lot of code replications in such load functions, it can be handled
- // with the help of some base functions.
- fileUtilities.loadSIFFile = function(file, callback1){
-   console.log( "Starting load td file...");
-
-   var self = this;
-   uiUtilities.startSpinner("load-file-spinner");
-
-   var textType = /text.*/;
-
-   var reader = new FileReader();
-
-   reader.onload = function(e) {
-     //Get the text result of the file.
-     var text = this.result;
-
-     setTimeout( function() {
-       var graph;
-       try{
-         graph = sifToJson.convert(text);
-         $( document ).trigger( "sbgnvizLoadFile", [ file.name, cy ] ); // Aliases for sbgnvizLoadFileStart
-
-         $( document ).trigger( "sbgnvizLoadFileStart", [ file.name, cy ] );
-       } catch (err){
-         uiUtilities.endSpinner("load-file-spinner");
-         console.log( "Error found in parsing");
-         console.log(err);
-         return;
-       }
-       if( !graph && typeof callback1 !== 'undefined')
-       {
-         uiUtilities.endSpinner("load-file-spinner");
-         callback1();
-         return;
-       }else if( !graph)
-       {
-         uiUtilities.endSpinner("load-file-spinner");
-         console.log( "Graph is not defined.");
-         return;
-       }
-
-       updateGraph(graph);
-       uiUtilities.endSpinner("load-file-spinner");
-       $( document ).trigger( "sbgnvizLoadFileEnd", [ file.name, cy] ); // Trigger an event signaling that a file is loaded
-         //console.log( "Load file end done...");
-     }, 0);
+ fileUtilities.loadSIFFile = function(file, callback) {
+   var convert = function( text ) {
+     return sifToJson.convert(text);
    };
-   reader.readAsText(file);
+
+   fileUtilities.loadFile( file, convert, undefined, callback );
  };
 
-fileUtilities.loadTDFile = function(file, callback1){
-  console.log( "Starting load td file...");
+ fileUtilities.loadTDFile = function functionName(file, callback) {
+   var convert = function( text ) {
+     return tdToJson.convert(text);
+   };
 
-  var self = this;
-  uiUtilities.startSpinner("load-file-spinner");
+   fileUtilities.loadFile( file, convert, undefined, callback );
+ };
 
-  var textType = /text.*/;
+ fileUtilities.loadSBGNMLFile = function(file, callback1, callback2) {
+   var convert = function( text ) {
+     return sbgnmlToJson.convert(textToXmlObject(text));
+   };
 
-  var reader = new FileReader();
+   fileUtilities.loadFile( file, convert, callback1, callback2, fileUtilities.collapseMarkedNodes );
+ };
 
-  reader.onload = function(e) {
-    //Get the text result of the file.
-    var text = this.result;
+ // collapse the nodes whose collapse data field is set
+ fileUtilities.collapseMarkedNodes = function() {
+   // collapse nodes
+   var nodesToCollapse = cy.nodes("[collapse]");
+   if (nodesToCollapse.length > 0 ){
+     cy.expandCollapse('get').collapse(nodesToCollapse, {layoutBy: null});
 
-    setTimeout( function() {
-      var graph;
-      try{
-        graph = tdToJson.convert(text);
-        $( document ).trigger( "sbgnvizLoadFile", [ file.name, cy ] ); // Aliases for sbgnvizLoadFileStart
+     nodesToCollapse.forEach(function(ele, i, eles){
+       ele.position(ele.data("positionBeforeSaving"));
+     });
+     nodesToCollapse.removeData("positionBeforeSaving");
+   }
+ };
 
-        $( document ).trigger( "sbgnvizLoadFileStart", [ file.name, cy ] );
-      } catch (err){
-        uiUtilities.endSpinner("load-file-spinner");
-        console.log( "Error found in parsing");
-        console.log(err);
-        return;
-      }
-      if( !graph && typeof callback1 !== 'undefined')
-      {
-        uiUtilities.endSpinner("load-file-spinner");
-        callback1();
-        return;
-      }else if( !graph)
-      {
-        uiUtilities.endSpinner("load-file-spinner");
-        console.log( "Graph is not defined.");
-        return;
-      }
-
-      updateGraph(graph);
-      uiUtilities.endSpinner("load-file-spinner");
-      $( document ).trigger( "sbgnvizLoadFileEnd", [ file.name, cy] ); // Trigger an event signaling that a file is loaded
-        //console.log( "Load file end done...");
-    }, 0);
-  };
-  reader.readAsText(file);
-};
  /*
    callback is a function remotely defined to add specific behavior that isn't implemented here.
    it is completely optional.
    signature: callback(textXml)
  */
- fileUtilities.loadSBGNMLFile = function(file, callback1, callback2) {
+ fileUtilities.loadFile = function(file, convertFcn, callback1, callback2, callback3) {
    var self = this;
    uiUtilities.startSpinner("load-file-spinner");
 
@@ -261,7 +195,7 @@ fileUtilities.loadTDFile = function(file, callback1){
 
        var cyGraph;
        try {
-         cyGraph = sbgnmlToJson.convert(textToXmlObject(text));
+         cyGraph = convertFcn( text );
          // Users may want to do customized things while an external file is being loaded
          // Trigger an event for this purpose and specify the 'filename' as an event parameter
          $(document).trigger( "sbgnvizLoadFile", [ file.name, cy ] ); // Aliases for sbgnvizLoadFileStart
@@ -275,16 +209,11 @@ fileUtilities.loadTDFile = function(file, callback1){
        }
 
        updateGraph(cyGraph);
-       // collapse nodes
-       var nodesToCollapse = cy.nodes("[collapse]");
-       if (nodesToCollapse.length > 0 ){
-         cy.expandCollapse('get').collapse(nodesToCollapse, {layoutBy: null});
 
-         nodesToCollapse.forEach(function(ele, i, eles){
-           ele.position(ele.data("positionBeforeSaving"));
-         });
-         nodesToCollapse.removeData("positionBeforeSaving");
+       if (typeof callback3 !== 'undefined') {
+         callback3();
        }
+
        uiUtilities.endSpinner("load-file-spinner");
        $(document).trigger( "sbgnvizLoadFileEnd", [ file.name, cy ] ); // Trigger an event signaling that a file is loaded
      }, 0);
