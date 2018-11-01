@@ -2316,6 +2316,49 @@ module.exports = function () {
     }
   } );
 
+  function getProp( props, name ) {
+    var prop = props[ name ];
+
+    if ( typeof prop !== null && typeof prop === 'object' ) {
+      return $.extend( {}, prop );
+    }
+
+    return prop;
+  }
+
+  function extendDataWithClassDefaults( data, className, propsToSkip ) {
+    if ( !className ) {
+      return;
+    }
+    
+    var defaultProps = elementUtilities.getDefaultProperties( className );
+
+    Object.keys( defaultProps ).forEach( function( name ) {
+      if ( !propsToSkip || !propsToSkip[ name ] ) {
+        data[ name ] = getProp( defaultProps, name );
+      }
+    } );
+  }
+
+  elementUtilities.extendNodeDataWithClassDefaults = function( data, className ) {
+    // list of properties to skip
+    var propsToSkip = {
+      'width': true,
+      'height': true,
+      'state variable': true,
+      'unit of information': true,
+      'multimer': true,
+      'clonemarker': true,
+      'ports-ordering': true
+    };
+
+    extendDataWithClassDefaults( data, className, propsToSkip );
+  };
+
+  elementUtilities.extendEdgeDataWithClassDefaults = function( data, className ) {
+    extendDataWithClassDefaults( data, className );
+  }
+
   elementUtilities.getDefaultProperties = function( sbgnclass ) {
     if ( sbgnclass == undefined ) {
       return defaultProperties;

@@ -8,7 +8,7 @@ var libs = libUtilities.getLibs();
 var jQuery = $ = libs.jQuery;
 
 module.exports = function () {
-  var elementUtilities, jsonToSbgnml, sbgnmlToJson, tdToJson, optionUtilities, graphUtilities;
+  var elementUtilities, jsonToSbgnml, sbgnmlToJson, tdToJson, sifToJson, optionUtilities, graphUtilities;
   var cy, options;
 
   function mainUtilities (param) {
@@ -16,6 +16,7 @@ module.exports = function () {
     jsonToSbgnml = param.jsonToSbgnmlConverter;
     sbgnmlToJson = param.sbgnmlToJsonConverter;
     tdToJson = param.tdToJsonConverter;
+    sifToJson = param.sifToJsonConverter;
     optionUtilities = param.optionUtilities;
     graphUtilities = param.graphUtilities;
     cy = param.sbgnCyInstance.getCy();
@@ -581,6 +582,8 @@ mainUtilities.getMapProperties = function() {
       return sbgnmlToJson.mapPropertiesToObj();
     else if( elementUtilities.fileFormat == 'td')
       return tdToJson.mapPropertiesToObj();
+    else if( elementUtilities.fileFormat == 'sif' )
+      return sifToJson.mapPropertiesToObj();
     else{
       console.log( "File format mismatched!")
       return

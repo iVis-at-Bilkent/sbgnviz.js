@@ -109,6 +109,8 @@ module.exports = function() {
     var defaults = elementUtilities.getDefaultProperties( className );
 
     var updateWithDefaults = function() {
+      elementUtilities.extendNodeDataWithClassDefaults( node.data, className );
+
       node.data.bbox.w = defaults.width;
       node.data.bbox.h = defaults.height;
     };
@@ -162,6 +164,8 @@ module.exports = function() {
         class: type
       };
 
+      elementUtilities.extendEdgeDataWithClassDefaults( edge.data, type );
+
       var key = sifToJson.calculateEdgeKey( srcName, type, tgtName );
       sifToJson.mapEdgeToKey( edge, key );
       sifToJson.graphData.edges.push( edge );
@@ -192,6 +196,15 @@ module.exports = function() {
     }
 
     return type;
+  };
+
+  sifToJson.mapPropertiesToObj = function() {
+    return {
+      mapProperties: {
+        dynamicLabelSize: 'large',
+        adjustNodeLabelFontSizeAutomatically: true
+      }
+    };
   };
 
   return sifToJson;

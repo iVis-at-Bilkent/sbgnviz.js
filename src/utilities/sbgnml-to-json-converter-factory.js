@@ -298,31 +298,7 @@ module.exports = function () {
     // add default properties of the node type to element data
     // these props would be overriden by style properties of element
     // stored in the file
-    var defaultProps = elementUtilities.getDefaultProperties( nodeObj.class );
-
-    function getProp( props, name ) {
-      var prop = props[ name ];
-
-      if ( typeof prop !== null && typeof prop === 'object' ) {
-        return $.extend( {}, prop );
-      }
-
-      return prop;
-    }
-
-    // list of properties to skip
-    var propsToSkip = {
-      'width': true,
-      'height': true,
-      'state variable': true,
-      'unit of information': true
-    };
-
-    Object.keys( defaultProps ).forEach( function( name ) {
-      if ( !propsToSkip[ name ] ) {
-        nodeObj[ name ] = getProp( defaultProps, name );
-      }
-    } );
+    elementUtilities.extendNodeDataWithClassDefaults( nodeObj, nodeObj.class );
 
     // add clone information
     if (ele.clone) {
