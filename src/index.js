@@ -26,6 +26,8 @@
     var sifToJsonConverter = require('./utilities/sif-to-json-converter-factory')();
     var classes = require('./utilities/classes');
     var tdParser = require('./utilities/tab-delimeted-parser');
+    var layoutLoader = require('./utilities/layout-loader-factory')();
+    var layoutToText = require('./utilities/layout-to-text-factory')();
 
     // Fill param object to use it utilities internally
     param.optionUtilities = optionUtilities;
@@ -42,6 +44,8 @@
     param.tdToJsonConverter = tdToJsonConverter;
     param.sifToJsonConverter = sifToJsonConverter;
     param.classes = classes;
+    param.layoutLoader = layoutLoader;
+    param.layoutToText = layoutToText;
 
     // call constructors of objects with param
     sbgnCyInstance(param);
@@ -57,6 +61,8 @@
     sbgnmlToJsonConverter(param);
     tdToJsonConverter(param);
     sifToJsonConverter(param);
+    layoutLoader(param);
+    layoutToText(param);
 
     // set scratch pad for sbgnviz and init sbgnvizParams inside it
     sbgnCyInstance.getCy().scratch('_sbgnviz', {});

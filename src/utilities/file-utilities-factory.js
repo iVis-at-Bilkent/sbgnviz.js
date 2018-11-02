@@ -61,7 +61,8 @@ module.exports = function () {
  }
  // Helper functions End
 
- var sbgnmlToJson, jsonToSbgnml, uiUtilities, tdToJson, sifToJson, graphUtilities;
+ var sbgnmlToJson, jsonToSbgnml, uiUtilities, tdToJson,
+     sifToJson, graphUtilities, layoutToText;
  var updateGraph;
  var options, cy;
 
@@ -71,6 +72,7 @@ module.exports = function () {
    uiUtilities = param.uiUtilities;
    tdToJson = param.tdToJsonConverter;
    sifToJson = param.sifToJsonConverter;
+   layoutToText = param.layoutToText;
    graphUtilities = param.graphUtilities;
    updateGraph = graphUtilities.updateGraph.bind(graphUtilities);
    options = param.optionUtilities.getOptions();
@@ -238,6 +240,15 @@ module.exports = function () {
    });
    saveAs(blob, filename);
  };
+
+ fileUtilities.exportLayoutData = function(filename, byName) {
+   var layoutText = layoutToText.convert( byName );
+
+   var blob = new Blob([layoutText], {
+     type: "text/plain;charset=utf-8;",
+   });
+   saveAs(blob, filename);
+ }
 
  fileUtilities.convertSbgnmlTextToJson = function(sbgnmlText){
      return sbgnmlToJson.convert(textToXmlObject(sbgnmlText));

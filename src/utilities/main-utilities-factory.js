@@ -8,7 +8,8 @@ var libs = libUtilities.getLibs();
 var jQuery = $ = libs.jQuery;
 
 module.exports = function () {
-  var elementUtilities, jsonToSbgnml, sbgnmlToJson, tdToJson, sifToJson, optionUtilities, graphUtilities;
+  var elementUtilities, jsonToSbgnml, sbgnmlToJson, tdToJson,
+      sifToJson, optionUtilities, graphUtilities, layoutLoader;
   var cy, options;
 
   function mainUtilities (param) {
@@ -20,6 +21,8 @@ module.exports = function () {
     optionUtilities = param.optionUtilities;
     graphUtilities = param.graphUtilities;
     cy = param.sbgnCyInstance.getCy();
+    layoutLoader = param.layoutLoader;
+    layoutToText = param.layoutToText;
 
     options = optionUtilities.getOptions();
   }
@@ -494,6 +497,14 @@ module.exports = function () {
       viewUtilities.removeHighlights();
     }
     cy.style().update();
+  };
+
+  mainUtilities.loadLayoutData = function(layoutText, byName) {
+    layoutLoader.load( layoutText, byName );
+  };
+
+  mainUtilities.getLayoutText = function( byName ) {
+    layoutToText.convert( byName );
   };
 
   // Performs layout by given layoutOptions. Considers 'undoable' option. However, by setting notUndoable parameter
