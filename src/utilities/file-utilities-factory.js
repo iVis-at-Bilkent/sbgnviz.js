@@ -137,12 +137,28 @@ module.exports = function () {
    }, 0);
  };
 
- fileUtilities.loadSIFFile = function(file, callback) {
+ fileUtilities.loadSIFFile = function(file, layoutBy, callback) {
    var convert = function( text ) {
      return sifToJson.convert(text);
    };
 
-   fileUtilities.loadFile( file, convert, undefined, callback );
+   var runLayout = function() {
+     if ( layoutBy ) {
+       if ( typeof layoutBy === 'function' ) {
+         layoutBy();
+       }
+       else {
+         var layout = cy.layout( layoutBy );
+
+         // for backward compatibility need to make this if check
+         if ( layout && layout.run ) {
+           layout.run();
+         }
+       }
+     }
+   };
+
+   fileUtilities.loadFile( file, convert, undefined, callback, runLayout );
  };
 
  fileUtilities.loadTDFile = function functionName(file, callback) {
