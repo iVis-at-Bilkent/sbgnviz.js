@@ -226,10 +226,7 @@ module.exports = function () {
   };
 
   sbgnmlToJson.getDefaultStateAndInfoStyle = function(gylph, parentClass) {
-    var defaultProps = elementUtilities.getDefaultProperties( parentClass );
-    var infoboxStyle = $.extend( {}, defaultProps[ gylph.class_ ] );
-
-    return infoboxStyle;
+    return elementUtilities.getDefaultInfoboxStyle( parentClass, gylph.class_ );
   };
 
   sbgnmlToJson.addParentInfoToNode = function (ele, nodeObj, parent, compartments) {

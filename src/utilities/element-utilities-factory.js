@@ -2242,40 +2242,66 @@ module.exports = function () {
     };
   };
 
-  var getDefaultInfoboxProperties = function() {
+  var getDefaultInfoboxProperties = function( nodeClass, infoboxType ) {
     return {
-      'font-size': 9,
+      'font-size': getDefaultInfoboxFontSize( nodeClass, infoboxType ),
       'font-family': 'Arial',
       'font-style': 'normal',
       'font-weight': 'normal',
       'font-color': '#0f0f0f',
       'border-width': 2.25,
       'border-color': '#555',
-      'background-color': '#ffffff'
+      'background-color': '#ffffff',
+      'shape-name': getDefaultInfoboxShapeName( nodeClass, infoboxType ),
+      'width': getDefaultInfoboxSize( nodeClass, infoboxType ).w,
+      'height': getDefaultInfoboxSize( nodeClass, infoboxType ).h
     };
   };
 
-  var getDefaultStateVarShapeName = function( type ) {
-    return 'stadium';
+  var getDefaultInfoboxFontSize = function( nodeClass, infoboxType ) {
+    var fontsize = 9;
+
+    if ( nodeClass === 'protein' || nodeClass === 'small molecule' ) {
+      fontsize = 11;
+    }
+
+    return fontsize;
   };
 
-  var getDefaultUnitOfInfoShapeName = function( type ) {
-    if ( type == 'protein' ) {
+  var getDefaultInfoboxSize = function( nodeClass, infoboxType ) {
+    var w = 12, h = 12;
+
+    if ( nodeClass === 'protein' || nodeClass === 'small molecule' ) {
+      w = 15;
+      h = 15;
+    }
+
+    return { w, h };
+  };
+
+  var getDefaultInfoboxShapeName = function( nodeClass, infoboxType ) {
+    if ( infoboxType === 'state variable' ) {
       return 'stadium';
     }
-    return 'rectangle';
+    else if ( infoboxType === 'unit of information' ) {
+      if ( nodeClass == 'protein' ) {
+        return 'stadium';
+      }
+      return 'rectangle';
+    }
+    else {
+      throw "Invalid infobox type";
+    }
   };
 
   elementUtilities.nodeTypes.forEach( function( type ) {
     defaultProperties[ type ] = $.extend( {}, getDefaultNodeProperties(), getDefaultSize( type ) );
     if (elementUtilities.canHaveStateVariable( type )) {
-      var props = getDefaultInfoboxProperties();
-      props[ 'shape-name' ] = getDefaultStateVarShapeName( type );
+      var props = getDefaultInfoboxProperties( type, 'state variable' );
       defaultProperties[ type ][ 'state variable' ] = props;
     }
     if (elementUtilities.canHaveUnitOfInformation( type )) {
-      var props = getDefaultInfoboxProperties();
-      props[ 'shape-name' ] = getDefaultUnitOfInfoShapeName( type );
+      var props = getDefaultInfoboxProperties( type, 'unit of information' );
       defaultProperties[ type ][ 'unit of information' ] = props;
     }
   } );
@@ -2330,7 +2356,7 @@ module.exports = function () {
     if ( !className ) {
       return;
     }
-    
+
     var defaultProps = elementUtilities.getDefaultProperties( className );
 
     Object.keys( defaultProps ).forEach( function( name ) {
@@ -2358,6 +2384,21 @@ module.exports = function () {
   elementUtilities.extendEdgeDataWithClassDefaults = function( data, className ) {
     extendDataWithClassDefaults( data, className );
   }
+
+  // get infobox properties and filter the ones related to style only
+  elementUtilities.getDefaultInfoboxStyle = function( nodeClass, infoboxType ) {
+    var defaultProps = elementUtilities.getDefaultProperties( nodeClass );
+    var infoboxStyle = $.extend( {}, defaultProps[ infoboxType ] );
+
+    // width and height are belonging to bbox object rather than style object
+    var nonStyleProps = [ 'width', 'height' ];
+
+    nonStyleProps.forEach( function( propName ) {
+      delete infoboxStyle[ propName ];
+    } );
+
+    return infoboxStyle;
+  };
 
   elementUtilities.getDefaultProperties = function( sbgnclass ) {
     if ( sbgnclass == undefined ) {
