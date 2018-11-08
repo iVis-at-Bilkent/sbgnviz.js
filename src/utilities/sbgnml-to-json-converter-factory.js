@@ -819,7 +819,7 @@ module.exports = function () {
     var glyphs = map.glyphs;
     var arcs = map.arcs;
 
-    var i;sbgnmlToJson
+    var i;
     for (i = 0; i < glyphs.length; i++) {
       var glyph = glyphs[i];
 
