@@ -425,7 +425,7 @@ module.exports = function () {
     'source and sink', 'unspecified entity',
     'perturbing agent', 'complex'];
   elementUtilities.sifTypes = ['protein', 'small molecule'];
-  elementUtilities.otherNodeTypes = ['compartment', 'tag', 'submap'];
+  elementUtilities.otherNodeTypes = ['compartment', 'tag', 'submap', 'topology group'];
 
   elementUtilities.nodeTypes = elementUtilities.epnTypes
     .concat( elementUtilities.logicalOperatorTypes )
@@ -451,6 +451,9 @@ module.exports = function () {
     'activates', 'inhibits', 'phosphorylates', 'dephosphorylates',
     'upregulates-expression', 'downregulates-expression'
   ];
+
+  elementUtilities.undirectedEdgeTypes = ['in-complex-with', 'interacts-with',
+    'neighbor-of', 'logic arc', 'equivalence arc'];
 
   elementUtilities.elementTypes = elementUtilities.nodeTypes
     .concat( elementUtilities.edgeTypes );
@@ -658,6 +661,16 @@ module.exports = function () {
     var sbgnclass = elementUtilities.getPureSbgnClass( ele );
 
     return inArray( sbgnclass, elementUtilities.sifTypes );
+  };
+
+  elementUtilities.isUndirectedEdge = function( ele ) {
+    var sbgnclass = elementUtilities.getPureSbgnClass( ele );
+
+    return inArray( sbgnclass, elementUtilities.undirectedEdgeTypes );
+  };
+
+  elementUtilities.isDirectedEdge = function( ele ) {
+    return !elementUtilities.isUndirectedEdge( ele );
   };
 
   // Returns whether the given element is an EPN
@@ -2208,6 +2221,10 @@ module.exports = function () {
     'small molecule': {
       width: 48,
       height: 24
+    },
+    'topology group': {
+      width: 44,
+      height: 44
     }
   };
 
