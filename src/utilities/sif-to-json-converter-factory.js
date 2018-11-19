@@ -116,7 +116,7 @@ module.exports = function() {
     };
 
     if ( node == undefined ) {
-      var uid = elementUtilities.generateUUID();
+      var uid = elementUtilities.generateNodeId();
       node = {};
 
       node.data = {
@@ -151,7 +151,7 @@ module.exports = function() {
     var edge = sifToJson.getEdgeByProps( srcName, type, tgtName );
 
     if ( edge == undefined ) {
-      var uid = elementUtilities.generateUUID();
+      var uid = elementUtilities.generateEdgeId();
       var source = sifToJson.getNodeByName( srcName ).data.id;
       var target = sifToJson.getNodeByName( tgtName ).data.id;
       edge = {};

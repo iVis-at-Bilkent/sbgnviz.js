@@ -59,6 +59,10 @@ module.exports = function () {
 
   // Expand given nodes. Requires expandCollapse extension and considers undoable option.
   mainUtilities.expandNodes = function(nodes) {
+    if ( elementUtilities.isGraphTopologyLocked() ) {
+      return;
+    }
+
     // Get expandCollapse api
     var expandCollapse = cy.expandCollapse('get');
 
@@ -78,6 +82,10 @@ module.exports = function () {
 
   // Collapse given nodes. Requires expandCollapse extension and considers undoable option.
   mainUtilities.collapseNodes = function(nodes) {
+    if ( elementUtilities.isGraphTopologyLocked() ) {
+      return;
+    }
+
     // Get expandCollapse api
     var expandCollapse = cy.expandCollapse('get');
 
@@ -97,6 +105,10 @@ module.exports = function () {
 
   // Collapse all complexes recursively. Requires expandCollapse extension and considers undoable option.
   mainUtilities.collapseComplexes = function() {
+    if ( elementUtilities.isGraphTopologyLocked() ) {
+      return;
+    }
+
     // Get expandCollapse api
     var expandCollapse = cy.expandCollapse('get');
 
@@ -117,6 +129,10 @@ module.exports = function () {
 
   // Expand all complexes recursively. Requires expandCollapse extension and considers undoable option.
   mainUtilities.expandComplexes = function() {
+    if ( elementUtilities.isGraphTopologyLocked() ) {
+      return;
+    }
+
     // Get expandCollapse api
     var expandCollapse = cy.expandCollapse('get');
 
@@ -137,6 +153,10 @@ module.exports = function () {
 
   // Collapse all nodes recursively. Requires expandCollapse extension and considers undoable option.
   mainUtilities.collapseAll = function() {
+    if ( elementUtilities.isGraphTopologyLocked() ) {
+      return;
+    }
+
     // Get expandCollapse api
     var expandCollapse = cy.expandCollapse('get');
 
@@ -157,6 +177,10 @@ module.exports = function () {
 
   // Expand all nodes recursively. Requires expandCollapse extension and considers undoable option.
   mainUtilities.expandAll = function() {
+    if ( elementUtilities.isGraphTopologyLocked() ) {
+      return;
+    }
+    
     // Get expandCollapse api
     var expandCollapse = cy.expandCollapse('get');
 
@@ -336,7 +360,7 @@ module.exports = function () {
 
   // Removes the given elements in a simple way. Considers 'undoable' option.
   mainUtilities.deleteElesSimple = function(eles) {
-    if (eles.length == 0) {
+    if (elementUtilities.isGraphTopologyLocked() || eles.length == 0) {
       return;
     }
 
@@ -354,7 +378,7 @@ module.exports = function () {
   // Considers 'undoable' option.
   mainUtilities.deleteNodesSmart = function(_nodes) {
     var nodes = _nodes.nodes();
-    if (nodes.length == 0) {
+    if (elementUtilities.isGraphTopologyLocked() || nodes.length == 0) {
       return;
     }
 
