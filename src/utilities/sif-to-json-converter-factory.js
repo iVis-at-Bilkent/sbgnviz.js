@@ -37,6 +37,7 @@ module.exports = function() {
 
   sifToJson.convert = function( graphText ) {
     elementUtilities.fileFormat = 'sif';
+    elementUtilities.mapType = 'SIF';
 
     sifToJson.initGraphVariables();
 
