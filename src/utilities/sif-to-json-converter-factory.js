@@ -128,7 +128,8 @@ module.exports = function() {
           x: 0,
           y: 0
         },
-        statesandinfos: []
+        statesandinfos: [],
+        ports: []
       };
 
       updateWithDefaults();

@@ -158,7 +158,7 @@ module.exports = function () {
      }
    };
 
-   fileUtilities.loadFile( file, convert, undefined, callback, runLayout );
+   fileUtilities.loadFile( file, convert, undefined, callback, undefined, runLayout );
  };
 
  fileUtilities.loadTDFile = function functionName(file, callback) {
@@ -196,7 +196,7 @@ module.exports = function () {
    it is completely optional.
    signature: callback(textXml)
  */
- fileUtilities.loadFile = function(file, convertFcn, callback1, callback2, callback3) {
+ fileUtilities.loadFile = function(file, convertFcn, callback1, callback2, callback3, callback4) {
    var self = this;
    uiUtilities.startSpinner("load-file-spinner");
 
@@ -234,6 +234,10 @@ module.exports = function () {
 
        uiUtilities.endSpinner("load-file-spinner");
        $(document).trigger( "sbgnvizLoadFileEnd", [ file.name, cy ] ); // Trigger an event signaling that a file is loaded
+
+       if (typeof callback4 !== 'undefined') {
+         callback4();
+       }
      }, 0);
    };
 
