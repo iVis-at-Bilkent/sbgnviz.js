@@ -8,14 +8,16 @@ var libs = libUtilities.getLibs();
 var jQuery = $ = libs.jQuery;
 
 module.exports = function () {
-  var elementUtilities, jsonToSbgnml, sbgnmlToJson, tdToJson,
-      sifToJson, optionUtilities, graphUtilities, layoutLoader;
+  var elementUtilities, jsonToSbgnml, sbgnmlToJson, tdToJson, nwtToJson,
+      sifToJson, optionUtilities, graphUtilities, layoutLoader, jsonToNwt;
   var cy, options;
 
   function mainUtilities (param) {
     elementUtilities = param.elementUtilities;
     jsonToSbgnml = param.jsonToSbgnmlConverter;
+    jsonToNwt = param.jsonToNwtConverter;
     sbgnmlToJson = param.sbgnmlToJsonConverter;
+    nwtToJson = param.nwtToJsonConverter;
     tdToJson = param.tdToJsonConverter;
     sifToJson = param.sifToJsonConverter;
     optionUtilities = param.optionUtilities;
@@ -180,7 +182,7 @@ module.exports = function () {
     if ( elementUtilities.isGraphTopologyLocked() ) {
       return;
     }
-    
+
     // Get expandCollapse api
     var expandCollapse = cy.expandCollapse('get');
 
@@ -558,10 +560,18 @@ module.exports = function () {
     return jsonToSbgnml.createSbgnml();
   };
 
+  mainUtilities.createNwt = function() {
+    return jsonToNwt.createSbgnml();
+  };
+
   // Converts given sbgnml data to a json object in a special format
   // (http://js.cytoscape.org/#notation/elements-json) and returns it.
   mainUtilities.convertSbgnmlToJson = function(data) {
     return sbgnmlToJson.convert(data);
+  };
+
+  mainUtilities.convertNwtToJson = function(data) {
+    return nwtToJson.convert(data);
   };
 
   // Create the qtip contents of the given node and returns it.
@@ -615,6 +625,8 @@ mainUtilities.getMapProperties = function() {
   if( elementUtilities.fileFormat !== undefined){
     if( elementUtilities.fileFormat == 'sbgnml')
       return sbgnmlToJson.mapPropertiesToObj();
+    else if( elementUtilities.fileFormat == 'nwt' )
+      return nwtToJson.mapPropertiesToObj();
     else if( elementUtilities.fileFormat == 'td')
       return tdToJson.mapPropertiesToObj();
     else if( elementUtilities.fileFormat == 'sif' )

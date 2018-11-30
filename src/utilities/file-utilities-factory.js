@@ -61,14 +61,16 @@ module.exports = function () {
  }
  // Helper functions End
 
- var sbgnmlToJson, jsonToSbgnml, uiUtilities, tdToJson,
-     sifToJson, graphUtilities, layoutToText;
+ var sbgnmlToJson, jsonToSbgnml, jsonToNwt, uiUtilities, tdToJson,
+     sifToJson, graphUtilities, layoutToText, nwtToJson;
  var updateGraph;
  var options, cy;
 
  function fileUtilities (param) {
    sbgnmlToJson = param.sbgnmlToJsonConverter;
+   nwtToJson = param.nwtToJsonConverter;
    jsonToSbgnml = param.jsonToSbgnmlConverter;
+   jsonToNwt = param.jsonToNwtConverter;
    uiUtilities = param.uiUtilities;
    tdToJson = param.tdToJsonConverter;
    sifToJson = param.sifToJsonConverter;
@@ -128,7 +130,7 @@ module.exports = function () {
    var xmlObject = loadXMLDoc((folderpath || 'sample-app/samples/') + filename);
 
    setTimeout(function () {
-     updateGraph(sbgnmlToJson.convert(xmlObject));
+     updateGraph(nwtToJson.convert(xmlObject));
 
      fileUtilities.collapseMarkedNodes();
 
@@ -172,6 +174,14 @@ module.exports = function () {
  fileUtilities.loadSBGNMLFile = function(file, callback1, callback2) {
    var convert = function( text ) {
      return sbgnmlToJson.convert(textToXmlObject(text));
+   };
+
+   fileUtilities.loadFile( file, convert, callback1, callback2, fileUtilities.collapseMarkedNodes );
+ };
+
+ fileUtilities.loadNwtFile = function(file, callback1, callback2) {
+   var convert = function( text ) {
+     return nwtToJson.convert(textToXmlObject(text));
    };
 
    fileUtilities.loadFile( file, convert, callback1, callback2, fileUtilities.collapseMarkedNodes );
@@ -261,6 +271,15 @@ module.exports = function () {
    saveAs(blob, filename);
  };
 
+ // supported versions are either 0.2 or 0.3
+ fileUtilities.saveAsNwt = function(filename, version, renderInfo, mapProperties) {
+   var sbgnmlText = jsonToNwt.createNwt(filename, version, renderInfo, mapProperties);
+   var blob = new Blob([sbgnmlText], {
+     type: "text/plain;charset=utf-8;",
+   });
+   saveAs(blob, filename);
+ };
+
  fileUtilities.exportLayoutData = function(filename, byName) {
    var layoutText = layoutToText.convert( byName );
 
@@ -274,6 +293,7 @@ module.exports = function () {
      return sbgnmlToJson.convert(textToXmlObject(sbgnmlText));
  };
 
+ // TODO: update this?
  fileUtilities.createJson = function(json){
      var sbgnmlText = jsonToSbgnml.createSbgnml();
      return sbgnmlToJson.convert(textToXmlObject(sbgnmlText));

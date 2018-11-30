@@ -449,6 +449,13 @@ module.exports = function () {
   elementUtilities.simpleNodeTypes = $(elementUtilities.nodeTypes)
     .not(elementUtilities.compoundNodeTypes).get();
 
+  elementUtilities.sifEdgeTypes = ['neighbor-of', 'interacts-with', 'in-complex-with',
+    'controls-state-change-of', 'controls-transport-of', 'controls-phosphorylation-of',
+    'catalysis-precedes', 'controls-expression-of', 'consumption-controled-by',
+    'controls-production-of', 'controls-transport-of-chemical', 'chemical-affects',
+    'reacts-with', 'used-to-produce', 'phosphorylates', 'dephosphorylates',
+    'upregulates-expression', 'downregulates-expression', 'activates', 'inhibits'];
+
   elementUtilities.edgeTypes = ['consumption', 'production', 'modulation',
     'stimulation', 'catalysis', 'inhibition', 'necessary stimulation',
     'logic arc', 'equivalence arc', 'unknown influence', 'positive influence',
@@ -671,6 +678,12 @@ module.exports = function () {
     var sbgnclass = elementUtilities.getPureSbgnClass( ele );
 
     return inArray( sbgnclass, elementUtilities.sifTypes );
+  };
+
+  elementUtilities.isSIFEdge = function( ele ) {
+    var sbgnclass = elementUtilities.getPureSbgnClass( ele );
+
+    return inArray( sbgnclass, elementUtilities.sifEdgeTypes );
   };
 
   elementUtilities.isUndirectedEdge = function( ele ) {
@@ -2456,6 +2469,32 @@ module.exports = function () {
 
   elementUtilities.isGraphTopologyLocked = function() {
     return elementUtilities.graphTopologyLocked;
+  };
+
+  elementUtilities.languageToMapType = function(lang) {
+    switch (lang) {
+      case 'process description':
+        return 'PD';
+      case 'activity flow':
+        return 'AF';
+      case 'sif':
+        return 'SIF';
+      default:
+        return 'Unknown';
+    }
+  };
+
+  elementUtilities.mapTypeToLanguage = function(mapType) {
+    switch (mapType) {
+      case 'PD':
+        return 'process description';
+      case 'AF':
+        return 'activity flow';
+      case 'SIF':
+        return 'sif';
+      default:
+        return 'unknown';
+    }
   };
 
   return elementUtilities;

@@ -489,10 +489,35 @@ module.exports = function () {
     return glyphs;
   };
 
+  sbgnmlToJson.getArcs = function (xmlObject) {
+    var arcs = xmlObject._cachedArcs;
+
+    if (!arcs) {
+      arcs = xmlObject._cachedArcs = xmlObject._cachedArcs || xmlObject.querySelectorAll('arc');
+
+      var id2arc = xmlObject._id2arc = {};
+
+      for ( var i = 0; i < arcs.length; i++ ) {
+        var arc = arcs[i];
+        var id = arc.getAttribute('id');
+
+        id2arc[ id ] = arc;
+      }
+    }
+
+    return arcs;
+  };
+
   sbgnmlToJson.getGlyphById = function (xmlObject, id) {
     this.getGlyphs(xmlObject); // make sure cache is built
 
     return xmlObject._id2glyph[id];
+  };
+
+  sbgnmlToJson.getArcById = function (xmlObject, id) {
+    this.getArcs(xmlObject); // make sure cache is built
+
+    return xmlObject._id2arc[id];
   };
 
   sbgnmlToJson.getArcSourceAndTarget = function (arc, xmlObject) {
@@ -818,15 +843,7 @@ module.exports = function () {
     }
 
     this.map = map;
-    if(map.language == "process description") {
-      elementUtilities.mapType = "PD";
-    }
-    else if(map.language == "activity flow") {
-      elementUtilities.mapType = "AF";
-    }
-    else {
-      elementUtilities.mapType = "Unknown";
-    }
+    elementUtilities.mapType = elementUtilities.languageToMapType(map.language);
 
     var compartments = self.getAllCompartments(map.glyphs);
 

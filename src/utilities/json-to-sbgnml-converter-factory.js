@@ -48,7 +48,7 @@ module.exports = function () {
    Serious changes occur between the format version for submaps content. Those changes are not implemented yet.
    TODO implement 0.3 changes when submap support is fully there.
    */
-  jsonToSbgnml.createSbgnml = function(filename, version, renderInfo, mapProperties){
+  jsonToSbgnml.buildJsObj = function(filename, version, renderInfo, mapProperties){
     var self = this;
     var mapID = textUtilities.getXMLValidId(filename);
     var hasExtension = false;
@@ -72,17 +72,7 @@ module.exports = function () {
       return "Error";
     }
 
-    var mapLanguage;
-    if(elementUtilities.mapType == "PD") {
-       mapLanguage = "process description";
-    }
-    else if(elementUtilities.mapType == "AF") {
-       mapLanguage = "activity flow";
-    }
-    else {
-       // case of a mixed map with bits of AF and PD for example
-       mapLanguage = "unknown";
-    }
+    var mapLanguage = elementUtilities.mapTypeToLanguage(elementUtilities.mapType);
 
     //add headers
     xmlHeader = "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>\n";
@@ -144,17 +134,45 @@ module.exports = function () {
 
     sbgn.addMap(map);
 
+    return sbgn.buildJsObj();
+
     /*
       prettyprint puts a line break inside the root <sbgn> tag before the xmlns attribute.
       This is perfecly valid, but Vanted doesn't like it and cannot load those files as is.
       This line break is removed here to make Newt output directly compatible with Vanted. This issue will be reported
       to the Vanted guys and hopefully fixed at some point. After that the following workaround can be removed.
     */
-    xmlbody = prettyprint.xml(sbgn.toXML()).replace("<sbgn \n  xmlns=\"http://sbgn.org/libsbgn", "<sbgn xmlns=\"http://sbgn.org/libsbgn");
-
-    // return prettyprint.xml(xmlHeader + sbgn.toXML());
-    return xmlHeader + xmlbody;
+    // xmlbody = prettyprint.xml(sbgn.toXML()).replace("<sbgn \n  xmlns=\"http://sbgn.org/libsbgn", "<sbgn xmlns=\"http://sbgn.org/libsbgn");
+    //
+    // // return prettyprint.xml(xmlHeader + sbgn.toXML());
+    // return xmlHeader + xmlbody;
   };
+
+  jsonToSbgnml.createSbgnml = function(filename, version, renderInfo, mapProperties) {
+    var jsObj = jsonToSbgnml.buildJsObj(filename, version, renderInfo, mapProperties);
+    return jsonToSbgnml.buildString({sbgn: jsObj});
+  }
+
+  // Copies and extends buildString() of https://github.com/sbgn/libsbgn.js/blob/master/src/utilities.js
+  jsonToSbgnml.buildString = function(obj) {
+    var xmlString =  new xml2js.Builder({
+  		headless: true,
+  		renderOpts: {pretty: false}
+  	}).buildObject(obj);
+
+  	/* 	dirty hack needed to solve the newline char encoding problem
+  		xml2js doesn't encode \n as &#xA; we need to do it manually
+  	*/
+  	var re = /<label text="((.|\n+)+?)"/gm;
+  	var xmlString_correctLabel = xmlString.replace(re, function(match, p1, p2) {
+  		return '<label text="'+p1.replace(/\n/g, "&#xA;")+'"';
+  	});
+
+    var xmlHeader = "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>\n";
+    var xmlbody = prettyprint.xml(xmlString_correctLabel).replace("<sbgn \n  xmlns=\"http://sbgn.org/libsbgn", "<sbgn xmlns=\"http://sbgn.org/libsbgn");
+
+    return xmlHeader + xmlbody;
+  }
 
   // see createSbgnml for info on the structure of renderInfo
   jsonToSbgnml.getRenderExtensionSbgnml = function(renderInfo) {
@@ -349,7 +367,7 @@ module.exports = function () {
        var extension = self.getOrCreateExtension(glyph);
        extension.add("<sbgnviz>"+sbgnvizExtString+"</sbgnviz>");
     }
-    
+
     // current glyph is done
     glyphList.push(glyph);
 
