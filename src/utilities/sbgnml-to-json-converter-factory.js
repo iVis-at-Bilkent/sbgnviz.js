@@ -606,6 +606,8 @@ module.exports = function () {
     // add language info, this will always be the mapType
     edgeObj.language = elementUtilities.mapType;
 
+    elementUtilities.extendEdgeDataWithClassDefaults( edgeObj, edgeObj.class );
+
     edgeObj.cardinality = 0;
     if (ele.glyphs.length > 0) {
       for (var i = 0; i < ele.glyphs.length; i++) {
