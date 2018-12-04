@@ -39,8 +39,8 @@ module.exports = function() {
     } );
   }
 
-  jsonToNwt.buildJsObj = function(filename, version, renderInfo, mapProperties) {
-    var jsObj = jsonToSbgnml.buildJsObj(filename, version, renderInfo, mapProperties);
+  jsonToNwt.buildJsObj = function(filename, version, renderInfo, mapProperties, nodes, edges) {
+    var jsObj = jsonToSbgnml.buildJsObj(filename, version, renderInfo, mapProperties, nodes, edges);
 
     if ( elementUtilities.mapType != 'PD' || elementUtilities.mapType != 'AF' ) {
       var arcs = jsObj.map[0].arc;
@@ -50,8 +50,8 @@ module.exports = function() {
     return jsObj;
   };
 
-  jsonToNwt.createNwt = function(filename, version, renderInfo, mapProperties) {
-    var jsObj = jsonToNwt.buildJsObj(filename, version, renderInfo, mapProperties);
+  jsonToNwt.createNwt = function(filename, version, renderInfo, mapProperties, nodes, edges) {
+    var jsObj = jsonToNwt.buildJsObj(filename, version, renderInfo, mapProperties, nodes, edges);
     return jsonToSbgnml.buildString({sbgn: jsObj});
   };
 

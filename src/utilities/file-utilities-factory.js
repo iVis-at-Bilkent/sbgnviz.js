@@ -263,8 +263,8 @@ module.exports = function () {
  };
 
  // supported versions are either 0.2 or 0.3
- fileUtilities.saveAsSbgnml = function(filename, version, renderInfo, mapProperties) {
-   var sbgnmlText = jsonToSbgnml.createSbgnml(filename, version, renderInfo, mapProperties);
+ fileUtilities.saveAsSbgnml = function(filename, version, renderInfo, mapProperties, nodes, edges) {
+   var sbgnmlText = jsonToSbgnml.createSbgnml(filename, version, renderInfo, mapProperties, nodes, edges);
    var blob = new Blob([sbgnmlText], {
      type: "text/plain;charset=utf-8;",
    });
@@ -272,8 +272,8 @@ module.exports = function () {
  };
 
  // supported versions are either 0.2 or 0.3
- fileUtilities.saveAsNwt = function(filename, version, renderInfo, mapProperties) {
-   var sbgnmlText = jsonToNwt.createNwt(filename, version, renderInfo, mapProperties);
+ fileUtilities.saveAsNwt = function(filename, version, renderInfo, mapProperties, nodes, edges) {
+   var sbgnmlText = jsonToNwt.createNwt(filename, version, renderInfo, mapProperties, nodes, edges);
    var blob = new Blob([sbgnmlText], {
      type: "text/plain;charset=utf-8;",
    });

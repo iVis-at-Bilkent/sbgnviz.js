@@ -48,13 +48,18 @@ module.exports = function () {
    Serious changes occur between the format version for submaps content. Those changes are not implemented yet.
    TODO implement 0.3 changes when submap support is fully there.
    */
-  jsonToSbgnml.buildJsObj = function(filename, version, renderInfo, mapProperties){
+  jsonToSbgnml.buildJsObj = function(filename, version, renderInfo, mapProperties, nodes, edges){
     var self = this;
     var mapID = textUtilities.getXMLValidId(filename);
     var hasExtension = false;
     var hasRenderExtension = false;
-    this.allCollapsedNodes = cy.expandCollapse('get').getAllCollapsedChildrenRecursively().filter("node");
-    this.allCollapsedEdges = cy.expandCollapse('get').getAllCollapsedChildrenRecursively().filter("edge");
+    var mapType = mapProperties.mapType || elementUtilities.mapType;
+    this.nodes = nodes || cy.nodes();
+    this.edges = edges || cy.edges();
+
+    var collapsedChildren = elementUtilities.getAllCollapsedChildrenRecursively(this.nodes);
+    this.allCollapsedNodes = collapsedChildren.filter("node");
+    this.allCollapsedEdges = collapsedChildren.filter("edge");
 
     if (typeof renderInfo !== 'undefined') {
        hasExtension = true;
@@ -72,7 +77,7 @@ module.exports = function () {
       return "Error";
     }
 
-    var mapLanguage = elementUtilities.mapTypeToLanguage(elementUtilities.mapType);
+    var mapLanguage = elementUtilities.mapTypeToLanguage(mapType);
 
     //add headers
     xmlHeader = "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>\n";
@@ -107,11 +112,12 @@ module.exports = function () {
     var glyphList = [];
     // be careful that :visible is also used during recursive search of nodes
     // in the getGlyphSbgnml function. If not set accordingly, discrepancies will occur.
-    cy.nodes().each(function(ele, i){
+    var self = this;
+    this.nodes.each(function(ele, i){
        if(typeof ele === "number") {
          ele = i;
        }
-       if(!ele.isChild())
+       if(jsonToSbgnml.childOfNone(ele, self.nodes))
            glyphList = glyphList.concat(self.getGlyphSbgnml(ele)); // returns potentially more than 1 glyph
     });
     // add them to the map
@@ -121,7 +127,7 @@ module.exports = function () {
        map.addGlyph(glyphList[i]);
     }
     // get all arcs
-    var edges = this.allCollapsedEdges.union(cy.edges());
+    var edges = this.allCollapsedEdges.union(this.edges);
     edges.each(function(ele, i){
        if(typeof ele === "number") {
          ele = i;
@@ -148,8 +154,8 @@ module.exports = function () {
     // return xmlHeader + xmlbody;
   };
 
-  jsonToSbgnml.createSbgnml = function(filename, version, renderInfo, mapProperties) {
-    var jsObj = jsonToSbgnml.buildJsObj(filename, version, renderInfo, mapProperties);
+  jsonToSbgnml.createSbgnml = function(filename, version, renderInfo, mapProperties, nodes, edges) {
+    var jsObj = jsonToSbgnml.buildJsObj(filename, version, renderInfo, mapProperties, nodes, edges);
     return jsonToSbgnml.buildString({sbgn: jsObj});
   }
 
@@ -535,6 +541,10 @@ module.exports = function () {
       }
 
       return glyph;
+  };
+
+  jsonToSbgnml.childOfNone = function(ele, nodes) {
+    return !ele.isChild() || nodes.getElementById(ele.data('parent')).length === 0;
   };
 
   return jsonToSbgnml;

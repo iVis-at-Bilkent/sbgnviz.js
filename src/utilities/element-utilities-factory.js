@@ -2497,5 +2497,15 @@ module.exports = function () {
     }
   };
 
+  elementUtilities.getAllCollapsedChildrenRecursively = function(nodes) {
+    var expandCollapse = cy.expandCollapse('get');
+    var collapsedChildren = cy.collection();
+    var collapsedNodes = nodes.filter(".cy-expand-collapse-collapsed-node");
+    collapsedNodes.forEach( function( n ) {
+      collapsedChildren = collapsedChildren.union(expandCollapse.getCollapsedChildrenRecursively(n));
+    } );
+    return collapsedChildren;
+  };
+
   return elementUtilities;
 }
