@@ -58,6 +58,14 @@ module.exports = function () {
     return 'nwtE_' + elementUtilities.generateUUID();
   };
 
+  elementUtilities.generateStateVarId = function() {
+    return 'nwtSV_' + elementUtilities.generateUUID();
+  };
+
+  elementUtilities.generateUnitOfInfoId = function() {
+    return 'nwtUIO_' + elementUtilities.generateUUID();
+  };
+
   /*
     see http://journal.imbio.de/articles/pdf/jib-263.pdf p.41 <-- but beware, outdated
     following tables have been updated with PD lvl1 v2.0 of November 7, 2016 working draft

@@ -190,9 +190,10 @@ module.exports = function () {
 
       var info = {};
       var infobox;
+      var infoboxId = glyph.id;
 
       if (glyph.class_ === 'unit of information') {
-        infobox = classes.UnitOfInformation.construct();
+        infobox = classes.UnitOfInformation.construct(undefined, undefined, infoboxId);
         if(glyph.entity) {
           // change the parent class according to its true class of biological activity
           switch(glyph.entity.name) {
@@ -208,14 +209,13 @@ module.exports = function () {
           'text': (glyph.label && glyph.label.text) || undefined
         };
       } else if (glyph.class_ === 'state variable') {
-        infobox = classes.StateVariable.construct();
+        infobox = classes.StateVariable.construct(undefined, undefined, undefined, infoboxId);
 
         var state = glyph.state;
         infobox.state.value = (state && state.value) || undefined;
         infobox.state.variable = (state && state.variable) || undefined;
       }
 
-      infobox.id = glyph.id || undefined;
       infobox.bbox = self.stateAndInfoBboxProp(glyph, parentBbox);
       infobox.style = self.getDefaultStateAndInfoStyle(glyph, parent.class);
       //classes.StateVariable.setAnchorSide(infobox);

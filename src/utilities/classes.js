@@ -5,6 +5,9 @@ var cytoscape = libs.cytoscape;
 // var optionUtilities = require('./option-utilities');
 // var options = optionUtilities.getOptions();
 var truncate = require('./text-utilities').truncate;
+// only functions not depending on the instances can be used in this way
+// e.g. elementUtilities.generateStateVarId()
+var elementUtilities = require('./element-utilities-factory')();
 
 var ns = {};
 
@@ -368,8 +371,9 @@ for (var prop in AuxiliaryUnit) {
 }
 
 // Construct a state variable object by extending default behaviours of a AuxiliaryUnit object and returns that object
-StateVariable.construct = function(value, stateVariableDefinition, parent) {
+StateVariable.construct = function(value, stateVariableDefinition, parent, id) {
   var obj = AuxiliaryUnit.construct(parent);
+  obj.id = id || elementUtilities.generateStateVarId();
   obj.state = {};
   obj.state.value = value;
   obj.state.variable = null;
@@ -456,8 +460,9 @@ for (var prop in AuxiliaryUnit) {
 }
 
 // Constructs a UnitOfInformation object by extending properties of an AuxiliaryUnit object and return that object
-UnitOfInformation.construct = function(value, parent) {
+UnitOfInformation.construct = function(value, parent, id) {
   var obj = AuxiliaryUnit.construct(parent);
+  obj.id = id || elementUtilities.generateUnitOfInfoId();
   obj.label = {text: value}; // from legacy code, contains {text: }
   obj.clazz = "unit of information";
 
