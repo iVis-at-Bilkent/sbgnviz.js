@@ -660,7 +660,7 @@ module.exports = function () {
     // convert style list to elementId-indexed object pointing to style
     // also convert color references to color values
     var styleList = renderInformation.listOfStyles.styles;
-    var elementIDToStyle = {};
+    var memberIDToStyle = {};
     for (var i=0; i < styleList.length; i++) {
       var style = styleList[i];
       var renderGroup = style.renderGroup;
@@ -680,7 +680,7 @@ module.exports = function () {
       var idList = style.idList.split(' ');
       for (var j=0; j < idList.length; j++) {
         var id = idList[j];
-        elementIDToStyle[id] = renderGroup;
+        memberIDToStyle[id] = renderGroup;
       }
     }
 
@@ -699,114 +699,131 @@ module.exports = function () {
       }
     }
 
-    // apply the style to nodes and overwrite the default style
-    for (var i=0; i < nodes.length; i++) {
-      var node = nodes[i];
-      // special case for color properties, we need to check opacity
-      var bgColor = elementIDToStyle[node.data['id']].fill;
-      if (bgColor) {
-        var res = convertHexColor(bgColor);
-        node.data['background-color'] = res.color;
-        node.data['background-opacity'] = res.opacity;
-      }
+    var nodePropMap = {
+      'background-color': 'fill',
+      'background-opacity': 'fill',
+      'border-color': 'stroke',
+      'border-width': 'strokeWidth',
+      'font-size': 'fontSize',
+      'font-family': 'fontFamily',
+      'font-style': 'fontStyle',
+      'font-weight': 'fontWeight',
+      'color': 'fontColor',
+      'text-halign': 'textAnchor',
+      'text-valign': 'vtextAnchor',
+      'background-image': 'backgroundImage',
+      'background-fit': 'backgroundFit',
+      'background-position-x': 'backgroundPosX',
+      'background-position-y': 'backgroundPosY',
+      'background-width': 'backgroundWidth',
+      'background-height': 'backgroundHeight',
+      'background-image-opacity': 'backgroundImageOpacity'
+    };
 
-      var borderColor = elementIDToStyle[node.data['id']].stroke;
-      if (borderColor) {
-        var res = convertHexColor(borderColor);
-        node.data['border-color'] = res.color;
-      }
+    var edgePropMap = {
+      'line-color': 'stroke',
+      'width': 'strokeWidth'
+    };
 
-      var borderWidth = elementIDToStyle[node.data['id']].strokeWidth;
-      if (borderWidth) {
-        node.data['border-width'] = borderWidth;
-      }
+    var infoboxPropMap = {
+      'background-color': 'fill',
+      'border-color': 'stroke',
+      'border-width': 'strokeWidth',
+      'font-size': 'fontSize',
+      'font-weight': 'fontWeight',
+      'font-style': 'fontStyle',
+      'font-family': 'fontFamily',
+      'font-color': 'fontColor',
+      'shape-name': 'shapeName'
+    };
 
-      var fontSize = elementIDToStyle[node.data['id']].fontSize;
-      if (fontSize) {
-        node.data['font-size'] = fontSize;
+    var nodePropDetails = {
+      'background-color': {
+        'converter': convertHexColor,
+        'extra-field': 'color'
+      },
+      'background-opacity': {
+        'converter': convertHexColor,
+        'extra-field': 'opacity'
+      },
+      'border-color': {
+        'converter': convertHexColor,
+        'extra-field': 'color'
       }
+    };
 
-      var fontFamily = elementIDToStyle[node.data['id']].fontFamily;
-      if (fontFamily) {
-        node.data['font-family'] = fontFamily;
+    var edgePropDetails = {
+      'line-color': {
+        'converter': convertHexColor,
+        'extra-field': 'color'
       }
+    };
 
-      var fontStyle = elementIDToStyle[node.data['id']].fontStyle;
-      if (fontStyle) {
-        node.data['font-style'] = fontStyle;
+    var infoboxPropDetails = {
+      'font-color': {
+        'converter': convertHexColor,
+        'extra-field': 'color'
+      },
+      'border-color': {
+        'converter': convertHexColor,
+        'extra-field': 'color'
       }
+    };
 
-      var fontWeight = elementIDToStyle[node.data['id']].fontWeight;
-      if (fontWeight) {
-        node.data['font-weight'] = fontWeight;
-      }
+    function getElementId( ele ) {
+      return ele.data.id;
+    }
 
-      var fontColor = elementIDToStyle[node.data['id']].fontColor;
-      if (fontColor) {
-        node.data['color'] = fontColor;
-      }
+    function getInfoboxId( infobox ) {
+      return infobox.id;
+    }
 
-      var textAnchor = elementIDToStyle[node.data['id']].textAnchor;
-      if (textAnchor) {
-        node.data['text-halign'] = textAnchor;
-      }
+    function setElementStyleProp( ele, name, value ) {
+      ele.data[ name ] = value;
+    }
 
-      var vtextAnchor = elementIDToStyle[node.data['id']].vtextAnchor;
-      if (vtextAnchor) {
-        node.data['text-valign'] = vtextAnchor;
-      }
+    function setInfoboxStyleProp( infobox, name, value ) {
+      infobox.style[ name ] = value;
+    }
 
-      var backgroundImage = elementIDToStyle[node.data['id']].backgroundImage;
-      if (backgroundImage) {
-        node.data['background-image'] = backgroundImage;
-      }
+    // apply the style to list and overwrite the default style
+    function overrideStyleProperties( list, propMap, propDetails, getId, setStyleProp ) {
+      for (var i=0; i < list.length; i++) {
+        // TODO: after this do a similar thing for node.data.statesandinfos
+        var member = list[i];
+        var memberStyle = memberIDToStyle[ getId( member ) ];
 
-      var backgroundFit = elementIDToStyle[node.data['id']].backgroundFit;
-      if (backgroundFit) {
-        node.data['background-fit'] = backgroundFit;
-      }
+        if (!memberStyle) {
+          return;
+        }
 
-      var backgroundPosX = elementIDToStyle[node.data['id']].backgroundPosX;
-      if (backgroundPosX) {
-        node.data['background-position-x'] = backgroundPosX;
-      }
+        Object.keys( propMap ).forEach( function( propName ) {
+          var fieldName = propMap[ propName ];
+          var fieldVal = memberStyle[ fieldName ];
+          if ( fieldVal ) {
+            var details = propDetails && propDetails[ propName ];
+            if ( details ) {
+              if ( details[ 'converter' ] ) {
+                fieldVal = details[ 'converter' ]( fieldVal );
+              }
 
-      var backgroundPosY = elementIDToStyle[node.data['id']].backgroundPosY;
-      if (backgroundPosY) {
-        node.data['background-position-y'] = backgroundPosY;
-      }
+              if ( details[ 'extra-field' ] ) {
+                fieldVal = fieldVal[ details[ 'extra-field' ] ];
+              }
+            }
 
-      var backgroundWidth = elementIDToStyle[node.data['id']].backgroundWidth;
-      if (backgroundWidth) {
-        node.data['background-width'] = backgroundWidth;
-      }
+            setStyleProp( member, propName, fieldVal );
+          }
+        } );
 
-      var backgroundHeight = elementIDToStyle[node.data['id']].backgroundHeight;
-      if (backgroundHeight) {
-        node.data['background-height'] = backgroundHeight;
-      }
-
-      var backgroundImageOpacity = elementIDToStyle[node.data['id']].backgroundImageOpacity;
-      if (backgroundImageOpacity) {
-        node.data['background-image-opacity'] = backgroundImageOpacity;
+        if ( member.data && member.data.statesandinfos ) {
+          overrideStyleProperties( member.data.statesandinfos, infoboxPropMap, infoboxPropDetails, getInfoboxId, setInfoboxStyleProp );
+        }
       }
     }
 
-    // do the same for edges
-    for (var i=0; i < edges.length; i++) {
-      var edge = edges[i];
-
-      var lineColor = elementIDToStyle[edge.data['id']].stroke;
-      if (lineColor) {
-        var res = convertHexColor(lineColor);
-        edge.data['line-color'] = res.color;
-      }
-
-      var width = elementIDToStyle[edge.data['id']].strokeWidth;
-      if (width) {
-        edge.data['width'] = width;
-      }
-    }
+    overrideStyleProperties( nodes, nodePropMap, nodePropDetails, getElementId, setElementStyleProp );
+    overrideStyleProperties( edges, edgePropMap, edgePropDetails, getElementId, setElementStyleProp );
   };
 
   sbgnmlToJson.mapPropertiesToObj = function() {
