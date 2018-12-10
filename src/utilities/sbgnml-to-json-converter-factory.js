@@ -789,7 +789,6 @@ module.exports = function () {
     // apply the style to list and overwrite the default style
     function overrideStyleProperties( list, propMap, propDetails, getId, setStyleProp ) {
       for (var i=0; i < list.length; i++) {
-        // TODO: after this do a similar thing for node.data.statesandinfos
         var member = list[i];
         var memberStyle = memberIDToStyle[ getId( member ) ];
 
@@ -816,6 +815,7 @@ module.exports = function () {
           }
         } );
 
+        // if the member is a node
         if ( member.data && member.data.statesandinfos ) {
           overrideStyleProperties( member.data.statesandinfos, infoboxPropMap, infoboxPropDetails, getInfoboxId, setInfoboxStyleProp );
         }
