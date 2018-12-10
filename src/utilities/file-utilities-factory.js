@@ -62,7 +62,7 @@ module.exports = function () {
  // Helper functions End
 
  var sbgnmlToJson, jsonToSbgnml, jsonToNwt, uiUtilities, tdToJson,
-     sifToJson, graphUtilities, layoutToText, nwtToJson;
+     sifToJson, graphUtilities, layoutToText, nwtToJson, jsonToSif;
  var updateGraph;
  var options, cy;
 
@@ -71,6 +71,7 @@ module.exports = function () {
    nwtToJson = param.nwtToJsonConverter;
    jsonToSbgnml = param.jsonToSbgnmlConverter;
    jsonToNwt = param.jsonToNwtConverter;
+   jsonToSif = param.jsonToSifConverter;
    uiUtilities = param.uiUtilities;
    tdToJson = param.tdToJsonConverter;
    sifToJson = param.sifToJsonConverter;
@@ -287,7 +288,16 @@ module.exports = function () {
      type: "text/plain;charset=utf-8;",
    });
    saveAs(blob, filename);
- }
+ };
+
+ fileUtilities.saveAsPlainSif = function(filename) {
+   var text = jsonToSif.convert();
+
+   var blob = new Blob([text], {
+     type: "text/plain;charset=utf-8;",
+   });
+   saveAs(blob, filename);
+ };
 
  fileUtilities.convertSbgnmlTextToJson = function(sbgnmlText){
      return sbgnmlToJson.convert(textToXmlObject(sbgnmlText));
