@@ -62,6 +62,7 @@ module.exports = function() {
         var srcName = tabs[ 0 ];
         var edgeType = tabs[ 1 ];
         var tgtName = tabs[ 2 ];
+        // TODO: add a check to see if they are available
         var pcIDSet = strToSet( tabs[ 3 ], /;| / );
         var siteLocSet = strToSet( tabs[ 4 ], ';' );
 
@@ -111,9 +112,34 @@ module.exports = function() {
 
     var updateWithDefaults = function() {
       elementUtilities.extendNodeDataWithClassDefaults( node.data, className );
-
-      node.data.bbox.w = defaults.width;
       node.data.bbox.h = defaults.height;
+
+      if ( elementUtilities.canHaveSBGNLabel( className ) ) {
+        // dynamicLabelSize: 'large',
+        // adjustNodeLabelFontSizeAutomatically: true
+        var isDynamicLabel = sifToJson.getMapProperty( 'adjustNodeLabelFontSizeAutomatically' );
+
+        var fontSize;
+        var fontFamily = node.data[ 'font-family' ];
+
+        if ( isDynamicLabel ) {
+          var dynamicLabelSize = sifToJson.getMapProperty( 'dynamicLabelSize' );
+          var coeff = elementUtilities.getDynamicLabelSizeCoefficient( dynamicLabelSize );
+          var obj = {
+            height: node.data.bbox.h,
+            class: className
+          };
+          fontSize = elementUtilities.getDynamicLabelTextSize( obj, coeff );
+        }
+        else {
+          fontSize = node.data[ 'font-size' ];
+        }
+
+        node.data.bbox.w = elementUtilities.getWidthByContent( name, fontFamily, fontSize );
+      }
+      else {
+        node.data.bbox.w = defaults.width;
+      }
     };
 
     if ( node == undefined ) {
@@ -182,11 +208,11 @@ module.exports = function() {
     switch (edgeType) {
       case 'controls-production-of':
       case 'controls-transport-of-chemical':
-        type = ( role === 'src' ? 'protein' : 'small chemical' );
+        type = ( role === 'src' ? 'protein' : 'small molecule' );
         break;
       case 'consumption-controled-by':
       case 'chemical-affects':
-        type = ( role === 'src' ? 'small chemical' : 'protein' );
+        type = ( role === 'src' ? 'small molecule' : 'protein' );
         break;
       case 'reacts-with':
       case 'used-to-produce':
@@ -198,6 +224,10 @@ module.exports = function() {
     }
 
     return type;
+  };
+
+  sifToJson.getMapProperty = function( propName ) {
+    return sifToJson.mapPropertiesToObj()[ 'mapProperties' ][ propName ];
   };
 
   sifToJson.mapPropertiesToObj = function() {

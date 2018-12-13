@@ -67,6 +67,17 @@ var textUtilities = {
     else {
       return originalId;
     }
+  },
+
+  getWidthByContent( content, fontFamily, fontSize ) {
+    var context = document.createElement('canvas').getContext('2d');
+    // should not make type check so '===' should not be used here
+    var shouldAppend = parseFloat( fontSize ) == fontSize;
+    var validFontSize = shouldAppend ? fontSize + 'px' : fontSize;
+    context.font = validFontSize + ' ' + fontFamily;
+
+    var w = context.measureText(content).width;
+    return w;
   }
 
 };

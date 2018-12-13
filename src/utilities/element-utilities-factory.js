@@ -1314,38 +1314,55 @@ module.exports = function () {
 
   // general utilities
 
+  elementUtilities.getDynamicLabelSizeCoefficient = function( dynamicLabelSize ) {
+    var map = {
+      'small': 0.75,
+      'regular': 1,
+      'large': 1.25
+    };
+
+    return map[ dynamicLabelSize ];
+  };
+
   elementUtilities.getDynamicLabelTextSize = function (ele, dynamicLabelSizeCoefficient) {
+    var sbgnclass, h;
+
+    // ele can either be node itself or an object that has class and height fields
+    if ( ele.isNode && ele.isNode() ) {
+      sbgnclass = ele.data( 'class' );
+      h = ele.height();
+    }
+    else {
+      sbgnclass = ele[ 'class' ];
+      h = ele[ 'height' ];
+    }
+
     var dynamicLabelSize = options.dynamicLabelSize;
     dynamicLabelSize = typeof dynamicLabelSize === 'function' ? dynamicLabelSize.call() : dynamicLabelSize;
 
     if (dynamicLabelSizeCoefficient === undefined) {
       if (dynamicLabelSize == 'small') {
-        if (ele.data("class").startsWith("complex"))
+        if (sbgnclass.startsWith("complex"))
           return 10;
-        else if (ele.data("class") == "compartment" || ele.data("class") == "submap")
+        else if (sbgnclass == "compartment" || sbgnclass == "submap")
           return 12;
-
-        dynamicLabelSizeCoefficient = 0.75;
       }
       else if (dynamicLabelSize == 'regular') {
-        if (ele.data("class").startsWith("complex"))
+        if (sbgnclass.startsWith("complex"))
           return 11;
-        else if (ele.data("class") == "compartment" || ele.data("class") == "submap")
+        else if (sbgnclass == "compartment" || sbgnclass == "submap")
           return 14;
-
-        dynamicLabelSizeCoefficient = 1;
       }
       else if (dynamicLabelSize == 'large') {
-        if (ele.data("class").startsWith("complex"))
+        if (sbgnclass.startsWith("complex"))
           return 12;
-        else if (ele.data("class") == "compartment" || ele.data("class") == "submap")
+        else if (sbgnclass == "compartment" || sbgnclass == "submap")
           return 16;
-
-        dynamicLabelSizeCoefficient = 1.25;
       }
+
+      dynamicLabelSizeCoefficient = elementUtilities.getDynamicLabelSizeCoefficient( dynamicLabelSize );
     }
 
-    var h = ele.height();
     var textHeight = parseInt(h / 2.45) * dynamicLabelSizeCoefficient;
 
     return textHeight;
@@ -2317,10 +2334,13 @@ module.exports = function () {
   };
 
   var getDefaultInfoboxSize = function( nodeClass, infoboxType ) {
-    var w = 12, h = 12;
+    var w = undefined, h = 12;
+
+    if ( !elementUtilities.canHaveMultipleUnitOfInformation( nodeClass ) ) {
+      w = 12;
+    }
 
     if ( nodeClass === 'protein' || nodeClass === 'small molecule' ) {
-      w = 15;
       h = 15;
     }
 
@@ -2331,14 +2351,18 @@ module.exports = function () {
     if ( infoboxType === 'state variable' ) {
       return 'stadium';
     }
-    else if ( infoboxType === 'unit of information' ) {
-      if ( nodeClass == 'protein' ) {
-        return 'stadium';
+
+    if ( elementUtilities.isSIFNode( nodeClass ) ) {
+      if ( infoboxType === 'unit of information' ) {
+        if ( nodeClass == 'protein' ) {
+          return 'stadium';
+        }
+        return 'rectangle';
       }
-      return 'rectangle';
     }
     else {
-      throw "Invalid infobox type";
+      var list = elementUtilities.getUnitOfInfoShapeOptions( nodeClass );
+      return list[ 0 ];
     }
   };
 
@@ -2513,6 +2537,10 @@ module.exports = function () {
       collapsedChildren = collapsedChildren.union(expandCollapse.getCollapsedChildrenRecursively(n));
     } );
     return collapsedChildren;
+  };
+
+  elementUtilities.getWidthByContent = function( content, fontFamily, fontSize ) {
+    return textUtilities.getWidthByContent( content, fontFamily, fontSize );
   };
 
   return elementUtilities;
