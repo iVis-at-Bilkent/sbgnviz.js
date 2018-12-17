@@ -26,6 +26,10 @@ module.exports = function() {
   };
 
   function extendArcsData(arcs, filterFcn, propHandlerMap) {
+    if ( !arcs ) {
+      return;
+    }
+    
     arcs.forEach( function( arc ) {
       if ( filterFcn( arc.$.class ) ) {
         var edge = cy.getElementById( arc.$.id );

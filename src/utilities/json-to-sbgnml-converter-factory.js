@@ -225,6 +225,7 @@ module.exports = function () {
               backgroundWidth: style.properties.backgroundWidth,
               backgroundHeight: style.properties.backgroundHeight,
               backgroundImageOpacity: style.properties.backgroundImageOpacity,
+              shapeName: style.properties.shapeName
           });
           xmlStyle.setRenderGroup(g);
           listOfStyles.addStyle(xmlStyle);
@@ -311,7 +312,7 @@ module.exports = function () {
     //add state and info box information
     for(var i = 0 ; i < node._private.data.statesandinfos.length ; i++){
        var boxGlyph = node._private.data.statesandinfos[i];
-       var statesandinfosId = node._private.data.id+"_"+i;
+       var statesandinfosId = boxGlyph.id;
        if(boxGlyph.clazz === "state variable"){
            glyph.addGlyphMember(this.addStateBoxGlyph(boxGlyph, statesandinfosId, node));
        }
