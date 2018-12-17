@@ -18,16 +18,20 @@ module.exports = function() {
     return set;
   }
 
+  function getFirstByTagName(arc, tagName) {
+    var els = arc.getElementsByTagName(tagName);
+    var val = els.length > 0 ? els[0].innerHTML : null;
+
+    return val;
+  }
+
   var sifEdgePropHandlerMap = {
     'pcIDSet': function(arc) {
-      // TODO: create a function to eliminate code replication here
-      var els = arc.getElementsByTagName('pcIDs');
-      var val = els.length > 0 ? els[0].innerHTML : null;
+      var val = getFirstByTagName( arc, 'pcIDs' );
       return strToSet( val, /;| / );
     },
     'siteLocSet': function(arc) {
-      var els = arc.getElementsByTagName('siteLocations');
-      var val = els.length > 0 ? els[0].innerHTML : null;
+      var val = getFirstByTagName( arc, 'siteLocations' );
       return strToSet( val, ';' );
     }
   };
@@ -60,7 +64,6 @@ module.exports = function() {
   };
 
   nwtToJson.mapPropertiesToObj = function() {
-    // TODO: may need to extend this with sif features
     return sbgnmlToJson.mapPropertiesToObj();
   };
 

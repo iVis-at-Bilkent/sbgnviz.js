@@ -1042,6 +1042,17 @@ module.exports = function () {
       return 'ellipse';
   };
 
+  elementUtilities.getCyTargetArrowFill = function(ele) {
+    var _class = ele.data('class');
+
+    if ( _class == 'inhibition' || _class == 'negative influence' ||
+          _class == 'production' || elementUtilities.isSIFEdge( _class ) ) {
+      return 'filled';
+    }
+
+    return 'hollow';
+  };
+
   elementUtilities.getCyArrowShape = function(ele) {
       var _class = ele.data('class');
 
@@ -2334,11 +2345,7 @@ module.exports = function () {
   };
 
   var getDefaultInfoboxSize = function( nodeClass, infoboxType ) {
-    var w = undefined, h = 12;
-
-    if ( !elementUtilities.canHaveMultipleUnitOfInformation( nodeClass ) ) {
-      w = 12;
-    }
+    var w = 12, h = 12;
 
     if ( nodeClass === 'protein' || nodeClass === 'small molecule' ) {
       h = 15;

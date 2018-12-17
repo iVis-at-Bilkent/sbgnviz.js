@@ -303,11 +303,5 @@ module.exports = function () {
      return sbgnmlToJson.convert(textToXmlObject(sbgnmlText));
  };
 
- // TODO: update this?
- fileUtilities.createJson = function(json){
-     var sbgnmlText = jsonToSbgnml.createSbgnml();
-     return sbgnmlToJson.convert(textToXmlObject(sbgnmlText));
- };
-
  return fileUtilities;
 };

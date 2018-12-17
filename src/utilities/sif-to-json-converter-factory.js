@@ -62,7 +62,6 @@ module.exports = function() {
         var srcName = tabs[ 0 ];
         var edgeType = tabs[ 1 ];
         var tgtName = tabs[ 2 ];
-        // TODO: add a check to see if they are available
         var pcIDSet = strToSet( tabs[ 3 ], /;| / );
         var siteLocSet = strToSet( tabs[ 4 ], ';' );
 

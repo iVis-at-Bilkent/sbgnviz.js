@@ -426,7 +426,7 @@ module.exports = function () {
 	            'text-margin-y' : -1 * options.extraCompartmentPadding,
 	            'compound-sizing-wrt-labels' : 'exclude',
 	          })
-	          .selector("node:parent[class='submap']")
+	          .selector("node:parent[class='submap'],[class='topology group']")
 	          .css({
 	            'padding': function() {
 	              return graphUtilities.getCompoundPaddings() + options.extraCompartmentPadding;
@@ -503,7 +503,9 @@ module.exports = function () {
 	          .selector("edge")
 	          .css({
 	            'curve-style': 'bezier',
-	            'target-arrow-fill': 'hollow',
+	            'target-arrow-fill': function(ele) {
+								return elementUtilities.getCyTargetArrowFill(ele);
+							},
 	            'source-arrow-fill': 'hollow',
 	            'text-border-color': function (ele) {
 	              if (ele.selected()) {
@@ -580,14 +582,6 @@ module.exports = function () {
 							'line-style': function (ele) {
 	              return elementUtilities.getArrayLineStyle(ele);
 	            }
-	          })
-	          .selector("edge[class='inhibition'],[class='negative influence']")
-	          .css({
-	            'target-arrow-fill': 'filled'
-	          })
-	          .selector("edge[class='production']")
-	          .css({
-	            'target-arrow-fill': 'filled'
 	          })
 	          .selector("core")
 	          .css({
