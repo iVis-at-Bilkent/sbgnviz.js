@@ -27,6 +27,8 @@ module.exports = function() {
     sifToJson.graphData = getEmptyGraphData();
     sifToJson.nameToNode = {};
     sifToJson.keyToEdge = {};
+    // set of nodes that are connected to an edge
+    sifToJson.nodeWithSpecifiedClass = {};
   }
 
   sifToJson.defaultNodeType = 'protein';
@@ -104,9 +106,11 @@ module.exports = function() {
   };
 
   sifToJson.getOrCreateNode = function( name, className ) {
+    // save if class name parameter is set
+    var classNameSpecified = !!className;
     className = className || sifToJson.defaultNodeType;
-    var node = sifToJson.getNodeByName( name );
 
+    var node = sifToJson.getNodeByName( name );
     var defaults = elementUtilities.getDefaultProperties( className );
 
     var updateWithDefaults = function() {
@@ -114,8 +118,6 @@ module.exports = function() {
       node.data.bbox.h = defaults.height;
 
       if ( elementUtilities.canHaveSBGNLabel( className ) ) {
-        // dynamicLabelSize: 'large',
-        // adjustNodeLabelFontSizeAutomatically: true
         var isDynamicLabel = sifToJson.getMapProperty( 'adjustNodeLabelFontSizeAutomatically' );
 
         var fontSize;
@@ -162,13 +164,24 @@ module.exports = function() {
       sifToJson.mapNodeToName( node, name );
       sifToJson.graphData.nodes.push( node );
     }
-    // if node the old node class is the default one and the given class name is
-    // different than it then we can assume that the node is created without included
-    // in an edge so we should update the node class and defaults according to the
-    // new node class
-    else if ( node.class !== className && node.class === sifToJson.defaultNodeType ) {
-      node.data.class = className;
-      updateWithDefaults();
+    // if class name parameter is set and the already existing node has a different
+    // class name check if the existing node has a specified class or just used the
+    // default one because it was not coming from an edge.
+    // In first case give a warning and do not update the class,
+    // in second case update the class and the node data with defaults
+    else if ( classNameSpecified && node.data.class !== className ) {
+      if ( sifToJson.nodeWithSpecifiedClass[ name ] ) {
+        console.log( 'Type of node ' + name + ' cannot be updated as '
+                    + className + ' because it was already specified as ' + node.data.class );
+      }
+      else {
+        node.data.class = className;
+        updateWithDefaults();
+      }
+    }
+
+    if ( classNameSpecified ) {
+      sifToJson.nodeWithSpecifiedClass[ name ] = true;
     }
 
     return node;
