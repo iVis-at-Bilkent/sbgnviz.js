@@ -2500,10 +2500,16 @@ module.exports = function () {
 
   elementUtilities.lockGraphTopology = function() {
     elementUtilities.graphTopologyLocked = true;
+    if ( cy.expandCollapse ) {
+      cy.expandCollapse('get').disableCue();
+    }
   };
 
   elementUtilities.unlockGraphTopology = function() {
     elementUtilities.graphTopologyLocked = false;
+    if ( cy.expandCollapse ) {
+      cy.expandCollapse('get').enableCue();
+    }
   };
 
   elementUtilities.isGraphTopologyLocked = function() {
