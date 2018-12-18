@@ -63,7 +63,7 @@ module.exports = function () {
   };
 
   elementUtilities.generateUnitOfInfoId = function() {
-    return 'nwtUIO_' + elementUtilities.generateUUID();
+    return 'nwtUOI_' + elementUtilities.generateUUID();
   };
 
   /*
