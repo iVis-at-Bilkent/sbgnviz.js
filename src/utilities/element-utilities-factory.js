@@ -2546,8 +2546,8 @@ module.exports = function () {
     return collapsedChildren;
   };
 
-  elementUtilities.getWidthByContent = function( content, fontFamily, fontSize ) {
-    return textUtilities.getWidthByContent( content, fontFamily, fontSize );
+  elementUtilities.getWidthByContent = function( content, fontFamily, fontSize, options ) {
+    return textUtilities.getWidthByContent( content, fontFamily, fontSize, options );
   };
 
   return elementUtilities;

@@ -136,7 +136,8 @@ module.exports = function() {
           fontSize = node.data[ 'font-size' ];
         }
 
-        node.data.bbox.w = elementUtilities.getWidthByContent( name, fontFamily, fontSize );
+        var max = 250;
+        node.data.bbox.w = elementUtilities.getWidthByContent( name, fontFamily, fontSize, { max } );
       }
       else {
         node.data.bbox.w = defaults.width;
