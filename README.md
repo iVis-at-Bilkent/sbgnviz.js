@@ -184,6 +184,18 @@ Loads a graph from the given text data in sbgnml format.
 `instance.saveAsSbgnml(filename[, version])`
 Exports the current graph to an sbgnml file with the given filename. A SBGN-ML version can be provided, either 0.2 or 0.3. No version defaults to 0.3.
 
+`instance.saveAsNwt(filename[, version])`
+Exports the current graph to an nwt file with the given filename. A version can be provided, either 0.2 or 0.3. No version defaults to 0.3.
+
+`instance.saveAsPlainSif(filename)`
+Exports the current graph to a plain SIF file with the given filename.
+
+`instance.loadSIFFile(file, layoutBy, callback)`
+Loads the given SIF file. Optional layoutBy parameter would either be a function that runs a layout or layout options data. Also, optionally apply a callback function upon loading.
+
+`instance.loadNwtFile(file[, callback])`
+Loads the given nwt file. Optionally apply a callback function upon loading. Callback accepts the file as an xml string as argument.
+
 `instance.enablePorts()`
 Enable node ports.
 
@@ -197,6 +209,22 @@ Get if node ports are enabled.
 Sets the ordering of the given nodes. Ordering options are 'L-to-R', 'R-to-L', 'T-to-B', 'B-to-T', 'none'.
 If a node does not have any port before the operation and it is supposed to have some after operation the portDistance parameter is used to set the distance between the node center and the ports. The default port distance is 70.
 Considers undoable option.
+
+`instance.loadLayoutData(layoutText, byName)`
+Load layout data from the text. Each line of layout text represent position of a node.
+It consists of an identifier, x position and y position seperated by tabs. If 'byName'
+parameter is set it means that the first column represents the node label, else it represents
+the node id.
+
+`instance.getLayoutText(byName)`
+Returns a text that represents the layout data of the graph. Text content and usage of
+'byName' parameter is the same as described in ``instance.loadLayoutData()`` section.
+
+`instance.createNwt()`
+Creates an nwt file content from the existing graph and returns it.
+
+`instance.convertNwtToJson()`
+Converts given nwt data to a json object in a special format (http://js.cytoscape.org/#notation/elements-json) and returns it.
 
 `instance.startSpinner(classname)`
 Starts a spinner at the middle of network container element. You can specify a css class that the
@@ -240,6 +268,12 @@ library of sbgnviz. Most users will not need to use this. It includes the follow
  * `isEPNClass(ele)` Returns whether the given class is an EPN class or the given element is an EPN.
  * `isPNClass(ele)` Returns whether the given class is an PN class or the given element is an PN.
  * `isLogicalOperator(ele)` Returns whether the given class is a logical operator class or the given element is a logical operator.
+ * `isSIFNode(node)` Returns whether the given node is a SIF node, it may take class name as a
+ parameter instead of the node.
+ * `isSIFEdge(edge)` Returns whether the given edge is a SIF edge, it may take class name as a
+ parameter instead of edge.
+ * `isUndirectedEdge(edge)` Returns whether the given edge is undirected, it may take class name as a parameter instead of edge.
+ * `isDirectedEdge(edge)` Returns whether the given edge is directed, it may take class name as a parameter instead of edge.
  * `convenientToEquivalence(ele)` Returns whether the given class or the class of the given element is an equivalance class.
  * `moveNodes(positionDiff, nodes)` This method moves given nodes by the given position difference.
  * `convertToModelPosition(renderedPosition)` This method calculates the modal position of the given rendered position by considering current the pan and zoom level of the graph.
@@ -253,7 +287,21 @@ library of sbgnviz. Most users will not need to use this. It includes the follow
  * `getPortsOrdering` Return ordering of ports of a node. Possible return values are 'L-to-R', 'R-to-L', 'T-to-B', 'B-to-T', 'none'.
  * `canHavePorts` Returns whether the given element or elements with the given class can have ports
  * `setPortsOrdering(nodes, ordering, portDistance)` Similar to `instance.setPortsOrdering()` but do not considers undoable option.
-
+ * `generateNodeId()` Generates a unique node id.
+ * `generateEdgeId()` Generates a unique edge id.
+ * `generateStateVarId()` Generates a unique state variable id.
+ * `generateUnitOfInfoId()` Generates a unique unit of information id.
+ * `getStateVarShapeOptions(node)` Returns the possible state variable shape options for the given
+ node. Class name of node can also be given instead of the node parameter.
+ * `getUnitOfInfoShapeOptions(node)` Returns the possible unit of information shape options for the given node. Class name of node can also be given instead of the node parameter.
+ * `extendNodeDataWithClassDefaults(data, className)` Extend the given data field with the default values for the given class name considering that it is the data field of a node.
+ * `extendEdgeDataWithClassDefaults(data, className)` Extend the given data field with the default values for the given class name considering that it is the data field of an edge.
+ * `getDefaultInfoboxStyle(nodeClass, infoboxType)` Returns the state variable or unit of information properties for the given nodeClass according to the infoboxType parameter.
+ * `lockGraphTopology()` Disables the operations that updates the topology grouping of graph.
+ * `unlockGraphTopology()` Enables the operations that updates the topology grouping of graph.
+ * `isGraphTopologyLocked()` Returns if the topology grouping of the graph is locked.
+ * `getAllCollapsedChildrenRecursively(nodes)` Returns all collapsed descendants of the given nodes.
+ * `getWidthByContent(content, fontFamily, fontSize, options)` Calculates and returns the width barely enough to fit the given content typed with the given fontName and fontSize. 'options' parameter may have extra margin to add both sides, min and max values to return.
 
 `instance.undoRedoActionFunctions`
 Functions to be utilized in defining new actions for cytoscape.js-undo-redo extension. These are exposed for the users who builds
@@ -267,6 +315,12 @@ an extension library of sbgnviz.
 ### Classes
 
 The following describes objects used by sbgnviz.js and accessible through `sbgnviz.classes`.
+
+### TabDelimetedParser
+Accessible through `sbgnviz.tdParser`. Provides the following methods.
+
+`getTabsArray(line)` Converts the give tab delimeted line into array of data and returns it.
+`getLinesArray(content)` Converts the content into an array of tab delimeted lines and returns it.
 
 #### AuxiliaryUnit
 
