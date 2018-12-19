@@ -172,7 +172,7 @@ module.exports = function() {
     // in second case update the class and the node data with defaults
     else if ( classNameSpecified && node.data.class !== className ) {
       if ( sifToJson.nodeWithSpecifiedClass[ name ] ) {
-        console.log( 'Type of node ' + name + ' cannot be updated as '
+        console.warn( 'Type of node ' + name + ' cannot be updated as '
                     + className + ' because it was already specified as ' + node.data.class );
       }
       else {
