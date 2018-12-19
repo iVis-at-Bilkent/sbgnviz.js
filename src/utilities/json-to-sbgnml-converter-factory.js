@@ -224,8 +224,7 @@ module.exports = function () {
               backgroundPosY: style.properties.backgroundPosY,
               backgroundWidth: style.properties.backgroundWidth,
               backgroundHeight: style.properties.backgroundHeight,
-              backgroundImageOpacity: style.properties.backgroundImageOpacity,
-              shapeName: style.properties.shapeName
+              backgroundImageOpacity: style.properties.backgroundImageOpacity
           });
           xmlStyle.setRenderGroup(g);
           listOfStyles.addStyle(xmlStyle);

@@ -733,8 +733,7 @@ module.exports = function () {
       'font-weight': 'fontWeight',
       'font-style': 'fontStyle',
       'font-family': 'fontFamily',
-      'font-color': 'fontColor',
-      'shape-name': 'shapeName'
+      'font-color': 'fontColor'
     };
 
     var nodePropDetails = {
