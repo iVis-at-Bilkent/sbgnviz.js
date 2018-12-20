@@ -119,9 +119,11 @@ module.exports = function() {
 
     if (mapType !== 'PD' && mapType !== 'AF') {
       elementUtilities.fileFormat = 'nwt';
+      // extend edges data with sif specific features
       extendEdgesData( graphData.edges, elementUtilities.isSIFEdge, sifEdgePropHandlerMap, xmlObject );
     }
 
+    // apply the style data that is not applied because of restrictions of libsbgn
     applyExtraStylesData( graphData, xmlObject );
 
     return graphData;
