@@ -866,10 +866,9 @@ module.exports = function () {
     return cytoscapeJsGraph;
   };
   
-    sbgnmlToJson.doSchematronValidation = function(xmlObject) {
+    sbgnmlToJson.doSchematronValidation = function(xmlString) {
    	var errors;
 	    try {
-     		 var xmlString = new XMLSerializer().serializeToString(xmlObject);
       		 errors = libsbgnjs.Sbgn.doSchematronValidation(xmlString);
    	   }
     	  catch (err) {
