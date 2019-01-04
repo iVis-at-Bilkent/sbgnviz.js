@@ -2348,6 +2348,7 @@ module.exports = function () {
     var w = 12, h = 12;
 
     if ( nodeClass === 'protein' || nodeClass === 'small molecule' ) {
+      w = 15;
       h = 15;
     }
 
