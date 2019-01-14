@@ -73,6 +73,44 @@ AuxiliaryUnit.setParentRef = function(mainObj, newParent) {
   }
 }
 
+AuxiliaryUnit.checkPoint = function(x, y, node, threshold) {
+  var centerX = node._private.position.x;
+  var centerY = node._private.position.y;
+  var padding = parseInt(node.css('border-width')) / 2;
+  var stateAndInfos = node._private.data.statesandinfos;
+  var cyBaseNodeShapes = cytoscape.baseNodeShapes;
+//    threshold = parseFloat(threshold);
+
+  for (var i = 0; i < stateAndInfos.length; i++) {
+    var state = stateAndInfos[i];
+
+    if (!state.isDisplayed) {
+      continue;
+    }
+
+    var stateWidth = parseFloat(state.bbox.w) + threshold;
+    var stateHeight = parseFloat(state.bbox.h) + threshold;
+    var coord = AuxiliaryUnit.getAbsoluteCoord(state, node.cy());
+    var stateCenterX = coord.x;
+    var stateCenterY = coord.y;
+    var checkPoint;
+
+    if (state.clazz == "state variable") {
+      checkPoint = cyBaseNodeShapes["ellipse"].checkPoint(
+              x, y, padding, stateWidth, stateHeight, stateCenterX, stateCenterY);
+    } else if (state.clazz == "unit of information") {
+      checkPoint = cyBaseNodeShapes["roundrectangle"].checkPoint(
+              x, y, padding, stateWidth, stateHeight, stateCenterX, stateCenterY);
+    }
+
+    if (checkPoint == true) {
+      return state;
+    }
+  }
+
+  return null;
+};
+
 /*
  * Return a new AuxiliaryUnit object. A new parent reference and new id can
  * optionnally be passed.
@@ -394,7 +432,7 @@ StateVariable.hasText = function(mainObj) {
   return (mainObj.state.value && mainObj.state.value != "") || (mainObj.state.variable && mainObj.state.variable != "");
 };
 
-StateVariable.create = function(parentNode, cy, value, variable, bbox, location, position, style, index) {
+StateVariable.create = function(parentNode, cy, value, variable, bbox, location, position, style, index, id) {
   // create the new state var of info
   var stateVar = StateVariable.construct();
   StateVariable.setParentRef(stateVar, parentNode);
@@ -404,6 +442,10 @@ StateVariable.create = function(parentNode, cy, value, variable, bbox, location,
   stateVar.state = {value: value, variable: variable};
   stateVar.bbox = bbox;
   stateVar.style = style;
+
+  if ( stateVar.id ) {
+    stateVar.id = id;
+  }
 
   // link to layout
   position = StateVariable.addToParent(stateVar, cy, parentNode, location, position, index);
@@ -485,11 +527,14 @@ UnitOfInformation.hasText = function(mainObj) {
  * @param [position] - its position in the order of elements placed on the same location
  * @param [index] - its index in the statesandinfos list
  */
-UnitOfInformation.create = function (parentNode, cy, value, bbox, location, position, style, index) {
+UnitOfInformation.create = function (parentNode, cy, value, bbox, location, position, style, index, id) {
   // create the new unit of info
   var unit = UnitOfInformation.construct(value, parentNode);
   unit.bbox = bbox;
   unit.style = style;
+  if (unit.id) {
+    unit.id = id;
+  }
 
   //console.log("will insert on", location, position);
   position = UnitOfInformation.addToParent(unit, cy, parentNode, location, position, index);

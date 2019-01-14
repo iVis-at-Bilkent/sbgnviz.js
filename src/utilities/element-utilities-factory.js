@@ -829,6 +829,19 @@ module.exports = function () {
     };
   };
 
+  elementUtilities.convertToRenderedPosition = function (modelPos, pan, zoom) {
+    pan = pan || cy.pan();
+    zoom = zoom || cy.zoom();
+
+    var res = {};
+
+    ['x', 'y'].forEach( function(dim) {
+      res[dim] = modelPos[dim] * zoom + pan[dim];
+    } );
+
+    return res;
+  };
+
   // Section End
   // General Element Utilities
 

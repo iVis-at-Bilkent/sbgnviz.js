@@ -1327,37 +1327,7 @@ module.exports = function () {
   };
 
   $$.sbgn.checkPointStateAndInfoBoxes = function (x, y, node, threshold) {
-    var centerX = node._private.position.x;
-    var centerY = node._private.position.y;
-    var padding =parseInt(node.css('border-width')) / 2;
-    var stateAndInfos = node._private.data.statesandinfos;
-//    threshold = parseFloat(threshold);
-
-    for (var i = 0; i < stateAndInfos.length; i++) {
-      var state = stateAndInfos[i];
-      var stateWidth = parseFloat(state.bbox.w) + threshold;
-      var stateHeight = parseFloat(state.bbox.h) + threshold;
-      var coord = classes.StateVariable.getAbsoluteCoord(state, node.cy());
-      var stateCenterX = coord.x;
-      var stateCenterY = coord.y;
-
-      if (state.clazz == "state variable" && state.isDisplayed) {//draw ellipse
-        var stateCheckPoint = cyBaseNodeShapes["ellipse"].checkPoint(
-                x, y, padding, stateWidth, stateHeight, stateCenterX, stateCenterY);
-
-        if (stateCheckPoint == true)
-          return true;
-
-      } else if (state.clazz == "unit of information" && state.isDisplayed) {//draw rectangle
-        var infoCheckPoint = cyBaseNodeShapes["roundrectangle"].checkPoint(
-                x, y, padding, stateWidth, stateHeight, stateCenterX, stateCenterY);
-
-        if (infoCheckPoint == true)
-          return true;
-      }
-
-    }
-    return false;
+    return classes.AuxiliaryUnit.checkPoint(x, y, node, threshold);
   };
 
   $$.sbgn.isNodeShapeTotallyOverriden = function (render, node) {
