@@ -36,13 +36,40 @@ module.exports = function() {
     }
   };
 
-  function extendEdgesData( edgesData, filterFcn, propHandlerMap, xmlObject ) {
-    edgesData.forEach( function( obj ) {
+  var sifNodePropHandlerMap = {
+    'tooltip': function(glyph) {
+      var val = getFirstByTagName( glyph, 'tooltip' );
+      return val;
+    },
+    'infoboxes': function(glyph, data) {
+      var sifInfoboxPropHandlerMap = {
+        'tooltip': function(glyph) {
+          var val = getFirstByTagName( glyph, 'tooltip' );
+          return val;
+        }
+      };
+
+      var infoboxGlyphs = glyph.getElementsByTagName('glyph');
+      for ( var i = 0; i <  infoboxGlyphs.length; i++ ) {
+        var infoboxGlyph = infoboxGlyphs[ i ];
+        Object.keys(sifInfoboxPropHandlerMap).forEach( function( propName ) {
+          var val = sifInfoboxPropHandlerMap[ propName ](infoboxGlyph);
+          if ( val ) {
+            data.statesandinfos[i][propName] = val;
+          }
+        } );
+      }
+    }
+  };
+
+  function extendElementsData( elesData, filterFcn, getXMLEleById, propHandlerMap, xmlObject ) {
+    elesData.forEach( function( obj ) {
       var data = obj.data;
       if ( filterFcn( data.class ) ) {
-        var arc = sbgnmlToJson.getArcById( xmlObject, data.id );
+        var xmlEle = getXMLEleById( xmlObject, data.id );
         Object.keys(propHandlerMap).forEach( function( propName ) {
-          var val = propHandlerMap[ propName ](arc);
+          // does not have to return a value, maybe a void function as well
+          var val = propHandlerMap[ propName ](xmlEle, data);
           if ( val ) {
             data[ propName ] = val;
           }
@@ -120,7 +147,8 @@ module.exports = function() {
     if (mapType !== 'PD' && mapType !== 'AF') {
       elementUtilities.fileFormat = 'nwt';
       // extend edges data with sif specific features
-      extendEdgesData( graphData.edges, elementUtilities.isSIFEdge, sifEdgePropHandlerMap, xmlObject );
+      extendElementsData( graphData.edges, elementUtilities.isSIFEdge, sbgnmlToJson.getArcById.bind(sbgnmlToJson), sifEdgePropHandlerMap, xmlObject );
+      extendElementsData( graphData.nodes, elementUtilities.isSIFNode, sbgnmlToJson.getGlyphById.bind(sbgnmlToJson), sifNodePropHandlerMap, xmlObject );
     }
 
     // apply the style data that is not applied because of restrictions of libsbgn

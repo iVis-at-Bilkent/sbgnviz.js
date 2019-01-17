@@ -25,18 +25,44 @@ module.exports = function() {
     }
   };
 
-  function extendArcsData(arcs, filterFcn, propHandlerMap) {
-    if ( !arcs ) {
+  var sifNodePropHandlerMap = {
+    'tooltip': function(node) {
+      return node.data('tooltip');
+    },
+    'infoboxes': function(node, obj) {
+      var sifInfoboxPropHandlerMap = {
+        'tooltip': function(infobox) {
+          return infobox.tooltip;
+        }
+      };
+
+      var infoboxes = node.data('statesandinfos');
+      var glyphs = obj.glyph;
+      infoboxes.forEach( function(infobox, i) {
+        Object.keys(sifInfoboxPropHandlerMap).forEach( function(propName) {
+          var val = sifInfoboxPropHandlerMap[propName](infobox);
+          if (val) {
+            glyphs[i][propName] = val;
+          }
+        } );
+      } );
+    }
+  };
+
+  // objects consist of arcs or gylphs
+  function extendObjectsData(objs, filterFcn, propHandlerMap) {
+    if ( !objs ) {
       return;
     }
-    
-    arcs.forEach( function( arc ) {
-      if ( filterFcn( arc.$.class ) ) {
-        var edge = cy.getElementById( arc.$.id );
+
+    objs.forEach( function( obj ) {
+      if ( filterFcn( obj.$.class ) ) {
+        var ele = cy.getElementById( obj.$.id );
         Object.keys( propHandlerMap ).forEach( function( propName ) {
-          var val = propHandlerMap[ propName ]( edge );
+          // does not have to return a value, maybe a void function as well
+          var val = propHandlerMap[ propName ]( ele, obj );
           if ( val ) {
-            arc[ propName ] = val;
+            obj[ propName ] = val;
           }
         } );
       }
@@ -102,7 +128,9 @@ module.exports = function() {
       var map = jsObj.map[0];
 
       var arcs = map.arc;
-      extendArcsData(arcs, elementUtilities.isSIFEdge, sifEdgePropHandlerMap);
+      var glyphs = map.glyph;
+      extendObjectsData(arcs, elementUtilities.isSIFEdge, sifEdgePropHandlerMap);
+      extendObjectsData(glyphs, elementUtilities.isSIFNode, sifNodePropHandlerMap);
 
       var jsObjStyles = ( map && map.extension && map.extension.renderInformation
                             && map.extension.renderInformation.listOfStyles ).style;
