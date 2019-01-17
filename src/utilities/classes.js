@@ -443,7 +443,7 @@ StateVariable.create = function(parentNode, cy, value, variable, bbox, location,
   stateVar.bbox = bbox;
   stateVar.style = style;
 
-  if ( stateVar.id ) {
+  if ( id ) {
     stateVar.id = id;
   }
 
@@ -532,7 +532,7 @@ UnitOfInformation.create = function (parentNode, cy, value, bbox, location, posi
   var unit = UnitOfInformation.construct(value, parentNode);
   unit.bbox = bbox;
   unit.style = style;
-  if (unit.id) {
+  if ( id ) {
     unit.id = id;
   }
 
