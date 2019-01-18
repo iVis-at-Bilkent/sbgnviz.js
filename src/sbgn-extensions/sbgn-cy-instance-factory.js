@@ -2,6 +2,7 @@ var classes = require('../utilities/classes');
 var libs = require('../utilities/lib-utilities').getLibs();
 var jQuery = $ = libs.jQuery;
 var cytoscape = libs.cytoscape;
+var Tippy = libs.tippy;
 
 module.exports = function () {
 
@@ -111,6 +112,97 @@ module.exports = function () {
 	  }
 
 	  function bindCyEvents() {
+
+			cy.on('tap', 'node', function(event) {
+			  var node = event.target || event.cyTarget;
+
+
+				var canHaveTooltip = function( node ) {
+					return elementUtilities.isSIFNode(node);
+				}
+
+				if (!canHaveTooltip(node)) {
+					return;
+				}
+
+				var ref; // used only for positioning
+				var pos = event.position || event.cyPosition;
+				var pan = cy.pan();
+			  var zoom = cy.zoom();
+
+			  var infobox = classes.AuxiliaryUnit.checkPoint(pos.x, pos.y, node, 0);
+			  var tooltipContent;
+
+				if ( elementUtilities.isSIFNode(node) ) {
+					if (!infobox) {
+				    tooltipContent = node.data('tooltip');
+
+				    if ( tooltipContent == undefined ) {
+				      return;
+				    }
+
+				    ref = node.popperRef();
+				  }
+				  else {
+				    tooltipContent = infobox['tooltip'];
+
+				    if ( tooltipContent == undefined ) {
+				      return;
+				    }
+
+				    var modelPos = classes.AuxiliaryUnit.getAbsoluteCoord(infobox, cy);
+				    var modelW = infobox.bbox.w;
+				    var modelH = infobox.bbox.h;
+				    var renderedW = modelW * zoom;
+				    var renderedH = modelH * zoom;
+				    modelPos.x -= modelW / 2;
+				    modelPos.y -= modelH / 2;
+				    var renderedPos = elementUtilities.convertToRenderedPosition(modelPos, pan, zoom);
+
+				    var renderedDims = { w: renderedW, h: renderedH };
+
+				    ref = node.popperRef({
+				      renderedPosition: function() {
+				        return renderedPos;
+				      },
+				      renderedDimensions: function() {
+				        return renderedDims;
+				      }
+				    });
+				  }
+				}
+
+			  var placement = infobox ? infobox.anchorSide : 'bottom';
+			  var destroyTippy;
+
+			  var tippy = Tippy.one(ref, {
+			    content: (() => {
+			      var content = document.createElement('div');
+
+			      content.style['font-size'] = 12 * zoom + 'px';
+			      content.innerHTML = tooltipContent;
+
+			      return content;
+			    })(),
+			    trigger: 'manual',
+			    hideOnClick: true,
+			    arrow: true,
+			    placement,
+			    onHidden: function() {
+			      cy.off('pan zoom', destroyTippy);
+			      node.off('position', destroyTippy);
+			    }
+			  });
+
+			  destroyTippy = function(){
+			    tippy.destroy();
+			  };
+
+			  cy.on('pan zoom', destroyTippy);
+			  node.on('position', destroyTippy);
+
+			  setTimeout( () => tippy.show(), 0 );
+			});
 
 	    cy.on('tapend', 'node', function (event) {
 	      cy.style().update();
