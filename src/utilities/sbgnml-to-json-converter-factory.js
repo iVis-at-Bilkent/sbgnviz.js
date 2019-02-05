@@ -866,10 +866,10 @@ module.exports = function () {
     return cytoscapeJsGraph;
   };
   
-    sbgnmlToJson.doSchematronValidation = function(xmlString) {
-   	var errors;
+    sbgnmlToJson.doValidation = function(xmlString) {
+   	var errors = [];
 	    try {
-      		 errors = libsbgnjs.Sbgn.doSchematronValidation(xmlString);
+      		 errors = libsbgnjs.Sbgn.doValidation(xmlString);
    	   }
     	  catch (err) {
       		throw new Error("Could not do validation. "+ err);
