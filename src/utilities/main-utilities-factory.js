@@ -585,8 +585,8 @@ mainUtilities.getMapProperties = function() {
     return;
   }
  };
-  mainUtilities.doSchematronValidation = function(file) {
-    return sbgnmlToJson.doSchematronValidation(file);
+  mainUtilities.doValidation = function(file) {
+    return sbgnmlToJson.doValidation(file);
   }
    return mainUtilities;
 };
