@@ -1,6 +1,6 @@
 {
   "name": "sbgnviz",
-  "version": "4.0.2",
+  "version": "4.2.0",
   "description": "SBGNPD visualization library",
   "main": "src/index.js",
   "licence": "LGPL-3.0",
@@ -20,10 +20,10 @@
   "peerDependencies": {
     "jquery": "^2.2.4",
     "filesaverjs": "~0.2.2",
-    "cytoscape": "iVis-at-Bilkent/cytoscape.js#unstable"
+    "cytoscape": "iVis-at-Bilkent/cytoscape.js#master"
   },
   "dependencies": {
-    "libsbgn.js": "github:sbgn/libsbgn.js#master",
+    "libsbgn.js": "github:sbgn/libsbgn.js#develop",
     "pretty-data": "^0.40.0",
     "xml2js": "^0.4.17"
   },
@@ -31,14 +31,14 @@
     "browserify": "^11.2.0",
     "gulp": "^3.9.1",
     "gulp-derequire": "^2.1.0",
-    "gulp-jshint": "^1.11.2",
+    "gulp-jshint": "^1.12.0",
     "gulp-prompt": "^0.1.2",
     "gulp-replace": "^0.5.4",
-    "gulp-shell": "^0.5.0",
-    "gulp-util": "^3.0.6",
+    "gulp-shell": "^0.5.2",
+    "gulp-util": "^3.0.8",
     "jshint-stylish": "^2.0.1",
     "node-notifier": "^4.3.1",
-    "run-sequence": "^1.1.4",
+    "run-sequence": "^1.2.2",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0"
   }

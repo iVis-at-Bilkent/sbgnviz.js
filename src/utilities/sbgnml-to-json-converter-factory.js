@@ -876,6 +876,17 @@ module.exports = function () {
 
     return cytoscapeJsGraph;
   };
+  
+    sbgnmlToJson.doValidation = function(xmlString) {
+   	var errors = [];
+	    try {
+      		 errors = libsbgnjs.Sbgn.doValidation(xmlString);
+   	   }
+    	  catch (err) {
+      		throw new Error("Could not do validation. "+ err);
+    	  }
+	  return errors;
+  };
 
   return sbgnmlToJson;
 };

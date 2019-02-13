@@ -150,6 +150,9 @@ Creates an sbgnml file content from the exising graph and returns it.
 `instance.convertSbgnmlToJson(data)`
 Converts given sbgnml data to a json object in a special format (http://js.cytoscape.org/#notation/elements-json) and returns it.
 
+`instance.doSchematronValidation(data)`
+Validates given sbgnml data and returns errors if they exist.
+
 `instance.getQtipContent(node)`
 Create the qtip contents of the given node and returns it.
 

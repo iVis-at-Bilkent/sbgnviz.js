@@ -589,6 +589,9 @@ mainUtilities.getMapProperties = function() {
     console.log( "File format is not defined!")
     return;
   }
- }
+ };
+  mainUtilities.doValidation = function(file) {
+    return sbgnmlToJson.doValidation(file);
+  }
    return mainUtilities;
 };
