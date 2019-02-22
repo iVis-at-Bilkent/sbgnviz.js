@@ -53,7 +53,7 @@ module.exports = function () {
     var mapID = textUtilities.getXMLValidId(filename);
     var hasExtension = false;
     var hasRenderExtension = false;
-    var mapType = mapProperties.mapType || elementUtilities.mapType;
+    var mapType = ( mapProperties && mapProperties.mapType ) || elementUtilities.mapType;
     this.nodes = nodes || cy.nodes();
     this.edges = edges || cy.edges();
 
