@@ -111,97 +111,139 @@ module.exports = function () {
 	    ur.action("setPortsOrdering", undoRedoActionFunctions.setPortsOrdering, undoRedoActionFunctions.setPortsOrdering);
 	  }
 
+		function showTooltip(event) {
+			var node = event.target || event.cyTarget;
+
+
+			var canHaveTooltip = function( node ) {
+				return elementUtilities.isSIFNode(node);
+			}
+
+			if (!canHaveTooltip(node)) {
+				return;
+			}
+
+			var ref; // used only for positioning
+			var pos = event.position || event.cyPosition;
+			var pan = cy.pan();
+			var zoom = cy.zoom();
+
+			var infobox = classes.AuxiliaryUnit.checkPoint(pos.x, pos.y, node, 0);
+			var tooltipContent;
+
+			if ( elementUtilities.isSIFNode(node) ) {
+				if (!infobox) {
+					tooltipContent = node.data('tooltip');
+
+					if ( tooltipContent == undefined ) {
+						return;
+					}
+
+					ref = node.popperRef();
+				}
+				else {
+					tooltipContent = infobox['tooltip'];
+
+					if ( tooltipContent == undefined ) {
+						return;
+					}
+
+					var modelPos = classes.AuxiliaryUnit.getAbsoluteCoord(infobox, cy);
+					var modelW = infobox.bbox.w;
+					var modelH = infobox.bbox.h;
+					var renderedW = modelW * zoom;
+					var renderedH = modelH * zoom;
+					modelPos.x -= modelW / 2;
+					modelPos.y -= modelH / 2;
+					var renderedPos = elementUtilities.convertToRenderedPosition(modelPos, pan, zoom);
+
+					var renderedDims = { w: renderedW, h: renderedH };
+
+					ref = node.popperRef({
+						renderedPosition: function() {
+							return renderedPos;
+						},
+						renderedDimensions: function() {
+							return renderedDims;
+						}
+					});
+				}
+			}
+
+			var placement = infobox ? infobox.anchorSide : 'bottom';
+			var destroyTippy;
+
+			var tippy = Tippy.one(ref, {
+				content: (() => {
+					var content = document.createElement('div');
+
+					content.style['font-size'] = 12 * zoom + 'px';
+					content.innerHTML = tooltipContent;
+
+					return content;
+				})(),
+				trigger: 'manual',
+				hideOnClick: true,
+				arrow: true,
+				placement,
+				onHidden: function() {
+					cy.off('pan zoom', destroyTippy);
+					node.off('position', destroyTippy);
+					cy.off('tapdrag', destroyTippy);
+				}
+			});
+
+			destroyTippy = function(){
+				tippy.destroy();
+			};
+
+			cy.on('pan zoom', destroyTippy);
+			node.on('position', destroyTippy);
+			cy.on('tapdrag', destroyTippy);
+
+			setTimeout( () => tippy.show(), 0 );
+		}
+
 	  function bindCyEvents() {
 
-			cy.on('tap', 'node', function(event) {
-			  var node = event.target || event.cyTarget;
+			cy.on('tapdragover', 'node', function(event) {
+				var waitDuration = 1000;
+				var nodeTapdragout;
+				var currEvent = event;
+				var node = currEvent.target || currEvent.cyTarget;
+				var inQueue = true;
 
+				var clearNodeEvent = function() {
+					if ( nodeTapdragout ) {
+						node.off('tapdragout', nodeTapdragout);
+					}
 
-				var canHaveTooltip = function( node ) {
-					return elementUtilities.isSIFNode(node);
-				}
+					if ( nodeTapdrag ) {
+						node.off('tapdrag', nodeTapdrag);
+					}
+				};
 
-				if (!canHaveTooltip(node)) {
-					return;
-				}
+				var getShowTooltipAsycn = function() {
+					return setTimeout( function() {
+						showTooltip( currEvent );
+						inQueue = false;
+					}, waitDuration );
+				};
 
-				var ref; // used only for positioning
-				var pos = event.position || event.cyPosition;
-				var pan = cy.pan();
-			  var zoom = cy.zoom();
+				var showTooltipAsycn = getShowTooltipAsycn();
 
-			  var infobox = classes.AuxiliaryUnit.checkPoint(pos.x, pos.y, node, 0);
-			  var tooltipContent;
+				node.on('tapdragout', nodeTapdragout = function(e) {
+					clearTimeout( showTooltipAsycn );
+					clearNodeEvent();
+				});
 
-				if ( elementUtilities.isSIFNode(node) ) {
-					if (!infobox) {
-				    tooltipContent = node.data('tooltip');
-
-				    if ( tooltipContent == undefined ) {
-				      return;
-				    }
-
-				    ref = node.popperRef();
-				  }
-				  else {
-				    tooltipContent = infobox['tooltip'];
-
-				    if ( tooltipContent == undefined ) {
-				      return;
-				    }
-
-				    var modelPos = classes.AuxiliaryUnit.getAbsoluteCoord(infobox, cy);
-				    var modelW = infobox.bbox.w;
-				    var modelH = infobox.bbox.h;
-				    var renderedW = modelW * zoom;
-				    var renderedH = modelH * zoom;
-				    modelPos.x -= modelW / 2;
-				    modelPos.y -= modelH / 2;
-				    var renderedPos = elementUtilities.convertToRenderedPosition(modelPos, pan, zoom);
-
-				    var renderedDims = { w: renderedW, h: renderedH };
-
-				    ref = node.popperRef({
-				      renderedPosition: function() {
-				        return renderedPos;
-				      },
-				      renderedDimensions: function() {
-				        return renderedDims;
-				      }
-				    });
-				  }
-				}
-
-			  var placement = infobox ? infobox.anchorSide : 'bottom';
-			  var destroyTippy;
-
-			  var tippy = Tippy.one(ref, {
-			    content: (() => {
-			      var content = document.createElement('div');
-
-			      content.style['font-size'] = 12 * zoom + 'px';
-			      content.innerHTML = tooltipContent;
-
-			      return content;
-			    })(),
-			    trigger: 'manual',
-			    hideOnClick: true,
-			    arrow: true,
-			    placement,
-			    onHidden: function() {
-			      cy.off('pan zoom', destroyTippy);
-			      node.off('position', destroyTippy);
-			    }
-			  });
-
-			  destroyTippy = function(){
-			    tippy.destroy();
-			  };
-
-			  cy.on('pan zoom', destroyTippy);
-			  node.on('position', destroyTippy);
-
-			  setTimeout( () => tippy.show(), 0 );
+				node.on('tapdrag', nodeTapdrag = function(e) {
+					currEvent = e;
+					if (!inQueue) {
+						showTooltipAsycn = getShowTooltipAsycn();
+						inQueue = true;
+					}
+				});
 			});
 
 	    cy.on('tapend', 'node', function (event) {
