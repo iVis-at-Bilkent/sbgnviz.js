@@ -2225,26 +2225,26 @@ module.exports = function () {
   };
 
   var defaultSifEdgeColorMap = {
-    'neighbor-of': 'rgb(100, 120, 100)',
-    'interacts-with': 'rgb(255, 192, 203)',
-    'in-complex-with': 'rgb(150, 150, 150)',
-    'controls-state-change-of': 'rgb(50, 100, 150)',
-    'controls-transport-of': 'rgb(100, 100, 150)',
-    'controls-phosphorylation-of': 'rgb(100, 150, 100)',
-    'catalysis-precedes': 'rgb(150, 50, 150)',
-    'controls-expression-of': 'rgb(50, 150, 50)',
-    'consumption-controled-by': 'rgb(100, 120, 80)',
-    'controls-production-of': 'rgb(50, 120, 100)',
-    'controls-transport-of-chemical': 'rgb(80, 130, 100)',
-    'chemical-affects': 'rgb(100, 80, 80)',
-    'reacts-with': 'rgb(70, 120, 80)',
-    'used-to-produce': 'rgb(70, 80, 120)',
-    'phosphorylates': 'rgb(0, 150, 0)',
-    'dephosphorylates': 'rgb(150, 0, 0)',
-    'upregulates-expression': 'rgb(0, 150, 0)',
-    'downregulates-expression': 'rgb(150, 0, 0)',
-    'activates': 'rgb(0, 150, 200)',
-    'inhibits': 'rgb(200, 0, 170)'
+    'neighbor-of': '#FC002C',
+    'interacts-with': '#B57261',
+    'in-complex-with': '#B4987A',
+    'controls-state-change-of': '#B4E1CD',
+    'controls-transport-of': '#F0E7C8',
+    'controls-phosphorylation-of': '#D970A1',
+    'catalysis-precedes': '#8EC3ED',
+    'controls-expression-of': '#6A0F30',
+    'consumption-controled-by': '#A9A9F7',
+    'controls-production-of': '#2D5207',
+    'controls-transport-of-chemical': '#369BF7',
+    'chemical-affects': '#D95F23',
+    'reacts-with': '#4E214B',
+    'used-to-produce': '#FF0AA9',
+    'phosphorylates': '#62392D',
+    'dephosphorylates': '#CC8E12',
+    'upregulates-expression': '#32D849',
+    'downregulates-expression': '#CC8E12',
+    'activates': '#32D849',
+    'inhibits': '#4886A5'
   };
 
   var defaultSizeMap = {
