@@ -31,7 +31,7 @@ module.exports = function() {
     sifToJson.nodeWithSpecifiedClass = {};
   }
 
-  sifToJson.defaultNodeType = 'protein';
+  sifToJson.defaultNodeType = 'SIF macromolecule';
 
   sifToJson.mergeGraphData = function() {
     return [ ...sifToJson.graphData.nodes, ...sifToJson.graphData.edges ];
@@ -221,18 +221,18 @@ module.exports = function() {
     switch (edgeType) {
       case 'controls-production-of':
       case 'controls-transport-of-chemical':
-        type = ( role === 'src' ? 'protein' : 'small molecule' );
+        type = ( role === 'src' ? 'SIF macromolecule' : 'SIF simple chemical' );
         break;
       case 'consumption-controled-by':
       case 'chemical-affects':
-        type = ( role === 'src' ? 'small molecule' : 'protein' );
+        type = ( role === 'src' ? 'SIF simple chemical' : 'SIF macromolecule' );
         break;
       case 'reacts-with':
       case 'used-to-produce':
-        type = 'small molecule';
+        type = 'SIF simple chemical';
         break;
       default:
-        type = 'protein';
+        type = 'SIF macromolecule';
         break;
     }
 

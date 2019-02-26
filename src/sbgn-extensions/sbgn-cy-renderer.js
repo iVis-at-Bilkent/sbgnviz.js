@@ -142,9 +142,7 @@ module.exports = function () {
     'macromolecule': true,
     'simple chemical': true,
     'biological activity': true,
-    'compartment': true,
-    'protein': true,
-    'small molecule': true
+    'compartment': true
   };
 
   var totallyOverridenNodeShapes = $$.sbgn.totallyOverridenNodeShapes = {
@@ -153,9 +151,7 @@ module.exports = function () {
     'simple chemical': true,
     'complex': true,
     'biological activity': true,
-    'compartment': true,
-    'protein': true,
-    'small molecule': true
+    'compartment': true
   };
 
   var canHaveInfoBoxShapes = $$.sbgn.canHaveInfoBoxShapes = {
@@ -164,9 +160,7 @@ module.exports = function () {
     'nucleic acid feature': true,
     'complex': true,
     'biological activity': true,
-    'compartment': true,
-    'protein': true,
-    'small molecule': true
+    'compartment': true
   };
 
   var canBeMultimerShapes = $$.sbgn.canBeMultimerShapes = {
@@ -476,7 +470,7 @@ module.exports = function () {
 
   cyStyleProperties.types.nodeShape.enums.push(
     'source and sink', 'nucleic acid feature', 'complex', 'macromolecule',
-    'simple chemical', 'biological activity', 'compartment', 'protein', 'small molecule'
+    'simple chemical', 'biological activity', 'compartment'
   );
 
   $$.sbgn.registerSbgnNodeShapes = function () {
@@ -612,7 +606,7 @@ module.exports = function () {
 
     var shapeNames = [ "simple chemical", "macromolecule", "complex",
       "nucleic acid feature", "source and sink", "biological activity",
-      "compartment", "oldCompartment", "protein", "small molecule"
+      "compartment", "oldCompartment"
     ];
 
     shapeNames.forEach( function( shapeName ) {
@@ -703,9 +697,7 @@ module.exports = function () {
     "source and sink": $$.sbgn.drawEllipse,
     "biological activity": $$.sbgn.drawBiologicalActivity,
     "compartment": $$.sbgn.drawBarrel,
-    "oldCompartment": $$.sbgn.drawRoundRectangle,
-    "protein": $$.sbgn.drawRoundRectangle,
-    "small molecule": $$.sbgn.drawRoundRectangle
+    "oldCompartment": $$.sbgn.drawRoundRectangle
   };
 
   // To define an extra drawing for the node that is rendered at the very end,
@@ -750,19 +742,7 @@ module.exports = function () {
       return cyMath.roundRectangleIntersectLine(
         x, y, centerX, centerY, width, height, padding
       );
-    },
-    "protein": function( centerX, centerY, width, height, x, y, padding ) {
-      return $$.sbgn.roundRectangleIntersectLine( x, y, centerX, centerY, centerX, centerY,
-        width, height,
-        cyMath.getRoundRectangleRadius(width, height), padding
-      );
-    },
-    "small molecule": function( centerX, centerY, width, height, x, y, padding ) {
-      return $$.sbgn.roundRectangleIntersectLine( x, y, centerX, centerY, centerX, centerY,
-        width, height,
-        cyMath.getRoundRectangleRadius(width, height), padding
-      );
-    },
+    }
   };
 
   $$.sbgn.plainCheckPoint = {
@@ -790,12 +770,6 @@ module.exports = function () {
       return cyBaseNodeShapes["barrel"].checkPoint( x, y, padding, width, height, centerX, centerY );
     },
     "oldCompartment": function( x, y, padding, width, height, centerX, centerY ) {
-      return cyBaseNodeShapes["roundrectangle"].checkPoint( x, y, padding, width, height, centerX, centerY );
-    },
-    "protein": function( x, y, padding, width, height, centerX, centerY ) {
-      return cyBaseNodeShapes["roundrectangle"].checkPoint( x, y, padding, width, height, centerX, centerY );
-    },
-    "small molecule": function( x, y, padding, width, height, centerX, centerY ) {
       return cyBaseNodeShapes["roundrectangle"].checkPoint( x, y, padding, width, height, centerX, centerY );
     }
   };

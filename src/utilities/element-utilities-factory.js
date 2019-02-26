@@ -352,84 +352,84 @@ module.exports = function () {
 
   elementUtilities.SIF.connectivityConstraints = {
     "controls-state-change-of": {
-      "protein": {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
-      "small molecule": {asSource: {},   asTarget: {}}
+      "SIF macromolecule": {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "SIF simple chemical": {asSource: {},   asTarget: {}}
     },
     "controls-transport-of": {
-      "protein": {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
-      "small molecule": {asSource: {},   asTarget: {}}
+      "SIF macromolecule": {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "SIF simple chemical": {asSource: {},   asTarget: {}}
     },
     "controls-phosphorylation-of": {
-      "protein": {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
-      "small molecule": {asSource: {},   asTarget: {}}
+      "SIF macromolecule": {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "SIF simple chemical": {asSource: {},   asTarget: {}}
     },
     "controls-expression-of": {
-      "protein": {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
-      "small molecule": {asSource: {},   asTarget: {}}
+      "SIF macromolecule": {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "SIF simple chemical": {asSource: {},   asTarget: {}}
     },
     "catalysis-precedes": {
-      "protein": {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
-      "small molecule": {asSource: {},   asTarget: {}}
+      "SIF macromolecule": {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "SIF simple chemical": {asSource: {},   asTarget: {}}
     },
     "in-complex-with": {
-      "protein": {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
-      "small molecule": {asSource: {},   asTarget: {}}
+      "SIF macromolecule": {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "SIF simple chemical": {asSource: {},   asTarget: {}}
     },
     "interacts-with": {
-      "protein": {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
-      "small molecule": {asSource: {},   asTarget: {}}
+      "SIF macromolecule": {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "SIF simple chemical": {asSource: {},   asTarget: {}}
     },
     "neighbor-of": {
-      "protein": {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
-      "small molecule": {asSource: {},   asTarget: {}}
+      "SIF macromolecule": {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "SIF simple chemical": {asSource: {},   asTarget: {}}
     },
     "consumption-controled-by": {
-      "protein": {asSource: {},   asTarget: {isAllowed: true}},
-      "small molecule": {asSource: {isAllowed: true},   asTarget: {}}
+      "SIF macromolecule": {asSource: {},   asTarget: {isAllowed: true}},
+      "SIF simple chemical": {asSource: {isAllowed: true},   asTarget: {}}
     },
     "controls-production-of": {
-      "protein": {asSource: {isAllowed: true},   asTarget: {}},
-      "small molecule": {asSource: {},   asTarget: {isAllowed: true}}
+      "SIF macromolecule": {asSource: {isAllowed: true},   asTarget: {}},
+      "SIF simple chemical": {asSource: {},   asTarget: {isAllowed: true}}
     },
     "controls-transport-of-chemical": {
-      "protein": {asSource: {isAllowed: true},   asTarget: {}},
-      "small molecule": {asSource: {},   asTarget: {isAllowed: true}}
+      "SIF macromolecule": {asSource: {isAllowed: true},   asTarget: {}},
+      "SIF simple chemical": {asSource: {},   asTarget: {isAllowed: true}}
     },
     "chemical-affects": {
-      "protein": {asSource: {},   asTarget: {isAllowed: true}},
-      "small molecule": {asSource: {isAllowed: true},   asTarget: {}}
+      "SIF macromolecule": {asSource: {},   asTarget: {isAllowed: true}},
+      "SIF simple chemical": {asSource: {isAllowed: true},   asTarget: {}}
     },
     "reacts-with": {
-      "protein": {asSource: {},   asTarget: {}},
-      "small molecule": {asSource: {isAllowed: true},   asTarget: {isAllowed: true}}
+      "SIF macromolecule": {asSource: {},   asTarget: {}},
+      "SIF simple chemical": {asSource: {isAllowed: true},   asTarget: {isAllowed: true}}
     },
     "used-to-produce": {
-      "protein": {asSource: {},   asTarget: {}},
-      "small molecule": {asSource: {isAllowed: true},   asTarget: {isAllowed: true}}
+      "SIF macromolecule": {asSource: {},   asTarget: {}},
+      "SIF simple chemical": {asSource: {isAllowed: true},   asTarget: {isAllowed: true}}
     },
     "activates": {
-      "protein": {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
-      "small molecule": {asSource: {},   asTarget: {}}
+      "SIF macromolecule": {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "SIF simple chemical": {asSource: {},   asTarget: {}}
     },
     "inhibits": {
-      "protein": {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
-      "small molecule": {asSource: {},   asTarget: {}}
+      "SIF macromolecule": {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "SIF simple chemical": {asSource: {},   asTarget: {}}
     },
     "phosphorylates": {
-      "protein": {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
-      "small molecule": {asSource: {},   asTarget: {}}
+      "SIF macromolecule": {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "SIF simple chemical": {asSource: {},   asTarget: {}}
     },
     "dephosphorylates": {
-      "protein": {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
-      "small molecule": {asSource: {},   asTarget: {}}
+      "SIF macromolecule": {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "SIF simple chemical": {asSource: {},   asTarget: {}}
     },
     "upregulates-expression": {
-      "protein": {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
-      "small molecule": {asSource: {},   asTarget: {}}
+      "SIF macromolecule": {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "SIF simple chemical": {asSource: {},   asTarget: {}}
     },
     "downregulates-expression": {
-      "protein": {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
-      "small molecule": {asSource: {},   asTarget: {}}
+      "SIF macromolecule": {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "SIF simple chemical": {asSource: {},   asTarget: {}}
     },
   };
 
@@ -442,7 +442,7 @@ module.exports = function () {
   elementUtilities.epnTypes = ['macromolecule', 'nucleic acid feature', 'simple chemical',
     'source and sink', 'unspecified entity',
     'perturbing agent', 'complex'];
-  elementUtilities.sifTypes = ['protein', 'small molecule'];
+  elementUtilities.sifTypes = ['SIF macromolecule', 'SIF simple chemical'];
   elementUtilities.otherNodeTypes = ['compartment', 'tag', 'submap', 'topology group'];
 
   elementUtilities.nodeTypes = elementUtilities.epnTypes
@@ -599,7 +599,7 @@ module.exports = function () {
             || sbgnclass == 'complex' || sbgnclass == 'simple chemical multimer'
             || sbgnclass == 'macromolecule multimer' || sbgnclass == 'nucleic acid feature multimer'
             || sbgnclass == 'complex multimer' || (sbgnclass.startsWith('BA') && sbgnclass != "BA plain")
-            || sbgnclass == 'compartment' || sbgnclass == 'protein' || sbgnclass == 'small molecule') {
+            || sbgnclass == 'compartment' || sbgnclass == 'SIF macromolecule' || sbgnclass == 'SIF simple chemical') {
       return true;
     }
     return false;
@@ -1021,6 +1021,12 @@ module.exports = function () {
       if (_class == 'perturbing agent' || _class == 'tag') {
           return 'polygon';
       }
+      if (_class == 'SIF macromolecule') {
+          return 'macromolecule';
+      }
+      if (_class == 'SIF simple chemical') {
+          return 'simple chemical';
+      }
 
       if (_class.startsWith('BA')){
           return 'biological activity';
@@ -1032,8 +1038,7 @@ module.exports = function () {
 
       // We need to define new node shapes with their class names for these nodes
       if (_class == 'source and sink' || _class == 'nucleic acid feature' || _class == 'macromolecule'
-              || _class == 'simple chemical' || _class == 'complex' || _class == 'biological activity'
-              || _class == 'small molecule' || _class == 'protein' ) {
+              || _class == 'simple chemical' || _class == 'complex' || _class == 'biological activity' ) {
           return _class;
       }
 
@@ -1105,7 +1110,8 @@ module.exports = function () {
           || _class == 'unspecified entity' || _class == 'nucleic acid feature'
           || _class == 'perturbing agent' || _class == 'tag'
           || _class == 'biological activity' || _class.startsWith('BA')
-          || _class == 'submap' || _class == 'protein' || _class == 'small molecule') {
+          || _class == 'submap' || _class == 'SIF macromolecule'
+          || _class == 'SIF simple chemical') {
           content = ele.data('label') ? ele.data('label') : "";
       }
       else if(_class == 'compartment'){
@@ -2286,11 +2292,11 @@ module.exports = function () {
       width: 35,
       height: 35
     },
-    'protein': {
+    'SIF macromolecule': {
       width: 60,
       height: 30
     },
-    'small molecule': {
+    'SIF simple chemical': {
       width: 48,
       height: 24
     },
@@ -2350,7 +2356,7 @@ module.exports = function () {
   var getDefaultInfoboxFontSize = function( nodeClass, infoboxType ) {
     var fontsize = 9;
 
-    if ( nodeClass === 'protein' || nodeClass === 'small molecule' ) {
+    if ( nodeClass === 'SIF macromolecule' || nodeClass === 'SIF simple chemical' ) {
       fontsize = 11;
     }
 
@@ -2360,7 +2366,7 @@ module.exports = function () {
   var getDefaultInfoboxSize = function( nodeClass, infoboxType ) {
     var w = 12, h = 12;
 
-    if ( nodeClass === 'protein' || nodeClass === 'small molecule' ) {
+    if ( nodeClass === 'SIF macromolecule' || nodeClass === 'SIF simple chemical' ) {
       w = 15;
       h = 15;
     }
@@ -2375,7 +2381,7 @@ module.exports = function () {
 
     if ( elementUtilities.isSIFNode( nodeClass ) ) {
       if ( infoboxType === 'unit of information' ) {
-        if ( nodeClass == 'protein' ) {
+        if ( nodeClass == 'SIF macromolecule' ) {
           return 'stadium';
         }
         return 'rectangle';
