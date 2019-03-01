@@ -2297,8 +2297,8 @@ module.exports = function () {
       height: 30
     },
     'SIF simple chemical': {
-      width: 48,
-      height: 24
+      width: 30,
+      height: 30
     },
     'topology group': {
       width: 44,
