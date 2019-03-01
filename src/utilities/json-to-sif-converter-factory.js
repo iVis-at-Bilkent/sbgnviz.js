@@ -37,6 +37,11 @@ module.exports = function() {
     edges.forEach( function( edge ) {
       var srcName = getLabel( edge.source() );
       var tgtName = getLabel( edge.target() );
+
+      if ( !srcName || !tgtName ) {
+        return;
+      }
+
       var type = edge.data('class');
       var pcIDSet = edge.data('pcIDSet');
       var siteLocSet = edge.data('siteLocSet');
@@ -49,7 +54,10 @@ module.exports = function() {
 
     nodes.forEach( function( node ) {
       var label = getLabel( node );
-      lines.push( label );
+
+      if ( label ) {
+        lines.push( label );
+      }
     } );
 
     var text = lines.join( '\n' );
