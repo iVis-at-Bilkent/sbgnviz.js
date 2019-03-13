@@ -303,5 +303,8 @@ module.exports = function () {
      return sbgnmlToJson.convert(textToXmlObject(sbgnmlText));
  };
 
+ fileUtilities.convertSifTextToJson = function(sifText){
+        return sifToJson.convert(sifText);
+ };
  return fileUtilities;
 };
