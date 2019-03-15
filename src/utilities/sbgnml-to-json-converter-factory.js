@@ -701,7 +701,7 @@ module.exports = function () {
 
     var nodePropMap = {
       'background-color': 'fill',
-      'background-opacity': 'fill',
+      'background-opacity': 'backgroundOpacity',
       'border-color': 'stroke',
       'border-width': 'strokeWidth',
       'font-size': 'fontSize',
