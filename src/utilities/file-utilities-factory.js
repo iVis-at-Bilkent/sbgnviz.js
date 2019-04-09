@@ -307,9 +307,18 @@ module.exports = function () {
         return sifToJson.convert(sifText);
  };
  
-  fileUtilities.createJson = function(){
-     var sbgnmlText = jsonToSbgnml.createSbgnml();
-     return sbgnmlToJson.convert(textToXmlObject(sbgnmlText));
- };
+  fileUtilities.createJsonFromSBGN = function(){
+
+
+    var sbgnmlText = jsonToSbgnml.createSbgnml();
+    return sbgnmlToJson.convert(textToXmlObject(sbgnmlText));
+};
+
+fileUtilities.createJsonFromSif = function(){
+
+    var sifText = jsonToSif.convert();
+    return sifToJson.convert(sifText);
+    
+};
  return fileUtilities;
 };
