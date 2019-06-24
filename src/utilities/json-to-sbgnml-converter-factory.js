@@ -415,7 +415,7 @@ module.exports = function () {
     arc.setEnd(new libsbgnjs.EndType({x: edge._private.rscratch.endX, y: edge._private.rscratch.endY}));
 
     var cardinality = edge._private.data.cardinality;
-    if(typeof cardinality != 'undefined' && cardinality != null) {
+    if(typeof cardinality != 'undefined' && cardinality != null && cardinality != 0) {
        arc.addGlyph(new libsbgnjs.Glyph({
            id: arc.id+'_card',
            class_: 'cardinality',
