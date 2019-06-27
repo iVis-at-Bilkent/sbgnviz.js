@@ -400,9 +400,9 @@ module.exports = function () {
     arc.setStart(new libsbgnjs.StartType({x: edge._private.rscratch.startX, y: edge._private.rscratch.startY}));
 
     // Export bend points if edgeBendEditingExtension is registered
-    if (cy.edgeBendEditing && cy.edgeBendEditing('initialized')) {
-     var segpts = cy.edgeBendEditing('get').getSegmentPoints(edge);
-     if(segpts){
+    if (cy.edgeEditing && cy.edgeEditing('initialized')) {
+     var segpts = cy.edgeEditing('get').getSegmentPoints(edge);
+     if(segpts.length != 0){
        for(var i = 0; segpts && i < segpts.length; i = i + 2){
          var bendX = segpts[i];
          var bendY = segpts[i + 1];
@@ -418,7 +418,7 @@ module.exports = function () {
     if(typeof cardinality != 'undefined' && cardinality != null && cardinality != 0) {
        arc.addGlyph(new libsbgnjs.Glyph({
            id: arc.id+'_card',
-           class_: 'cardinality',
+           class_: 'stoichiometry',
            label: new libsbgnjs.Label({text: cardinality}),
            bbox: new libsbgnjs.Bbox({x: 0, y: 0, w: 0, h: 0}) // dummy bbox, needed for format compliance
        }));

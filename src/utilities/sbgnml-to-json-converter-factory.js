@@ -581,7 +581,7 @@ module.exports = function () {
     edgeObj.cardinality = 0;
     if (ele.glyphs.length > 0) {
       for (var i = 0; i < ele.glyphs.length; i++) {
-        if (ele.glyphs[i].class_ === 'cardinality') {
+        if (ele.glyphs[i].class_ === 'cardinality' || ele.glyphs[i].class_ === 'stoichiometry') {
           var label = ele.glyphs[i].label;
           edgeObj.cardinality = label.text || undefined;
         }
