@@ -6,6 +6,7 @@ var libUtilities = require('./lib-utilities');
 var libs = libUtilities.getLibs();
 var jQuery = $ = libs.jQuery;
 var saveAs = libs.saveAs;
+var textUtilities = require('./text-utilities');
 
 module.exports = function () {
  // Helper functions Start
@@ -204,6 +205,21 @@ fileUtilities.loadTDFile = function(file, callback1){
 
    reader.onload = function (e) {
      var text = this.result;
+
+    var renderInfoString = text.match("<renderInformation[^]*</renderInformation>")[0];
+    if(renderInfoString != null){
+    var renderInfoStringCopy = (' ' + renderInfoString).slice(1);
+      const regex = /\s([\S]+)([\s]*)=/g;
+      var result;
+      var matches = []; 
+      while(result = regex.exec(renderInfoString)) {
+        matches.push(result[0]);
+      };
+      matches.forEach(function(match){
+        renderInfoString = renderInfoString.replace(match , textUtilities.FromKebabToCamelCase(match));
+      });      
+      text = text.replace(renderInfoStringCopy, renderInfoString);
+    }
 
      setTimeout(function () {
        

@@ -143,14 +143,33 @@ module.exports = function () {
     });
 
     sbgn.addMap(map);
+    
+   var sbgnXml = sbgn.toXML();
+   
+   // change naming convention from Camel Case (variableName) to Kebab case (variable-name)
+   var renderInfoString = sbgnXml.match("<renderInformation[^]*</renderInformation>")[0];  
+   if(renderInfoString != null){
+    var renderInfoStringCopy = (' ' + renderInfoString).slice(1);
+    const regex = /\s([\S]+)([\s]*)=/g;
+    var result;
+    var matches = []; 
+    while(result = regex.exec(renderInfoString)) {
+      matches.push(result[0]);
+    };
+    matches.forEach(function(match){
+      renderInfoString = renderInfoString.replace(match , textUtilities.FromCamelToKebabCase(match));
+    });
 
-    /*
+    
+    sbgnXml = sbgnXml.replace(renderInfoStringCopy, renderInfoString);
+    }
+   /*
       prettyprint puts a line break inside the root <sbgn> tag before the xmlns attribute.
       This is perfecly valid, but Vanted doesn't like it and cannot load those files as is.
       This line break is removed here to make Newt output directly compatible with Vanted. This issue will be reported
       to the Vanted guys and hopefully fixed at some point. After that the following workaround can be removed.
     */
-    xmlbody = prettyprint.xml(sbgn.toXML()).replace("<sbgn \n  xmlns=\"http://sbgn.org/libsbgn", "<sbgn xmlns=\"http://sbgn.org/libsbgn");
+    xmlbody = prettyprint.xml(sbgnXml).replace("<sbgn \n  xmlns=\"http://sbgn.org/libsbgn", "<sbgn xmlns=\"http://sbgn.org/libsbgn");
 
     // return prettyprint.xml(xmlHeader + sbgn.toXML());
     return xmlHeader + xmlbody;
@@ -200,7 +219,7 @@ module.exports = function () {
               backgroundPosY: style.properties.backgroundPosY,
               backgroundWidth: style.properties.backgroundWidth,
               backgroundHeight: style.properties.backgroundHeight,
-              backgroundImageOpacity: style.properties.backgroundImageOpacity,
+              backgroundImageOpacity: style.properties.backgroundImageOpacity              
           });
           xmlStyle.setRenderGroup(g);
           listOfStyles.addStyle(xmlStyle);
