@@ -147,8 +147,9 @@ module.exports = function () {
    var sbgnXml = sbgn.toXML();
    
    // change naming convention from Camel Case (variableName) to Kebab case (variable-name)
-   var renderInfoString = sbgnXml.match("<renderInformation[^]*</renderInformation>")[0];  
-   if(renderInfoString != null){
+   var matchResult = text.match("<renderInformation[^]*</renderInformation>");
+   if(matchResult != null){
+   var renderInfoString = matchResult[0];
     var renderInfoStringCopy = (' ' + renderInfoString).slice(1);
     const regex = /\s([\S]+)([\s]*)=/g;
     var result;

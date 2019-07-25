@@ -205,9 +205,9 @@ fileUtilities.loadTDFile = function(file, callback1){
 
    reader.onload = function (e) {
      var text = this.result;
-
-    var renderInfoString = text.match("<renderInformation[^]*</renderInformation>")[0];
-    if(renderInfoString != null){
+    var matchResult = text.match("<renderInformation[^]*</renderInformation>");
+    if(matchResult != null){
+    var renderInfoString = matchResult[0];
     var renderInfoStringCopy = (' ' + renderInfoString).slice(1);
       const regex = /\s([\S]+)([\s]*)=/g;
       var result;
