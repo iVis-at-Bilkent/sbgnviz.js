@@ -105,6 +105,18 @@ var textUtilities = {
     }
 
     return width;
+  },
+
+  FromKebabToCamelCase : function(input){
+    return input.replace(/(-\w)/g, function(m){
+      return m[1].toUpperCase();
+    });
+  },
+
+  FromCamelToKebabCase : function(input){
+    return input.replace(/[\w]([A-Z])/g, function(m) {
+      return m[0] + "-" + m[1];
+    }).toLowerCase();
   }
 
 };

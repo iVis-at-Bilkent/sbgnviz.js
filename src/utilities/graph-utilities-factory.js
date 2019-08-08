@@ -110,8 +110,8 @@ module.exports = function () {
     // Update the style
     cy.style().update();
     // Initilize the bend points once the elements are created
-    if (cy.edgeBendEditing && cy.edgeBendEditing('initialized')) {
-      cy.edgeBendEditing('get').initBendPoints(cy.edges());
+    if (cy.edgeEditing && cy.edgeEditing('initialized')) {
+      cy.edgeEditing('get').initBendPoints(cy.edges());
     }
 
 

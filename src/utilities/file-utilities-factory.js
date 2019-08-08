@@ -6,6 +6,7 @@ var libUtilities = require('./lib-utilities');
 var libs = libUtilities.getLibs();
 var jQuery = $ = libs.jQuery;
 var saveAs = libs.saveAs;
+var textUtilities = require('./text-utilities');
 
 module.exports = function () {
  // Helper functions Start
@@ -217,6 +218,21 @@ module.exports = function () {
 
    reader.onload = function (e) {
      var text = this.result;
+    var matchResult = text.match("<renderInformation[^]*</renderInformation>");
+    if(matchResult != null){
+    var renderInfoString = matchResult[0];
+    var renderInfoStringCopy = (' ' + renderInfoString).slice(1);
+      const regex = /\s([\S]+)([\s]*)=/g;
+      var result;
+      var matches = []; 
+      while(result = regex.exec(renderInfoString)) {
+        matches.push(result[0]);
+      };
+      matches.forEach(function(match){
+        renderInfoString = renderInfoString.replace(match , textUtilities.FromKebabToCamelCase(match));
+      });      
+      text = text.replace(renderInfoStringCopy, renderInfoString);
+    }
 
      setTimeout(function () {
 

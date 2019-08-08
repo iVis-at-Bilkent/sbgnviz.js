@@ -611,7 +611,7 @@ module.exports = function () {
     edgeObj.cardinality = 0;
     if (ele.glyphs.length > 0) {
       for (var i = 0; i < ele.glyphs.length; i++) {
-        if (ele.glyphs[i].class_ === 'cardinality') {
+        if (ele.glyphs[i].class_ === 'cardinality' || ele.glyphs[i].class_ === 'stoichiometry') {
           var label = ele.glyphs[i].label;
           edgeObj.cardinality = label.text || undefined;
         }
@@ -913,6 +913,17 @@ module.exports = function () {
     this.insertedNodes = {};
 
     return cytoscapeJsGraph;
+  };
+  
+    sbgnmlToJson.doValidation = function(xmlString) {
+   	var errors = [];
+	    try {
+      		 errors = libsbgnjs.Sbgn.doValidation(xmlString);
+   	   }
+    	  catch (err) {
+      		throw new Error("Could not do validation. "+ err);
+    	  }
+	  return errors;
   };
 
   return sbgnmlToJson;

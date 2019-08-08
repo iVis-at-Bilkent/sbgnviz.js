@@ -141,17 +141,6 @@ module.exports = function () {
     sbgn.addMap(map);
 
     return sbgn.buildJsObj();
-
-    /*
-      prettyprint puts a line break inside the root <sbgn> tag before the xmlns attribute.
-      This is perfecly valid, but Vanted doesn't like it and cannot load those files as is.
-      This line break is removed here to make Newt output directly compatible with Vanted. This issue will be reported
-      to the Vanted guys and hopefully fixed at some point. After that the following workaround can be removed.
-    */
-    // xmlbody = prettyprint.xml(sbgn.toXML()).replace("<sbgn \n  xmlns=\"http://sbgn.org/libsbgn", "<sbgn xmlns=\"http://sbgn.org/libsbgn");
-    //
-    // // return prettyprint.xml(xmlHeader + sbgn.toXML());
-    // return xmlHeader + xmlbody;
   };
 
   jsonToSbgnml.createSbgnml = function(filename, version, renderInfo, mapProperties, nodes, edges) {
@@ -166,6 +155,24 @@ module.exports = function () {
   		renderOpts: {pretty: false}
   	}).buildObject(obj);
 
+    // change naming convention from Camel Case (variableName) to Kebab case (variable-name)
+    var matchResult = xmlString.match("<renderInformation[^]*</renderInformation>");
+    if(matchResult != null){
+      var renderInfoString = matchResult[0];
+      var renderInfoStringCopy = (' ' + renderInfoString).slice(1);
+      const regex = /\s([\S]+)([\s]*)=/g;
+      var result;
+      var matches = [];
+      while(result = regex.exec(renderInfoString)) {
+        matches.push(result[0]);
+      };
+      matches.forEach(function(match){
+        renderInfoString = renderInfoString.replace(match , textUtilities.FromCamelToKebabCase(match));
+      });
+
+      xmlString = xmlString.replace(renderInfoStringCopy, renderInfoString);
+    }
+
   	/* 	dirty hack needed to solve the newline char encoding problem
   		xml2js doesn't encode \n as &#xA; we need to do it manually
   	*/
@@ -175,6 +182,12 @@ module.exports = function () {
   	});
 
     var xmlHeader = "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>\n";
+    /*
+      prettyprint puts a line break inside the root <sbgn> tag before the xmlns attribute.
+      This is perfecly valid, but Vanted doesn't like it and cannot load those files as is.
+      This line break is removed here to make Newt output directly compatible with Vanted. This issue will be reported
+      to the Vanted guys and hopefully fixed at some point. After that the following workaround can be removed.
+    */
     var xmlbody = prettyprint.xml(xmlString_correctLabel).replace("<sbgn \n  xmlns=\"http://sbgn.org/libsbgn", "<sbgn xmlns=\"http://sbgn.org/libsbgn");
 
     return xmlHeader + xmlbody;
@@ -424,27 +437,30 @@ module.exports = function () {
     arc.setStart(new libsbgnjs.StartType({x: edge._private.rscratch.startX, y: edge._private.rscratch.startY}));
 
     // Export bend points if edgeBendEditingExtension is registered
-    if (cy.edgeBendEditing && cy.edgeBendEditing('initialized')) {
-     var segpts = cy.edgeBendEditing('get').getSegmentPoints(edge);
-     if(segpts){
-       for(var i = 0; segpts && i < segpts.length; i = i + 2){
-         var bendX = segpts[i];
-         var bendY = segpts[i + 1];
-
-         arc.addNext(new libsbgnjs.NextType({x: bendX, y: bendY}));
+    if (cy.edgeEditing && cy.edgeEditing('initialized')) {
+     var segpts = cy.edgeEditing('get').getSegmentPoints(edge);
+     if(typeof segpts !== 'undefined'){
+       if(segpts.length > 0){
+        for(var i = 0; segpts && i < segpts.length; i = i + 2){
+          var bendX = segpts[i];
+          var bendY = segpts[i + 1];
+          arc.addNext(new libsbgnjs.NextType({x: bendX, y: bendY}));
+        }
        }
-     }
+
+      }
     }
 
     arc.setEnd(new libsbgnjs.EndType({x: edge._private.rscratch.endX, y: edge._private.rscratch.endY}));
 
     var cardinality = edge._private.data.cardinality;
-    if(typeof cardinality != 'undefined' && cardinality != null) {
+    if(typeof cardinality != 'undefined' && cardinality != null && cardinality != 0) {
+      var edgebBox = edge.boundingBox({ includeLabels: true, includeNodes: false, includeEdges: false, includeOverlays: false });
        arc.addGlyph(new libsbgnjs.Glyph({
            id: arc.id+'_card',
-           class_: 'cardinality',
+           class_: 'stoichiometry',
            label: new libsbgnjs.Label({text: cardinality}),
-           bbox: new libsbgnjs.Bbox({x: 0, y: 0, w: 0, h: 0}) // dummy bbox, needed for format compliance
+           bbox: new libsbgnjs.Bbox({x: edgebBox.x1, y: edgebBox.y1, w: edgebBox.w, h: edgebBox.h}) // dummy bbox, needed for format compliance
        }));
     }
     // check for annotations
