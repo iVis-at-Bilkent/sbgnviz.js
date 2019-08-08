@@ -20,5 +20,6 @@ module.exports = {
   defaultInfoboxHeight: true,
   defaultInfoboxWidth: true,
   mapName: true,
-  mapDescription: true
+  mapDescription: true,
+  enableSIFTopologyGrouping: false
 };

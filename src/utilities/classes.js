@@ -5,6 +5,9 @@ var cytoscape = libs.cytoscape;
 // var optionUtilities = require('./option-utilities');
 // var options = optionUtilities.getOptions();
 var truncate = require('./text-utilities').truncate;
+// only functions not depending on the instances can be used in this way
+// e.g. elementUtilities.generateStateVarId()
+var elementUtilities = require('./element-utilities-factory')();
 
 var ns = {};
 
@@ -48,7 +51,7 @@ AuxiliaryUnit.construct = function(parent) {
   obj.coordType = "relativeToSide";
   obj.anchorSide = null;
   obj.isDisplayed = false;
-  obj.dashed = false;
+  obj.style = null;
 
   return obj;
 };
@@ -70,7 +73,43 @@ AuxiliaryUnit.setParentRef = function(mainObj, newParent) {
   }
 }
 
-AuxiliaryUnit.defaultBackgroundColor = "#ffffff";
+AuxiliaryUnit.checkPoint = function(x, y, node, threshold) {
+  var centerX = node._private.position.x;
+  var centerY = node._private.position.y;
+  var padding = parseInt(node.css('border-width')) / 2;
+  var stateAndInfos = node._private.data.statesandinfos;
+  var cyBaseNodeShapes = cytoscape.baseNodeShapes;
+//    threshold = parseFloat(threshold);
+
+  for (var i = 0; i < stateAndInfos.length; i++) {
+    var state = stateAndInfos[i];
+
+    if (!state.isDisplayed) {
+      continue;
+    }
+
+    var stateWidth = parseFloat(state.bbox.w) + threshold;
+    var stateHeight = parseFloat(state.bbox.h) + threshold;
+    var coord = AuxiliaryUnit.getAbsoluteCoord(state, node.cy());
+    var stateCenterX = coord.x;
+    var stateCenterY = coord.y;
+    var checkPoint;
+
+    if (state.clazz == "state variable") {
+      checkPoint = cyBaseNodeShapes["ellipse"].checkPoint(
+              x, y, padding, stateWidth, stateHeight, stateCenterX, stateCenterY);
+    } else if (state.clazz == "unit of information") {
+      checkPoint = cyBaseNodeShapes["roundrectangle"].checkPoint(
+              x, y, padding, stateWidth, stateHeight, stateCenterX, stateCenterY);
+    }
+
+    if (checkPoint == true) {
+      return state;
+    }
+  }
+
+  return null;
+};
 
 /*
  * Return a new AuxiliaryUnit object. A new parent reference and new id can
@@ -87,7 +126,7 @@ AuxiliaryUnit.copy = function (mainObj, cy, existingInstance, newParent, newId) 
   newUnit.coordType = mainObj.coordType;
   newUnit.anchorSide = mainObj.anchorSide;
   newUnit.isDisplayed = mainObj.isDisplayed;
-  newUnit.dashed = mainObj.dashed;
+  newUnit.style = mainObj.style;
   return newUnit;
 };
 
@@ -111,7 +150,23 @@ AuxiliaryUnit.hasText = function(mainObj, cy) {
   throw new Error("Abstract method!");
 };
 AuxiliaryUnit.drawShape = function(mainObj, cy, context, x, y) {
-  throw new Error("Abstract method!");
+  var style = mainObj.style;
+  cytoscape.sbgn.drawInfoBox(context, x, y, mainObj.bbox.w, mainObj.bbox.h,
+                              style['shape-name']);
+
+  var tmp_ctxt = context.fillStyle;
+  context.fillStyle = style['background-color'];
+  context.fill();
+  context.fillStyle = tmp_ctxt;
+
+  var parent = getAuxUnitClass(mainObj).getParent(mainObj, cy);
+  var borderStyle = style.dashed ? 'dashed' : undefined;
+  var borderWidth = style['border-width'];
+  // Selected nodes have a specific border color so infobox should have the same
+  // border color when the node is selected. May need to be updated if style of
+  // selected nodes is updated in a different way.
+  var borderColor = parent.selected() ? null : style['border-color'];
+  cytoscape.sbgn.drawBorder( { context, node: parent, borderStyle, borderColor, borderWidth } );
 };
 
 // draw the statesOrInfo's label at given position
@@ -120,7 +175,7 @@ AuxiliaryUnit.drawText = function(mainObj, cy, context, centerX, centerY) {
   var options = cy.scratch('_sbgnviz').sbgnvizParams.optionUtilities.getOptions();
   var unitClass = getAuxUnitClass(mainObj);
   var parent = unitClass.getParent(mainObj, cy);
-  var fontSize = 9; // parseInt(textProp.height / 1.5);
+  var style = mainObj.style;
 
   // part of : $$.sbgn.drawText(context, textProp);
   // save style before modification
@@ -128,10 +183,11 @@ AuxiliaryUnit.drawText = function(mainObj, cy, context, centerX, centerY) {
   var oldStyle = context.fillStyle;
   var oldOpacity = context.globalAlpha;
 
-  context.font = fontSize + "px Arial";
+  context.font = style['font-style'] + " " + style['font-weight'] + " "
+                  + style['font-size'] + "px " + style['font-family'];
+  context.fillStyle = style['font-color'];
   context.textAlign = "center";
   context.textBaseline = "middle";
-  context.fillStyle = "#0f0f0f";
   context.globalAlpha = parent.css('text-opacity') * parent.css('opacity'); // ?
 
   var text;
@@ -353,8 +409,9 @@ for (var prop in AuxiliaryUnit) {
 }
 
 // Construct a state variable object by extending default behaviours of a AuxiliaryUnit object and returns that object
-StateVariable.construct = function(value, stateVariableDefinition, parent) {
+StateVariable.construct = function(value, stateVariableDefinition, parent, id) {
   var obj = AuxiliaryUnit.construct(parent);
+  obj.id = id || elementUtilities.generateStateVarId();
   obj.state = {};
   obj.state.value = value;
   obj.state.variable = null;
@@ -363,8 +420,6 @@ StateVariable.construct = function(value, stateVariableDefinition, parent) {
 
   return obj;
 };
-
-StateVariable.shapeRadius = 15;
 
 StateVariable.getText = function(mainObj) {
   var stateValue = mainObj.state.value || '';
@@ -377,22 +432,7 @@ StateVariable.hasText = function(mainObj) {
   return (mainObj.state.value && mainObj.state.value != "") || (mainObj.state.variable && mainObj.state.variable != "");
 };
 
-StateVariable.drawShape = function(mainObj, cy, context, x, y) {
-  cytoscape.sbgn.drawRoundRectanglePath(context,
-              x, y,
-              mainObj.bbox.w, mainObj.bbox.h,
-              Math.min(mainObj.bbox.w / 2, mainObj.bbox.h / 2, StateVariable.shapeRadius));
-  var tmp_ctxt = context.fillStyle;
-  context.fillStyle = StateVariable.defaultBackgroundColor;
-  context.fill();
-  context.fillStyle = tmp_ctxt;
-
-  var parent = getAuxUnitClass(mainObj).getParent(mainObj, cy);
-  var borderStyle = mainObj.dashed ? 'dashed' : undefined;
-  cytoscape.sbgn.drawBorder( { context, node: parent, borderStyle } );
-};
-
-StateVariable.create = function(parentNode, cy, value, variable, bbox, location, position, index) {
+StateVariable.create = function(parentNode, cy, value, variable, bbox, location, position, style, index, id) {
   // create the new state var of info
   var stateVar = StateVariable.construct();
   StateVariable.setParentRef(stateVar, parentNode);
@@ -401,6 +441,11 @@ StateVariable.create = function(parentNode, cy, value, variable, bbox, location,
   stateVar.variable = variable;
   stateVar.state = {value: value, variable: variable};
   stateVar.bbox = bbox;
+  stateVar.style = style;
+
+  if ( id ) {
+    stateVar.id = id;
+  }
 
   // link to layout
   position = StateVariable.addToParent(stateVar, cy, parentNode, location, position, index);
@@ -457,15 +502,14 @@ for (var prop in AuxiliaryUnit) {
 }
 
 // Constructs a UnitOfInformation object by extending properties of an AuxiliaryUnit object and return that object
-UnitOfInformation.construct = function(value, parent) {
+UnitOfInformation.construct = function(value, parent, id) {
   var obj = AuxiliaryUnit.construct(parent);
+  obj.id = id || elementUtilities.generateUnitOfInfoId();
   obj.label = {text: value}; // from legacy code, contains {text: }
   obj.clazz = "unit of information";
 
   return obj;
 };
-
-UnitOfInformation.shapeRadius = 4;
 
 UnitOfInformation.getText = function(mainObj) {
   return mainObj.label.text;
@@ -473,19 +517,6 @@ UnitOfInformation.getText = function(mainObj) {
 
 UnitOfInformation.hasText = function(mainObj) {
   return mainObj.label.text && mainObj.label.text != "";
-};
-
-UnitOfInformation.drawShape = function(mainObj, cy, context, x, y) {
-  cytoscape.sbgn.UnitOfInformationShapeFn(context, x, y, mainObj.bbox.w, mainObj.bbox.h,
-                  getAuxUnitClass(mainObj).getParent(mainObj, cy).data("class"));
-  var tmp_ctxt = context.fillStyle;
-  context.fillStyle = UnitOfInformation.defaultBackgroundColor;
-  context.fill();
-  context.fillStyle = tmp_ctxt;
-
-  var parent = getAuxUnitClass(mainObj).getParent(mainObj, cy);
-  var borderStyle = mainObj.dashed ? 'dashed' : undefined;
-  cytoscape.sbgn.drawBorder( { context, node: parent, borderStyle } );
 };
 
 /**
@@ -496,10 +527,14 @@ UnitOfInformation.drawShape = function(mainObj, cy, context, x, y) {
  * @param [position] - its position in the order of elements placed on the same location
  * @param [index] - its index in the statesandinfos list
  */
-UnitOfInformation.create = function (parentNode, cy, value, bbox, location, position, index) {
+UnitOfInformation.create = function (parentNode, cy, value, bbox, location, position, style, index, id) {
   // create the new unit of info
   var unit = UnitOfInformation.construct(value, parentNode);
   unit.bbox = bbox;
+  unit.style = style;
+  if ( id ) {
+    unit.id = id;
+  }
 
   //console.log("will insert on", location, position);
   position = UnitOfInformation.addToParent(unit, cy, parentNode, location, position, index);

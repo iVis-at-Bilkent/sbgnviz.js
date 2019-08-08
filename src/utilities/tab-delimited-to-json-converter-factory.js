@@ -176,6 +176,16 @@ module.exports = function() {
 					newNode.data.parent = parentID;
 				}
 
+				if ( newNode.data.class ) {
+					elementUtilities.extendNodeDataWithClassDefaults( newNode.data, newNode.data.class );
+
+					if ( !newNode.data.bbox.w || !newNode.data.bbox.h ) {
+						var defaults = elementUtilities.getDefaultProperties( newNode.data.class );
+						newNode.data.bbox.w = newNode.data.bbox.w || defaults.width;
+						newNode.data.bbox.h = newNode.data.bbox.h || defaults.height;
+					}
+				}
+
 				nodes.push(newNode);
 
 			}
@@ -208,6 +218,9 @@ module.exports = function() {
 					console.log( "Edge Type mismatched...");
 					return false;
 				}
+
+				elementUtilities.extendEdgeDataWithClassDefaults( newEdge.data, newEdge.data.class );
+
 				edges.push( newEdge);
 			}
 			var jsGraph = {};

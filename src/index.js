@@ -21,9 +21,16 @@
 
     // Other utilities
     var jsonToSbgnmlConverter = require('./utilities/json-to-sbgnml-converter-factory')();
+    var jsonToNwtConverter = require('./utilities/json-to-nwt-converter-factory')();
     var sbgnmlToJsonConverter = require('./utilities/sbgnml-to-json-converter-factory')();
+    var nwtToJsonConverter = require('./utilities/nwt-to-json-converter-factory')();
     var tdToJsonConverter = require('./utilities/tab-delimited-to-json-converter-factory')();
+    var sifToJsonConverter = require('./utilities/sif-to-json-converter-factory')();
+    var jsonToSifConverter = require('./utilities/json-to-sif-converter-factory')();
     var classes = require('./utilities/classes');
+    var tdParser = require('./utilities/tab-delimeted-parser');
+    var layoutLoader = require('./utilities/layout-loader-factory')();
+    var layoutToText = require('./utilities/layout-to-text-factory')();
 
     // Fill param object to use it utilities internally
     param.optionUtilities = optionUtilities;
@@ -36,9 +43,15 @@
     param.elementUtilities = elementUtilities;
     param.undoRedoActionFunctions = undoRedoActionFunctions;
     param.jsonToSbgnmlConverter = jsonToSbgnmlConverter;
+    param.jsonToNwtConverter = jsonToNwtConverter;
     param.sbgnmlToJsonConverter = sbgnmlToJsonConverter;
+    param.nwtToJsonConverter = nwtToJsonConverter;
     param.tdToJsonConverter = tdToJsonConverter;
+    param.sifToJsonConverter = sifToJsonConverter;
     param.classes = classes;
+    param.layoutLoader = layoutLoader;
+    param.layoutToText = layoutToText;
+    param.jsonToSifConverter = jsonToSifConverter;
 
     // call constructors of objects with param
     sbgnCyInstance(param);
@@ -51,8 +64,14 @@
     elementUtilities(param);
     undoRedoActionFunctions(param);
     jsonToSbgnmlConverter(param);
+    jsonToNwtConverter(param);
     sbgnmlToJsonConverter(param);
+    nwtToJsonConverter(param);
     tdToJsonConverter(param);
+    sifToJsonConverter(param);
+    layoutLoader(param);
+    layoutToText(param);
+    jsonToSifConverter(param);
 
     // set scratch pad for sbgnviz and init sbgnvizParams inside it
     sbgnCyInstance.getCy().scratch('_sbgnviz', {});
@@ -88,8 +107,9 @@
     // Expose get cy function to enable accessing related cy instance
     api.getCy = sbgnCyInstance.getCy;
 
-    // Expose classes
+    // Expose some utilities directly here
     api.classes = classes;
+    api.tdParser = tdParser;
 
     return api;
   };
@@ -102,6 +122,7 @@
     libs.jQuery = _libs.jQuery || jQuery;
     libs.cytoscape = _libs.cytoscape || cytoscape;
     libs.saveAs = _libs.filesaverjs ? _libs.filesaverjs.saveAs : saveAs;
+    libs.tippy = _libs.tippy || Tippy;
 
     // Set the libraries to access them from any file
     var libUtilities = require('./utilities/lib-utilities');

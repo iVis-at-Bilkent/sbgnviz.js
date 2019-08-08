@@ -142,7 +142,7 @@ module.exports = function () {
     'macromolecule': true,
     'simple chemical': true,
     'biological activity': true,
-    'compartment': true,
+    'compartment': true
   };
 
   var totallyOverridenNodeShapes = $$.sbgn.totallyOverridenNodeShapes = {
@@ -151,7 +151,7 @@ module.exports = function () {
     'simple chemical': true,
     'complex': true,
     'biological activity': true,
-    'compartment': true,
+    'compartment': true
   };
 
   var canHaveInfoBoxShapes = $$.sbgn.canHaveInfoBoxShapes = {
@@ -194,29 +194,30 @@ module.exports = function () {
     context.closePath();
   };
 
-  $$.sbgn.UnitOfInformationShapeFn = function (context, x, y, width, height, type) {
-
-    if ( type == "BA macromolecule"){
-	    cyBaseNodeShapes['roundrectangle'].draw(context, x, y, width, height);
-    }
-    else if ( type == "BA simple chemical"){
-	    drawRoundRectanglePath(context, x, y, width, height,Math.min(width / 2, height / 2, 15));
-    }
-    else if ( type == "BA nucleic acid feature"){
-	    $$.sbgn.drawBottomRoundRectangle(context, x, y, width, height);
-    }
-    else if ( type == "BA unspecified entity"){
-	    cyBaseNodeShapes['ellipse'].draw(context, x, y, width, height);
-    }
-    else if ( type == "BA complex"){
-      $$.sbgn.drawComplex( context, x, y, width, height, height / 2 );
-    }
-    else if ( type == "BA perturbing agent"){
-	    var points = $$.sbgn.generatePerturbingAgentPoints();
-	    drawPolygonPath(context, x, y, width, height, points);
-    }
-    else{
-	    cyBaseNodeShapes['rectangle'].draw(context, x, y, width, height);
+  $$.sbgn.drawInfoBox = function(context, x, y, width, height, shapeName) {
+    switch (shapeName) {
+      case 'roundrectangle':
+        cyBaseNodeShapes['roundrectangle'].draw(context, x, y, width, height);
+        break;
+      case 'bottomroundrectangle':
+        $$.sbgn.drawBottomRoundRectangle(context, x, y, width, height);
+        break;
+      case 'ellipse':
+        cyBaseNodeShapes['ellipse'].draw(context, x, y, width, height);
+        break;
+      case 'complex':
+        $$.sbgn.drawComplex( context, x, y, width, height, height / 2 );
+        break;
+      case 'perturbing agent':
+        var points = $$.sbgn.generatePerturbingAgentPoints();
+        drawPolygonPath(context, x, y, width, height, points);
+        break;
+      case 'rectangle':
+        cyBaseNodeShapes['rectangle'].draw(context, x, y, width, height);
+        break;
+      case 'stadium':
+        $$.sbgn.drawRoundRectanglePath(context, x, y, width, height, Math.min(width / 2, height / 2, 15));
+        break;
     }
   };
 
@@ -1300,37 +1301,7 @@ module.exports = function () {
   };
 
   $$.sbgn.checkPointStateAndInfoBoxes = function (x, y, node, threshold) {
-    var centerX = node._private.position.x;
-    var centerY = node._private.position.y;
-    var padding =parseInt(node.css('border-width')) / 2;
-    var stateAndInfos = node._private.data.statesandinfos;
-//    threshold = parseFloat(threshold);
-
-    for (var i = 0; i < stateAndInfos.length; i++) {
-      var state = stateAndInfos[i];
-      var stateWidth = parseFloat(state.bbox.w) + threshold;
-      var stateHeight = parseFloat(state.bbox.h) + threshold;
-      var coord = classes.StateVariable.getAbsoluteCoord(state, node.cy());
-      var stateCenterX = coord.x;
-      var stateCenterY = coord.y;
-
-      if (state.clazz == "state variable" && state.isDisplayed) {//draw ellipse
-        var stateCheckPoint = cyBaseNodeShapes["ellipse"].checkPoint(
-                x, y, padding, stateWidth, stateHeight, stateCenterX, stateCenterY);
-
-        if (stateCheckPoint == true)
-          return true;
-
-      } else if (state.clazz == "unit of information" && state.isDisplayed) {//draw rectangle
-        var infoCheckPoint = cyBaseNodeShapes["roundrectangle"].checkPoint(
-                x, y, padding, stateWidth, stateHeight, stateCenterX, stateCenterY);
-
-        if (infoCheckPoint == true)
-          return true;
-      }
-
-    }
-    return false;
+    return classes.AuxiliaryUnit.checkPoint(x, y, node, threshold);
   };
 
   $$.sbgn.isNodeShapeTotallyOverriden = function (render, node) {

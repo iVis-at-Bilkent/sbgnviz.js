@@ -2,6 +2,7 @@ var classes = require('../utilities/classes');
 var libs = require('../utilities/lib-utilities').getLibs();
 var jQuery = $ = libs.jQuery;
 var cytoscape = libs.cytoscape;
+var Tippy = libs.tippy;
 
 module.exports = function () {
 
@@ -110,106 +111,140 @@ module.exports = function () {
 	    ur.action("setPortsOrdering", undoRedoActionFunctions.setPortsOrdering, undoRedoActionFunctions.setPortsOrdering);
 	  }
 
-		var initElementData = function (ele) {
+		function showTooltip(event) {
+			var node = event.target || event.cyTarget;
 
-      var eleclass = ele.data('class');
-      if (!eleclass) {
-        return;
-      }
-      eleclass = elementUtilities.demultimerizeClass(eleclass);
 
-      var classProperties = elementUtilities.getDefaultProperties(eleclass);
+			var canHaveTooltip = function( node ) {
+				return elementUtilities.isSIFNode(node);
+			}
 
-      cy.batch(function () {
+			if (!canHaveTooltip(node)) {
+				return;
+			}
 
-        if (ele.isNode()) {
+			var ref; // used only for positioning
+			var pos = event.position || event.cyPosition;
+			var pan = cy.pan();
+			var zoom = cy.zoom();
 
-      		if (classProperties['width'] && !ele.data('bbox').w) {
-            ele.data('bbox').w = classProperties['width'];
-          }
-          if (classProperties['height'] && !ele.data('bbox').h) {
-            ele.data('bbox').h = classProperties['height'];
-          }
+			var infobox = classes.AuxiliaryUnit.checkPoint(pos.x, pos.y, node, 0);
+			var tooltipContent;
 
-          if (!ele.data('font-size') && classProperties['font-size']) {
-            ele.data('font-size', classProperties['font-size']);
-          }
-          if (!ele.data('font-family') && classProperties['font-family']) {
-            ele.data('font-family', classProperties['font-family']);
-          }
-          if (!ele.data('font-style') && classProperties['font-style']) {
-            ele.data('font-style', classProperties['font-style']);
-          }
-          if (!ele.data('font-weight') && classProperties['font-weight']) {
-            ele.data('font-weight', classProperties['font-weight']);
-          }
-          if (!ele.data('color') && classProperties['color']) {
-            ele.data('color', classProperties['color']);
-          }
-          if (!ele.data('background-color') && classProperties['background-color']) {
-            ele.data('background-color', classProperties['background-color']);
-          }
-          if (!ele.data('background-opacity') && classProperties['background-opacity']) {
-            ele.data('background-opacity', classProperties['background-opacity']);
-          }
-          if (!ele.data('border-color') && classProperties['border-color']) {
-            ele.data('border-color', classProperties['border-color']);
-          }
-          if (!ele.data('border-width') && classProperties['border-width']) {
-            ele.data('border-width', classProperties['border-width']);
-          }
-          if (!ele.data('text-wrap') && classProperties['text-wrap']) {
-            ele.data('text-wrap', classProperties['text-wrap']);
-          }
+			if ( elementUtilities.isSIFNode(node) ) {
+				if (!infobox) {
+					tooltipContent = node.data('tooltip');
 
-          if (ele.data('init') && ele.data('background-image') === undefined && classProperties['background-image']) {
-            ele.data('background-image', classProperties['background-image']);
-          }
-          if (ele.data('init') && ele.data('background-fit') === undefined && classProperties['background-fit']) {
-            ele.data('background-fit', classProperties['background-fit']);
-          }
-          if (ele.data('init') && ele.data('background-position-x') === undefined && classProperties['background-position-x']) {
-            ele.data('background-position-x', classProperties['background-position-x']);
-          }
-          if (ele.data('init') && ele.data('background-position-y') === undefined && classProperties['background-position-y']) {
-            ele.data('background-position-y', classProperties['background-position-y']);
-          }
-          if (ele.data('init') && ele.data('background-width') === undefined && classProperties['background-width']) {
-            ele.data('background-width', classProperties['background-width']);
-          }
-          if (ele.data('init') && ele.data('background-height') === undefined && classProperties['background-height']) {
-            ele.data('background-height', classProperties['background-height']);
-          }
-          if (ele.data('init') && ele.data('background-image-opacity') === undefined && classProperties['background-image-opacity']) {
-            ele.data('background-image-opacity', classProperties['background-image-opacity']);
-          }
+					if ( tooltipContent == undefined ) {
+						return;
+					}
 
-          if(!ele.data('init')){
-            ele.data('init', true);
-          }
+					ref = node.popperRef();
+				}
+				else {
+					tooltipContent = infobox['tooltip'];
 
-        }
+					if ( tooltipContent == undefined ) {
+						return;
+					}
 
-        else if (ele.isEdge()) {
+					var modelPos = classes.AuxiliaryUnit.getAbsoluteCoord(infobox, cy);
+					var modelW = infobox.bbox.w;
+					var modelH = infobox.bbox.h;
+					var renderedW = modelW * zoom;
+					var renderedH = modelH * zoom;
+					modelPos.x -= modelW / 2;
+					modelPos.y -= modelH / 2;
+					var renderedPos = elementUtilities.convertToRenderedPosition(modelPos, pan, zoom);
 
-          if (!ele.data('width') && classProperties['width']) {
-            ele.data('width', classProperties['width']);
-          }
-          if (!ele.data('line-color') && classProperties['line-color']) {
-            ele.data('line-color', classProperties['line-color']);
-          }
+					var renderedDims = { w: renderedW, h: renderedH };
 
-        }
-				
-      });
-    };
+					ref = node.popperRef({
+						renderedPosition: function() {
+							return renderedPos;
+						},
+						renderedDimensions: function() {
+							return renderedDims;
+						}
+					});
+				}
+			}
+
+			var placement = infobox ? infobox.anchorSide : 'bottom';
+			var destroyTippy;
+
+			var tippy = Tippy.one(ref, {
+				content: (() => {
+					var content = document.createElement('div');
+
+					content.style['font-size'] = 12 * zoom + 'px';
+					content.innerHTML = tooltipContent;
+
+					return content;
+				})(),
+				trigger: 'manual',
+				hideOnClick: true,
+				arrow: true,
+				placement,
+				onHidden: function() {
+					cy.off('pan zoom', destroyTippy);
+					node.off('position', destroyTippy);
+					cy.off('tapdrag', destroyTippy);
+				}
+			});
+
+			destroyTippy = function(){
+				tippy.destroy();
+			};
+
+			cy.on('pan zoom', destroyTippy);
+			node.on('position', destroyTippy);
+			cy.on('tapdrag', destroyTippy);
+
+			setTimeout( () => tippy.show(), 0 );
+		}
 
 	  function bindCyEvents() {
 
-			cy.on("add", function (event) {
-        var ele = event.cyTarget || event.target;
-        initElementData(ele);
-      });
+			cy.on('tapdragover', 'node', function(event) {
+				var waitDuration = 1000;
+				var nodeTapdragout;
+				var currEvent = event;
+				var node = currEvent.target || currEvent.cyTarget;
+				var inQueue = true;
+
+				var clearNodeEvent = function() {
+					if ( nodeTapdragout ) {
+						node.off('tapdragout', nodeTapdragout);
+					}
+
+					if ( nodeTapdrag ) {
+						node.off('tapdrag', nodeTapdrag);
+					}
+				};
+
+				var getShowTooltipAsycn = function() {
+					return setTimeout( function() {
+						showTooltip( currEvent );
+						inQueue = false;
+					}, waitDuration );
+				};
+
+				var showTooltipAsycn = getShowTooltipAsycn();
+
+				node.on('tapdragout', nodeTapdragout = function(e) {
+					clearTimeout( showTooltipAsycn );
+					clearNodeEvent();
+				});
+
+				node.on('tapdrag', nodeTapdrag = function(e) {
+					currEvent = e;
+					if (!inQueue) {
+						showTooltipAsycn = getShowTooltipAsycn();
+						inQueue = true;
+					}
+				});
+			});
 
 	    cy.on('tapend', 'node', function (event) {
 	      cy.style().update();
@@ -525,7 +560,7 @@ module.exports = function () {
 	            'text-margin-y' : -1 * options.extraCompartmentPadding,
 	            'compound-sizing-wrt-labels' : 'exclude',
 	          })
-	          .selector("node:parent[class='submap']")
+	          .selector("node:parent[class='submap'],[class='topology group']")
 	          .css({
 	            'padding': function() {
 	              return graphUtilities.getCompoundPaddings() + options.extraCompartmentPadding;
@@ -602,7 +637,9 @@ module.exports = function () {
 	          .selector("edge")
 	          .css({
 	            'curve-style': 'bezier',
-	            'target-arrow-fill': 'hollow',
+	            'target-arrow-fill': function(ele) {
+								return elementUtilities.getCyTargetArrowFill(ele);
+							},
 	            'source-arrow-fill': 'hollow',
 	            'text-border-color': function (ele) {
 	              if (ele.selected()) {
@@ -675,15 +712,10 @@ module.exports = function () {
 	            },
 	            'target-endpoint': function(ele) {
 	              return elementUtilities.getEndPoint(ele, 'target');
+	            },
+							'line-style': function (ele) {
+	              return elementUtilities.getArrayLineStyle(ele);
 	            }
-	          })
-	          .selector("edge[class='inhibition'],[class='negative influence']")
-	          .css({
-	            'target-arrow-fill': 'filled'
-	          })
-	          .selector("edge[class='production']")
-	          .css({
-	            'target-arrow-fill': 'filled'
 	          })
 	          .selector("core")
 	          .css({
