@@ -912,6 +912,32 @@ module.exports = function () {
 
     this.insertedNodes = {};
 
+
+    var shouldDisablePorts = false;
+    cytoscapeJsGraph.nodes.forEach(function(node) {
+      if((node.data.bbox.w == 0 || isNaN(node.data.bbox.w)) && (node.data.bbox.h == 0 || isNaN(node.data.bbox.h))){
+        node.data.bbox.w = elementUtilities.getDefaultProperties(node.data.class).width;
+        node.data.bbox.h = elementUtilities.getDefaultProperties(node.data.class).height;     
+       // node.data.bbox.x = 15;     
+       // node.data.bbox.y = 10; 
+      } 
+      node.data.ports.forEach(function(port){
+        if (isNaN(port.x) || isNaN(port.y)){
+          shouldDisablePorts = true;
+        }
+      });     
+    }); 
+
+      if(shouldDisablePorts){      
+      graphUtilities.disablePorts();
+    }
+    //getDefaultProperties
+    //elementUtilities.nodeTypes.forEach(function(type){
+    //  console.log(elementUtilities.getDefaultProperties(type));
+    //});
+    
+    //console.log(cytoscapeJsGraph);
+    //console.log( elementUtilities.nodeTypes);
     return cytoscapeJsGraph;
   };
   
