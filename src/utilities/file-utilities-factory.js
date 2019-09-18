@@ -35,18 +35,31 @@ module.exports = function () {
    return blob;
  }
 
- function loadXMLDoc(fullFilePath) {
+ function loadTextDoc(fullFilePath) {
    if (window.XMLHttpRequest) {
      xhttp = new XMLHttpRequest();
    }
    else {
      xhttp = new ActiveXObject("Microsoft.XMLHTTP");
    }
-   xhttp.overrideMimeType('application/xml');
+   xhttp.overrideMimeType('application/text');
    xhttp.open("GET", fullFilePath, false);
    xhttp.send();
-   return xhttp.responseXML;
+   return xhttp.responseText;
  }
+
+ function loadXMLDoc(fullFilePath) {
+  if (window.XMLHttpRequest) {
+    xhttp = new XMLHttpRequest();
+  }
+  else {
+    xhttp = new ActiveXObject("Microsoft.XMLHTTP");
+  }
+  xhttp.overrideMimeType('application/xml');
+  xhttp.open("GET", fullFilePath, false);
+  xhttp.send();
+  return xhttp.responseXML;
+}
 
  // Should this be exposed or should this be moved to the helper functions section?
  function textToXmlObject(text) {
@@ -121,24 +134,40 @@ module.exports = function () {
  };
 
  fileUtilities.loadSample = function(filename, folderpath) {
-   uiUtilities.startSpinner("load-spinner");
 
+  var file = (folderpath || 'sample-app/samples/') + filename;
+
+  
+   uiUtilities.startSpinner("load-spinner");
    // Users may want to do customized things while a sample is being loaded
    // Trigger an event for this purpose and specify the 'filename' as an event parameter
    $(document).trigger( "sbgnvizLoadSample", [ filename, cy ] ); // Aliases for sbgnvizLoadSampleStart
    $(document).trigger( "sbgnvizLoadSampleStart", [ filename, cy ] );
-
-   // load xml document use default folder path if it is not specified
-   var xmlObject = loadXMLDoc((folderpath || 'sample-app/samples/') + filename);
-
-   setTimeout(function () {
-     updateGraph(nwtToJson.convert(xmlObject));
-
-     fileUtilities.collapseMarkedNodes();
-
-     uiUtilities.endSpinner("load-spinner");
-     $(document).trigger( "sbgnvizLoadSampleEnd", [ filename, cy ] ); // Trigger an event signaling that a sample is loaded
-   }, 0);
+   var text = loadTextDoc(file);
+   var matchResult = text.match("<renderInformation[^]*</renderInformation>");
+   if(matchResult != null){
+     var renderInfoString = matchResult[0];
+     var renderInfoStringCopy = (' ' + renderInfoString).slice(1);
+     const regex = /\s([\S]+)([\s]*)=/g;
+     var result;
+     var matches = []; 
+     while(result = regex.exec(renderInfoString)) {
+       matches.push(result[0]);
+     };
+     matches.forEach(function(match){
+       renderInfoString = renderInfoString.replace(match , textUtilities.FromKebabToCamelCase(match));
+     });      
+     text = text.replace(renderInfoStringCopy, renderInfoString);
+      var xmlObject = textToXmlObject(text);
+      setTimeout(function () {
+        updateGraph(nwtToJson.convert(xmlObject));
+  
+        fileUtilities.collapseMarkedNodes();
+  
+        uiUtilities.endSpinner("load-spinner");
+        $(document).trigger( "sbgnvizLoadSampleEnd", [ filename, cy ] ); // Trigger an event signaling that a sample is loaded
+        }, 0);
+   };  
  };
 
  fileUtilities.loadSIFFile = function(file, layoutBy, callback) {
