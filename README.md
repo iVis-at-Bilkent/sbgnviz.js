@@ -175,6 +175,10 @@ Exports the current graph to a png file. The name of the file is determined by t
 Exports the current graph to a jpg file. The name of the file is determined by the filename parameter which is
 'network.jpg' by default.
 
+`instance.saveAsSVG(filename)`
+Exports the current graph to a svg file. The name of the file is determined by the filename parameter which is
+'network.svg' by default.
+
 `instance.loadSample(filename, folderpath)`
 Loads a sample file whose name and path of containing folder is given.
 
