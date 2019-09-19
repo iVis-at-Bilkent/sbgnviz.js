@@ -158,6 +158,7 @@ module.exports = function () {
        renderInfoString = renderInfoString.replace(match , textUtilities.FromKebabToCamelCase(match));
      });      
      text = text.replace(renderInfoStringCopy, renderInfoString);
+    }
       var xmlObject = textToXmlObject(text);
       setTimeout(function () {
         updateGraph(nwtToJson.convert(xmlObject));
@@ -167,7 +168,7 @@ module.exports = function () {
         uiUtilities.endSpinner("load-spinner");
         $(document).trigger( "sbgnvizLoadSampleEnd", [ filename, cy ] ); // Trigger an event signaling that a sample is loaded
         }, 0);
-   };  
+  
  };
 
  fileUtilities.loadSIFFile = function(file, layoutBy, callback) {
