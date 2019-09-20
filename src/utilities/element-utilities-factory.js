@@ -2427,6 +2427,7 @@ module.exports = function () {
   elementUtilities.epnTypes
     .concat( elementUtilities.sifTypes )
     .concat( elementUtilities.otherNodeTypes )
+    .concat (elementUtilities.biologicalActivityTypes)
     .concat( ['phenotype'] )
     .forEach( function( type ) {
        $.extend( defaultProperties[ type ], getDefaultFontProperties() );
