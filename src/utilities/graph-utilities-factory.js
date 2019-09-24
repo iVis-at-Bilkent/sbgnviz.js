@@ -96,9 +96,9 @@ module.exports = function () {
       var preferences = {};
       if(cy.nodes().length > 3000 || cy.edges().length > 3000) {
         preferences.quality = "draft";
-        preferences.randomize = true;
-        preferences.animate = false;
       }
+      preferences.animate = false;
+      preferences.randomize = true;
       preferences = $.extend({}, layoutOptions, preferences);
       var layout = cy.layout(preferences);
     }
