@@ -51,11 +51,15 @@ module.exports = function () {
     return graphUtilities.compoundSizesConsidered = true;
   };
 
-  graphUtilities.updateGraph = function(cyGraph, callback, isLayoutRequired, tileInfoBoxes) {
+  graphUtilities.updateGraph = function(cyGraph, callback, layoutOptions, tileInfoBoxes) {
     console.log('cy update called');
 
-    if(isLayoutRequired === undefined){
+    var isLayoutRequired;
+    if(layoutOptions === undefined){
       isLayoutRequired = false;
+    }
+    else{
+      isLayoutRequired = true;
     }
 
     $(document).trigger( "updateGraphStart", cy );
@@ -88,19 +92,22 @@ module.exports = function () {
     this.refreshPaddings(); // Recalculates/refreshes the compound paddings
     cy.endBatch();
 
-    if(!isLayoutRequired) {
+    if(isLayoutRequired) {
+      var preferences = {};
+      if(cy.nodes().length > 3000 || cy.edges().length > 3000) {
+        preferences.quality = "draft";
+        preferences.randomize = true;
+        preferences.animate = false;
+      }
+      preferences = $.extend({}, layoutOptions, preferences);
+      var layout = cy.layout(preferences);
+    }
+    else {
       var layout = cy.layout({
         name: 'preset',
         positions: positionMap,
         fit: true,
         padding: 50
-      });
-    }
-    else {
-      var layout = cy.layout({
-        name: 'cose-bilkent',
-        randomize: true,
-        animate: false
       });
     }
 
