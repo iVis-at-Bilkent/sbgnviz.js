@@ -55,7 +55,9 @@ module.exports = function () {
     parents.removeData('minHeightBiasBottom');
 
     cy.endBatch();
-    cy.style().update();
+    
+    if(parents.length > 0)
+      cy.style().update();
   };
   // Helpers end
 
