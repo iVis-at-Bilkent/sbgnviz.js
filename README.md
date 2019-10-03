@@ -1,12 +1,13 @@
-# SBGNViz version 3
+# SBGNViz
 
-SBGNViz is a web application based on [Cytoscape.js](http://cytoscape.github.io/cytoscape.js/) to visualize the pathway models represented by [SBGN](http://www.sbgn.org) Process Description (PD) and Activity Flow (AF) Notation. It accepts the pathway models represented in [SBGN-ML](https://github.com/sbgn/sbgn/wiki/LibSBGN) format.
+SBGNViz is a web based library developed to visualize pathway models represented by process description (PD) and activity flow (AF) languages of [SBGN](http://sbgn.org) or in [simple interaction format (SIF)](https://www.pathwaycommons.org/pc/sif_interaction_rules.do).
+It accepts the pathway models represented in [SBGN-ML](https://github.com/sbgn/sbgn/wiki/LibSBGN) format as well as import facilities from various formats from SIF to SBML to CellDesigner.
 
 ## Software
 
 SBGNViz is distributed under [GNU Lesser General Public License](http://www.gnu.org/licenses/lgpl.html). 
 
-**A sample application using SBGNViz** can be found [here](http://cs.bilkent.edu.tr/~ivis/SBGNViz_sample_app/). The sample application source codes are available [here](https://github.com/iVis-at-Bilkent/sbgnviz.js-sample-app)
+**A sample application using SBGNViz** can be found [here](http://cs.bilkent.edu.tr/~ivis/SBGNViz_sample_app/). The sample application source codes are available [here](https://github.com/iVis-at-Bilkent/sbgnviz.js-sample-app).
 
 Please cite the following when you use SBGNViz.js:
 
@@ -444,12 +445,4 @@ This project is set up to automatically be published to npm.  To publish:
 
 ## Credits
 
-Thanks to JetBrains for an [Open Source License](https://www.jetbrains.com/buy/opensource/)
-
-## Team
-
-  * [Hasan Balci](https://github.com/hasanbalci), [Kaan Sancak](https://github.com/kaansancak), [Ahmet Candiroglu](https://github.com/ahmetcandiroglu), and [Ugur Dogrusoz](https://github.com/ugurdogrusoz) of [i-Vis at Bilkent University](http://www.cs.bilkent.edu.tr/~ivis), and [Metin Can Siper](https://github.com/metincansiper) of the Demir Lab at [OHSU](http://www.ohsu.edu/)
-  
-#### Alumni
-
-  * [Ilkin Safarli](https://github.com/kinimesi), [Ludovic Roy](https://github.com/royludo), [Leonard Dervishi](https://github.com/leonarddrv), Alper Karacelik, Selim Firat Yilmaz, Istemi Bahceci, Mecit Sari, Ayhun Tekat, M.Furkan Sahin
+SBGNViz.js has been mainly developed by [i-Vis at Bilkent University](http://www.cs.bilkent.edu.tr/~ivis).
