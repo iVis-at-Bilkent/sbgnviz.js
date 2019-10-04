@@ -382,6 +382,7 @@ module.exports = function () {
 
   $$.sbgn.drawBarrel = function (context, x, y, width, height) {
     cyBaseNodeShapes['barrel'].draw(context, x, y, width, height);
+    context.fill();
   };
 
   $$.sbgn.drawBottomRoundRectangle = function (context, x, y, width, height) {

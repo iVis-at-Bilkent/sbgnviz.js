@@ -9,8 +9,10 @@ module.exports = {
   arrowScale: true,
   showComplexName: true,
   dynamicLabelSize: true,
+  inferNestingOnLoad: true,
   fitLabelsToNodes: true,
   fitLabelsToInfoboxes: true,
+  recalculateLayoutOnComplexityManagement: true,
   rearrangeAfterExpandCollapse: true,
   animateOnDrawingChanges: true,
   adjustNodeLabelFontSizeAutomatically: true,
@@ -21,5 +23,5 @@ module.exports = {
   defaultInfoboxWidth: true,
   mapName: true,
   mapDescription: true,
-  enableSIFTopologyGrouping: false
+  enableSIFTopologyGrouping: true
 };

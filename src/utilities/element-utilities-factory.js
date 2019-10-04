@@ -440,8 +440,8 @@ module.exports = function () {
     'BA simple chemical', 'BA macromolecule', 'BA nucleic acid feature',
     'BA perturbing agent', 'BA complex'];
   elementUtilities.epnTypes = ['macromolecule', 'nucleic acid feature', 'simple chemical',
-    'source and sink', 'unspecified entity',
-    'perturbing agent', 'complex'];
+    'source and sink', 'unspecified entity', 'perturbing agent', 'complex', 
+    'nucleic acid feature multimer', 'macromolecule multimer', 'simple chemical multimer', 'complex multimer'];
   elementUtilities.sifTypes = ['SIF macromolecule', 'SIF simple chemical'];
   elementUtilities.otherNodeTypes = ['compartment', 'tag', 'submap', 'topology group'];
 
@@ -2427,6 +2427,7 @@ module.exports = function () {
   elementUtilities.epnTypes
     .concat( elementUtilities.sifTypes )
     .concat( elementUtilities.otherNodeTypes )
+    .concat (elementUtilities.biologicalActivityTypes)
     .concat( ['phenotype'] )
     .forEach( function( type ) {
        $.extend( defaultProperties[ type ], getDefaultFontProperties() );

@@ -326,6 +326,11 @@ module.exports = function () {
    });
    saveAs(blob, filename);
  };
+ fileUtilities.convertSbgn= function(filename, version, renderInfo, mapProperties, nodes, edges) {
+  var sbgnmlText = jsonToSbgnml.createSbgnml(filename, "plain", renderInfo, mapProperties, nodes, edges);
+ 
+  return sbgnmlText;
+};
 
  fileUtilities.exportLayoutData = function(filename, byName) {
    var layoutText = layoutToText.convert( byName );
