@@ -456,21 +456,24 @@ The following describes objects used by sbgnviz.js and accessible through `sbgnv
 
 ## Dependencies
 
- * cytoscape (iVis-at-Bilkent/cytoscape.js#unstable)
- * jQuery ^2.2.4
- * filesaverjs ~0.2.2
- * tippy.js ^3.4.0
- * libsbgn.js github:sbgn/libsbgn.js#develop
- * pretty-data ^0.40.0
- * xml2js ^0.4.17
+ * cytoscape 
+ * jQuery
+ * filesaverjs
+ * tippy.js
+ * libsbgn.js
+ * pretty-data
+ * xml2js
+
+for exact versions of dependencies refer to [package.json](https://github.com/iVis-at-Bilkent/sbgnviz.js/blob/master/package.json)
 
 ## Optional Dependencies
 The following extensions are used by this library if they are registered.
- * cytoscape-undo-redo ^1.2.1
- * cytoscape-expand-collapse ^3.0.0
- * cytoscape-edge-bend-editing ^1.4.0
- * cytoscape-view-utilities ^2.0.0
+ * cytoscape-undo-redo
+ * cytoscape-expand-collapse
+ * cytoscape-edge-bend-editing
+ * cytoscape-view-utilities
 
+ for exact versions of dependencies refer to [package.json](https://github.com/iVis-at-Bilkent/sbgnviz.js/blob/master/package.json)
 
 ## Usage instructions
 Download the library:
