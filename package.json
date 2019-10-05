@@ -20,7 +20,7 @@
   "peerDependencies": {
     "jquery": "^2.2.4",
     "filesaverjs": "~0.2.2",
-    "cytoscape": "iVis-at-Bilkent/cytoscape.js#unstable",
+    "cytoscape": "iVis-at-Bilkent/cytoscape.js#master",
     "tippy.js": "^3.4.0"
   },
   "dependencies": {
