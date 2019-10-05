@@ -19,15 +19,17 @@ module.exports = function () {
 
   // TODO make these initial values user options instead of hardcoding them here
   graphUtilities.portsEnabled = true;
-  graphUtilities.compoundSizesConsidered = false;
+  graphUtilities.compoundSizesConsidered = true;
 
   graphUtilities.disablePorts = function() {
     graphUtilities.portsEnabled = false;
+    cy.undoRedo().do("changeMenu", {id: "enable-ports", type: "checkbox", property: "currentGeneralProperties.enablePorts", update: self.applyUpdate, value : false});
     cy.style().update();
   };
 
   graphUtilities.enablePorts = function() {
     graphUtilities.portsEnabled = true;
+    cy.undoRedo().do("changeMenu", {id: "enable-ports", type: "checkbox", property: "currentGeneralProperties.enablePorts", update: self.applyUpdate, value : true});
     cy.style().update();
   };
 
@@ -49,13 +51,17 @@ module.exports = function () {
     return graphUtilities.compoundSizesConsidered = true;
   };
 
-  graphUtilities.updateGraph = function(cyGraph, callback, isLayoutRequired) {
+  graphUtilities.updateGraph = function(cyGraph, callback, layoutOptions, tileInfoBoxes) {
     console.log('cy update called');
 
-    if(isLayoutRequired === undefined){
+    var isLayoutRequired;
+    if(layoutOptions === undefined){
       isLayoutRequired = false;
     }
-    
+    else{
+      isLayoutRequired = true;
+    }
+
     $(document).trigger( "updateGraphStart", cy );
     // Reset undo/redo stack and buttons when a new graph is loaded
     if (options.undoable) {
@@ -86,19 +92,22 @@ module.exports = function () {
     this.refreshPaddings(); // Recalculates/refreshes the compound paddings
     cy.endBatch();
 
-    if(!isLayoutRequired) {
+    if(isLayoutRequired) {
+      var preferences = {};
+      if(cy.nodes().length > 3000 || cy.edges().length > 3000) {
+        preferences.quality = "draft";
+      }
+      preferences.animate = false;
+      preferences.randomize = true;
+      preferences = $.extend({}, layoutOptions, preferences);
+      var layout = cy.layout(preferences);
+    }
+    else {
       var layout = cy.layout({
         name: 'preset',
         positions: positionMap,
         fit: true,
         padding: 50
-      });
-    }
-    else {
-      var layout = cy.layout({
-        name: 'cose-bilkent',
-        randomize: true,
-        animate: false
       });
     }
 
@@ -110,11 +119,13 @@ module.exports = function () {
     // Update the style
     cy.style().update();
     // Initilize the bend points once the elements are created
-    if (cy.edgeBendEditing && cy.edgeBendEditing('initialized')) {
-      cy.edgeBendEditing('get').initBendPoints(cy.edges());
+    if (cy.edgeEditing && cy.edgeEditing('initialized')) {
+      cy.edgeEditing('get').initBendPoints(cy.edges());
     }
 
-    $(document).trigger( "updateGraphEnd", cy );
+
+
+    $(document).trigger( "updateGraphEnd", [cy, (isLayoutRequired || tileInfoBoxes)]);
     if (callback) callback();
   };
 

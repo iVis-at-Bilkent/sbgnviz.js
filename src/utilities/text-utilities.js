@@ -67,6 +67,56 @@ var textUtilities = {
     else {
       return originalId;
     }
+  },
+
+  getWidthByContent( content, fontFamily, fontSize, options ) {
+    var DEFAULT_MARGIN = 5;
+    var lines = content.split("\n");
+    var context = document.createElement('canvas').getContext('2d');
+    // should not make type check so '===' should not be used here
+    var shouldAppend = parseFloat( fontSize ) == fontSize;
+    var validFontSize = shouldAppend ? fontSize + 'px' : fontSize;
+    context.font = validFontSize + ' ' + fontFamily;
+
+    var width = 0;
+
+    lines.forEach( function( line ) {
+      var w = context.measureText(line).width;
+      if ( w > width ) {
+        width = w;
+      }
+    });
+
+    var margin = options && options.margin;
+    if ( margin == null ) {
+      margin = DEFAULT_MARGIN;
+    }
+
+    width += 2 * margin;
+
+    var min = options && options.min;
+    var max = options && options.max;
+
+    if ( min != null && width < min ) {
+      width = min;
+    }
+    else if ( max != null && width > max ) {
+      width = max;
+    }
+
+    return width;
+  },
+
+  FromKebabToCamelCase : function(input){
+    return input.replace(/(-\w)/g, function(m){
+      return m[1].toUpperCase();
+    });
+  },
+
+  FromCamelToKebabCase : function(input){
+    return input.replace(/[\w]([A-Z])/g, function(m) {
+      return m[0] + "-" + m[1];
+    }).toLowerCase();
   }
 
 };

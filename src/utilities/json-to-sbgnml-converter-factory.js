@@ -48,13 +48,18 @@ module.exports = function () {
    Serious changes occur between the format version for submaps content. Those changes are not implemented yet.
    TODO implement 0.3 changes when submap support is fully there.
    */
-  jsonToSbgnml.createSbgnml = function(filename, version, renderInfo, mapProperties){
+  jsonToSbgnml.buildJsObj = function(filename, version, renderInfo, mapProperties, nodes, edges){
     var self = this;
     var mapID = textUtilities.getXMLValidId(filename);
     var hasExtension = false;
     var hasRenderExtension = false;
-    this.allCollapsedNodes = cy.expandCollapse('get').getAllCollapsedChildrenRecursively().filter("node");
-    this.allCollapsedEdges = cy.expandCollapse('get').getAllCollapsedChildrenRecursively().filter("edge");
+    var mapType = ( mapProperties && mapProperties.mapType ) || elementUtilities.mapType;
+    this.nodes = nodes || cy.nodes();
+    this.edges = edges || cy.edges();
+
+    var collapsedChildren = elementUtilities.getAllCollapsedChildrenRecursively(this.nodes);
+    this.allCollapsedNodes = collapsedChildren.filter("node");
+    this.allCollapsedEdges = collapsedChildren.filter("edge");
 
     if (typeof renderInfo !== 'undefined') {
        hasExtension = true;
@@ -72,17 +77,7 @@ module.exports = function () {
       return "Error";
     }
 
-    var mapLanguage;
-    if(elementUtilities.mapType == "PD") {
-       mapLanguage = "process description";
-    }
-    else if(elementUtilities.mapType == "AF") {
-       mapLanguage = "activity flow";
-    }
-    else {
-       // case of a mixed map with bits of AF and PD for example
-       mapLanguage = "unknown";
-    }
+    var mapLanguage = elementUtilities.mapTypeToLanguage(mapType);
 
     //add headers
     xmlHeader = "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>\n";
@@ -117,11 +112,12 @@ module.exports = function () {
     var glyphList = [];
     // be careful that :visible is also used during recursive search of nodes
     // in the getGlyphSbgnml function. If not set accordingly, discrepancies will occur.
-    cy.nodes().each(function(ele, i){
+    var self = this;
+    this.nodes.each(function(ele, i){
        if(typeof ele === "number") {
          ele = i;
        }
-       if(!ele.isChild())
+       if(jsonToSbgnml.childOfNone(ele, self.nodes))
            glyphList = glyphList.concat(self.getGlyphSbgnml(ele)); // returns potentially more than 1 glyph
     });
     // add them to the map
@@ -131,7 +127,7 @@ module.exports = function () {
        map.addGlyph(glyphList[i]);
     }
     // get all arcs
-    var edges = this.allCollapsedEdges.union(cy.edges());
+    var edges = this.allCollapsedEdges.union(this.edges);
     edges.each(function(ele, i){
        if(typeof ele === "number") {
          ele = i;
@@ -144,17 +140,58 @@ module.exports = function () {
 
     sbgn.addMap(map);
 
+    return sbgn.buildJsObj();
+  };
+
+  jsonToSbgnml.createSbgnml = function(filename, version, renderInfo, mapProperties, nodes, edges) {
+    var jsObj = jsonToSbgnml.buildJsObj(filename, version, renderInfo, mapProperties, nodes, edges);
+    return jsonToSbgnml.buildString({sbgn: jsObj});
+  }
+
+  // Copies and extends buildString() of https://github.com/sbgn/libsbgn.js/blob/master/src/utilities.js
+  jsonToSbgnml.buildString = function(obj) {
+    var xmlString =  new xml2js.Builder({
+  		headless: true,
+  		renderOpts: {pretty: false}
+  	}).buildObject(obj);
+
+    // change naming convention from Camel Case (variableName) to Kebab case (variable-name)
+    var matchResult = xmlString.match("<renderInformation[^]*</renderInformation>");
+    if(matchResult != null){
+      var renderInfoString = matchResult[0];
+      var renderInfoStringCopy = (' ' + renderInfoString).slice(1);
+      const regex = /\s([\S]+)([\s]*)=/g;
+      var result;
+      var matches = [];
+      while(result = regex.exec(renderInfoString)) {
+        matches.push(result[0]);
+      };
+      matches.forEach(function(match){
+        renderInfoString = renderInfoString.replace(match , textUtilities.FromCamelToKebabCase(match));
+      });
+
+      xmlString = xmlString.replace(renderInfoStringCopy, renderInfoString);
+    }
+
+  	/* 	dirty hack needed to solve the newline char encoding problem
+  		xml2js doesn't encode \n as &#xA; we need to do it manually
+  	*/
+  	var re = /<label text="((.|\n+)+?)"/gm;
+  	var xmlString_correctLabel = xmlString.replace(re, function(match, p1, p2) {
+  		return '<label text="'+p1.replace(/\n/g, "&#xA;")+'"';
+  	});
+
+    var xmlHeader = "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>\n";
     /*
       prettyprint puts a line break inside the root <sbgn> tag before the xmlns attribute.
       This is perfecly valid, but Vanted doesn't like it and cannot load those files as is.
       This line break is removed here to make Newt output directly compatible with Vanted. This issue will be reported
       to the Vanted guys and hopefully fixed at some point. After that the following workaround can be removed.
     */
-    xmlbody = prettyprint.xml(sbgn.toXML()).replace("<sbgn \n  xmlns=\"http://sbgn.org/libsbgn", "<sbgn xmlns=\"http://sbgn.org/libsbgn");
+    var xmlbody = prettyprint.xml(xmlString_correctLabel).replace("<sbgn \n  xmlns=\"http://sbgn.org/libsbgn", "<sbgn xmlns=\"http://sbgn.org/libsbgn");
 
-    // return prettyprint.xml(xmlHeader + sbgn.toXML());
     return xmlHeader + xmlbody;
-  };
+  }
 
   // see createSbgnml for info on the structure of renderInfo
   jsonToSbgnml.getRenderExtensionSbgnml = function(renderInfo) {
@@ -190,6 +227,7 @@ module.exports = function () {
               fontFamily: style.properties.fontFamily,
               fontWeight: style.properties.fontWeight,
               fontStyle: style.properties.fontStyle,
+              fontColor: style.properties.fontColor,
               fill: style.properties.fill, // fill color
               stroke: style.properties.stroke, // stroke color
               strokeWidth: style.properties.strokeWidth,
@@ -199,7 +237,7 @@ module.exports = function () {
               backgroundPosY: style.properties.backgroundPosY,
               backgroundWidth: style.properties.backgroundWidth,
               backgroundHeight: style.properties.backgroundHeight,
-              backgroundImageOpacity: style.properties.backgroundImageOpacity,
+              backgroundImageOpacity: style.properties.backgroundImageOpacity
           });
           xmlStyle.setRenderGroup(g);
           listOfStyles.addStyle(xmlStyle);
@@ -286,7 +324,7 @@ module.exports = function () {
     //add state and info box information
     for(var i = 0 ; i < node._private.data.statesandinfos.length ; i++){
        var boxGlyph = node._private.data.statesandinfos[i];
-       var statesandinfosId = node._private.data.id+"_"+i;
+       var statesandinfosId = boxGlyph.id;
        if(boxGlyph.clazz === "state variable"){
            glyph.addGlyphMember(this.addStateBoxGlyph(boxGlyph, statesandinfosId, node));
        }
@@ -348,7 +386,7 @@ module.exports = function () {
        var extension = self.getOrCreateExtension(glyph);
        extension.add("<sbgnviz>"+sbgnvizExtString+"</sbgnviz>");
     }
-    
+
     // current glyph is done
     glyphList.push(glyph);
 
@@ -399,27 +437,30 @@ module.exports = function () {
     arc.setStart(new libsbgnjs.StartType({x: edge._private.rscratch.startX, y: edge._private.rscratch.startY}));
 
     // Export bend points if edgeBendEditingExtension is registered
-    if (cy.edgeBendEditing && cy.edgeBendEditing('initialized')) {
-     var segpts = cy.edgeBendEditing('get').getSegmentPoints(edge);
-     if(segpts){
-       for(var i = 0; segpts && i < segpts.length; i = i + 2){
-         var bendX = segpts[i];
-         var bendY = segpts[i + 1];
-
-         arc.addNext(new libsbgnjs.NextType({x: bendX, y: bendY}));
+    if (cy.edgeEditing && cy.edgeEditing('initialized')) {
+     var segpts = cy.edgeEditing('get').getSegmentPoints(edge);
+     if(typeof segpts !== 'undefined'){
+       if(segpts.length > 0){
+        for(var i = 0; segpts && i < segpts.length; i = i + 2){
+          var bendX = segpts[i];
+          var bendY = segpts[i + 1];
+          arc.addNext(new libsbgnjs.NextType({x: bendX, y: bendY}));
+        }
        }
-     }
+
+      }
     }
 
     arc.setEnd(new libsbgnjs.EndType({x: edge._private.rscratch.endX, y: edge._private.rscratch.endY}));
 
     var cardinality = edge._private.data.cardinality;
-    if(typeof cardinality != 'undefined' && cardinality != null) {
+    if(typeof cardinality != 'undefined' && cardinality != null && cardinality != 0) {
+      var edgebBox = edge.boundingBox({ includeLabels: true, includeNodes: false, includeEdges: false, includeOverlays: false });
        arc.addGlyph(new libsbgnjs.Glyph({
            id: arc.id+'_card',
-           class_: 'cardinality',
+           class_: 'stoichiometry',
            label: new libsbgnjs.Label({text: cardinality}),
-           bbox: new libsbgnjs.Bbox({x: 0, y: 0, w: 0, h: 0}) // dummy bbox, needed for format compliance
+           bbox: new libsbgnjs.Bbox({x: edgebBox.x1, y: edgebBox.y1, w: edgebBox.w, h: edgebBox.h}) // dummy bbox, needed for format compliance
        }));
     }
     // check for annotations
@@ -516,6 +557,10 @@ module.exports = function () {
       }
 
       return glyph;
+  };
+
+  jsonToSbgnml.childOfNone = function(ele, nodes) {
+    return !ele.isChild() || nodes.getElementById(ele.data('parent')).length === 0;
   };
 
   return jsonToSbgnml;

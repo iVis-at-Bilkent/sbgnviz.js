@@ -5,6 +5,9 @@ var cytoscape = libs.cytoscape;
 // var optionUtilities = require('./option-utilities');
 // var options = optionUtilities.getOptions();
 var truncate = require('./text-utilities').truncate;
+// only functions not depending on the instances can be used in this way
+// e.g. elementUtilities.generateStateVarId()
+var elementUtilities = require('./element-utilities-factory')();
 
 var ns = {};
 
@@ -45,10 +48,10 @@ AuxiliaryUnit.construct = function(parent) {
 
   obj.id = null;
   obj.bbox = null;
-  obj.coordType = "relativeToCenter";
+  obj.coordType = "relativeToSide";
   obj.anchorSide = null;
   obj.isDisplayed = false;
-  obj.dashed = false;
+  obj.style = null;
 
   return obj;
 };
@@ -70,7 +73,43 @@ AuxiliaryUnit.setParentRef = function(mainObj, newParent) {
   }
 }
 
-AuxiliaryUnit.defaultBackgroundColor = "#ffffff";
+AuxiliaryUnit.checkPoint = function(x, y, node, threshold) {
+  var centerX = node._private.position.x;
+  var centerY = node._private.position.y;
+  var padding = parseInt(node.css('border-width')) / 2;
+  var stateAndInfos = node._private.data.statesandinfos;
+  var cyBaseNodeShapes = cytoscape.baseNodeShapes;
+//    threshold = parseFloat(threshold);
+
+  for (var i = 0; i < stateAndInfos.length; i++) {
+    var state = stateAndInfos[i];
+
+    if (!state.isDisplayed) {
+      continue;
+    }
+
+    var stateWidth = parseFloat(state.bbox.w) + threshold;
+    var stateHeight = parseFloat(state.bbox.h) + threshold;
+    var coord = AuxiliaryUnit.getAbsoluteCoord(state, node.cy());
+    var stateCenterX = coord.x;
+    var stateCenterY = coord.y;
+    var checkPoint;
+
+    if (state.clazz == "state variable") {
+      checkPoint = cyBaseNodeShapes["ellipse"].checkPoint(
+              x, y, padding, stateWidth, stateHeight, stateCenterX, stateCenterY);
+    } else if (state.clazz == "unit of information") {
+      checkPoint = cyBaseNodeShapes["roundrectangle"].checkPoint(
+              x, y, padding, stateWidth, stateHeight, stateCenterX, stateCenterY);
+    }
+
+    if (checkPoint == true) {
+      return state;
+    }
+  }
+
+  return null;
+};
 
 /*
  * Return a new AuxiliaryUnit object. A new parent reference and new id can
@@ -87,7 +126,7 @@ AuxiliaryUnit.copy = function (mainObj, cy, existingInstance, newParent, newId) 
   newUnit.coordType = mainObj.coordType;
   newUnit.anchorSide = mainObj.anchorSide;
   newUnit.isDisplayed = mainObj.isDisplayed;
-  newUnit.dashed = mainObj.dashed;
+  newUnit.style = mainObj.style;
   return newUnit;
 };
 
@@ -95,12 +134,7 @@ AuxiliaryUnit.copy = function (mainObj, cy, existingInstance, newParent, newId) 
 AuxiliaryUnit.draw = function(mainObj, cy, context) {
   var unitClass = getAuxUnitClass(mainObj);
   var coords = unitClass.getAbsoluteCoord(mainObj, cy);
-  if (mainObj.dashed === true) {
-    context.setLineDash([2,2]);
-  }
-  else {
-    context.setLineDash([]);
-  }
+
   unitClass.drawShape(mainObj, cy, context, coords.x, coords.y);
   if (unitClass.hasText(mainObj, cy)) {
     unitClass.drawText(mainObj, cy, context, coords.x, coords.y);
@@ -116,7 +150,23 @@ AuxiliaryUnit.hasText = function(mainObj, cy) {
   throw new Error("Abstract method!");
 };
 AuxiliaryUnit.drawShape = function(mainObj, cy, context, x, y) {
-  throw new Error("Abstract method!");
+  var style = mainObj.style;
+  cytoscape.sbgn.drawInfoBox(context, x, y, mainObj.bbox.w, mainObj.bbox.h,
+                              style['shape-name']);
+
+  var tmp_ctxt = context.fillStyle;
+  context.fillStyle = style['background-color'];
+  context.fill();
+  context.fillStyle = tmp_ctxt;
+
+  var parent = getAuxUnitClass(mainObj).getParent(mainObj, cy);
+  var borderStyle = style.dashed ? 'dashed' : undefined;
+  var borderWidth = style['border-width'];
+  // Selected nodes have a specific border color so infobox should have the same
+  // border color when the node is selected. May need to be updated if style of
+  // selected nodes is updated in a different way.
+  var borderColor = parent.selected() ? null : style['border-color'];
+  cytoscape.sbgn.drawBorder( { context, node: parent, borderStyle, borderColor, borderWidth } );
 };
 
 // draw the statesOrInfo's label at given position
@@ -125,7 +175,7 @@ AuxiliaryUnit.drawText = function(mainObj, cy, context, centerX, centerY) {
   var options = cy.scratch('_sbgnviz').sbgnvizParams.optionUtilities.getOptions();
   var unitClass = getAuxUnitClass(mainObj);
   var parent = unitClass.getParent(mainObj, cy);
-  var fontSize = 9; // parseInt(textProp.height / 1.5);
+  var style = mainObj.style;
 
   // part of : $$.sbgn.drawText(context, textProp);
   // save style before modification
@@ -133,10 +183,11 @@ AuxiliaryUnit.drawText = function(mainObj, cy, context, centerX, centerY) {
   var oldStyle = context.fillStyle;
   var oldOpacity = context.globalAlpha;
 
-  context.font = fontSize + "px Arial";
+  context.font = style['font-style'] + " " + style['font-weight'] + " "
+                  + style['font-size'] + "px " + style['font-family'];
+  context.fillStyle = style['font-color'];
   context.textAlign = "center";
   context.textBaseline = "middle";
-  context.fillStyle = "#0f0f0f";
   context.globalAlpha = parent.css('text-opacity') * parent.css('opacity'); // ?
 
   var text;
@@ -243,7 +294,7 @@ AuxiliaryUnit.convertToRelativeCoord = function(mainObj, absX, absY, cy, parentN
     var relY = (absY - position.y) * 100 / (parent.outerHeight() - borderWidth);
     return {x: relX, y: relY};
   }
-  else if(mainObj.coordType == "relativeToSide") {
+  else {
     if (parent.data("class") == "compartment"){
         absX -= parent.outerWidth() * 0.1;
     };
@@ -260,47 +311,35 @@ AuxiliaryUnit.convertToRelativeCoord = function(mainObj, absX, absY, cy, parentN
   }
 };
 
-AuxiliaryUnit.setAnchorSide = function(mainObj, parentBbox) {
-  if(mainObj.coordType == "relativeToCenter") {
-    var thisX = mainObj.bbox.x;
-    var thisY = mainObj.bbox.y;
-    if(thisY > 45) {
-      mainObj.anchorSide = "bottom";
-      mainObj.bbox.y = 50;
-    }
-    else if (thisY < -45) {
-      mainObj.anchorSide = "top";
-      mainObj.bbox.y = -50;
-    }
-    else if (thisY >= 0) {
-      if (thisX > 45) {
-        mainObj.anchorSide = "right";
-        mainObj.bbox.x = 50;
-      }
-      else if (thisX < -45) {
-        mainObj.anchorSide = "left";
-        mainObj.bbox.x = -50;
-      }
-      else {
-        mainObj.anchorSide = "bottom";
-        mainObj.bbox.y = 50;
-      }
-    }
-    else {
-      if (thisX > 45) {
-        mainObj.anchorSide = "right";
-        mainObj.bbox.x = 50;
-      }
-      else if (thisX < -45) {
-        mainObj.anchorSide = "left";
-        mainObj.bbox.x = -50;
-      }
-      else {
-        mainObj.anchorSide = "top";
-        mainObj.bbox.y = -50;
-      }
-    }
+AuxiliaryUnit.setAnchorSide = function(mainObj, node) {
+
+  var thisX = mainObj.bbox.x;
+  var thisY = mainObj.bbox.y;
+  var thisH = mainObj.bbox.h;
+  var thisW = mainObj.bbox.w;
+  var width = (node.data('class') == "compartment" || node.data('class') == "complex") ? node.data('bbox').w : node.width();
+  var height = (node.data('class') == "compartment"|| node.data('class') == "complex") ? node.data('bbox').h : node.height();
+  var outerWidth = node.outerWidth() + (width - node.width());
+  var extraCompartmentPadding = (node.data("class") == "compartment") ? (-outerWidth * 0.1) : 0;
+  var parentX = (node.data('class') == "compartment" || node.data('class') == "complex") ? node.data('bbox').x : node.position().x;
+  var parentY = (node.data('class') == "compartment" || node.data('class') == "complex") ? node.data('bbox').y : node.position().y;
+  var parentX1 = parentX - width / 2 - extraCompartmentPadding;
+  var parentY1 = parentY - height/ 2;
+  var parentY2 = parentY + height/ 2;
+
+  if ((thisY + thisH/2).toFixed(2) == (parentY1).toFixed(2)){
+    mainObj.anchorSide = "top";
   }
+  else if ((thisY + thisH/2).toFixed(2) == (parentY2).toFixed(2)) {
+    mainObj.anchorSide = "bottom";
+  }
+  else if((thisX + thisW/2).toFixed(2) <= (parentX1).toFixed(2)) {
+    mainObj.anchorSide = "left";
+  }
+  else {
+    mainObj.anchorSide = "right";
+  }
+
 };
 
 AuxiliaryUnit.addToParent = function (mainObj, cy, parentNode, location, position, index) {
@@ -370,8 +409,9 @@ for (var prop in AuxiliaryUnit) {
 }
 
 // Construct a state variable object by extending default behaviours of a AuxiliaryUnit object and returns that object
-StateVariable.construct = function(value, stateVariableDefinition, parent) {
+StateVariable.construct = function(value, stateVariableDefinition, parent, id) {
   var obj = AuxiliaryUnit.construct(parent);
+  obj.id = id || elementUtilities.generateStateVarId();
   obj.state = {};
   obj.state.value = value;
   obj.state.variable = null;
@@ -380,8 +420,6 @@ StateVariable.construct = function(value, stateVariableDefinition, parent) {
 
   return obj;
 };
-
-StateVariable.shapeRadius = 15;
 
 StateVariable.getText = function(mainObj) {
   var stateValue = mainObj.state.value || '';
@@ -394,19 +432,7 @@ StateVariable.hasText = function(mainObj) {
   return (mainObj.state.value && mainObj.state.value != "") || (mainObj.state.variable && mainObj.state.variable != "");
 };
 
-StateVariable.drawShape = function(mainObj, cy, context, x, y) {
-  cytoscape.sbgn.drawRoundRectanglePath(context,
-              x, y,
-              mainObj.bbox.w, mainObj.bbox.h,
-              Math.min(mainObj.bbox.w / 2, mainObj.bbox.h / 2, StateVariable.shapeRadius));
-  var tmp_ctxt = context.fillStyle;
-  context.fillStyle = StateVariable.defaultBackgroundColor;
-  context.fill();
-  context.fillStyle = tmp_ctxt;
-  context.stroke();
-};
-
-StateVariable.create = function(parentNode, cy, value, variable, bbox, location, position, index) {
+StateVariable.create = function(parentNode, cy, value, variable, bbox, location, position, style, index, id) {
   // create the new state var of info
   var stateVar = StateVariable.construct();
   StateVariable.setParentRef(stateVar, parentNode);
@@ -415,6 +441,11 @@ StateVariable.create = function(parentNode, cy, value, variable, bbox, location,
   stateVar.variable = variable;
   stateVar.state = {value: value, variable: variable};
   stateVar.bbox = bbox;
+  stateVar.style = style;
+
+  if ( id ) {
+    stateVar.id = id;
+  }
 
   // link to layout
   position = StateVariable.addToParent(stateVar, cy, parentNode, location, position, index);
@@ -471,15 +502,14 @@ for (var prop in AuxiliaryUnit) {
 }
 
 // Constructs a UnitOfInformation object by extending properties of an AuxiliaryUnit object and return that object
-UnitOfInformation.construct = function(value, parent) {
+UnitOfInformation.construct = function(value, parent, id) {
   var obj = AuxiliaryUnit.construct(parent);
+  obj.id = id || elementUtilities.generateUnitOfInfoId();
   obj.label = {text: value}; // from legacy code, contains {text: }
   obj.clazz = "unit of information";
 
   return obj;
 };
-
-UnitOfInformation.shapeRadius = 4;
 
 UnitOfInformation.getText = function(mainObj) {
   return mainObj.label.text;
@@ -487,16 +517,6 @@ UnitOfInformation.getText = function(mainObj) {
 
 UnitOfInformation.hasText = function(mainObj) {
   return mainObj.label.text && mainObj.label.text != "";
-};
-
-UnitOfInformation.drawShape = function(mainObj, cy, context, x, y) {
-  cytoscape.sbgn.UnitOfInformationShapeFn(context, x, y, mainObj.bbox.w, mainObj.bbox.h,
-                  getAuxUnitClass(mainObj).getParent(mainObj, cy).data("class"));
-  var tmp_ctxt = context.fillStyle;
-  context.fillStyle = UnitOfInformation.defaultBackgroundColor;
-  context.fill();
-  context.fillStyle = tmp_ctxt;
-  context.stroke();
 };
 
 /**
@@ -507,10 +527,14 @@ UnitOfInformation.drawShape = function(mainObj, cy, context, x, y) {
  * @param [position] - its position in the order of elements placed on the same location
  * @param [index] - its index in the statesandinfos list
  */
-UnitOfInformation.create = function (parentNode, cy, value, bbox, location, position, index) {
+UnitOfInformation.create = function (parentNode, cy, value, bbox, location, position, style, index, id) {
   // create the new unit of info
   var unit = UnitOfInformation.construct(value, parentNode);
   unit.bbox = bbox;
+  unit.style = style;
+  if ( id ) {
+    unit.id = id;
+  }
 
   //console.log("will insert on", location, position);
   position = UnitOfInformation.addToParent(unit, cy, parentNode, location, position, index);
@@ -723,11 +747,11 @@ AuxUnitLayout.alwaysShowAuxUnits = true;
 AuxUnitLayout.maxUnitDisplayed = -1;
 AuxUnitLayout.lastPos = -1;
 
-AuxUnitLayout.update = function(mainObj, cy, doForceUpdate) {
-  AuxUnitLayout.precomputeCoords(mainObj, cy, doForceUpdate);
+AuxUnitLayout.update = function(mainObj, cy) {
+  //AuxUnitLayout.precomputeCoords(mainObj, cy);
 };
 
-AuxUnitLayout.addAuxUnit = function(mainObj, cy, unit, position) {
+AuxUnitLayout.addAuxUnit = function(mainObj, cy, unit, position, preComputed) {
   if(typeof position != "undefined") {
     //console.log("add unit at positiion", position);
     mainObj.units.splice(position, 0, unit);
@@ -736,31 +760,63 @@ AuxUnitLayout.addAuxUnit = function(mainObj, cy, unit, position) {
     mainObj.units.push(unit);
     position = mainObj.units.length - 1;
   }
-
-  AuxUnitLayout.updateLengthCache(mainObj, cy);
-  AuxUnitLayout.update(mainObj, cy, true);/*
-  if (AuxUnitLayout.getAlwaysShowAuxUnits(mainObj)) {
+  if (preComputed === undefined || preComputed === false) {
+    AuxUnitLayout.computeCoords(mainObj, cy, unit);
+    var parentNode = AuxUnitLayout.getParentNode(mainObj, cy);
+    AuxUnitLayout.fitUnits(parentNode, cy, mainObj.location);
+  }
+  //AuxUnitLayout.updateLengthCache(mainObj, cy);
+  //AuxUnitLayout.update(mainObj, cy, true);
+  /*if (AuxUnitLayout.getAlwaysShowAuxUnits(mainObj)) {
     // set a minimum size according to both sides on the same orientation
     AuxUnitLayout.setParentMinLength(mainObj, cy);
     // need to resize the parent in case the space was too small
     AuxUnitLayout.resizeParent(mainObj, cy, mainObj.lengthUsed);
   }*/
   //cy.style().update(); // <- was it really necessary ?
-  var parentNode = AuxUnitLayout.getParentNode(mainObj, cy);
   return position;
+};
+
+AuxUnitLayout.computeCoords = function(mainObj, cy, unit){
+  AuxUnitLayout.setDisplayedUnits(mainObj, cy);
+  var location = mainObj.location;
+  var node = AuxUnitLayout.getParentNode(mainObj, cy);
+  if (location === "top" || location === "bottom") {
+    var position = node.position();
+    var parentWidth = node.data('bbox').w;
+    var padding = node.padding();
+    var parentWidth = node.width();
+    var parentHeight = node.height();
+    var parentX1 = position.x - parentWidth/2 - padding;
+    var parentX2 = position.x + parentWidth/2 + padding;
+    var parentY1 = position.y - parentHeight/2 - padding;
+    var parentY2 = position.y + parentHeight/2 + padding;
+
+    if (mainObj.units.length === 1) {
+      var relativeCoords = AuxiliaryUnit.convertToRelativeCoord(unit, (parentX1) + AuxUnitLayout.getCurrentGap(location), 50, cy);
+      unit.bbox.x = relativeCoords.x + unit.bbox.w/2;
+    }
+    else {
+      var lastUnit = mainObj.units.length - 2;//Get the position of the last unit
+      unit.bbox.x = mainObj.units[lastUnit].bbox.x +  mainObj.units[lastUnit].bbox.w/2 + unit.bbox.w/2 + AuxUnitLayout.getCurrentGap(location);
+    }
+    unit.bbox.y = (location === "top") ? -50 : 50;
+  }//We don't have the right or left addition cases yet
 };
 
 AuxUnitLayout.removeAuxUnit = function(mainObj, cy, unit) {
   var index = mainObj.units.indexOf(unit);
   mainObj.units.splice(index, 1);
-  AuxUnitLayout.updateLengthCache(mainObj, cy);
-  AuxUnitLayout.update(mainObj, cy, true);/*
+  //AuxUnitLayout.updateLengthCache(mainObj, cy);
+  /*AuxUnitLayout.update(mainObj, cy, true);
   if (AuxUnitLayout.getAlwaysShowAuxUnits(mainObj)) {
     // set a minimum size according to both sides on the same orientation
     AuxUnitLayout.setParentMinLength(mainObj, cy);
   }*/
   var parentNode = AuxUnitLayout.getParentNode(mainObj, cy);
-  cy.style().update();
+
+  //TODO find a way to elimate this redundancy to update info-box positions
+  parentNode.data('border-width', parentNode.data('border-width'));
 };
 
 /**
@@ -788,8 +844,8 @@ AuxUnitLayout.reorderFromPositions = function(mainObj, cy) {
     return 0;
   });
   //console.log("units after reoarder", this.units);
-  AuxUnitLayout.updateLengthCache(mainObj, cy);
-  AuxUnitLayout.update(mainObj, cy, true);
+  /*AuxUnitLayout.updateLengthCache(mainObj, cy);
+  AuxUnitLayout.update(mainObj, cy, true);*/
 };
 
 /**
@@ -916,32 +972,81 @@ AuxUnitLayout.setCurrentGap = function (location, value){
   }
 };
 
-AuxUnitLayout.fitUnits = function (node) {
-  if (node.data('auxunitlayouts') === undefined) {
-    return;
+AuxUnitLayout.getCurrentGap = function (location){
+  if (location === "top") {
+    return AuxUnitLayout.currentTopUnitGap;
   }
-  if ((node.data("class") === "compartment" || node.data("class") === "complex")
-    && node._private.children !== undefined && node._private.children.length !== 0) {
-    var parentWidth =  node._private.autoWidth;
-    var parentHeight =  node._private.autoHeight;
-    var padding = node._private.autoPadding;
+  else if (location === "bottom") {
+    return AuxUnitLayout.currentBottomUnitGap;
+  }
+  else if (location === "right") {
+    return AuxUnitLayout.currentRightUnitGap;
   }
   else {
-    var parentWidth = node.data("bbox").w;
-    var parentHeight = node.data("bbox").h;
-    var padding = 0;
+    return AuxUnitLayout.currentLeftUnitGap;
   }
+};
+
+AuxUnitLayout.checkFit = function (node, cy, forceCheck){
+  var fitLocations = [];
+  for(var location in node.data('auxunitlayouts')) {
+    if (forceCheck !== undefined && location !== forceCheck) {
+      continue;
+    }
+    if (AuxUnitLayout.getCurrentGap(location) < AuxUnitLayout.unitGap) {
+      fitLocations.push(location);
+      continue;
+    }
+    var unit = node.data('auxunitlayouts')[location];
+    var units = unit.units;
+    if (units.length === 0) {
+      continue;
+    }
+    var firstUnit = units[0];
+    var lastUnit = units[units.length-1];
+    var coordsFirst = AuxiliaryUnit.convertToAbsoluteCoord(firstUnit, firstUnit.bbox.x, firstUnit.bbox.y, cy);
+    var coordsLast = AuxiliaryUnit.convertToAbsoluteCoord(lastUnit, lastUnit.bbox.x, lastUnit.bbox.y, cy);
+    var gap = AuxUnitLayout.getCurrentGap(location);
+    var padding = node.padding();
+    if (units.length > 0) { //For any case of removal
+      if (location === "top" || location === "bottom") {
+        var parentX1 = node.position().x - node.width()/2 - padding;
+        var parentX2 = node.position().x + node.width()/2 + padding;
+        var firstX1 = coordsFirst.x - firstUnit.bbox.w/2;
+        var lastX2 = coordsLast.x + lastUnit.bbox.w/2;
+        if (parentX1 + gap > firstX1 || parentX2 - gap < lastX2) {
+            fitLocations.push(location);
+        }
+      }
+      else {
+        var parentY1 = node.position().y - node.height()/2 - padding;
+        var parentY2 = node.position().y + node.height()/2 + padding;
+        var firstY1 = coordsFirst.y - firstUnit.bbox.h/2;
+        var lastY2 = coordsLast.y + lastUnit.bbox.h/2;
+        if (parentY1 + gap > firstY1 || parentY2 - gap < lastY2) {
+            fitLocations.push(location);
+        }
+      }
+    }
+  }
+  return fitLocations;
+};
+
+AuxUnitLayout.fitUnits = function (node, cy, locations) {
+
+  var parentWidth = node.width();
+  var parentHeight = node.height();
+  var padding = node.padding();
   var position = node.position();
-  var parentX1 = position.x - parentWidth/2;
-  var parentX2 = position.x + parentWidth/2;
-  var parentY1 = position.y - parentHeight/2;
-  var parentY2 = position.y + parentHeight/2;
+  var parentX1 = position.x - parentWidth/2 - padding;
+  var parentX2 = position.x + parentWidth/2 + padding;
+  var parentY1 = position.y - parentHeight/2 - padding;
+  var parentY2 = position.y + parentHeight/2 + padding;
+
   //Get Parent node and find parent width
   var usedLength;
-  var totalWidth;
   var estimatedGap;
-  var units;
-  var locations = ["top", "bottom", "left", "right"];
+
   for (var index = 0; index < locations.length; index++) {
     var location = locations[index];
     var auxUnit = node.data('auxunitlayouts')[location];
@@ -951,11 +1056,11 @@ AuxUnitLayout.fitUnits = function (node) {
     if (auxUnit.units.length <= 0 || !auxUnit.units) {
       continue;
     }
+    var units = auxUnit.units;
+    var firstPosition = AuxiliaryUnit.convertToRelativeCoord(units[0], parentX1, parentY1, undefined, node);//Position of the first unit
     if ( location === "top" || location === "bottom") {
       usedLength = AuxUnitLayout.getUsedLengthTB(node, auxUnit);
-      units = auxUnit.units;
-      var firstPosition = AuxiliaryUnit.convertToRelativeCoord(units[0], parentX1, parentY1, undefined, node);//Position of the first unit
-      totalWidth = AuxUnitLayout.getUsedWidth(node, auxUnit);
+      var totalWidth = AuxUnitLayout.getUsedWidth(node, auxUnit);
       estimatedGap = (parentWidth - totalWidth) / (units.length + 1);
       if (estimatedGap > AuxUnitLayout.unitGap) {
         estimatedGap = AuxUnitLayout.unitGap;
@@ -969,10 +1074,8 @@ AuxUnitLayout.fitUnits = function (node) {
     else {
       //Find total left length
       usedLength = AuxUnitLayout.getUsedLengthLR(node, auxUnit);
-      units = auxUnit.units;
-      var firstPosition = AuxiliaryUnit.convertToRelativeCoord(units[0], parentX1, parentY1, undefined, node);//Position of the first unit
       //Compare the side lengths
-      totalHeight = AuxUnitLayout.getUsedHeight(node, auxUnit);
+      var totalHeight = AuxUnitLayout.getUsedHeight(node, auxUnit);
       estimatedGap = (parentHeight - totalHeight) / (units.length + 1);
       if (estimatedGap > AuxUnitLayout.unitGap) {
         estimatedGap = AuxUnitLayout.unitGap;
@@ -987,6 +1090,10 @@ AuxUnitLayout.fitUnits = function (node) {
     }
     AuxUnitLayout.setCurrentGap(location, estimatedGap);
   }
+
+  //TODO find a way to elimate this redundancy to update info-box positions
+  node.data('border-width', node.data('border-width'));
+
 };
 
 
@@ -1038,10 +1145,7 @@ AuxUnitLayout.precomputeCoords = function (mainObj, cy, doForceUpdate) {
 AuxUnitLayout.draw = function (mainObj, cy, context) {
   for(var i=0; i < mainObj.units.length; i++) {
     var auxUnit = mainObj.units[i];
-    if (auxUnit.isDisplayed) {
-      // make each unit draw itself
       getAuxUnitClass(auxUnit).draw(auxUnit, cy, context);
-    }
   }
 };
 
@@ -1064,8 +1168,6 @@ AuxUnitLayout.modifyUnits = function(parentNode, unit, oldLocation, cy){
     }
   }
   deleteUnits.splice(deleteIndex, 1);
-  AuxUnitLayout.updateLengthCache(oldAuxUnit, cy);
-  AuxUnitLayout.update(oldAuxUnit, cy, true);
   //If new is not constructed contruct interval
   if (!parentNode.data('auxunitlayouts')[location]) {
     parentNode.data('auxunitlayouts')[location] = AuxUnitLayout.construct(parentNode, location);
@@ -1086,10 +1188,6 @@ AuxUnitLayout.modifyUnits = function(parentNode, unit, oldLocation, cy){
     }
   }
   insertUnits.splice(index, 0, unit);
-
-  AuxUnitLayout.updateLengthCache(insertAuxUnit, cy);
-  AuxUnitLayout.update(insertAuxUnit, cy, true);
-  AuxUnitLayout.fitUnits(parentNode);
 };
 
 AuxUnitLayout.isEmpty = function(mainObj) {

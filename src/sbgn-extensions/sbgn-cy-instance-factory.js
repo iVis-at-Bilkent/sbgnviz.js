@@ -2,6 +2,7 @@ var classes = require('../utilities/classes');
 var libs = require('../utilities/lib-utilities').getLibs();
 var jQuery = $ = libs.jQuery;
 var cytoscape = libs.cytoscape;
+var Tippy = libs.tippy;
 
 module.exports = function () {
 
@@ -110,7 +111,141 @@ module.exports = function () {
 	    ur.action("setPortsOrdering", undoRedoActionFunctions.setPortsOrdering, undoRedoActionFunctions.setPortsOrdering);
 	  }
 
+		function showTooltip(event) {
+			var node = event.target || event.cyTarget;
+
+
+			var canHaveTooltip = function( node ) {
+				return elementUtilities.isSIFNode(node);
+			}
+
+			if (!canHaveTooltip(node)) {
+				return;
+			}
+
+			var ref; // used only for positioning
+			var pos = event.position || event.cyPosition;
+			var pan = cy.pan();
+			var zoom = cy.zoom();
+
+			var infobox = classes.AuxiliaryUnit.checkPoint(pos.x, pos.y, node, 0);
+			var tooltipContent;
+
+			if ( elementUtilities.isSIFNode(node) ) {
+				if (!infobox) {
+					tooltipContent = node.data('tooltip');
+
+					if ( tooltipContent == undefined ) {
+						return;
+					}
+
+					ref = node.popperRef();
+				}
+				else {
+					tooltipContent = infobox['tooltip'];
+
+					if ( tooltipContent == undefined ) {
+						return;
+					}
+
+					var modelPos = classes.AuxiliaryUnit.getAbsoluteCoord(infobox, cy);
+					var modelW = infobox.bbox.w;
+					var modelH = infobox.bbox.h;
+					var renderedW = modelW * zoom;
+					var renderedH = modelH * zoom;
+					modelPos.x -= modelW / 2;
+					modelPos.y -= modelH / 2;
+					var renderedPos = elementUtilities.convertToRenderedPosition(modelPos, pan, zoom);
+
+					var renderedDims = { w: renderedW, h: renderedH };
+
+					ref = node.popperRef({
+						renderedPosition: function() {
+							return renderedPos;
+						},
+						renderedDimensions: function() {
+							return renderedDims;
+						}
+					});
+				}
+			}
+
+			var placement = infobox ? infobox.anchorSide : 'bottom';
+			var destroyTippy;
+
+			var tippy = Tippy.one(ref, {
+				content: (() => {
+					var content = document.createElement('div');
+
+					content.style['font-size'] = 12 * zoom + 'px';
+					content.innerHTML = tooltipContent;
+
+					return content;
+				})(),
+				trigger: 'manual',
+				hideOnClick: true,
+				arrow: true,
+				placement,
+				onHidden: function() {
+					cy.off('pan zoom', destroyTippy);
+					node.off('position', destroyTippy);
+					cy.off('tapdrag', destroyTippy);
+				}
+			});
+
+			destroyTippy = function(){
+				tippy.destroy();
+			};
+
+			cy.on('pan zoom', destroyTippy);
+			node.on('position', destroyTippy);
+			cy.on('tapdrag', destroyTippy);
+
+			setTimeout( () => tippy.show(), 0 );
+		}
+
 	  function bindCyEvents() {
+
+			cy.on('tapdragover', 'node', function(event) {
+				var waitDuration = 1000;
+				var nodeTapdragout;
+				var currEvent = event;
+				var node = currEvent.target || currEvent.cyTarget;
+				var inQueue = true;
+
+				var clearNodeEvent = function() {
+					if ( nodeTapdragout ) {
+						node.off('tapdragout', nodeTapdragout);
+					}
+
+					if ( nodeTapdrag ) {
+						node.off('tapdrag', nodeTapdrag);
+					}
+				};
+
+				var getShowTooltipAsycn = function() {
+					return setTimeout( function() {
+						showTooltip( currEvent );
+						inQueue = false;
+					}, waitDuration );
+				};
+
+				var showTooltipAsycn = getShowTooltipAsycn();
+
+				node.on('tapdragout', nodeTapdragout = function(e) {
+					clearTimeout( showTooltipAsycn );
+					clearNodeEvent();
+				});
+
+				node.on('tapdrag', nodeTapdrag = function(e) {
+					currEvent = e;
+					if (!inQueue) {
+						showTooltipAsycn = getShowTooltipAsycn();
+						inQueue = true;
+					}
+				});
+			});
+
 	    cy.on('tapend', 'node', function (event) {
 	      cy.style().update();
 	    });
@@ -167,7 +302,7 @@ module.exports = function () {
 	      }
 	    });
 
-	    $(document).on('updateGraphEnd', function(event, _cy) {
+	    $(document).on('updateGraphEnd', function(event, _cy, isLayoutRequired) {
 
 				// if the event is not triggered for this cy instance return directly
 				if ( _cy != cy ) {
@@ -210,43 +345,53 @@ module.exports = function () {
 	        // for each statesandinfos
 	        for(var i=0; i < node.data('statesandinfos').length; i++) {
 	          var statesandinfos = node.data('statesandinfos')[i];
-	          var location = statesandinfos.anchorSide; // top bottom right left
-	          var layouts = node.data('auxunitlayouts');
-	          if(!layouts[location]) { // layout doesn't exist yet for this location
-	            layouts[location] = classes.AuxUnitLayout.construct(node, location);
-	          }
-	          // populate the layout of this side
-	          classes.AuxUnitLayout.addAuxUnit(layouts[location], cy, statesandinfos);
-	        }
-	        // ensure that each layout has statesandinfos in correct order according to their initial positions
-	        for(var location in node.data('auxunitlayouts')) {
-						var unit = node.data('auxunitlayouts')[location];
-	          classes.AuxUnitLayout.reorderFromPositions(unit, cy);
-						var units = unit.units;
-						var coordsFirst = classes.AuxiliaryUnit.getAbsoluteCoord(units[0], cy);
-						var coordsLast = classes.AuxiliaryUnit.getAbsoluteCoord(units[units.length-1], cy);
-						var gap = classes.AuxUnitLayout.unitGap;
-						if (units.length > 0) { //For any case of removal
-							if (location === "top" || location === "bottom") {
-								var parentX1 = node.position().x - node.data("bbox").w/2;
-								var parentX2 = node.position().x + node.data("bbox").w/2;
-								var firstX1 = coordsFirst.x - units[0].bbox.w/2;
-								var lastX2 = coordsLast.x + units[units.length-1].bbox.w/2;
-								if (parentX1 + gap > firstX1 || parentX2 - gap < lastX2) {
-										classes.AuxUnitLayout.fitUnits(node, location);
-								}
+						var bbox = statesandinfos.bbox;
+
+						if (isLayoutRequired === undefined || !isLayoutRequired) {
+							var position = node.position();
+							var width = (node.data('class') == "compartment" || node.data('class') == "complex") ? node.data('bbox').w : node.width();
+							var height = (node.data('class') == "compartment" || node.data('class') == "complex") ? node.data('bbox').h : node.height();
+							var parentX = (node.data('class') == "compartment" || node.data('class') == "complex") ? node.data('bbox').x : position.x;
+							var parentY = (node.data('class') == "compartment" || node.data('class') == "complex") ? node.data('bbox').y : position.y;
+
+							classes.AuxiliaryUnit.setAnchorSide(statesandinfos, node);
+							bbox.x = (bbox.x - parentX + bbox.w/2) * 100 / width;
+							bbox.y = (bbox.y - parentY + bbox.h/2) * 100 / height;
+							var location = statesandinfos.anchorSide; // top bottom right left
+							var layouts = node.data('auxunitlayouts');
+							if(!layouts[location]) { // layout doesn't exist yet for this location
+								layouts[location] = classes.AuxUnitLayout.construct(node, location);
 							}
-							else {
-								var parentY1 = node.position().y - node.data("bbox").w/2;
-								var parentY2 = node.position().y + node.data("bbox").w/2 ;
-								var firstY1 = coordsFirst.y - units[0].bbox.h/2;
-								var lastY2 = coordsLast.y + units[units.length-1].bbox.h/2;
-								if (parentY1 + gap > firstY1 || parentY2 - gap < lastY2) {
-										classes.AuxUnitLayout.fitUnits(node, location);
-								}
-							}
+		          // populate the layout of this side
+		          classes.AuxUnitLayout.addAuxUnit(layouts[location], cy, statesandinfos, undefined, true); //positions are precomputed
 						}
+						else {
+							if(!node.data('auxunitlayouts')) { // ensure minimal initialization
+								node.data('auxunitlayouts', {});
+							}
+							var location = classes.AuxUnitLayout.selectNextAvailable(node, cy);
+							if(!node.data('auxunitlayouts')[location]) {
+								node.data('auxunitlayouts')[location] = classes.AuxUnitLayout.construct(node, location);
+							}
+							var layout = node.data('auxunitlayouts')[location];
+							statesandinfos.anchorSide = location;
+							switch(location) {
+								case "top": statesandinfos.bbox.y = -50; break;
+								case "bottom": statesandinfos.bbox.y = 50; break;
+								case "left": statesandinfos.bbox.x = -50; break;
+								case "right": statesandinfos.bbox.x = -50; break;
+							}
+							classes.AuxUnitLayout.addAuxUnit(layout, cy, statesandinfos);
+						}
+
 	        }
+
+					if (isLayoutRequired === true) {
+						var locations = classes.AuxUnitLayout.checkFit(node, cy);
+						if (locations !== undefined && locations.length > 0) {
+							classes.AuxUnitLayout.fitUnits(node, cy, locations);
+						}
+					}
 	      });
 	      cy.endBatch();
 	    });
@@ -258,14 +403,9 @@ module.exports = function () {
 	          .css({
 	            'text-valign': 'center',
 	            'text-halign': 'center',
-	            'border-width': 1.25,
-	            'border-color': '#555',
-	            'background-color': '#ffffff',
-	            'background-opacity': 0.5,
 	            'text-opacity': 1,
 	            'opacity': 1,
-	            'padding': 0,
-	            'text-wrap': 'wrap'
+	            'padding': 0
 	          })
 	          .selector("node[class]")
 	          .css({
@@ -275,10 +415,92 @@ module.exports = function () {
 	            'content': function (ele) {
 	              return elementUtilities.getElementContent(ele);
 	            },
-	            'font-size': function (ele) {
-	              return elementUtilities.getLabelTextSize(ele);
-	            },
-	          })
+							'font-size': function (ele) {
+			          // If node labels are expected to be adjusted automatically or element cannot have label
+			          // or ele.data('font-size') is not defined return elementUtilities.getLabelTextSize()
+								// else return ele.data('font-size')
+			          var opt = options.adjustNodeLabelFontSizeAutomatically;
+			          var adjust = typeof opt === 'function' ? opt() : opt;
+
+			          if (!adjust && ele.data('font-size') != undefined) {
+			            return ele.data('font-size');
+			          }
+
+			          return elementUtilities.getLabelTextSize(ele);
+			        }
+			      })
+			      .selector("node[class][font-family]")
+			      .style({
+			        'font-family': function( ele ) {
+								return ele.data('font-family');
+							}
+			      })
+			      .selector("node[class][font-style]")
+			      .style({
+			        'font-style': function( ele ) {
+								return ele.data('font-style')
+							}
+			      })
+			      .selector("node[class][font-weight]")
+			      .style({
+			        'font-weight': function( ele ) {
+								return ele.data('font-weight');
+							}
+			      })
+			      .selector("node[class][color]")
+			      .style({
+			        'color': function( ele ) {
+								return ele.data('color');
+							}
+			      })
+			      .selector("node[class][background-color]")
+			      .style({
+			        'background-color': function( ele ) {
+								return ele.data('background-color');
+							}
+			      })
+			      .selector("node[class][background-opacity]")
+			      .style({
+			        'background-opacity': function( ele ) {
+								return ele.data('background-opacity');
+							}
+			      })
+			      .selector("node[class][border-width]")
+			      .style({
+			        'border-width': function( ele ) {
+								return ele.data('border-width');
+							}
+			      })
+			      .selector("node[class][border-color]")
+			      .style({
+			        'border-color': function( ele ) {
+								return ele.data('border-color');
+							}
+			      })
+			      .selector("node[class][text-wrap]")
+			      .style({
+			        'text-wrap': function( ele ) {
+								return ele.data('text-wrap');
+							}
+			      })
+						.selector("edge[class][line-color]")
+			      .style({
+			        'line-color': function( ele ) {
+								return ele.data('line-color');
+							},
+			        'source-arrow-color': function( ele ) {
+								return ele.data('line-color');
+							},
+			        'target-arrow-color': function( ele ) {
+								return ele.data('line-color');
+							}
+			      })
+			      .selector("edge[class][width]")
+			      .style({
+			        'width': function( ele ) {
+								return ele.data('width');
+							}
+			      })
 	          .selector("node[class='association'],[class='dissociation'],[class='and'],[class='or'],[class='not'],[class='process'],[class='omitted process'],[class='uncertain process']")
 	          .css({
 	            'shape-polygon-points': function(ele) {
@@ -320,8 +542,6 @@ module.exports = function () {
 	          })
 	          .selector("node[class='compartment']")
 	          .css({
-	            'border-width': 3.25,
-	            'background-opacity': 0,
 	            'text-valign': 'bottom',
 	            'text-halign': 'center',
 	            'text-margin-y' : -1 * options.extraCompartmentPadding,
@@ -335,14 +555,12 @@ module.exports = function () {
 	          })
 	          .selector("node[class='submap']")
 	          .css({
-	            'border-width': 2.25,
-	            'background-opacity': 0,
 	            'text-valign': 'bottom',
 	            'text-halign': 'center',
 	            'text-margin-y' : -1 * options.extraCompartmentPadding,
 	            'compound-sizing-wrt-labels' : 'exclude',
 	          })
-	          .selector("node:parent[class='submap']")
+	          .selector("node:parent[class='submap'],[class='topology group']")
 	          .css({
 	            'padding': function() {
 	              return graphUtilities.getCompoundPaddings() + options.extraCompartmentPadding;
@@ -366,15 +584,15 @@ module.exports = function () {
 	          .selector("node:parent[minHeightBiasTop]")
 	          .css({
 	            'min-height-bias-top': function(ele) {
-	              var min = ele.data('minHeightBiasTop');
-	              return (min > 0 ? min : 100) + '%';
+	              var min = parseFloat(ele.data('minHeightBiasTop'));
+	              return (min >= 0 ? min : 100) + '%';
 	            }
 	          })
 	          .selector("node:parent[minHeightBiasBottom]")
 	          .css({
 	            'min-height-bias-bottom': function(ele) {
-	              var min = ele.data('minHeightBiasBottom');
-	              return (min > 0 ? min : 100) + '%';
+	              var min = parseFloat(ele.data('minHeightBiasBottom'));
+	              return (min >= 0 ? min : 100) + '%';
 	            }
 	          })
 	          .selector("node:parent[minWidth]")
@@ -390,15 +608,15 @@ module.exports = function () {
 	          .selector("node:parent[minWidthBiasLeft]")
 	          .css({
 	            'min-width-bias-left': function(ele) {
-	              var min = ele.data('minWidthBiasLeft');
-	              return (min > 0 ? min : 100) + '%';
+	              var min = parseFloat(ele.data('minWidthBiasLeft'));
+	              return (min >= 0 ? min : 100) + '%';
 	            }
 	          })
 	          .selector("node:parent[minWidthBiasRight]")
 	          .css({
 	            'min-width-bias-right': function(ele) {
-	              var min = ele.data('minWidthBiasRight');
-	              return (min > 0 ? min : 100) + '%';
+	              var min = parseFloat(ele.data('minWidthBiasRight'));
+	              return (min >= 0 ? min : 100) + '%';
 	            }
 	          })
 	          .selector("node.cy-expand-collapse-collapsed-node")
@@ -419,12 +637,10 @@ module.exports = function () {
 	          .selector("edge")
 	          .css({
 	            'curve-style': 'bezier',
-	            'line-color': '#555',
-	            'target-arrow-fill': 'hollow',
+	            'target-arrow-fill': function(ele) {
+								return elementUtilities.getCyTargetArrowFill(ele);
+							},
 	            'source-arrow-fill': 'hollow',
-	            'width': 1.25,
-	            'target-arrow-color': '#555',
-	            'source-arrow-color': '#555',
 	            'text-border-color': function (ele) {
 	              if (ele.selected()) {
 	                return selectionColor;
@@ -496,15 +712,10 @@ module.exports = function () {
 	            },
 	            'target-endpoint': function(ele) {
 	              return elementUtilities.getEndPoint(ele, 'target');
+	            },
+							'line-style': function (ele) {
+	              return elementUtilities.getArrayLineStyle(ele);
 	            }
-	          })
-	          .selector("edge[class='inhibition'],[class='negative influence']")
-	          .css({
-	            'target-arrow-fill': 'filled'
-	          })
-	          .selector("edge[class='production']")
-	          .css({
-	            'target-arrow-fill': 'filled'
 	          })
 	          .selector("core")
 	          .css({

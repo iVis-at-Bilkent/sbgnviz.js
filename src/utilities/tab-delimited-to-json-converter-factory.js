@@ -101,8 +101,7 @@ module.exports = function() {
 
 			if( formatVersion.length < 10 || formatVersion.substring(0,10).toLowerCase() != 'sbgnviz af')
 			{
-				console.log( "Wrong file format!");
-				return false;
+				throw "Wrong file format!";
 			}
 
 			if( formatVersion.length == 10){
@@ -168,12 +167,21 @@ module.exports = function() {
 					this.convertTypeToClass( newNode, nodeType, true);
 					this.addInfoBox(newNode);
 				} else{
-					console.log( "Node type mismatched...");
-					return false;
+					throw "Node type mismatched...";
 				}
 
 				if( parentID != '-1'){
 					newNode.data.parent = parentID;
+				}
+
+				if ( newNode.data.class ) {
+					elementUtilities.extendNodeDataWithClassDefaults( newNode.data, newNode.data.class );
+
+					if ( !newNode.data.bbox.w || !newNode.data.bbox.h ) {
+						var defaults = elementUtilities.getDefaultProperties( newNode.data.class );
+						newNode.data.bbox.w = newNode.data.bbox.w || defaults.width;
+						newNode.data.bbox.h = newNode.data.bbox.h || defaults.height;
+					}
 				}
 
 				nodes.push(newNode);
@@ -205,9 +213,11 @@ module.exports = function() {
 				if( this.validateEdgeType( edgeType))
 					this.convertTypeToClass( newEdge, edgeType);
 				else{
-					console.log( "Edge Type mismatched...");
-					return false;
+					throw "Edge Type mismatched...";
 				}
+
+				elementUtilities.extendEdgeDataWithClassDefaults( newEdge.data, newEdge.data.class );
+
 				edges.push( newEdge);
 			}
 			var jsGraph = {};

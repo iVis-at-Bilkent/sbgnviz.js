@@ -8,17 +8,23 @@ var libs = libUtilities.getLibs();
 var jQuery = $ = libs.jQuery;
 
 module.exports = function () {
-  var elementUtilities, jsonToSbgnml, sbgnmlToJson, tdToJson, optionUtilities, graphUtilities;
+  var elementUtilities, jsonToSbgnml, sbgnmlToJson, tdToJson, nwtToJson,
+      sifToJson, optionUtilities, graphUtilities, layoutLoader, jsonToNwt;
   var cy, options;
 
   function mainUtilities (param) {
     elementUtilities = param.elementUtilities;
     jsonToSbgnml = param.jsonToSbgnmlConverter;
+    jsonToNwt = param.jsonToNwtConverter;
     sbgnmlToJson = param.sbgnmlToJsonConverter;
+    nwtToJson = param.nwtToJsonConverter;
     tdToJson = param.tdToJsonConverter;
+    sifToJson = param.sifToJsonConverter;
     optionUtilities = param.optionUtilities;
     graphUtilities = param.graphUtilities;
     cy = param.sbgnCyInstance.getCy();
+    layoutLoader = param.layoutLoader;
+    layoutToText = param.layoutToText;
 
     options = optionUtilities.getOptions();
   }
@@ -33,9 +39,13 @@ module.exports = function () {
     // graphUtilities.disablePorts();
 
     // TODO do this by using extension API
-    cy.$('.edgebendediting-hasbendpoints').removeClass('edgebendediting-hasbendpoints');
-    edges.scratch('cyedgebendeditingWeights', []);
-    edges.scratch('cyedgebendeditingDistances', []);
+    // removes all bendpoints for all edges in cytoscape instance
+    for(var i = 0; i < edges.length; i++){
+      var edge = edges[i];
+      edge.removeClass('edgebendediting-hasbendpoints');
+      edge.data('cyedgebendeditingDistances', []);
+      edge.data('cyedgebendeditingWeights', []);
+    }
 
     parents.removeData('minWidth');
     parents.removeData('minHeight');
@@ -45,12 +55,18 @@ module.exports = function () {
     parents.removeData('minHeightBiasBottom');
 
     cy.endBatch();
-    cy.style().update();
+    
+    if(parents.length > 0)
+      cy.style().update();
   };
   // Helpers end
 
   // Expand given nodes. Requires expandCollapse extension and considers undoable option.
   mainUtilities.expandNodes = function(nodes) {
+    if ( elementUtilities.isGraphTopologyLocked() ) {
+      return;
+    }
+
     // Get expandCollapse api
     var expandCollapse = cy.expandCollapse('get');
 
@@ -70,6 +86,10 @@ module.exports = function () {
 
   // Collapse given nodes. Requires expandCollapse extension and considers undoable option.
   mainUtilities.collapseNodes = function(nodes) {
+    if ( elementUtilities.isGraphTopologyLocked() ) {
+      return;
+    }
+
     // Get expandCollapse api
     var expandCollapse = cy.expandCollapse('get');
 
@@ -89,6 +109,10 @@ module.exports = function () {
 
   // Collapse all complexes recursively. Requires expandCollapse extension and considers undoable option.
   mainUtilities.collapseComplexes = function() {
+    if ( elementUtilities.isGraphTopologyLocked() ) {
+      return;
+    }
+
     // Get expandCollapse api
     var expandCollapse = cy.expandCollapse('get');
 
@@ -109,6 +133,10 @@ module.exports = function () {
 
   // Expand all complexes recursively. Requires expandCollapse extension and considers undoable option.
   mainUtilities.expandComplexes = function() {
+    if ( elementUtilities.isGraphTopologyLocked() ) {
+      return;
+    }
+
     // Get expandCollapse api
     var expandCollapse = cy.expandCollapse('get');
 
@@ -129,6 +157,10 @@ module.exports = function () {
 
   // Collapse all nodes recursively. Requires expandCollapse extension and considers undoable option.
   mainUtilities.collapseAll = function() {
+    if ( elementUtilities.isGraphTopologyLocked() ) {
+      return;
+    }
+
     // Get expandCollapse api
     var expandCollapse = cy.expandCollapse('get');
 
@@ -149,6 +181,10 @@ module.exports = function () {
 
   // Expand all nodes recursively. Requires expandCollapse extension and considers undoable option.
   mainUtilities.expandAll = function() {
+    if ( elementUtilities.isGraphTopologyLocked() ) {
+      return;
+    }
+
     // Get expandCollapse api
     var expandCollapse = cy.expandCollapse('get');
 
@@ -328,7 +364,7 @@ module.exports = function () {
 
   // Removes the given elements in a simple way. Considers 'undoable' option.
   mainUtilities.deleteElesSimple = function(eles) {
-    if (eles.length == 0) {
+    if (elementUtilities.isGraphTopologyLocked() || eles.length == 0) {
       return;
     }
 
@@ -346,7 +382,7 @@ module.exports = function () {
   // Considers 'undoable' option.
   mainUtilities.deleteNodesSmart = function(_nodes) {
     var nodes = _nodes.nodes();
-    if (nodes.length == 0) {
+    if (elementUtilities.isGraphTopologyLocked() || nodes.length == 0) {
       return;
     }
 
@@ -435,7 +471,8 @@ module.exports = function () {
     // If this function is being called we can assume that view utilities extension is on use
     var viewUtilities = cy.viewUtilities('get');
 
-    nodesToHighlight = elementUtilities.extendNodeList(nodesToHighlight);
+    // Use this line for smart search
+    // nodesToHighlight = elementUtilities.extendNodeList(nodesToHighlight);
 
     if (options.undoable) {
       cy.undoRedo().do("highlight", nodesToHighlight);
@@ -490,6 +527,14 @@ module.exports = function () {
     cy.style().update();
   };
 
+  mainUtilities.loadLayoutData = function(layoutText, byName) {
+    layoutLoader.load( layoutText, byName );
+  };
+
+  mainUtilities.getLayoutText = function( byName ) {
+    layoutToText.convert( byName );
+  };
+
   // Performs layout by given layoutOptions. Considers 'undoable' option. However, by setting notUndoable parameter
   // to a truthy value you can force an undable layout operation independant of 'undoable' option.
   mainUtilities.performLayout = function(layoutOptions, notUndoable) {
@@ -517,10 +562,18 @@ module.exports = function () {
     return jsonToSbgnml.createSbgnml();
   };
 
+  mainUtilities.createNwt = function() {
+    return jsonToNwt.createSbgnml();
+  };
+
   // Converts given sbgnml data to a json object in a special format
   // (http://js.cytoscape.org/#notation/elements-json) and returns it.
   mainUtilities.convertSbgnmlToJson = function(data) {
     return sbgnmlToJson.convert(data);
+  };
+
+  mainUtilities.convertNwtToJson = function(data) {
+    return nwtToJson.convert(data);
   };
 
   // Create the qtip contents of the given node and returns it.
@@ -574,8 +627,12 @@ mainUtilities.getMapProperties = function() {
   if( elementUtilities.fileFormat !== undefined){
     if( elementUtilities.fileFormat == 'sbgnml')
       return sbgnmlToJson.mapPropertiesToObj();
+    else if( elementUtilities.fileFormat == 'nwt' )
+      return nwtToJson.mapPropertiesToObj();
     else if( elementUtilities.fileFormat == 'td')
       return tdToJson.mapPropertiesToObj();
+    else if( elementUtilities.fileFormat == 'sif' )
+      return sifToJson.mapPropertiesToObj();
     else{
       console.log( "File format mismatched!")
       return
@@ -584,6 +641,9 @@ mainUtilities.getMapProperties = function() {
     console.log( "File format is not defined!")
     return;
   }
- }
+ };
+  mainUtilities.doValidation = function(file) {
+    return sbgnmlToJson.doValidation(file);
+  }
    return mainUtilities;
 };
