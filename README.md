@@ -95,7 +95,7 @@ edge.data('bendPointPositions');
 
 ## API
 
-`sbgnviz.register(options)`
+`sbgnviz.register(libs)`
 Register with libraries before creating instances
 
 `sbgnviz.validMapProperties`
@@ -374,24 +374,17 @@ library of sbgnviz. Most users will not need to use this. It includes the follow
 * `canHaveUnitOfInformation(ele)` Returns whether the give element have unit of information.
 * `isEmptySetClass(ele)` Returns wether the given element or string is of the special empty set/source and sink class.
 * `isModulationArcClass(ele)` Returns whether the class of given element is a modulation arc as defined in PD specs.
-* `convertToRenderedPosition(modelPos, pan, zoom)` ?????.
-* `extendNodeList(nodesToShow)` ????????.
-* `extendRemainingNodes(nodesToFilter, allNodes)` ????.
-* `getArrayLineStyle(ele)` ?????.
-* `getCyShape(ele)` ????.
-* `getCyTargetArrowFill(ele)` ?????.
-* `getCyArrowShape(ele)` ????????.
-* `getElementContent(ele)` ????.
-* `getLabelTextSize(ele)` ?????.
-* `getCardinalityDistance(ele)` ????.
-* `getInfoLabel(node)` ?????.
-* `getQtipContent(node)` ????????.
-* `getDynamicLabelSizeCoefficient(dynamicLabelSize)` ????.
-* `getDynamicLabelTextSize(ele, dynamicLabelSizeCoefficient)` ?????.
+* `convertToRenderedPosition(modelPos, pan, zoom)` Returns rendered position of a given model position.
+* `getArrayLineStyle(ele)` Returns whether the line style is dashed or solid.
+* `getCyShape(ele)` Returns shape of the node.
+* `getCyTargetArrowFill(ele)` Returns whether target arrow of an edge is filled or hollow.
+* `getCyArrowShape(ele)` Returns arrow shape of an edge.
+* `getLabelTextSize(ele)` Returns text size of a node label.
+* `getCardinalityDistance(ele)` Returns the distance where the cardinality value is placed on the given edge.
 * `getEndPoint(edge, sourceOrTarget)` Get source/target end point of edge in 'x-value% y-value%' format. It returns 'outside-to-node' if there is no source/target port.
 * `addPorts(node, ordering, portDistance)` Add ports to the given node, with given ordering and port distance.
 * `removePorts(node)` Remove the ports of the given node
-* `changePortsOrientationAfterLayout()` ?????.
+* `changePortsOrientationAfterLayout()` Changes ports orientation after layout to beautify the visual quality
 * `changePortsOrientation(ele)` Calculates the best orientation for an 'ele' with port (process or logical operator) and returns it.
 * `calculateOrientationScore(ele, other, orientation, firstOrientation, oppositeOrientation, pos, simple)`
   This function calculates the scores for each orientation
@@ -412,11 +405,9 @@ library of sbgnviz. Most users will not need to use this. It includes the follow
   @param other - is the other node, and based on its position score of a node is calculated
   @param orientation - A string which holds current best orientation
 * `swapElements(firstEle, secondEle)` Swaps the positions of 2 elements.
-* `getComplexPadding(ele)` ??????.
-* `getComplexMargin(ele)` Swaps the positions of 2 elements.
-* `setCloneMarkerStatus(node, status)` et clone marker status of given nodes to the given status.
-* `languageToMapType(lang)` ????????
-* `mapTypeToLanguage(mapType)` ???????
+* `setCloneMarkerStatus(node, status)` Set clone marker status of given nodes to the given status.
+* `languageToMapType(lang)` Returns the corresponding map type of the given SBGN language.  
+* `mapTypeToLanguage(mapType)` Returns the corresponding SBGN language of the given map type.
 * `getAllCollapsedChildrenRecursively(nodes)` Returns all collapsed descendants of the given nodes.
 * `getWidthByContent(content, fontFamily, fontSize, options)` Calculates and returns the width barely enough to fit the given content typed with the given fontName and fontSize. 'options' parameter may have extra margin to add both sides, min and max values to return.
 
@@ -488,6 +479,7 @@ var sbgnviz = require('sbgnviz');
 var cytoscape = require('cytoscape-for-sbgnviz');
 var jQuery = require('jQuery');
 var filesaverjs = require('filesaverjs');
+var tippy = require('tippy.js');
 
 var options = {
 };
@@ -495,10 +487,15 @@ var options = {
 var libs = {
     cytoscape: cytoscape,
     jQuery: jQuery,
-    filesaverjs: filesaverjs
+    filesaverjs: filesaverjs,
+    tippy = tippy;
 };
 
-sbgnviz( options, libs );
+// Register sbgnviz with libs
+sbgnviz.register(libs);
+
+// Create a new sbgnviz.js instance
+var sbgnInstance = sbgnviz( options );
 ```
 
 In plain JS you do not need to require the libraries you just need to register sbgnviz with the options.
