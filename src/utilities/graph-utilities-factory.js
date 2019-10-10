@@ -52,7 +52,7 @@ module.exports = function () {
   };
 
   graphUtilities.updateGraph = function(cyGraph, callback, layoutOptions, tileInfoBoxes) {
-    console.log('cy update called');
+   
 
     var isLayoutRequired;
     if(layoutOptions === undefined){
