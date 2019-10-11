@@ -2198,7 +2198,7 @@ module.exports = function () {
   var getDefaultNodeProperties = function() {
     return {
       'border-width': 1.25,
-      'border-color': '#555',
+      'border-color': '#555555',
       'background-color': '#ffffff',
       'background-opacity': 1,
       'text-wrap': 'wrap'
@@ -2207,7 +2207,7 @@ module.exports = function () {
 
   var getDefaultEdgeProperties = function() {
     return {
-      'line-color': '#555',
+      'line-color': '#555555',
       'width': 1.25
     };
   };
@@ -2354,7 +2354,7 @@ module.exports = function () {
       'font-weight': 'normal',
       'font-color': '#0f0f0f',
       'border-width': 2.25,
-      'border-color': '#555',
+      'border-color': '#555555',
       'background-color': '#ffffff',
       'shape-name': getDefaultInfoboxShapeName( nodeClass, infoboxType ),
       'width': getDefaultInfoboxSize( nodeClass, infoboxType ).w,
