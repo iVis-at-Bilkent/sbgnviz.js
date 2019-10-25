@@ -26,7 +26,7 @@ module.exports = function () {
   };
 
   // initialize map type
-  elementUtilities.mapType = undefined;
+  elementUtilities.mapType = 'PD';
   elementUtilities.fileFormat = undefined;
 
   elementUtilities.PD = {}; // namespace for all PD specific stuff
@@ -521,7 +521,7 @@ module.exports = function () {
       return true;
     }
     else if (parentClass.startsWith('complex') && (!node || node.connectedEdges().length == 0  // Complexes can only include EPNs which do not have edges
-            || elementUtilities.mapType == "Unknown")) { // When map type is unknown, allow complexes to include EPNs with edges
+            || elementUtilities.mapType == "HybridAny" ||elementUtilities.mapType == "HybridSbgn")) { // When map type is unknown, allow complexes to include EPNs with edges
       return elementUtilities.isEPNClass(nodeClass);
     }
 
@@ -2554,8 +2554,10 @@ module.exports = function () {
         return 'AF';
       case 'sif':
         return 'SIF';
+      case 'HybridSbgn':
+        return 'HybridSbgn';
       default:
-        return 'Unknown';
+        return 'HybridAny';
     }
   };
 
@@ -2567,8 +2569,10 @@ module.exports = function () {
         return 'activity flow';
       case 'SIF':
         return 'sif';
+      case 'HybridSbgn':
+        return 'HybridSbgn';
       default:
-        return 'unknown';
+        return 'HybridAny';
     }
   };
 

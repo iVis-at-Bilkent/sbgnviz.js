@@ -290,8 +290,28 @@ module.exports = function () {
     nodeObj.statesandinfos = self.stateAndInfoProp(ele, nodeObj);
     // adding parent information
     self.addParentInfoToNode(ele, nodeObj, parent, compartments);
-    // add language info, this will always be the mapType
-    nodeObj.language = elementUtilities.mapType;
+
+
+    // add language info, this will always be the mapType if not hybrid
+    var mapType = elementUtilities.mapType;
+    if(mapType == 'PD' || mapType == 'AF' || mapType == 'SIF'){
+      nodeObj.language = elementUtilities.mapType;
+    }else if(mapType == 'HybridSbgn'){
+      if(nodeObj.class == 'delay' || nodeObj.class.startsWith("BA")){
+        nodeObj.language = 'AF';
+      }else{
+        nodeObj.language = 'PD';
+      }
+    }else{//maptype == HybridAny
+      if(nodeObj.class.startsWith("SIF")){
+        nodeObj.language = 'SIF';
+      }else if(nodeObj.class == 'delay' || nodeObj.class.startsWith("BA")){
+        nodeObj.language = 'AF';
+      }else{
+        nodeObj.language = 'PD';
+      }
+    }
+   
     // add default properties of the node type to element data
     // these props would be overriden by style properties of element
     // stored in the file
@@ -603,8 +623,34 @@ module.exports = function () {
     edgeObj.id = ele.id || undefined;
     edgeObj.class = ele.class_;
     edgeObj.bendPointPositions = bendPointPositions;
-    // add language info, this will always be the mapType
-    edgeObj.language = elementUtilities.mapType;
+
+
+
+    // add language info, this will always be the mapType if not hybrid
+    var PdEdges = ["consumption","production","modulation","stimulation","catalysis","inhibition","necessary stimulation","logic arc","equivalence arc"];
+    var AfEdges = ["positive influence","negative influence","unknown influence"];  
+    var mapType = elementUtilities.mapType;
+    if(mapType == 'PD' || mapType == 'AF' || mapType == 'SIF'){
+      edgeObj.language = elementUtilities.mapType;
+    }else if(mapType == 'HybridSbgn'){
+      if(PdEdges.indexOf(edgeObj.class) > -1){
+        edgeObj.language = 'PD';
+      }else{
+        edgeObj.language = 'AF';
+      }
+    }else{//maptype == HybridAny
+      if(PdEdges.indexOf(edgeObj.class) > -1){
+        edgeObj.language = 'PD';
+      }else if(AfEdges.indexOf(edgeObj.class) > -1){
+        edgeObj.language = 'AF';
+      }else{
+        edgeObj.language = 'SIF';
+      }
+    }
+
+
+    
+    
 
     elementUtilities.extendEdgeDataWithClassDefaults( edgeObj, edgeObj.class );
 

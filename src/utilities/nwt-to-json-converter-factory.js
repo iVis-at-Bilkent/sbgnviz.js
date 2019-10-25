@@ -144,7 +144,7 @@ module.exports = function() {
     var graphData = sbgnmlToJson.convert(xmlObject);
     var mapType = elementUtilities.mapType;
 
-    if (mapType !== 'PD' && mapType !== 'AF') {
+    if (mapType !== 'PD' && mapType !== 'AF' && elementUtilities.mapType !== 'HybridSbgn') {
       elementUtilities.fileFormat = 'nwt';
       // extend edges data with sif specific features
       extendElementsData( graphData.edges, elementUtilities.isSIFEdge, sbgnmlToJson.getArcById.bind(sbgnmlToJson), sifEdgePropHandlerMap, xmlObject );
