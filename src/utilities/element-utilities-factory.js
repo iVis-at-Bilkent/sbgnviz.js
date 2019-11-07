@@ -2554,7 +2554,7 @@ module.exports = function () {
         return 'AF';
       case 'sif':
         return 'SIF';
-      case 'HybridSbgn':
+      case 'hybrid sbgn':
         return 'HybridSbgn';
       default:
         return 'HybridAny';
@@ -2570,9 +2570,9 @@ module.exports = function () {
       case 'SIF':
         return 'sif';
       case 'HybridSbgn':
-        return 'HybridSbgn';
+        return 'hybrid sbgn';
       default:
-        return 'HybridAny';
+        return 'hybrid any';
     }
   };
 
