@@ -31,7 +31,10 @@
     var tdParser = require('./utilities/tab-delimeted-parser');
     var layoutLoader = require('./utilities/layout-loader-factory')();
     var layoutToText = require('./utilities/layout-to-text-factory')();
-
+    var cdToSbgnmlConverter = require('./utilities/cd-to-sbgnml-converter-factory')();
+    var sbgnmlToCdConverter = require('./utilities/sbgnml-to-cd-converter-factory')();
+    var sbgnmlToSbmlConverter = require('./utilities/sbgnml-to-sbml-converter-factory')();
+    var sbmlToSbgnmlConverter = require('./utilities/sbml-to-sbgnml-converter-factory')();
     // Fill param object to use it utilities internally
     param.optionUtilities = optionUtilities;
     param.sbgnCyInstance = sbgnCyInstance;
@@ -52,6 +55,10 @@
     param.layoutLoader = layoutLoader;
     param.layoutToText = layoutToText;
     param.jsonToSifConverter = jsonToSifConverter;
+    param.cdToSbgnmlConverter = cdToSbgnmlConverter;
+    param.sbgnmlToCdConverter = sbgnmlToCdConverter;
+    param.sbgnmlToSbmlConverter = sbgnmlToSbmlConverter;
+    param.sbmlToSbgnmlConverter = sbmlToSbgnmlConverter;
 
     // call constructors of objects with param
     sbgnCyInstance(param);
@@ -72,6 +79,10 @@
     layoutLoader(param);
     layoutToText(param);
     jsonToSifConverter(param);
+    cdToSbgnmlConverter(param);
+    sbgnmlToCdConverter(param);
+    sbgnmlToSbmlConverter(param);
+    sbmlToSbgnmlConverter(param);
 
     // set scratch pad for sbgnviz and init sbgnvizParams inside it
     sbgnCyInstance.getCy().scratch('_sbgnviz', {});

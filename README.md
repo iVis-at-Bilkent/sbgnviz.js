@@ -234,6 +234,31 @@ Loads the given nwt file. Optionally apply a callback function upon loading. Cal
 `instance.getMapProperties()`
 Get map properties from SBGNML file. Needs to be called after file is loaded - sbgnvizLoadFileEnd event. Return: map properties as object
 
+`instance.loadCellDesigner(file, successCallback, errorCallback)`
+Loads the given celldesigner file. successCallback is the callback function applied upon success and accepts file data as sbgnml text.
+
+`instance.loadSbml(file, successCallback, errorCallback)`
+Loads the given sbml file. successCallback is the callback function applied upon success and accepts file data as sbgnml text.
+
+
+`instance.saveAsCellDesigner = function(filename, errorCallback)`
+ Exports the current graph to an CellDesigner file with the given filename.
+
+`instance.saveAsSbml = function(filename, errorCallback)`
+ Exports the current graph to an SBML file with the given filename.
+
+`instance.convertSbgnmlToCD = function(sbgnml, callback)`
+Converts the given sbgnml text to a cell designer format.
+
+`instance.convertSbgnmlToSbml = function(sbgnml, callback)`
+Converts the given sbgnml text to sbml format.
+
+`instance.convertSbmlToSbgnml = function(sbml, callback)`
+Converts the given sbml text to sbgnml format.
+
+`instance.convertCDToSbgnml = function(xml,callback)`
+Converts the given celldesginer text to sbgnml format.
+
 `instance.exportLayoutData(filename, byName)`
 
 

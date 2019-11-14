@@ -576,6 +576,7 @@ module.exports = function () {
     return nwtToJson.convert(data);
   };
 
+
   // Create the qtip contents of the given node and returns it.
   mainUtilities.getQtipContent = function(node) {
     return elementUtilities.getQtipContent(node);
