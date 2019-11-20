@@ -236,11 +236,13 @@ AuxiliaryUnit.getAbsoluteCoord = function(mainObj, cy) {
   }
   else if(mainObj.coordType == "relativeToSide") {
     if (mainObj.anchorSide == "top" || mainObj.anchorSide == "bottom") {
-      var absX = position.x - (parent.outerWidth() - borderWidth) / 2 + mainObj.bbox.x;
+      var absX = position.x - (parent.outerWidth() - borderWidth) / 2 + mainObj.bbox.x;      
+      //var absX = mainObj.bbox.x * (parent.outerWidth() - borderWidth) / 100 + position.x;
       var absY = mainObj.bbox.y * (parent.outerHeight() - borderWidth) / 100 + position.y;
     }
     else {
       var absY = position.y - (parent.outerHeight() - borderWidth) / 2 + mainObj.bbox.y;
+      //var absY = mainObj.bbox.y * (parent.outerHeight() - borderWidth) / 100 + position.y;
       var absX = mainObj.bbox.x * (parent.outerWidth() - borderWidth) / 100 + position.x;
     }
 
@@ -261,11 +263,14 @@ AuxiliaryUnit.convertToAbsoluteCoord = function(mainObj, relX, relY, cy) {
   }
   else if(mainObj.coordType == "relativeToSide") {
     if (mainObj.anchorSide == "top" || mainObj.anchorSide == "bottom") {
-      var absX = parent._private.position.x - (parent.outerWidth() - parent._private.data['border-width']) / 2 + relX;
+      //var absX = parent._private.position.x - (parent.outerWidth() - parent._private.data['border-width']) / 2 + relX;
+      var absX = relX  * (parent.outerWidth() - parent._private.data['border-width']) / 100 + parent._private.position.x;
+
       var absY = relY  * (parent.outerHeight() - parent._private.data['border-width']) / 100 + parent._private.position.y;
     }
     else {
-      var absY = parent._private.position.y - (parent.outerHeight() - parent._private.data['border-width']) / 2 + relY ;
+     // var absY = parent._private.position.y - (parent.outerHeight() - parent._private.data['border-width']) / 2 + relY ;
+      var absY = relY * (parent.outerHeight() - parent._private.data['border-width']) / 100 + parent._private.position.y;
       var absX = relX * (parent.outerWidth() - parent._private.data['border-width']) / 100 + parent._private.position.x;
     }
 
@@ -299,11 +304,13 @@ AuxiliaryUnit.convertToRelativeCoord = function(mainObj, absX, absY, cy, parentN
         absX -= parent.outerWidth() * 0.1;
     };
     if (mainObj.anchorSide == "top" || mainObj.anchorSide == "bottom") {
-      var relX = absX - position.x + (parent.outerWidth() - borderWidth) / 2;
+      //var relX = absX - position.x + (parent.outerWidth() - borderWidth) / 2;
+      var relX = (absX - position.x) * 100 / (parent.outerWidth() - borderWidth);
       var relY = (absY - position.y) * 100 / (parent.outerHeight() - borderWidth);
     }
     else {
-      var relY = absY - position.y + (parent.outerHeight() - borderWidth) / 2;
+      //var relY = absY - position.y + (parent.outerHeight() - borderWidth) / 2;
+      var relY = (absY - position.y) * 100 / (parent.outerHeight() - borderWidth);
       var relX = (absX - position.x) * 100 / (parent.outerWidth() - borderWidth);
     }
 
@@ -370,7 +377,7 @@ AuxiliaryUnit.addToParent = function (mainObj, cy, parentNode, location, positio
     case "top": mainObj.bbox.y = -50; break;
     case "bottom": mainObj.bbox.y = 50; break;
     case "left": mainObj.bbox.x = -50; break;
-    case "right": mainObj.bbox.x = -50; break;
+    case "right": mainObj.bbox.x = 50; break;
   }
   // add stateVar to layout, precomputing of relative coords will be triggered accordingly
   var insertedPosition = AuxUnitLayout.addAuxUnit(layout, cy, mainObj, position);
