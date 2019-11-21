@@ -236,13 +236,13 @@ AuxiliaryUnit.getAbsoluteCoord = function(mainObj, cy) {
   }
   else if(mainObj.coordType == "relativeToSide") {
     if (mainObj.anchorSide == "top" || mainObj.anchorSide == "bottom") {
-      var absX = position.x - (parent.outerWidth() - borderWidth) / 2 + mainObj.bbox.x;      
-      //var absX = mainObj.bbox.x * (parent.outerWidth() - borderWidth) / 100 + position.x;
+      //var absX = position.x - (parent.outerWidth() - borderWidth) / 2 + mainObj.bbox.x;      
+      var absX = mainObj.bbox.x * (parent.outerWidth() - borderWidth) / 100 + position.x;
       var absY = mainObj.bbox.y * (parent.outerHeight() - borderWidth) / 100 + position.y;
     }
     else {
-      var absY = position.y - (parent.outerHeight() - borderWidth) / 2 + mainObj.bbox.y;
-      //var absY = mainObj.bbox.y * (parent.outerHeight() - borderWidth) / 100 + position.y;
+      //var absY = position.y - (parent.outerHeight() - borderWidth) / 2 + mainObj.bbox.y;
+      var absY = mainObj.bbox.y * (parent.outerHeight() - borderWidth) / 100 + position.y;
       var absX = mainObj.bbox.x * (parent.outerWidth() - borderWidth) / 100 + position.x;
     }
 
