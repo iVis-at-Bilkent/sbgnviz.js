@@ -512,8 +512,8 @@ module.exports = function () {
       var x = boxBbox.x / 100 * node.width();
       var y = boxBbox.y / 100 * node.height();
 
-      x = node._private.position.x + (x - boxBbox.w/2);
-      y = node._private.position.y + (y - boxBbox.h/2);
+      x = node._private.position.x - node.width()/2 + (x - boxBbox.w/2);
+      y = node._private.position.y - node.height()/2 + (y - boxBbox.h/2);
 
       return new libsbgnjs.Bbox({x: x, y: y, w: boxBbox.w, h: boxBbox.h});
   };

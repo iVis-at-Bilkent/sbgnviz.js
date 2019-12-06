@@ -342,47 +342,52 @@ module.exports = function () {
 	      cy.startBatch();
 	      cy.nodes().forEach(function(node) {
 	        node.data('auxunitlayouts', {});
-	        // for each statesandinfos
+			// for each statesandinfos
+			
+			/* var correctInfoBoxCoord = true;
+			for(var i=0; i < node.data('statesandinfos').length; i++) {
+				var statesandinfos = node.data('statesandinfos')[i];
+				var bbox = statesandinfos.bbox;
+				var infoBoxOnNode = classes.AuxiliaryUnit.setAnchorSide(statesandinfos, node);
+				correctInfoBoxCoord = correctInfoBoxCoord && infoBoxOnNode;
+			}
+ */
 	        for(var i=0; i < node.data('statesandinfos').length; i++) {
-	          var statesandinfos = node.data('statesandinfos')[i];
-						var bbox = statesandinfos.bbox;
+	           var statesandinfos = node.data('statesandinfos')[i];
+				var bbox = statesandinfos.bbox;
+				
 
-						if (isLayoutRequired === undefined || !isLayoutRequired) {
-							var position = node.position();
-							var width = (node.data('class') == "compartment" || node.data('class') == "complex") ? node.data('bbox').w : node.width();
-							var height = (node.data('class') == "compartment" || node.data('class') == "complex") ? node.data('bbox').h : node.height();
-							var parentX = (node.data('class') == "compartment" || node.data('class') == "complex") ? node.data('bbox').x : position.x;
-							var parentY = (node.data('class') == "compartment" || node.data('class') == "complex") ? node.data('bbox').y : position.y;
-
-							classes.AuxiliaryUnit.setAnchorSide(statesandinfos, node);
-							bbox.x = (bbox.x - parentX + bbox.w/2) * 100 / width;
-							bbox.y = (bbox.y - parentY + bbox.h/2) * 100 / height;
-							var location = statesandinfos.anchorSide; // top bottom right left
-							var layouts = node.data('auxunitlayouts');
-							if(!layouts[location]) { // layout doesn't exist yet for this location
-								layouts[location] = classes.AuxUnitLayout.construct(node, location);
-							}
-		          // populate the layout of this side
-		          classes.AuxUnitLayout.addAuxUnit(layouts[location], cy, statesandinfos, undefined, true); //positions are precomputed
-						}
-						else {
-							if(!node.data('auxunitlayouts')) { // ensure minimal initialization
-								node.data('auxunitlayouts', {});
-							}
-							var location = classes.AuxUnitLayout.selectNextAvailable(node, cy);
-							if(!node.data('auxunitlayouts')[location]) {
-								node.data('auxunitlayouts')[location] = classes.AuxUnitLayout.construct(node, location);
-							}
-							var layout = node.data('auxunitlayouts')[location];
-							statesandinfos.anchorSide = location;
-							switch(location) {
-								case "top": statesandinfos.bbox.y = -50; break;
-								case "bottom": statesandinfos.bbox.y = 50; break;
-								case "left": statesandinfos.bbox.x = -50; break;
-								case "right": statesandinfos.bbox.x = -50; break;
-							}
-							classes.AuxUnitLayout.addAuxUnit(layout, cy, statesandinfos);
-						}
+				if ((isLayoutRequired === undefined || !isLayoutRequired )) {					
+					classes.AuxiliaryUnit.setAnchorSide(statesandinfos, node);
+					var cordResult = classes.AuxiliaryUnit.convertToRelativeCoord(statesandinfos, bbox.x+bbox.w/2, bbox.y+bbox.h/2, cy, node)
+					statesandinfos.bbox.x = cordResult.x;
+					statesandinfos.bbox.y = cordResult.y;						
+					var location = statesandinfos.anchorSide; // top bottom right left
+					var layouts = node.data('auxunitlayouts');
+					if(!layouts[location]) { // layout doesn't exist yet for this location
+						layouts[location] = classes.AuxUnitLayout.construct(node, location);
+					}
+					// populate the layout of this side
+					classes.AuxUnitLayout.addAuxUnit(layouts[location], cy, statesandinfos, undefined, true); //positions are precomputed
+				}
+				else {
+					if(!node.data('auxunitlayouts')) { // ensure minimal initialization
+						node.data('auxunitlayouts', {});
+					}
+					var location = classes.AuxUnitLayout.selectNextAvailable(node, cy);
+					if(!node.data('auxunitlayouts')[location]) {
+						node.data('auxunitlayouts')[location] = classes.AuxUnitLayout.construct(node, location);
+					}
+					var layout = node.data('auxunitlayouts')[location];
+					statesandinfos.anchorSide = location;
+					switch(location) {
+						case "top": statesandinfos.bbox.y = 0; break;
+						case "bottom": statesandinfos.bbox.y = 100; break;
+						case "left": statesandinfos.bbox.x = 0; break;
+						case "right": statesandinfos.bbox.x = 100; break;
+					}
+					classes.AuxUnitLayout.addAuxUnit(layout, cy, statesandinfos);
+				}
 
 	        }
 

@@ -149,6 +149,9 @@ module.exports = function () {
     bbox.y = ele.bbox.y;
     bbox.w = ele.bbox.w;
     bbox.h = ele.bbox.h;
+   
+
+
     return bbox;
   };
 
@@ -215,6 +218,7 @@ module.exports = function () {
         infobox.state.value = (state && state.value) || undefined;
         infobox.state.variable = (state && state.variable) || undefined;
       }
+      //var bboxAndAnchorResult = getAuxUnitClass(infobox).setAnchorSideAndBbox();
 
       infobox.bbox = self.stateAndInfoBboxProp(glyph, parentBbox);
       infobox.style = self.getDefaultStateAndInfoStyle(glyph, parent.class);
@@ -455,7 +459,7 @@ module.exports = function () {
   };
 
   sbgnmlToJson.traverseNodes = function (ele, jsonArray, parent, compartments) {
-    var elId = ele.id;
+    var elId = ele.id; 
     if (!handledElements[ele.class_]) {
       return;
     }
