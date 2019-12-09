@@ -145,10 +145,19 @@ module.exports = function () {
   sbgnmlToJson.stateAndInfoBboxProp = function (ele, parentBbox) {
     // don't copy directly ele.box because it contains other things than x y w h
     var bbox = {};
-    bbox.x = ele.bbox.x;
-    bbox.y = ele.bbox.y;
-    bbox.w = ele.bbox.w;
-    bbox.h = ele.bbox.h;
+
+    if(ele.bbox != null){
+      bbox.x = ele.bbox.x ;
+      bbox.y = ele.bbox.y;
+      bbox.w = ele.bbox.w;
+      bbox.h = ele.bbox.h;
+    }else{
+      bbox.x = 0 ;
+      bbox.y = 0;
+      bbox.w = 12;
+      bbox.h = 12;
+    }
+   
    
 
 
