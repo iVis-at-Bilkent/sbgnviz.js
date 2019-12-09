@@ -352,7 +352,7 @@ AuxiliaryUnit.setAnchorSide = function(mainObj, node) {
   else if((thisX + thisW/2).toFixed(2) <= (parentX1).toFixed(2)) {
     mainObj.anchorSide = "left";
   }
-  else if((thisX + thisW/2).toFixed(2) == (parentX1).toFixed(2)){
+  else if(((thisX + thisW/2).toFixed(2)  <=  ((parentX1).toFixed(2) + 2))  || ((thisX + thisW/2).toFixed(2)  >=  ((parentX1).toFixed(2) - 2)) ){
     mainObj.anchorSide = "right";
   }else{
     return false;

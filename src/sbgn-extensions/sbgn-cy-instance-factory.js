@@ -344,20 +344,20 @@ module.exports = function () {
 	        node.data('auxunitlayouts', {});
 			// for each statesandinfos
 			
-			/* var correctInfoBoxCoord = true;
+			 var correctInfoBoxCoord = true;
 			for(var i=0; i < node.data('statesandinfos').length; i++) {
 				var statesandinfos = node.data('statesandinfos')[i];
 				var bbox = statesandinfos.bbox;
 				var infoBoxOnNode = classes.AuxiliaryUnit.setAnchorSide(statesandinfos, node);
 				correctInfoBoxCoord = correctInfoBoxCoord && infoBoxOnNode;
 			}
- */
+
 	        for(var i=0; i < node.data('statesandinfos').length; i++) {
 	           var statesandinfos = node.data('statesandinfos')[i];
 				var bbox = statesandinfos.bbox;
 				
 
-				if ((isLayoutRequired === undefined || !isLayoutRequired )) {					
+				if ((isLayoutRequired === undefined || !isLayoutRequired ) && correctInfoBoxCoord) {					
 					classes.AuxiliaryUnit.setAnchorSide(statesandinfos, node);
 					var cordResult = classes.AuxiliaryUnit.convertToRelativeCoord(statesandinfos, bbox.x+bbox.w/2, bbox.y+bbox.h/2, cy, node)
 					statesandinfos.bbox.x = cordResult.x;
