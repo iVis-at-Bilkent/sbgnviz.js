@@ -1059,6 +1059,68 @@ AuxUnitLayout.checkFit = function (node, cy, forceCheck){
   return fitLocations;
 };
 
+AuxUnitLayout.setIdealGap = function(node, location){
+
+  var parentWidth = node.width();
+  var parentHeight = node.height();
+  var padding = node.padding();
+  var position = node.position();
+  var parentX1 = position.x - parentWidth/2 - padding;
+  var parentY1 = position.y - parentHeight/2 - padding;
+  var estimatedGap;
+   
+    var auxUnit = node.data('auxunitlayouts')[location];
+    if (auxUnit === undefined) {
+      return 0;
+    }
+    if (auxUnit.units.length <= 0 || !auxUnit.units) {
+      return 0;
+    }
+    var units = auxUnit.units;
+    
+    if ( location === "top" || location === "bottom") {
+      usedLength = AuxUnitLayout.getUsedLengthTB(node, auxUnit);
+      var totalWidth = AuxUnitLayout.getUsedWidth(node, auxUnit);
+      estimatedGap = (parentWidth - totalWidth) / (units.length + 1);
+      if (estimatedGap > AuxUnitLayout.unitGap) {
+        estimatedGap = AuxUnitLayout.unitGap;
+      }
+
+      //var firstPosition = AuxiliaryUnit.convertToRelativeCoord(units[0], unit[0].bbox.w/2 + (parentX1) + estimatedGap, (parentY1) + estimatedGap, undefined, node);//Position of the first unit
+      
+      var usedLength = estimatedGap;
+      for (var i = 0; i < units.length; i++) {
+        var relativeCord = AuxiliaryUnit.convertToRelativeCoord(units[i], parentX1 +usedLength + units[i].bbox.w/2, (parentY1) , undefined, node);
+        units[i].bbox.x = relativeCord.x;
+        units[i].bbox.y = relativeCord.y;
+        usedLength += units[i].bbox.w+ estimatedGap;       
+       
+      }
+      AuxUnitLayout.setCurrentGap(location, estimatedGap);
+    }
+    else {
+      //Find total left length
+      usedLength = AuxUnitLayout.getUsedLengthLR(node, auxUnit);
+      //Compare the side lengths
+      var totalHeight = AuxUnitLayout.getUsedHeight(node, auxUnit);
+      estimatedGap = (parentHeight - totalHeight) / (units.length + 1);
+      if (estimatedGap > AuxUnitLayout.unitGap) {
+        estimatedGap = AuxUnitLayout.unitGap;
+      }
+      //Else scale by using available space, reducing margins and gaps.
+      //Check if new gap is enough to fit
+      var usedLength = estimatedGap;
+      for (var i = 0; i < units.length; i++) {
+        var relativeCord = AuxiliaryUnit.convertToRelativeCoord(units[i], parentX1 , (parentY1) + usedLength + units[i].bbox.h/2, undefined, node);
+        units[i].bbox.x = relativeCord.x;
+        units[i].bbox.y = relativeCord.y;
+        usedLength += units[i].bbox.h+ estimatedGap;
+      }
+      //AuxUnitLayout.currentLeftUnitGap = estimatedGap;
+    }
+    AuxUnitLayout.setCurrentGap(location, estimatedGap);
+  
+}
 AuxUnitLayout.fitUnits = function (node, cy, locations) {
 
   var parentWidth = node.width();
