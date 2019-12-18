@@ -339,20 +339,24 @@ AuxiliaryUnit.setAnchorSide = function(mainObj, node) {
   var extraCompartmentPadding = (node.data("class") == "compartment") ? (-outerWidth * 0.1) : 0;
   var parentX = (node.data('class') == "compartment" || node.data('class') == "complex") ? node.data('bbox').x : node.position().x;
   var parentY = (node.data('class') == "compartment" || node.data('class') == "complex") ? node.data('bbox').y : node.position().y;
-  var parentX1 = parentX - width / 2 - extraCompartmentPadding;
-  var parentY1 = parentY - height/ 2;
-  var parentY2 = parentY + height/ 2;
+  var parentX1 = Number((parentX - width / 2 - extraCompartmentPadding).toFixed(2));
+  var parentX2 = Number((parentX+width/2).toFixed(2));
+  var parentY1 = Number((parentY - height/ 2).toFixed(2));
+  var parentY2 = Number((parentY + height/ 2).toFixed(2));
+  var centerX = Number((thisX+thisW/2).toFixed(2));
+  var centerY = Number((thisY+thisH/2).toFixed(2));
 
-  if ((thisY + thisH/2).toFixed(2) == (parentY1).toFixed(2)){
+
+  if (centerY ==parentY1){
     mainObj.anchorSide = "top";
   }
-  else if ((thisY + thisH/2).toFixed(2) == (parentY2).toFixed(2)) {
+  else if (centerY == parentY2) {
     mainObj.anchorSide = "bottom";
   }
-  else if((thisX + thisW/2).toFixed(2) <= (parentX1).toFixed(2)) {
+  else if(centerX <= parentX1) {
     mainObj.anchorSide = "left";
   }
-  else if(((thisX + thisW/2).toFixed(2)  <=  ((parentX1).toFixed(2) + 2))  || ((thisX + thisW/2).toFixed(2)  >=  ((parentX1).toFixed(2) - 2)) ){
+  else if((centerX  <=  (parentX2 + 2))  && (centerX  >=  (parentX2 - 2)) ){
     mainObj.anchorSide = "right";
   }else{
     return false;
