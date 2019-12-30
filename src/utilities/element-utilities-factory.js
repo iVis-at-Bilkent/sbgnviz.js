@@ -1860,23 +1860,27 @@ module.exports = function () {
       {
           targetingEdges.forEach(function(edge){
               var source = cy.getElementById(edge.data('source'));
-              if (edge.data('class') === 'consumption')
-              {
-                  elementUtilities.addSimpleNodeToArray(ele, source, bestOrientation, inputPort, "input");
-              }
-              else
-              {
-                  elementUtilities.addSimpleNodeToArray(ele, source, bestOrientation, notConnectedToPort, "notConnected");
+              if(!source.isParent()){
+                if (edge.data('class') === 'consumption')
+                {
+                    elementUtilities.addSimpleNodeToArray(ele, source, bestOrientation, inputPort, "input");
+                }
+                else
+                {
+                    elementUtilities.addSimpleNodeToArray(ele, source, bestOrientation, notConnectedToPort, "notConnected");
+                }
               }
           });
           sourcingEdges.forEach(function (edge) {
               var target = cy.getElementById(edge.data('target'));
-              if (edge.data('class') === 'production') {
-                  elementUtilities.addSimpleNodeToArray(ele, target, bestOrientation, outputPort, "output");
-              }
-              else
-              {
-                  elementUtilities.addSimpleNodeToArray(ele, target, bestOrientation, notConnectedToPort, "notConnected");
+              if(!target.isParent()){
+                if (edge.data('class') === 'production') {
+                    elementUtilities.addSimpleNodeToArray(ele, target, bestOrientation, outputPort, "output");
+                }
+                else
+                {
+                    elementUtilities.addSimpleNodeToArray(ele, target, bestOrientation, notConnectedToPort, "notConnected");
+                }
               }
           });
       }
@@ -1884,24 +1888,28 @@ module.exports = function () {
       {
           targetingEdges.forEach(function(edge){
               var source = cy.getElementById(edge.data('source'));
-              if (edge.data('class') === 'logic arc')
-              {
-                  elementUtilities.addSimpleNodeToArray(ele, source, bestOrientation, inputPort, "input");
-              }
-              else
-              {
-                  elementUtilities.addSimpleNodeToArray(ele, source, bestOrientation, notConnectedToPort, "notConnected");
+              if(!source.isParent()){
+                if (edge.data('class') === 'logic arc')
+                {
+                    elementUtilities.addSimpleNodeToArray(ele, source, bestOrientation, inputPort, "input");
+                }
+                else
+                {
+                    elementUtilities.addSimpleNodeToArray(ele, source, bestOrientation, notConnectedToPort, "notConnected");
+                }
               }
           });
           sourcingEdges.forEach(function (edge) {
               var target = cy.getElementById(edge.data('target'));
-              if (edge.data('class') === 'modulation' || edge.data('class') === 'stimulation' || edge.data('class') === 'catalysis' || edge.data('class') === 'inhibition' || edge.data('class') === 'necessary stimulation' || edge.data('class') === 'logic arc')
-              {
-                  elementUtilities.addSimpleNodeToArray(ele, target, bestOrientation, outputPort, "output");
-              }
-              else
-              {
-                  elementUtilities.addSimpleNodeToArray(ele, target, bestOrientation, notConnectedToPort, "notConnected");
+              if(!target.isParent()){
+                if (edge.data('class') === 'modulation' || edge.data('class') === 'stimulation' || edge.data('class') === 'catalysis' || edge.data('class') === 'inhibition' || edge.data('class') === 'necessary stimulation' || edge.data('class') === 'logic arc')
+                {
+                    elementUtilities.addSimpleNodeToArray(ele, target, bestOrientation, outputPort, "output");
+                }
+                else
+                {
+                    elementUtilities.addSimpleNodeToArray(ele, target, bestOrientation, notConnectedToPort, "notConnected");
+                }
               }
           });
       }
