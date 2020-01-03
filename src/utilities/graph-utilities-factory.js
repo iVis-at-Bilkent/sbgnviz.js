@@ -48,7 +48,7 @@ module.exports = function () {
   };
 
   graphUtilities.areCompoundSizesConsidered = function() {
-    return graphUtilities.compoundSizesConsidered = true;
+    return graphUtilities.compoundSizesConsidered == true;
   };
 
   graphUtilities.updateGraph = function(cyGraph, callback, layoutOptions, tileInfoBoxes) {
