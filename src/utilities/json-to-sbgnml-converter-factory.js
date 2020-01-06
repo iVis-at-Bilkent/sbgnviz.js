@@ -482,7 +482,7 @@ module.exports = function () {
   jsonToSbgnml.addGlyphBbox = function(node){
     var width = node.width();
     var height = node.height();
-
+    var padding = node.padding();
     var _class = node.data('class');
 
     // If the node can have ports and it has exactly 2 ports then it is represented by a bigger bbox.
@@ -500,21 +500,26 @@ module.exports = function () {
       }
     }
 
-    var x = node._private.position.x - width/2;
-    var y = node._private.position.y - height/2;
+    var x =node._private.position.x - width/2 - padding;    
+    var y = node._private.position.y - height/2 - padding;
+    //var x = node._private.position.x - width/2;
+    //var y = node._private.position.y - height/2;
 
     return new libsbgnjs.Bbox({x: x, y: y, w: width, h: height});
   };
 
   jsonToSbgnml.addStateAndInfoBbox = function(node, boxGlyph){
       boxBbox = boxGlyph.bbox;
+      var borderWidth = node.data()['border-width'];
+      var padding = node.padding();
+      var x = ((boxBbox.x * (node.outerWidth() - borderWidth)) / 100) + (node._private.position.x - node.width()/2 - padding - boxBbox.w/2);
+      var y = ((boxBbox.y * (node.outerHeight() - borderWidth)) / 100) + (node._private.position.y - node.height()/2 - padding - boxBbox.h/2);
+      //var x = boxBbox.x / 100 * node.width();
+      //var y = boxBbox.y / 100 * node.height();
 
-      var x = boxBbox.x / 100 * node.width();
-      var y = boxBbox.y / 100 * node.height();
-
-      x = node._private.position.x - node.width()/2 + (x - boxBbox.w/2);
-      y = node._private.position.y - node.height()/2 + (y - boxBbox.h/2);
-
+      //x = node._private.position.x - node.width()/2 + (x - boxBbox.w/2);
+      //y = node._private.position.y - node.height()/2 + (y - boxBbox.h/2);
+      
       return new libsbgnjs.Bbox({x: x, y: y, w: boxBbox.w, h: boxBbox.h});
   };
 
