@@ -96,11 +96,12 @@
     // Expose elementUtilities and undoRedoActionFunctions as is, most users will not need these
     api.elementUtilities = elementUtilities;
     api.undoRedoActionFunctions = undoRedoActionFunctions;
+    api.experimentalDataOverlay = experimentalDataOverlay;
     
     //expose utility of experimental data-overlay
-    for (var prop in experimentalDataOverlay) {
-      api[prop] = experimentalDataOverlay[prop];
-    }
+    // for (var prop in experimentalDataOverlay) {
+    //   api[prop] = experimentalDataOverlay[prop];
+    // }
 
 
     // Expose each main utility seperately
