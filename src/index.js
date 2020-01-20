@@ -14,7 +14,7 @@
     var graphUtilities = require('./utilities/graph-utilities-factory')();
     var mainUtilities = require('./utilities/main-utilities-factory')();
     var keyboardInputUtilities = require('./utilities/keyboard-input-utilities-factory')(); // require keybord input utilities
-
+    var experimentalDataOverlay = require('./utilities/experimental-data-overlay')();
     // Utilities to be exposed as is
     var elementUtilities = require('./utilities/element-utilities-factory')();
     var undoRedoActionFunctions = require('./utilities/undo-redo-action-functions-factory')();
@@ -36,6 +36,7 @@
     var sbgnmlToSbmlConverter = require('./utilities/sbgnml-to-sbml-converter-factory')();
     var sbmlToSbgnmlConverter = require('./utilities/sbml-to-sbgnml-converter-factory')();
     // Fill param object to use it utilities internally
+    param.experimentalDataOverlay = experimentalDataOverlay;
     param.optionUtilities = optionUtilities;
     param.sbgnCyInstance = sbgnCyInstance;
     param.uiUtilities = uiUtilities;
@@ -61,6 +62,7 @@
     param.sbmlToSbgnmlConverter = sbmlToSbgnmlConverter;
 
     // call constructors of objects with param
+    experimentalDataOverlay(param);
     sbgnCyInstance(param);
     optionUtilities(param);
     uiUtilities(param);
@@ -94,6 +96,12 @@
     // Expose elementUtilities and undoRedoActionFunctions as is, most users will not need these
     api.elementUtilities = elementUtilities;
     api.undoRedoActionFunctions = undoRedoActionFunctions;
+    
+    //expose utility of experimental data-overlay
+    for (var prop in experimentalDataOverlay) {
+      api[prop] = experimentalDataOverlay[prop];
+    }
+
 
     // Expose each main utility seperately
     for (var prop in mainUtilities) {
