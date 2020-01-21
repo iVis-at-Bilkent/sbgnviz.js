@@ -6,12 +6,13 @@ var Tippy = libs.tippy;
 
 module.exports = function () {
 
-	var elementUtilities, graphUtilities, undoRedoActionFunctions, optionUtilities;
+	var elementUtilities, graphUtilities, undoRedoActionFunctions, optionUtilities, experimentalDataOverlay;
 	var refreshPaddings, options, cy;
 
 	var sbgnCyInstance = function (param) {
 		elementUtilities = param.elementUtilities;
 		graphUtilities = param.graphUtilities;
+		experimentalDataOverlay = param.experimentalDataOverlay;
 		undoRedoActionFunctions = param.undoRedoActionFunctions;
 		refreshPaddings = graphUtilities.refreshPaddings.bind(graphUtilities);
 

@@ -1,7 +1,7 @@
 /*
  * Common utilities for elements includes both general utilities and sbgn specific utilities
  */
-var jQuery = $ = libs.jQuery;
+//var jQuery = $ = libs.jQuery;
 
 module.exports = function () {
     var cy;
