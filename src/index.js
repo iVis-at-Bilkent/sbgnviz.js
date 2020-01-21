@@ -36,7 +36,7 @@
     var sbgnmlToSbmlConverter = require('./utilities/sbgnml-to-sbml-converter-factory')();
     var sbmlToSbgnmlConverter = require('./utilities/sbml-to-sbgnml-converter-factory')();
     // Fill param object to use it utilities internally
-    param.experimentalDataOverlay = experimentalDataOverlay;
+    
     param.optionUtilities = optionUtilities;
     param.sbgnCyInstance = sbgnCyInstance;
     param.uiUtilities = uiUtilities;
@@ -60,9 +60,10 @@
     param.sbgnmlToCdConverter = sbgnmlToCdConverter;
     param.sbgnmlToSbmlConverter = sbgnmlToSbmlConverter;
     param.sbmlToSbgnmlConverter = sbmlToSbgnmlConverter;
+    param.experimentalDataOverlay = experimentalDataOverlay;
 
     // call constructors of objects with param
-    experimentalDataOverlay(param);
+    
     sbgnCyInstance(param);
     optionUtilities(param);
     uiUtilities(param);
@@ -85,6 +86,7 @@
     sbgnmlToCdConverter(param);
     sbgnmlToSbmlConverter(param);
     sbmlToSbgnmlConverter(param);
+    experimentalDataOverlay(param);
 
     // set scratch pad for sbgnviz and init sbgnvizParams inside it
     sbgnCyInstance.getCy().scratch('_sbgnviz', {});

@@ -20,18 +20,18 @@ module.exports = function () {
       visibleGenomicDataMapByType = {};
       groupedGenomicDataCount = 0;
       groupedGenomicDataMap = {};
-      this.observers = [];
+      observers = [];
     }
     //functionalities for data processing
     experimentalDataOverlay.clearAllGenomicData = function(){
-      this.genomicDataMap = {};
-      this.visibleGenomicDataMapByType = {};
-      this.groupedGenomicDataMap = {};
-      this.groupedGenomicDataCount = 0;
+      genomicDataMap = {};
+      visibleGenomicDataMapByType = {};
+      groupedGenomicDataMap = {};
+      groupedGenomicDataCount = 0;
     }
     experimentalDataOverlay.getEmptyGroupID = function() {
-      const oldCount = this.groupedGenomicDataCount
-      this.groupedGenomicDataCount++
+      const oldCount = groupedGenomicDataCount
+      groupedGenomicDataCount++
       return oldCount
     }
   
@@ -61,39 +61,39 @@ module.exports = function () {
     }
   
     experimentalDataOverlay.addGenomicData= function(data) {
-      this.genomicDataMap = data
+      genomicDataMap = data
     }
   
     experimentalDataOverlay.removeGenomicVisData= function() {
-      this.visibleGenomicDataMapByType = {}
+      visibleGenomicDataMapByType = {}
     }
   
     experimentalDataOverlay.addGenomicDataWithGeneSymbol= function(geneSymbol, data) {
-      this.genomicDataMap[geneSymbol] = data
+      genomicDataMap[geneSymbol] = data
     }
   
     experimentalDataOverlay.addGenomicGroupData= function(groupID, data) {
-      this.groupedGenomicDataMap[groupID] = data
+      groupedGenomicDataMap[groupID] = data
     }
   
     experimentalDataOverlay.addPortalGenomicData= function(data, groupID) {
       for (const cancerStudy of Object.keys(data)) {
-        this.visibleGenomicDataMapByType[cancerStudy] = true
+        visibleGenomicDataMapByType[cancerStudy] = true
   
         // Group current cancer study according to the groupID
-        if (this.groupedGenomicDataMap[groupID] === undefined) {
-          this.groupedGenomicDataMap[groupID] = []
+        if (groupedGenomicDataMap[groupID] === undefined) {
+          groupedGenomicDataMap[groupID] = []
         }
   
-        this.groupedGenomicDataMap[groupID].push(cancerStudy)
+        groupedGenomicDataMap[groupID].push(cancerStudy)
   
         var cancerData = data[cancerStudy]
   
         for (const geneSymbol of Object.keys(cancerData)) {
-          if (this.genomicDataMap[geneSymbol] === undefined)
-            this.genomicDataMap[geneSymbol] = {}
+          if (genomicDataMap[geneSymbol] === undefined)
+            genomicDataMap[geneSymbol] = {}
   
-          this.genomicDataMap[geneSymbol][cancerStudy] = data[cancerStudy][
+          genomicDataMap[geneSymbol][cancerStudy] = data[cancerStudy][
             geneSymbol
           ].toFixed(2)
         }
@@ -103,13 +103,13 @@ module.exports = function () {
       this.notifyObservers()
     }
     experimentalDataOverlay.removeGenomicData = function() {
-      this.genomicDataMap = {}
+      genomicDataMap = {}
     }
     experimentalDataOverlay.removeGenomicDataWithGeneSymbol = function(geneSymbol) {
-      this.genomicDataMap[geneSymbol] = {}
+      genomicDataMap[geneSymbol] = {}
     }
     experimentalDataOverlay. addGenomicVisData = function(key, data) {
-      this.visibleGenomicDataMapByType[key] = data
+      visibleGenomicDataMapByType[key] = data
     }
     experimentalDataOverlay.prepareGenomicDataShareDB = function(genomicData) {
       const genomicDataMap = {}
@@ -125,7 +125,7 @@ module.exports = function () {
       for (let i = 1; i < metaLineColumns.length; i++) {
         cancerTypes.push(metaLineColumns[i])
         // Update initially visible genomic data boxes !
-        if (i - 1 < this.DEFAULT_VISIBLE_GENOMIC_DATA_COUNT) {
+        if (i - 1 < DEFAULT_VISIBLE_GENOMIC_DATA_COUNT) {
           visibleGenomicDataMapByType[cancerTypes[i - 1]] = true
         } else {
           visibleGenomicDataMapByType[cancerTypes[i - 1]] = false
@@ -163,32 +163,33 @@ module.exports = function () {
     }
   
     experimentalDataOverlay.updateGenomicDataVisibility = function(_key, isVisible) {
-      if (_key in this.visibleGenomicDataMapByType) {
-        this.visibleGenomicDataMapByType[_key] = isVisible
+      if (_key in visibleGenomicDataMapByType) {
+        visibleGenomicDataMapByType[_key] = isVisible
       }
     }
   
     experimentalDataOverlay.hideGenomicData = function() {
-      this.cy
-        .style()
-        .selector('node[type="GENE"]')
-        .style('text-margin-y', 0)
-        .style('width', function(ele) {
-          return 150
-        })
-        .style('background-image', function(ele) {
-          const dataURI = 'data:image/svg+xml;utf8,'
-          return dataURI
-        })
-        .update()
+      console.log(cy);
+      // cy
+      //   .style()
+      //   .selector('node[type="GENE"]')
+      //   .style('text-margin-y', 0)
+      //   .style('width', function(ele) {
+      //     return 150
+      //   })
+      //   .style('background-image', function(ele) {
+      //     const dataURI = 'data:image/svg+xml;utf8,'
+      //     return dataURI
+      //   })
+      //   .update()
     }
   
 
     experimentalDataOverlay.countVisibleGenomicDataByType = function() {
       // Count the genomic data that will be displayed on nodes' body
       let genomicDataBoxCount = 0
-      for (let type in this.visibleGenomicDataMapByType) {
-        if (this.visibleGenomicDataMapByType[type]) {
+      for (let type in visibleGenomicDataMapByType) {
+        if (visibleGenomicDataMapByType[type]) {
           genomicDataBoxCount++
         }
       }
@@ -209,7 +210,7 @@ module.exports = function () {
       const nodeLabel = ele.data('name')
   
       // If there is no genomic data for this node return !
-      if (!(nodeLabel in this.genomicDataMap)) {
+      if (!(nodeLabel in genomicDataMap)) {
         return dataURI
       }
   
@@ -232,15 +233,15 @@ module.exports = function () {
         y: eleBBox.h / 2 + overlayRecBoxH / 2 - 18
       }
   
-      const genomicFrequencyData = this.genomicDataMap[nodeLabel]
+      const genomicFrequencyData = genomicDataMap[nodeLabel]
   
       let maxGenomicDataBoxCount = /*(genomicDataBoxCount > 3) ? 3:*/ genomicDataBoxCount
       let genomicBoxCounter = 0
   
-      for (let i in this.groupedGenomicDataMap) {
-        for (let j in this.groupedGenomicDataMap[i]) {
-          const cancerType = this.groupedGenomicDataMap[i][j]
-          if (!this.visibleGenomicDataMapByType[cancerType]) {
+      for (let i in groupedGenomicDataMap) {
+        for (let j in groupedGenomicDataMap[i]) {
+          const cancerType = groupedGenomicDataMap[i][j]
+          if (!visibleGenomicDataMapByType[cancerType]) {
             continue
           }
   
@@ -345,9 +346,9 @@ module.exports = function () {
        }
   
       console.log('Inside showGenomicData')
-      console.log(this.cy)
+      console.log(cy)
   
-      this.cy
+      cy
         .style()
         .selector('node[type="GENE"]')
         // It used to change the width of nodes only locally
@@ -379,9 +380,9 @@ module.exports = function () {
 
     experimentalDataOverlay.parseGenomicData= function(genomicData, groupID) {
       console.log("parse genomic data");
-      this.genomicDataMap = this.genomicDataMap || {}
-      this.visibleGenomicDataMapByType = this.visibleGenomicDataMapByType || {}
-      this.groupedGenomicDataMap = this.groupedGenomicDataMap || {}
+      genomicDataMap = genomicDataMap || {}
+      visibleGenomicDataMapByType = visibleGenomicDataMapByType || {}
+      groupedGenomicDataMap = groupedGenomicDataMap || {}
       const cancerTypes = []
   
       // By lines
@@ -393,16 +394,16 @@ module.exports = function () {
       for (let i = 1; i < metaLineColumns.length; i++) {
         cancerTypes.push(metaLineColumns[i])
         // Update initially visible genomic data boxes !
-        if (i - 1 < this.DEFAULT_VISIBLE_GENOMIC_DATA_COUNT) {
-          this.visibleGenomicDataMapByType[cancerTypes[i - 1]] = true
+        if (i - 1 < DEFAULT_VISIBLE_GENOMIC_DATA_COUNT) {
+          visibleGenomicDataMapByType[cancerTypes[i - 1]] = true
         } else {
-          this.visibleGenomicDataMapByType[cancerTypes[i - 1]] = false
+          visibleGenomicDataMapByType[cancerTypes[i - 1]] = false
         }
   
-        if (this.groupedGenomicDataMap[groupID] === undefined) {
-          this.groupedGenomicDataMap[groupID] = []
+        if (groupedGenomicDataMap[groupID] === undefined) {
+          groupedGenomicDataMap[groupID] = []
         }
-        this.groupedGenomicDataMap[groupID].push(cancerTypes[i - 1])
+        groupedGenomicDataMap[groupID].push(cancerTypes[i - 1])
       }
       console.log("first for out");
       // parse genomic data
@@ -417,24 +418,24 @@ module.exports = function () {
         const geneSymbol = lineContent[0]
   
         // If current gene entry is not  in genomic data map create new map
-        if (!(geneSymbol in this.genomicDataMap)) {
-          this.genomicDataMap[geneSymbol] = {}
+        if (!(geneSymbol in genomicDataMap)) {
+          genomicDataMap[geneSymbol] = {}
         }
   
         // Add each entry of genomic data
         for (let j = 1; j < lineContent.length; j++) {
-          this.genomicDataMap[geneSymbol][cancerTypes[j - 1]] = lineContent[j]
+          genomicDataMap[geneSymbol][cancerTypes[j - 1]] = lineContent[j]
         }
       }
     }
   
     // Simple observer-observable pattern for views!!!!!
     experimentalDataOverlay.registerObserver = function(observer) {
-      this.observers.push(observer)
+      observers.push(observer)
     }
   
     experimentalDataOverlay.notifyObservers= function() {
-      for (const observer of this.observers) {
+      for (const observer of observers) {
         observer.notify()
       }
     }
