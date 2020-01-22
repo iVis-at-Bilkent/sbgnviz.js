@@ -214,7 +214,7 @@ module.exports = function () {
       }
   
       const eleBBox = ele.boundingBox()
-      const reqWidth = this.getRequiredWidthForData(dataBoxCount)
+      const reqWidth = this.getRequiredWidth(dataBoxCount)
       const overlayRecBoxW = reqWidth - 10
       const overlayRecBoxH = 25
       const svg = document.createElementNS(svgNameSpace, 'svg')
@@ -363,7 +363,7 @@ module.exports = function () {
           // Else shift label in Y axis
           return -15
         })
-        .style('backgorund-fit', 'contain')
+        .style('background-fit', 'contain')
         .style('background-image', function(ele) {
           const x = encodeURIComponent(self.generateSVGForNode(ele).outerHTML)
           if (x === 'undefined') {
@@ -398,7 +398,7 @@ module.exports = function () {
           visibleDataMapByEle[experiments[i - 1]] = false
         }
   
-        if (groupedGenomicDataMap[groupID] === undefined) {
+        if (groupedDataMap[groupID] === undefined) {
           groupedDataMap[groupID] = []
         }
         groupedDataMap[groupID].push(experiments[i - 1])
