@@ -214,9 +214,10 @@ module.exports = function () {
       }
   
       const eleBBox = ele.boundingBox()
-      const reqWidth = this.getRequiredWidth(dataBoxCount)
-      const overlayRecBoxW = reqWidth - 10
-      const overlayRecBoxH = 25
+      const reqWidth = eleBBox.w
+      const reqHeight = eleBBox.h
+      const overlayRecBoxW = reqWidth
+      const overlayRecBoxH = reqHeight
       const svg = document.createElementNS(svgNameSpace, 'svg')
       // It seems this should be set according to the node size !
       svg.setAttribute('width', reqWidth)
@@ -351,28 +352,31 @@ module.exports = function () {
         .style()
         .selector("node")
         // It used to change the width of nodes only locally
-        .style('width', ele => {
-          return this.getRequiredWidth(dataBoxCount)
-        })
-        .style('text-margin-y', function(ele) {
-          const nodeLabel = ele.data('label')
-          // If there is no genomic data for this node return !
-          if (!(nodeLabel in parsedDataMap)) {
-            return 0
-          }
-          // Else shift label in Y axis
-          return -15
-        })
-        .style('background-fit', 'contain')
+        // .style('width', ele => {
+        //   return this.getRequiredWidth(dataBoxCount)
+        // })
+        // .style('text-margin-y', function(ele) {
+        //   const nodeLabel = ele.data('label')
+        //   // If there is no genomic data for this node return !
+        //   if (!(nodeLabel in parsedDataMap)) {
+        //     return 0
+        //   }
+        //   // Else shift label in Y axis
+        //   return -15
+        // })
         .style('background-image', function(ele) {
+          const nodeLabel = ele.data('label')
           const x = encodeURIComponent(self.generateSVGForNode(ele).outerHTML)
+          console.log(nodeLabel)
+          //console.log(self.generateSVGForNode(ele).outerHTML)
           if (x === 'undefined') {
             return 'none'
           }
           const dataURI = 'data:image/svg+xml;utf8,' + x
-          // console.log(dataURI)
+          console.log("DATAURI -------- " + dataURI)
           return dataURI
         })
+        .style('background-fit', 'contain')
         .update()
     }
 
