@@ -229,8 +229,8 @@ module.exports = function () {
       const overLayRectBBox = {
         w: overlayRecBoxW,
         h: overlayRecBoxH,
-        x: reqWidth / 2 - overlayRecBoxW / 2,
-        y: eleBBox.h / 2 + overlayRecBoxH / 2 - 18
+        x: 0,
+        y: 0
       }
   
       const frequencyData = parsedDataMap[nodeLabel]
@@ -339,13 +339,15 @@ module.exports = function () {
       console.log('Inside NEW22 showGenomicData')
       cy.nodes().forEach(function(node) { 
         const nodeLabel = node.data('label')
+        //console.log(svgg)
         if(nodeLabel in parsedDataMap){
-          node.data('background-image', 'data:image/svg+xml;utf8,%3Csvg%20width%3D%22100%22%20height%3D%22100%22%20viewBox%3D%220%200%20100%20100%22%20style%3D%22fill%3Anone%3Bstroke%3Ablack%3Bstroke-width%3A0%3B%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20%3E%3Crect%20x%3D%220%22%20y%3D%220%22%20width%3D%22100%22%20height%3D%22100%22%20style%3D%22fill%3A%23a9a9a9%22/%3E%20%3C/svg%3E');
+          var imageURI = 'data:image/svg+xml;utf8,' + encodeURIComponent(self.generateSVGForNode(node).outerHTML)
+          node.data('background-image', imageURI),
           node.data('background-position-x', '100%');
           node.data('background-position-y', '100%');
           node.data('background-width', '100%');
           node.data('background-height', '100%');
-          node.data('background-fit', 'none');
+          node.data('background-fit', 'contain');
           node.data('background-image-opacity', '1');
         }
         else{
