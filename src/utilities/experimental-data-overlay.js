@@ -348,6 +348,9 @@ module.exports = function () {
           node.data('background-fit', 'none');
           node.data('background-image-opacity', '1');
         }
+        else{
+          node.data('background-image','none');
+        }
       })
 
     }
