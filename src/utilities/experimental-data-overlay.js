@@ -336,49 +336,72 @@ module.exports = function () {
 
     experimentalDataOverlay.showGenomicData = function() {
       const self = this
-  
-      const dataBoxCount = this.countVisibleDataByEle()
-  
-       if (dataBoxCount < 1) {
-        // Hide all genomic data and return
-        this.hideGenomicData()
-        return
-       }
-  
-      console.log('Inside showGenomicData')
-      console.log(cy)
-  
-      cy
-        .style()
-        .selector("node")
-        // It used to change the width of nodes only locally
-        // .style('width', ele => {
-        //   return this.getRequiredWidth(dataBoxCount)
-        // })
-        // .style('text-margin-y', function(ele) {
-        //   const nodeLabel = ele.data('label')
-        //   // If there is no genomic data for this node return !
-        //   if (!(nodeLabel in parsedDataMap)) {
-        //     return 0
-        //   }
-        //   // Else shift label in Y axis
-        //   return -15
-        // })
-        .style('background-image', function(ele) {
-          const nodeLabel = ele.data('label')
-          const x = encodeURIComponent(self.generateSVGForNode(ele).outerHTML)
-          console.log(nodeLabel)
-          //console.log(self.generateSVGForNode(ele).outerHTML)
-          if (x === 'undefined') {
-            return 'none'
-          }
-          const dataURI = 'data:image/svg+xml;utf8,' + x
-          console.log("DATAURI -------- " + dataURI)
-          return dataURI
-        })
-        .style('background-fit', 'contain')
-        .update()
+      console.log('Inside NEW22 showGenomicData')
+      cy.nodes().forEach(function(node) { 
+        const nodeLabel = node.data('label')
+        if(nodeLabel in parsedDataMap){
+          node.data('background-image', 'data:image/svg+xml;utf8,%3Csvg%20width%3D%22100%22%20height%3D%22100%22%20viewBox%3D%220%200%20100%20100%22%20style%3D%22fill%3Anone%3Bstroke%3Ablack%3Bstroke-width%3A0%3B%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20%3E%3Crect%20x%3D%220%22%20y%3D%220%22%20width%3D%22100%22%20height%3D%22100%22%20style%3D%22fill%3A%23a9a9a9%22/%3E%20%3C/svg%3E');
+          node.data('background-position-x', '100%');
+          node.data('background-position-y', '100%');
+          node.data('background-width', '100%');
+          node.data('background-height', '100%');
+          node.data('background-fit', 'none');
+          node.data('background-image-opacity', '1');
+        }
+      })
+
     }
+    // experimentalDataOverlay.showGenomicData = function() {
+    //   const self = this
+  
+    //   const dataBoxCount = this.countVisibleDataByEle()
+  
+    //    if (dataBoxCount < 1) {
+    //     // Hide all genomic data and return
+    //     this.hideGenomicData()
+    //     return
+    //    }
+  
+    //   console.log('Inside showGenomicData')
+    //   console.log(cy)
+  
+    //   cy
+    //     .style()
+    //     .selector("node")
+    //     // It used to change the width of nodes only locally
+    //     // .style('width', ele => {
+    //     //   return this.getRequiredWidth(dataBoxCount)
+    //     // })
+    //     // .style('text-margin-y', function(ele) {
+    //     //   const nodeLabel = ele.data('label')
+    //     //   // If there is no genomic data for this node return !
+    //     //   if (!(nodeLabel in parsedDataMap)) {
+    //     //     return 0
+    //     //   }
+    //     //   // Else shift label in Y axis
+    //     //   return -15
+    //     // })
+    //     .style('background-image', function(ele) {
+    //       const nodeLabel = ele.data('label')
+    //       //const x = encodeURIComponent(self.generateSVGForNode(ele).outerHTML)
+    //       //console.log(nodeLabel)
+    //       //console.log(self.generateSVGForNode(ele).outerHTML)
+    //       // if (x === 'undefined') {
+    //       //   return 'none'
+    //       // }
+    //       if(nodeLabel in parsedDataMap){
+    //         return 'image/svg+xml;utf8,%3Csvg%20width%3D%22100%22%20height%3D%22100%22%20viewBox%3D%220%200%20100%20100%22%20style%3D%22fill%3Anone%3Bstroke%3Ablack%3Bstroke-width%3A0%3B%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20%3E%3Crect%20x%3D%220%22%20y%3D%220%22%20width%3D%22100%22%20height%3D%22100%22%20style%3D%22fill%3A%23a9a9a9%22/%3E%20%3C/svg%3E'
+    //       }
+    //       else {
+    //         return 'image/svg+xml;utf8'
+    //       }
+    //       // const dataURI = x
+    //       // //console.log("DATAURI -------- " + dataURI)
+    //       // return dataURI
+    //     })
+    //     //.style('background-fit', 'contain')
+    //     .update()
+    // }
 
     experimentalDataOverlay.parseData= function(data, groupID) {
       console.log("parse genomic data");
