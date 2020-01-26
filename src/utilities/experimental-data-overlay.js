@@ -6,7 +6,7 @@
 module.exports = function () {
     var cy;
     var parsedDataMap;
-    var visibleDataMapByEle;
+    var visibleDataMapByExp;
     // var groupedGenomicDataCount;
     var groupedDataMap;
     var DEFAULT_VISIBLE_GENOMIC_DATA_COUNT = 3;
@@ -17,28 +17,26 @@ module.exports = function () {
       console.log("in init");
       cy = param.sbgnCyInstance.getCy();
       parsedDataMap = {};
-      visibleDataMapByEle = {};
+      visibleDataMapByExp = {};
       // groupedGenomicDataCount = 0;
       groupedDataMap = {};
       // observers = [];
     }
     //functionalities for data processing
-    // experimentalDataOverlay.clearAllGenomicData = function(){
-    //   parsedDataMap = {};
-    //   visibleGenomicDataMapByType = {};
-    //   groupedGenomicDataMap = {};
-    //   groupedGenomicDataCount = 0;
-    // }
+    experimentalDataOverlay.clearAllData = function(){
+      parsedDataMap = {};
+      visibleDataMapByExp = {};
+      groupedDataMap = {};
+    }
     // experimentalDataOverlay.getEmptyGroupID = function() {
     //   const oldCount = groupedGenomicDataCount
     //   groupedGenomicDataCount++
     //   return oldCount
     // }
   
-    // experimentalDataOverlay.addGenomicDataLocally= function(genomicData, groupID) {
-    //   this.parseGenomicData(genomicData, groupID)
-    //   this.showGenomicData()
-    //   this.notifyObservers()
+    // experimentalDataOverlay.addGenomicDataLocally= function(data, groupID) {
+    //   this.parseData(data, groupID)
+    //   this.showData()
     // }
   
     // experimentalDataOverlay.preparePortalGenomicDataShareDB = function(genomicData) {
@@ -102,9 +100,7 @@ module.exports = function () {
     //   this.showGenomicData()
     //   this.notifyObservers()
     // }
-    // experimentalDataOverlay.removeGenomicData = function() {
-    //   genomicDataMap = {}
-    // }
+    
     // experimentalDataOverlay.removeGenomicDataWithGeneSymbol = function(geneSymbol) {
     //   genomicDataMap[geneSymbol] = {}
     // }
@@ -168,50 +164,49 @@ module.exports = function () {
     //   }
     // }
   
-    experimentalDataOverlay.hideGenomicData = function() {
-      cy
-        .style()
-        .selector('node')
-        .style('text-margin-y', 0)
-        .style('width', function(ele) {
-          return 150
-        })
-        .style('background-image', function(ele) {
-          const dataURI = 'data:image/svg+xml;utf8,'
-          return dataURI
-        })
-        .update()
+    experimentalDataOverlay.removeData = function(expName) {
+      delete visibleDataMapByExp[expName]
+      delete groupedDataMap[0][expName]
+      for (let i in parsedDataMap) {
+        for (let j in parsedDataMap[i]) {
+          delete parsedDataMap[i][expName]
+        }
+      }
+    }
+    experimentalDataOverlay.hideData = function(expName) {
+      visibleDataMapByExp[expName] = false
+      this.showData()
     }
   
-
-    experimentalDataOverlay.countVisibleDataByEle = function() {
+    experimentalDataOverlay.countVisibleDataByExp = function() {
       // Count the genomic data that will be displayed on nodes' body
       let dataBoxCount = 0
-      for (let exp in visibleDataMapByEle) {
-        if (visibleDataMapByEle[exp]) {
+      for (let exp in visibleDataMapByExp) {
+        if (visibleDataMapByExp[exp]) {
           dataBoxCount++
         }
       }
       return dataBoxCount
     }
 
-    experimentalDataOverlay.getRequiredWidth = function (dataBoxCount) {
-      const term = dataBoxCount > 3 ? dataBoxCount - 3 : 0
-      return 150 + term * 35
-    }
+    // experimentalDataOverlay.getRequiredWidth = function (dataBoxCount) {
+    //   const term = dataBoxCount > 3 ? dataBoxCount - 3 : 0
+    //   return 150 + term * 35
+    // }
     
+    //colors is an object like: colors[expName] = color
     experimentalDataOverlay.generateSVGForNode = function (ele) {
-      const dataBoxCount = this.countVisibleDataByEle()
+      const dataBoxCount = this.countVisibleDataByExp()
   
       // Experimental data overlay part !
-      const dataURI = 'data:image/svg+xml;utf8,'
+     // const dataURI = 'data:image/svg+xml;utf8,'
       const svgNameSpace = 'http://www.w3.org/2000/svg'
       const nodeLabel = ele.data('label')
   
-      // If there is no genomic data for this node return !
-      if (!(nodeLabel in parsedDataMap)) {
-        return dataURI
-      }
+      // // If there is no genomic data for this node return !
+      // if (!(nodeLabel in parsedDataMap)) {
+      //   return dataURI
+      // }
   
       const eleBBox = ele.boundingBox()
       const reqWidth = eleBBox.w
@@ -241,7 +236,7 @@ module.exports = function () {
       for (let i in groupedDataMap) {
         for (let j in groupedDataMap[i]) {
           const experiment = groupedDataMap[i][j]
-          if (!visibleDataMapByEle[experiment]) {
+          if (!visibleDataMapByExp[experiment]) {
             continue
           }
   
@@ -334,14 +329,15 @@ module.exports = function () {
       return svg
     }
 
-    experimentalDataOverlay.showGenomicData = function() {
+    experimentalDataOverlay.showData = function() {
       const self = this
       console.log('Inside NEW22 showGenomicData')
       cy.nodes().forEach(function(node) { 
         const nodeLabel = node.data('label')
+        var imageURI = 'data:image/svg+xml;utf8,'
         //console.log(svgg)
         if(nodeLabel in parsedDataMap){
-          var imageURI = 'data:image/svg+xml;utf8,' + encodeURIComponent(self.generateSVGForNode(node).outerHTML)
+          imageURI = imageURI + encodeURIComponent(self.generateSVGForNode(node).outerHTML)
           node.data('background-image', imageURI),
           node.data('background-position-x', '100%');
           node.data('background-position-y', '100%');
@@ -351,7 +347,7 @@ module.exports = function () {
           node.data('background-image-opacity', '1');
         }
         else{
-          node.data('background-image','none');
+          node.data('background-image',imageURI);
         }
       })
 
@@ -411,8 +407,8 @@ module.exports = function () {
     experimentalDataOverlay.parseData= function(data, groupID) {
       console.log("parse genomic data");
       parsedDataMap = parsedDataMap || {}
-      visibleDataMapByEle = visibleDataMapByEle || {}
-      //groupedGenomicDataMap = groupedGenomicDataMap || {}
+      visibleDataMapByExp = visibleDataMapByExp || {}
+      groupedDataMap = groupedDataMap || {}
       const experiments = [];
   
       // By lines
@@ -425,9 +421,9 @@ module.exports = function () {
         experiments.push(metaLineColumns[i])
         // Update initially visible genomic data boxes !
         if (i - 1 < DEFAULT_VISIBLE_GENOMIC_DATA_COUNT) {
-          visibleDataMapByEle[experiments[i - 1]] = true
+          visibleDataMapByExp[experiments[i - 1]] = true
         } else {
-          visibleDataMapByEle[experiments[i - 1]] = false
+          visibleDataMapByExp[experiments[i - 1]] = false
         }
   
         if (groupedDataMap[groupID] === undefined) {
@@ -460,15 +456,15 @@ module.exports = function () {
     }
   
     // Simple observer-observable pattern for views!!!!!
-    experimentalDataOverlay.registerObserver = function(observer) {
-      observers.push(observer)
-    }
+    // experimentalDataOverlay.registerObserver = function(observer) {
+    //   observers.push(observer)
+    // }
   
-    experimentalDataOverlay.notifyObservers= function() {
-      for (const observer of observers) {
-        observer.notify()
-      }
-    }
+    // experimentalDataOverlay.notifyObservers= function() {
+    //   for (const observer of observers) {
+    //     observer.notify()
+    //   }
+    // }
 
     return experimentalDataOverlay;
 }
