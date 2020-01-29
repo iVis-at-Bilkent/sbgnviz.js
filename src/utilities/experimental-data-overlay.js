@@ -13,14 +13,6 @@ module.exports = function () {
       groupedDataMap = {};
     }
 
-    experimentalDataOverlay.copyGroupedDataMap = function(toCopy){
-      for(let i in groupedDataMap){
-        if (toCopy[i] === undefined){
-          toCopy[i] = []
-        }
-        toCopy[i] = groupedDataMap[i]
-      }
-    }
     experimentalDataOverlay.getGroupedDataMap = function(){
       return groupedDataMap
     }
@@ -122,8 +114,6 @@ module.exports = function () {
         for (let j in groupedDataMap[i]) {
           const fileName = i
           const expName = groupedDataMap[i][j]
-          console.log('FILE NAMEEEEEEE' + fileName)
-          console.log('EXP NAMEEEEEEE' + expName)
           if (!visibleDataMapByExp[fileName + '-' + expName]) {
             continue
           }
