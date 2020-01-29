@@ -13,6 +13,14 @@ module.exports = function () {
       groupedDataMap = {};
     }
 
+    experimentalDataOverlay.copyGroupedDataMap = function(toCopy){
+      for(let i in groupedDataMap){
+        if (toCopy[i] === undefined){
+          toCopy[i] = []
+        }
+        toCopy[i] = groupedDataMap[i]
+      }
+    }
     experimentalDataOverlay.getGroupedDataMap = function(){
       return groupedDataMap
     }
@@ -33,6 +41,7 @@ module.exports = function () {
       if(groupedDataMap[fileName].length == 0){
         delete groupedDataMap[fileName]
       }
+      this.showData()
     }
 
     experimentalDataOverlay.removeFile = function(fileName) {
@@ -44,6 +53,7 @@ module.exports = function () {
         }
       }
       delete  groupedDataMap[fileName]
+      this.showData()
     }
 
     experimentalDataOverlay.hideExp = function(fileName, expName) {
@@ -238,6 +248,10 @@ module.exports = function () {
       groupedDataMap = groupedDataMap || {}
       const experiments = [];
   
+      if(fileName in groupedDataMap){
+        return
+      }
+
       // By lines
       const lines = data.split('\n')
       // First line is meta data !
