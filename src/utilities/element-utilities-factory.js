@@ -2112,7 +2112,7 @@ module.exports = function () {
         padding += 2;
       }
     }
-    return padding;
+    return padding > 5 ? padding : 5 ;
   };
 
   // used for handling the variable property of complexes

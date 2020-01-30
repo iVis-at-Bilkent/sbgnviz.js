@@ -25,7 +25,7 @@ module.exports = function () {
     },
     // percentage used to calculate compound paddings
     compoundPadding: function () {
-      return 5;
+      return 0;
     },
     improveFlow: function () {
         return true;
