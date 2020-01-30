@@ -134,7 +134,8 @@ module.exports = function () {
       for (var i = 0; i < childNodes.length; i++) {
         var childNode = childNodes[i];
       
-        var childNodeBbox = this.bboxProp(childNode); 
+        var childNodeBbox = this.bboxProp(childNode);
+        childNode.bbox = childNodeBbox; 
         //var childStyle = styles.filter(style =>{ return style.idList == childNode.id});
         var borderWidth = 0;
        /*  if(childStyle.length > 0 && childStyle[0].renderGroup !== undefined){
