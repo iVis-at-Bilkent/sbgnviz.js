@@ -519,7 +519,7 @@ module.exports = function () {
     }
 
     var x = node.position().x - width/2;
-    var y = node.position().y- width/2;
+    var y = node.position().y- height/2;
     //var x =node._private.position.x - width/2 - padding;    
     //var y = node._private.position.y - height/2 - padding;
     //var x = node._private.position.x - width/2;
