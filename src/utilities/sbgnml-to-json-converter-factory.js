@@ -24,6 +24,7 @@ module.exports = function () {
   sbgnmlToJson.insertedNodes = {};
 
   sbgnmlToJson.map = undefined;
+  sbgnmlToJson.calculatedCompoundPadding = undefined;
 
   sbgnmlToJson.getAllCompartments = function (glyphList) {
     var compartments = [];
@@ -66,80 +67,152 @@ module.exports = function () {
   };
 
   sbgnmlToJson.bboxProp = function (ele) {
+
+    if(ele.bboxCalculated){
+      return ele.bbox;
+    }
+
+    ele.bboxCalculated = true;
+    var childNodes = ele.glyphMembers;
+    //exclude state variables and units of information from child members
+    childNodes = childNodes.filter(function(child){ return child.class_ != "state variable" && child.class_ != "unit of information"});
     var bbox = {};
     bbox.x = ele.bbox.x;
     bbox.y = ele.bbox.y;
     bbox.w = ele.bbox.w;
     bbox.h = ele.bbox.h;
+    //if it is simple node return bbox
+    if(childNodes.length <= 0){
+      bbox.x = parseFloat(bbox.x) + parseFloat(bbox.w) / 2;
+      bbox.y = parseFloat(bbox.y) + parseFloat(bbox.h) / 2;
+     
+      return bbox;
+    }else if (ele.extension && ele.extension.has('extraInfo')) {// if newt file then extrainfo on the compound node exists
+        var xml = ele.extension.get('extraInfo');
+        var extraInfo;
+        parseString(xml, function (err, result) {
+           extraInfo = result.extraInfo;
+        });
+        ele.originalW= bbox.w;
+        ele.originalH = bbox.h;
+        bbox.x = parseFloat(bbox.x) + parseFloat(bbox.w) / 2;
+        bbox.y = parseFloat(bbox.y) + parseFloat(bbox.h) / 2;
+        bbox.w = parseFloat(extraInfo.w);
+        bbox.h = parseFloat(extraInfo.h);       
+        ele.minWidth = parseFloat(extraInfo.minW);
+        ele.minHeight = parseFloat(extraInfo.minH);
+        ele.minWidthBiasLeft = parseFloat(extraInfo.WLBias);
+        ele.minWidthBiasRight = parseFloat(extraInfo.WRBias);
+        ele.minHeightBiasBottom = parseFloat(extraInfo.HBBias);
+        ele.minHeightBiasTop = parseFloat(extraInfo.HTBias);
+        
+        return bbox;
 
-    var childNodes = ele.glyphMembers;
-    var minLeft, maxRight, minTop, maxBottom, childrenBboxW, childrenBboxH;
-    var compound;
+        
+     }else{
 
-    // Traverse the other children and update the extreme values
-    for (var i = 0; i < childNodes.length; i++) {
-      var childNode = childNodes[i];
+     /*  var styles;
+      if (this.map.extension && this.map.extension.has('renderInformation')) { // render extension was found
+        styles = this.map.extension.get('renderInformation').listOfStyles;
+        if(styles  !== undefined){
+          styles = styles.styles;
+        }
+      }
+ */
+     /*  var compoundPadding = parseFloat(mapProperties.compoundPadding);
+      var extraCompartmentPadding = parseFloat(mapProperties.extraCompartmentPadding); */
+      var extraCompartmentPadding = typeof options.extraCompartmentPadding === 'function' ? options.extraCompartmentPadding.call() : options.extraCompartmentPadding;
+      var compoundPadding;
+      if(this.calculatedCompoundPadding !== undefined){
+        compoundPadding = this.calculatedCompoundPadding;
+      }else{
+        compoundPadding = typeof options.compoundPadding === 'function' ? options.compoundPadding.call() : options.compoundPadding;
+      } 
+      var padding = extraCompartmentPadding +  compoundPadding;
+      var minLeft, maxRight, minTop, maxBottom, childrenBboxW, childrenBboxH,minLeftBorder,maxRightBorder,minTopBorder,maxBottomBorder; 
+      // Traverse the other children and update the extreme values
+      for (var i = 0; i < childNodes.length; i++) {
+        var childNode = childNodes[i];
+      
+        var childNodeBbox = this.bboxProp(childNode); 
+        //var childStyle = styles.filter(style =>{ return style.idList == childNode.id});
+        var borderWidth = 0;
+       /*  if(childStyle.length > 0 && childStyle[0].renderGroup !== undefined){
+          borderWidth = childStyle[0].renderGroup.strokeWidth;
+        } */
+        var left = childNodeBbox.x - childNodeBbox.w/2;
+        var right = childNodeBbox.x + childNodeBbox.w/2;
+        var top = childNodeBbox.y  - childNodeBbox.h/2;
+        var bottom = childNodeBbox.y + childNodeBbox.h/2;
+    
 
-      if (childNode.class_ === 'state variable' || childNode.class_ === 'unit of information') {
-        continue; // Eleminate state variables and info boxes
+        if (minLeft === undefined || left < minLeft) {
+          minLeft = left;
+          minLeftBorder = borderWidth;
+        }
+
+        if (maxRight === undefined || right > maxRight) {
+          maxRight = right;
+          maxRightBorder = borderWidth;
+        }
+
+        if (minTop === undefined || top < minTop) {
+          minTop = top;
+          minTopBorder = borderWidth;
+        }
+
+        if (maxBottom === undefined || bottom > maxBottom) {
+          maxBottom = bottom;
+          maxBottomBorder = borderWidth;
+        }
       }
 
-      compound = true;
-
-      var childNodeBbox = childNode.bbox;
-      var left = childNodeBbox.x;
-      var right = childNodeBbox.x + childNodeBbox.w;
-      var top = childNodeBbox.y;
-      var bottom = childNodeBbox.y + childNodeBbox.h;
-
-      if (minLeft === undefined || left < minLeft) {
-        minLeft = left;
-      }
-
-      if (maxRight === undefined || right > maxRight) {
-        maxRight = right;
-      }
-
-      if (minTop === undefined || top < minTop) {
-        minTop = top;
-      }
-
-      if (maxBottom === undefined || bottom > maxBottom) {
-        maxBottom = bottom;
-      }
-    }
-
-    if (compound) {
+      var averageBorderWidthW = (minLeftBorder + maxRightBorder)/2;
+      var averageBorderWidthH = (minTopBorder + maxBottomBorder)/2;
       // The sizes of children bbox are determined by the difference between the extreme coordinates
       childrenBboxW = maxRight - minLeft;
       childrenBboxH = maxBottom - minTop;
 
-      // If children bbox width is bigger than node bbox width set minWidth, and horizontal biases
-      if (childrenBboxW < bbox.w) {
-        ele.minWidth = bbox.w;
-        var extraLeft =  minLeft - bbox.x;
-        var extraRight = (bbox.x + bbox.w) - maxRight;
+     
+    
+      // If children bbox width is less than node bbox width + paddings set minWidth, and horizontal biases
+      if (childrenBboxW + 2 * padding + averageBorderWidthW < bbox.w) {
 
+        //ele.minWidth = bbox.w - 2 padding  calculate badding first
+        ele.minWidth =  bbox.w - 2 * padding;
+        var extraLeft =  minLeft - bbox.x  - padding - averageBorderWidthW/2;
+        var extraRight = (bbox.x + bbox.w) - maxRight  - padding - averageBorderWidthW/2;
+
+       
         ele.minWidthBiasLeft = extraLeft / (extraLeft + extraRight) * 100;
         ele.minWidthBiasRight = 100 - ele.minWidthBiasLeft;
       }
 
       // If children bbox height is bigger than node bbox height set minHeight, and vertical biases
-      if (childrenBboxH < bbox.h) {
-        ele.minHeight = bbox.h;
-        var extraTop = minTop - bbox.y;
-        var extraBottom = (bbox.y + bbox.h) - maxBottom;
+      if (childrenBboxH + 2 * padding + averageBorderWidthH < bbox.h) {
+        ele.minHeight = bbox.h - 2 * padding;
+        var extraTop = minTop - bbox.y - padding - averageBorderWidthH/2;
+        var extraBottom = (bbox.y + bbox.h) - maxBottom - padding - averageBorderWidthH/2;        
 
         ele.minHeightBiasTop = extraTop / (extraTop + extraBottom) * 100;
         ele.minHeightBiasBottom = 100 - ele.minHeightBiasTop;
       }
-    }
+      
 
-    // set positions as center
-    bbox.x = parseFloat(bbox.x) + parseFloat(bbox.w) / 2;
-    bbox.y = parseFloat(bbox.y) + parseFloat(bbox.h) / 2;
+      // set positions as center
 
-    return bbox;
+      bbox.x = parseFloat(bbox.x) + parseFloat(bbox.w) / 2;
+      bbox.y = parseFloat(bbox.y) + parseFloat(bbox.h) / 2;
+      bbox.w = bbox.w - 2 * padding - averageBorderWidthW;
+      bbox.h = bbox.h - 2 * padding - averageBorderWidthH;
+
+      return bbox;
+     }
+    
+
+  
+
+    
   };
 
   sbgnmlToJson.stateAndInfoBboxProp = function (ele, parentBbox) {
@@ -293,6 +366,12 @@ module.exports = function () {
       nodeObj.minHeight = ele.minHeight;
       nodeObj.minHeightBiasTop = ele.minHeightBiasTop;
       nodeObj.minHeightBiasBottom = ele.minHeightBiasBottom;
+    }
+    if(ele.originalW){
+      nodeObj.originalW = ele.originalW;
+    }
+    if(ele.originalH){
+      nodeObj.originalH = ele.originalH;
     }
 
     // add class information
@@ -892,6 +971,12 @@ module.exports = function () {
           obj = result;
        });
        return obj;
+    }else{
+        if(this.calculatedCompoundPadding !== undefined){
+          return {mapProperties : {compoundPadding : this.calculatedCompoundPadding}};
+        }
+     
+
     }
   };
 
@@ -950,10 +1035,44 @@ module.exports = function () {
         compartmentChildrenMap[compartmentRef].push(glyph);
       }
     }
+    
+    var minDistanceToChildren ;
+    if (!map.extension) {
+      for (var i = 0; i < glyphs.length; i++) {
+        var glyph = glyphs[i];
+        childNodes = glyph.glyphMembers.filter(function(child){ return child.class_ != "state variable" && child.class_ != "unit of information"});
+        if(childNodes.length > 0){ // compound node
+          for (var j = 0; j < childNodes.length; j++) {
+            var childNode = childNodes[j];
+          
+            var childNodeBbox = childNode.bbox; 
+            
+            var left =childNodeBbox.x - glyph.bbox.x;
+            var right =  (glyph.bbox.x + glyph.bbox.w) - (childNodeBbox.x + childNodeBbox.w);
+            var top = childNodeBbox.y - glyph.bbox.y;
+            var bottom = (glyph.bbox.y + glyph.bbox.h) - (childNodeBbox.y + childNodeBbox.h);
+            
+            if(minDistanceToChildren === undefined){
+              minDistanceToChildren = Math.min(left,right,top,bottom);              
+            }else{
+              minDistanceToChildren = Math.min(left,right,top,bottom,minDistanceToChildren);
+            }   
+          }
+        }
+      }      
+    }
+
+    if(minDistanceToChildren !== undefined){
+      //var compoundPadding = typeof options.compoundPadding === 'function' ? options.compoundPadding.call() : options.compoundPadding;
+      var extraCompartmentPadding = typeof options.extraCompartmentPadding === 'function' ? options.extraCompartmentPadding.call() : options.extraCompartmentPadding;
+      if(minDistanceToChildren >= extraCompartmentPadding){
+        this.calculatedCompoundPadding = minDistanceToChildren - extraCompartmentPadding;
+      }
+    }
 
     for (i = 0; i < glyphs.length; i++) {
       var glyph = glyphs[i];
-      self.traverseNodes(glyph, cytoscapeJsNodes, '', compartments);
+      self.traverseNodes(glyph, cytoscapeJsNodes, '', compartments,minDistanceToChildren);
     }
 
     for (i = 0; i < arcs.length; i++) {

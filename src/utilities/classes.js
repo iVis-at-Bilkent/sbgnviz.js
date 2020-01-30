@@ -333,13 +333,13 @@ AuxiliaryUnit.setAnchorSide = function(mainObj, node) {
   var thisY = mainObj.bbox.y;
   var thisH = mainObj.bbox.h;
   var thisW = mainObj.bbox.w;
-  var width = (node.data('class') == "compartment" || node.data('class') == "complex") ? node.data('bbox').w : node.width();
-  var height = (node.data('class') == "compartment"|| node.data('class') == "complex") ? node.data('bbox').h : node.height();
+  var width = node.data("originalW") ? node.data("originalW") : node.width();
+  var height = node.data("originalH") ? node.data("originalH") : node.height();
   var outerWidth = node.outerWidth() + (width - node.width());
-  var extraCompartmentPadding = (node.data("class") == "compartment") ? (-outerWidth * 0.1) : 0;
+ 
   var parentX = (node.data('class') == "compartment" || node.data('class') == "complex") ? node.data('bbox').x : node.position().x;
   var parentY = (node.data('class') == "compartment" || node.data('class') == "complex") ? node.data('bbox').y : node.position().y;
-  var parentX1 = Number((parentX - width / 2 - extraCompartmentPadding).toFixed(2));
+  var parentX1 = Number((parentX - width / 2).toFixed(2));
   var parentX2 = Number((parentX+width/2).toFixed(2));
   var parentY1 = Number((parentY - height/ 2).toFixed(2));
   var parentY2 = Number((parentY + height/ 2).toFixed(2));
@@ -353,7 +353,7 @@ AuxiliaryUnit.setAnchorSide = function(mainObj, node) {
   else if (centerY == parentY2) {
     mainObj.anchorSide = "bottom";
   }
-  else if(centerX <= parentX1) {
+  else if(centerX == parentX1) {
     mainObj.anchorSide = "left";
   }
   else if((centerX  <=  (parentX2 + 2))  && (centerX  >=  (parentX2 - 2)) ){
@@ -1051,18 +1051,25 @@ AuxUnitLayout.checkFit = function (node, cy, forceCheck){
         var parentX2 = node.position().x + node.width()/2 + padding;
         var firstX1 = coordsFirst.x - firstUnit.bbox.w/2;
         var lastX2 = coordsLast.x + lastUnit.bbox.w/2;
-        if (parentX1 + gap > firstX1 || parentX2 - gap < lastX2) {
-            fitLocations.push(location);
+
+        if(parentX2 < lastX2 + gap){
+          fitLocations.push(location)
         }
+        /* if (parentX1 + gap > firstX1 || parentX2 - gap < lastX2) {
+            fitLocations.push(location);
+        } */
       }
       else {
         var parentY1 = node.position().y - node.height()/2 - padding;
         var parentY2 = node.position().y + node.height()/2 + padding;
         var firstY1 = coordsFirst.y - firstUnit.bbox.h/2;
         var lastY2 = coordsLast.y + lastUnit.bbox.h/2;
-        if (parentY1 + gap > firstY1 || parentY2 - gap < lastY2) {
-            fitLocations.push(location);
+        if(parentY2 < lastY2 + gap){
+          fitLocations.push(location)
         }
+        /* if (parentY1 + gap > firstY1 || parentY2 - gap < lastY2) {
+            fitLocations.push(location);
+        } */
       }
     }
   }

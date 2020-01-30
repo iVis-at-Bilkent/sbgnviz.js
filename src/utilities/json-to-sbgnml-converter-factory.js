@@ -7,6 +7,7 @@ var pkgName = require('../../package.json').name;
 var prettyprint = require('pretty-data').pd;
 var xml2js = require('xml2js');
 var mapPropertiesBuilder = new xml2js.Builder({rootName: "mapProperties"});
+var compoundExtensionBuilder = new xml2js.Builder({rootName: "extraInfo"});
 var textUtilities = require('./text-utilities');
 
 module.exports = function () {
@@ -308,6 +309,22 @@ module.exports = function () {
        glyph.setClone(new libsbgnjs.CloneType());
     //add bbox information
     glyph.setBbox(this.addGlyphBbox(node));
+
+    if(node.isParent() || node.data().class == 'topology group' || node.data().class == 'submap' || node.data().class == 'complex' || node.data().class == 'compartment'){
+      var extraInfo = {};
+      extraInfo.w = node.width();
+      extraInfo.h = node.height();
+      extraInfo.minW = Number(node.css("min-width").replace("px",""));
+      extraInfo.minH = Number(node.css("min-height").replace("px",""));
+      extraInfo.WLBias = Number(node.css("min-width-bias-left").replace("px",""));
+      extraInfo.WRBias = Number(node.css("min-width-bias-right").replace("px",""));
+      extraInfo.HTBias = Number(node.css("min-height-bias-top").replace("px",""));
+      extraInfo.HBBias = Number(node.css("min-height-bias-bottom").replace("px",""));
+      glyph.setExtension(new libsbgnjs.Extension());
+      glyph.extension.add(compoundExtensionBuilder.buildObject(extraInfo));
+
+    }
+   
     //add port information
     var ports = node._private.data.ports;
     for(var i = 0 ; i < ports.length ; i++){
@@ -480,11 +497,12 @@ module.exports = function () {
   };
 
   jsonToSbgnml.addGlyphBbox = function(node){
-    var width = node.width();
-    var height = node.height();
+    
     var padding = node.padding();
+    var borderWidth = Number(node.css("border-width").replace("px",""));
     var _class = node.data('class');
-
+    var width = node.outerWidth() - borderWidth ;
+    var height = node.outerHeight() - borderWidth;
     // If the node can have ports and it has exactly 2 ports then it is represented by a bigger bbox.
     // This is because we represent it as a polygon and so the whole shape including the ports are rendered in the node bbox.
     if (elementUtilities.canHavePorts(_class)) {
@@ -500,8 +518,10 @@ module.exports = function () {
       }
     }
 
-    var x =node._private.position.x - width/2 - padding;    
-    var y = node._private.position.y - height/2 - padding;
+    var x = node.position().x - width/2;
+    var y = node.position().y- width/2;
+    //var x =node._private.position.x - width/2 - padding;    
+    //var y = node._private.position.y - height/2 - padding;
     //var x = node._private.position.x - width/2;
     //var y = node._private.position.y - height/2;
 

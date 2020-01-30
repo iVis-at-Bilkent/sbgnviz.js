@@ -165,7 +165,10 @@ module.exports = function () {
 
   graphUtilities.getCompoundPaddings = function() {
     // Return calculated paddings in case of that data is invalid return 5
-    return graphUtilities.calculatedPaddings || 5;
+    var compoundPadding = options.compoundPadding;
+    return ( typeof compoundPadding === 'function') ? compoundPadding.call() : compoundPadding
+
+    //return graphUtilities.calculatedPaddings || 5;
   };
 
   return graphUtilities;

@@ -25,7 +25,7 @@ module.exports = function () {
     },
     // percentage used to calculate compound paddings
     compoundPadding: function () {
-      return 10;
+      return 5;
     },
     improveFlow: function () {
         return true;
@@ -37,7 +37,7 @@ module.exports = function () {
       return true;
     },
     // extra padding for compartment and complexes
-    extraCompartmentPadding: 10,
+    extraCompartmentPadding: 14,
     extraComplexPadding: 10,
     // Wether to display the complex's labels, like compartments.
     // Will also increase the paddings by extraCompoundPadding to make room for the name.
