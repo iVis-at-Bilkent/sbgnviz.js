@@ -2362,7 +2362,7 @@ module.exports = function () {
       'font-style': 'normal',
       'font-weight': 'normal',
       'font-color': '#0f0f0f',
-      'border-width': 2.25,
+      'border-width': 1,
       'border-color': '#555555',
       'background-color': '#ffffff',
       'shape-name': getDefaultInfoboxShapeName( nodeClass, infoboxType ),
