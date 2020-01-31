@@ -2098,6 +2098,7 @@ module.exports = function () {
     // - option to display complex labels
     // - presence of states and info box on the bottom
     var padding = graphUtilities.getCompoundPaddings();
+    padding = padding < 5 ? 5 : padding;
     if (options.showComplexName && elementUtilities.getElementContent(ele)) {
       padding += options.extraComplexPadding * 0.5;
       // if there is something on the bottom side
@@ -2112,7 +2113,7 @@ module.exports = function () {
         padding += 2;
       }
     }
-    return padding > 5 ? padding : 5 ;
+    return padding;
   };
 
   // used for handling the variable property of complexes

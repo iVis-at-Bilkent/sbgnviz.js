@@ -23,7 +23,7 @@ module.exports = function () {
     inferNestingOnLoad: function () {
       return false;
     },
-    // percentage used to calculate compound paddings
+    // intial compound padding for all compound nodes 
     compoundPadding: function () {
       return 0;
     },
@@ -36,8 +36,10 @@ module.exports = function () {
     adjustNodeLabelFontSizeAutomatically: function() {
       return true;
     },
-    // extra padding for compartment and complexes
+    // extra padding for compound nodes except for complexes
     extraCompartmentPadding: 14,
+
+    //extra padding for complex compound nodes, refer to elementUtilities.getComplexPadding function to see details
     extraComplexPadding: 10,
     // Wether to display the complex's labels, like compartments.
     // Will also increase the paddings by extraCompoundPadding to make room for the name.
