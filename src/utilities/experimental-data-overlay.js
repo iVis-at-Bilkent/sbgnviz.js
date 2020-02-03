@@ -21,6 +21,7 @@ module.exports = function () {
       parsedDataMap = {};
       visibleDataMapByExp = {};
       groupedDataMap = {};
+      this.showData();
     }
 
     experimentalDataOverlay.removeExp = function(fileName, expName) {
@@ -49,6 +50,8 @@ module.exports = function () {
     }
 
     experimentalDataOverlay.hideExp = function(fileName, expName) {
+      if(visibleDataMapByExp[fileName + '-' + expName] == undefined)
+        return
       visibleDataMapByExp[fileName + '-' + expName] = false
       this.showData()
     }
@@ -56,7 +59,53 @@ module.exports = function () {
     experimentalDataOverlay.hideFile = function(fileName) {
       for (let j = 0; j < groupedDataMap[fileName].length; j++){
         const expName = groupedDataMap[fileName][j]
+        if(visibleDataMapByExp[fileName + '-' + expName] == undefined)
+          continue
         visibleDataMapByExp[fileName + '-' + expName] = false
+      }
+      this.showData()
+    }
+
+    experimentalDataOverlay.changeVisExp = function(fileName, expName) {
+      if(visibleDataMapByExp[fileName + '-' + expName] == undefined){
+        return
+      }
+      if (visibleDataMapByExp[fileName + '-' + expName]){
+        visibleDataMapByExp[fileName + '-' + expName] = false
+      }
+      else
+        visibleDataMapByExp[fileName + '-' + expName] = true
+      this.showData()
+    }
+
+    experimentalDataOverlay.changeVisFile = function(fileName) {
+      for (let j = 0; j < groupedDataMap[fileName].length; j++){
+        const expName = groupedDataMap[fileName][j]
+        if(visibleDataMapByExp[fileName + '-' + expName] == undefined)
+          continue
+        
+        if (visibleDataMapByExp[fileName + '-' + expName]){
+          visibleDataMapByExp[fileName + '-' + expName] = false
+        }
+        else
+          visibleDataMapByExp[fileName + '-' + expName] = true
+      }
+      this.showData()
+    }
+
+    experimentalDataOverlay.unhideExp = function(fileName, expName) {
+      if(visibleDataMapByExp[fileName + '-' + expName] == undefined)
+        return
+      visibleDataMapByExp[fileName + '-' + expName] = true
+      this.showData()
+    }
+  
+    experimentalDataOverlay.unhideFile = function(fileName) {
+      for (let j = 0; j < groupedDataMap[fileName].length; j++){
+        const expName = groupedDataMap[fileName][j]
+        if(visibleDataMapByExp[fileName + '-' + expName] == undefined)
+          continue
+        visibleDataMapByExp[fileName + '-' + expName] = true
       }
       this.showData()
     }
@@ -249,20 +298,21 @@ module.exports = function () {
   
       // Parse experiment types
       for (let i = 1; i < metaLineColumns.length; i++) {
-        experiments.push(metaLineColumns[i])
-        // Update initially visible genomic data boxes !
-        ///if (i - 1 < DEFAULT_VISIBLE_GENOMIC_DATA_COUNT) {
+        if(i == metaLineColumns.length - 1){
+          var length = metaLineColumns[i].length
+          experiments.push(metaLineColumns[i].substring(0,length - 1))
+        }
+        else
+          experiments.push(metaLineColumns[i])
+        
         visibleDataMapByExp[fileName + '-' + experiments[i - 1]] = true
-        // } else {
-        //   visibleDataMapByExp[experiments[i - 1]] = false
-        // }
-
+       
         if (groupedDataMap[fileName] === undefined) {
           groupedDataMap[fileName] = []
         }
         groupedDataMap[fileName].push(experiments[i - 1])
       }
-      console.log("first for out");
+
       // parse genomic data
       for (let i = 1; i < lines.length; i++) {
         // EOF check
