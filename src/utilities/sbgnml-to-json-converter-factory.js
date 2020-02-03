@@ -356,6 +356,7 @@ module.exports = function () {
     nodeObj.id = ele.id;
     // add node bounding box information
     nodeObj.bbox = self.bboxProp(ele);
+    nodeObj.fileCompoundPadding = this.mapPropertiesToObj().mapProperties.compoundPadding;
 
     if (ele.minWidth) {
       nodeObj.minWidth = ele.minWidth;

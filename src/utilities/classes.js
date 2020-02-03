@@ -287,7 +287,7 @@ AuxiliaryUnit.convertToAbsoluteCoord = function(mainObj, relX, relY, cy) {
   return {x: absX, y: absY}; 
 };
 
-AuxiliaryUnit.convertToRelativeCoord = function(mainObj, absX, absY, cy, parentNode){
+AuxiliaryUnit.convertToRelativeCoord = function(mainObj, absX, absY, cy, parentNode, extraPadding){
   if (mainObj === undefined) {
     return;
   }
@@ -298,7 +298,11 @@ AuxiliaryUnit.convertToRelativeCoord = function(mainObj, absX, absY, cy, parentN
     var parent = getAuxUnitClass(mainObj).getParent(mainObj, cy);
   }
   var position = parent.position();
+  
   var padding = parent.padding();
+  if(extraPadding > 0){
+    padding+= extraPadding;
+  }
   var parentWidth = parent.width();
   var parentHeight = parent.height();
   var borderWidth = parent.data()['border-width'];
@@ -312,13 +316,13 @@ AuxiliaryUnit.convertToRelativeCoord = function(mainObj, absX, absY, cy, parentN
   if (mainObj.anchorSide == "top" || mainObj.anchorSide == "bottom") {
     
    
-    relX = ((absX - (position.x - parentWidth/2 - padding)) * 100 )/ (parent.outerWidth() - borderWidth);
+    relX = ((absX - (position.x - parentWidth/2 - padding)) * 100 )/ (parent.width() + 2*padding);
     relY = mainObj.anchorSide == "top" ? 0 : 100;
   }
   else {
    
     relX = mainObj.anchorSide == "left" ? 0 : 100;
-    relY = ((absY - (position.y - parentHeight/2 - padding)) * 100) / (parent.outerHeight() - borderWidth);
+    relY = ((absY - (position.y - parentHeight/2 - padding)) * 100) / (parent.height() + 2*padding);
    
   }
 

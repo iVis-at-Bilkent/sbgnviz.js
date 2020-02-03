@@ -359,7 +359,7 @@ module.exports = function () {
 
 				if ((isLayoutRequired === undefined || !isLayoutRequired ) && correctInfoBoxCoord) {					
 					classes.AuxiliaryUnit.setAnchorSide(statesandinfos, node);
-					var cordResult = classes.AuxiliaryUnit.convertToRelativeCoord(statesandinfos, bbox.x+bbox.w/2, bbox.y+bbox.h/2, cy, node)
+					var cordResult = classes.AuxiliaryUnit.convertToRelativeCoord(statesandinfos, bbox.x+bbox.w/2, bbox.y+bbox.h/2, cy, node, Number(node.data().fileCompoundPadding))
 					statesandinfos.bbox.x = cordResult.x;
 					statesandinfos.bbox.y = cordResult.y;						
 					var location = statesandinfos.anchorSide; // top bottom right left
