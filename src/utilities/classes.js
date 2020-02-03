@@ -303,8 +303,8 @@ AuxiliaryUnit.convertToRelativeCoord = function(mainObj, absX, absY, cy, parentN
   if(extraPadding > 0){
     padding+= extraPadding;
   }
-  var parentWidth = parent.width();
-  var parentHeight = parent.height();
+  var parentWidth = parent.data().bbox.w;
+  var parentHeight = parent.data().bbox.h;
   var borderWidth = parent.data()['border-width'];
 
 
@@ -316,13 +316,13 @@ AuxiliaryUnit.convertToRelativeCoord = function(mainObj, absX, absY, cy, parentN
   if (mainObj.anchorSide == "top" || mainObj.anchorSide == "bottom") {
     
    
-    relX = ((absX - (position.x - parentWidth/2 - padding)) * 100 )/ (parent.width() + 2*padding);
+    relX = ((absX - (position.x - parentWidth/2 - padding)) * 100 )/ (parentWidth + 2*padding);
     relY = mainObj.anchorSide == "top" ? 0 : 100;
   }
   else {
    
     relX = mainObj.anchorSide == "left" ? 0 : 100;
-    relY = ((absY - (position.y - parentHeight/2 - padding)) * 100) / (parent.height() + 2*padding);
+    relY = ((absY - (position.y - parentHeight/2 - padding)) * 100) / (parentHeight + 2*padding);
    
   }
 
