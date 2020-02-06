@@ -651,7 +651,10 @@ module.exports = function () {
 	          .css({
 	            'border-color': selectionColor,
 	            'target-arrow-color': '#000',
-	            'text-outline-color': '#000'
+				'text-outline-color': '#000',
+				'border-width': function(ele){
+					return Math.max(ele.data("border-width"), 1);
+				  }
 	          })
 	          .selector("node:active")
 	          .css({
@@ -689,7 +692,10 @@ module.exports = function () {
 	          .css({
 	            'line-color': selectionColor,
 	            'source-arrow-color': selectionColor,
-	            'target-arrow-color': selectionColor
+				'target-arrow-color': selectionColor,
+				'width': function(ele){
+					return Math.max(ele.data("width"), 3);
+				  }
 	          })
 	          .selector("edge:active")
 	          .css({
