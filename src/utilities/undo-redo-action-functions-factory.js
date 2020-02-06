@@ -5,10 +5,12 @@
 module.exports = function () {
 
   var elementUtilities;
+  var experimentalDataOverlay;
   var cy;
 
   function undoRedoActionFunctions (param) {
     elementUtilities = param.elementUtilities;
+    experimentalDataOverlay = param.experimentalDataOverlay;
     cy = param.sbgnCyInstance.getCy();
   }
 
@@ -90,5 +92,55 @@ module.exports = function () {
     return result;
   };
 
+  undoRedoActionFunctions.hideExp = function(param){
+    var expName = param.expName;
+    var fileName = param.fileName;
+    return experimentalDataOverlay.hideExp(fileName, expName);
+  }
+
+  undoRedoActionFunctions.unhideExp = function(param){
+    var expName = param.expName;
+    var fileName = param.fileName;
+    return experimentalDataOverlay.unhideExp(fileName, expName);
+  }
+
+  undoRedoActionFunctions.hideFile = function(param){
+    var fileName = param.fileName;
+    return experimentalDataOverlay.hideFile(fileName);
+  }
+
+  undoRedoActionFunctions.unhideFile = function(param){
+    var fileName = param.fileName;
+    return experimentalDataOverlay.unhideFile(fileName);
+  }
+
+  undoRedoActionFunctions.addExp = function(param){
+    var fileName = param.fileName;
+    var expName = param.expName;
+    var isVisible = param.isVisible;
+    var values = param.values;
+    var groupArray = param.groupArray;
+    console.log(values);
+    console.log(groupArray);
+    console.log(isVisible);
+    return experimentalDataOverlay.addExp(fileName, expName, isVisible, values, groupArray);
+  }
+
+  undoRedoActionFunctions.removeExp = function(param){
+    var fileName = param.fileName;
+    var expName = param.expName;
+    return experimentalDataOverlay.removeExp(fileName, expName);
+  }
+
+  undoRedoActionFunctions.removeAll = function(param){
+    return experimentalDataOverlay.removeAll();
+  }
+
+  undoRedoActionFunctions.restoreAll = function(param){
+    var parsed = param.parsed;
+    var grouped = param.grouped;
+    var visible = param.visible;
+    return experimentalDataOverlay.restoreAll(parsed,visible,grouped)
+  }
   return undoRedoActionFunctions;
 };

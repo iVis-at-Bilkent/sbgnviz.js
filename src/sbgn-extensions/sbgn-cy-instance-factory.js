@@ -109,7 +109,16 @@ module.exports = function () {
 	    // register add remove actions
 	    ur.action("deleteElesSimple", undoRedoActionFunctions.deleteElesSimple, undoRedoActionFunctions.restoreEles);
 	    ur.action("deleteNodesSmart", undoRedoActionFunctions.deleteNodesSmart, undoRedoActionFunctions.restoreEles);
-	    ur.action("setPortsOrdering", undoRedoActionFunctions.setPortsOrdering, undoRedoActionFunctions.setPortsOrdering);
+		ur.action("setPortsOrdering", undoRedoActionFunctions.setPortsOrdering, undoRedoActionFunctions.setPortsOrdering);
+		
+		//experimental data ovarlay
+		ur.action("removeAll", undoRedoActionFunctions.removeAll, undoRedoActionFunctions.restoreAll);
+		ur.action("hideExperiment", undoRedoActionFunctions.hideExp, undoRedoActionFunctions.unhideExp);
+		ur.action("unhideExperiment", undoRedoActionFunctions.unhideExp, undoRedoActionFunctions.hideExp);
+		ur.action("hideFile", undoRedoActionFunctions.hideFile, undoRedoActionFunctions.unhideFile);
+		ur.action("unhideFile", undoRedoActionFunctions.unhideFile, undoRedoActionFunctions.hideFile);
+		ur.action("removeExperiment", undoRedoActionFunctions.removeExp, undoRedoActionFunctions.addExp);
+		
 	  }
 
 		function showTooltip(event) {
