@@ -14,7 +14,7 @@ module.exports = function () {
   function graphUtilities (param) {
     optionUtilities = param.optionUtilities;
     options = optionUtilities.getOptions();
-    cy = param.sbgnCyInstance.getCy();
+    cy = param.sbgnCyInstance.getCy();    
   }
 
   // TODO make these initial values user options instead of hardcoding them here
@@ -89,7 +89,7 @@ module.exports = function () {
     });
 
 
-    this.refreshPaddings(); // Recalculates/refreshes the compound paddings
+    //this.refreshPaddings(); // Recalculates/refreshes the compound paddings
     cy.endBatch();
 
     if(isLayoutRequired) {
@@ -159,8 +159,10 @@ module.exports = function () {
   graphUtilities.recalculatePaddings = graphUtilities.refreshPaddings = function() {
     // this.calculatedPaddings is not working here
     // TODO: replace this reference with this.calculatedPaddings once the reason is figured out
-    graphUtilities.calculatedPaddings = this.calculatePaddings();
-    return graphUtilities.calculatedPaddings;
+    //graphUtilities.calculatedPaddings = this.calculatePaddings();
+    var compoundPadding = options.compoundPadding;
+    return ( typeof compoundPadding === 'function') ? compoundPadding.call() : compoundPadding
+    //return graphUtilities.calculatedPaddings;
   };
 
   graphUtilities.getCompoundPaddings = function() {

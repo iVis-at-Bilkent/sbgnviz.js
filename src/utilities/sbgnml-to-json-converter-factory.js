@@ -6,13 +6,14 @@ var jQuery = $ = libs.jQuery;
 var classes = require('./classes');
 
 module.exports = function () {
-  var elementUtilities, graphUtilities, handledElements;
+  var elementUtilities, graphUtilities, handledElements,mainUtilities;
 
   function sbgnmlToJson (param) {
     optionUtilities = param.optionUtilities;
     options = optionUtilities.getOptions();
     elementUtilities = param.elementUtilities;
     graphUtilities = param.graphUtilities;
+    mainUtilities = param.mainUtilities;
 
     handledElements = {};
 
@@ -123,11 +124,11 @@ module.exports = function () {
       var extraCompartmentPadding = parseFloat(mapProperties.extraCompartmentPadding); */
       var extraCompartmentPadding = typeof options.extraCompartmentPadding === 'function' ? options.extraCompartmentPadding.call() : options.extraCompartmentPadding;
       var compoundPadding;
-      if(this.calculatedCompoundPadding !== undefined){
-        compoundPadding = this.calculatedCompoundPadding;
-      }else{
+      //if(this.calculatedCompoundPadding !== undefined){
+        //compoundPadding = this.calculatedCompoundPadding;
+      //}else{
         compoundPadding = typeof options.compoundPadding === 'function' ? options.compoundPadding.call() : options.compoundPadding;
-      } 
+     // } 
       var padding = extraCompartmentPadding +  compoundPadding;
       var minLeft, maxRight, minTop, maxBottom, childrenBboxW, childrenBboxH,minLeftBorder,maxRightBorder,minTopBorder,maxBottomBorder; 
       // Traverse the other children and update the extreme values
@@ -355,8 +356,7 @@ module.exports = function () {
     // add id information
     nodeObj.id = ele.id;
     // add node bounding box information
-    nodeObj.bbox = self.bboxProp(ele);
-    nodeObj.fileCompoundPadding = this.mapPropertiesToObj().mapProperties.compoundPadding;
+    nodeObj.bbox = self.bboxProp(ele);    
 
     if (ele.minWidth) {
       nodeObj.minWidth = ele.minWidth;
@@ -974,12 +974,12 @@ module.exports = function () {
        });
        return obj;
     }else{
-        if(this.calculatedCompoundPadding !== undefined){
-          return {mapProperties : {compoundPadding : this.calculatedCompoundPadding}};
+        
+          return {mapProperties : {compoundPadding : mainUtilities.getCompoundPadding()}};
         }
      
 
-    }
+    
   };
 
   sbgnmlToJson.convert = function (xmlObject) {
@@ -1061,16 +1061,21 @@ module.exports = function () {
             }   
           }
         }
-      }      
+      }
+      var extraCompartmentPadding = typeof options.extraCompartmentPadding === 'function' ? options.extraCompartmentPadding.call() : options.extraCompartmentPadding;
+      
+        var newPadding = minDistanceToChildren - extraCompartmentPadding;
+        if(newPadding < 0){
+          newPadding = 0;
+        }
+        mainUtilities.setCompoundPadding(newPadding);
+      
+     
+    }else{
+      mainUtilities.setCompoundPadding(Number(self.mapPropertiesToObj().mapProperties.compoundPadding));
     }
 
-    if(minDistanceToChildren !== undefined){
-      //var compoundPadding = typeof options.compoundPadding === 'function' ? options.compoundPadding.call() : options.compoundPadding;
-      var extraCompartmentPadding = typeof options.extraCompartmentPadding === 'function' ? options.extraCompartmentPadding.call() : options.extraCompartmentPadding;
-      if(minDistanceToChildren >= extraCompartmentPadding){
-        this.calculatedCompoundPadding = minDistanceToChildren - extraCompartmentPadding;
-      }
-    }
+    
 
     for (i = 0; i < glyphs.length; i++) {
       var glyph = glyphs[i];

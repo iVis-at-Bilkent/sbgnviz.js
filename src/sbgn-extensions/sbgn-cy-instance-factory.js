@@ -304,10 +304,83 @@ module.exports = function () {
 
 	    $(document).on('updateGraphEnd', function(event, _cy, isLayoutRequired) {
 
+
 				// if the event is not triggered for this cy instance return directly
 				if ( _cy != cy ) {
 					return;
 				}
+
+				var setCompoundInfoboxes = function(node, isLayoutRequired,cy){
+					if(node.data().infoboxCalculated){
+						return;
+					}else if(node.isParent()){
+						node.children().forEach(function(childNode){
+							setCompoundInfoboxes(childNode,isLayoutRequired);
+						});						
+
+					}
+
+					node.data("infoboxCalculated", true);
+					node.data('auxunitlayouts', {});
+					// for each statesandinfos
+					
+					var correctInfoBoxCoord = true;
+					for(var i=0; i < node.data('statesandinfos').length; i++) {
+						var statesandinfos = node.data('statesandinfos')[i];
+						var bbox = statesandinfos.bbox;
+						var infoBoxOnNode = classes.AuxiliaryUnit.setAnchorSide(statesandinfos, node);
+						correctInfoBoxCoord = correctInfoBoxCoord && infoBoxOnNode;
+					}
+
+					for(var i=0; i < node.data('statesandinfos').length; i++) {
+					var statesandinfos = node.data('statesandinfos')[i];
+						var bbox = statesandinfos.bbox;
+						
+
+						if ((isLayoutRequired === undefined || !isLayoutRequired ) && correctInfoBoxCoord) {					
+							classes.AuxiliaryUnit.setAnchorSide(statesandinfos, node);
+							//var fileLoadParam = {extraPadding:  Number(node.data().originalPadding)};
+							var cordResult = classes.AuxiliaryUnit.convertToRelativeCoord(statesandinfos, bbox.x+bbox.w/2, bbox.y+bbox.h/2, cy, node)
+							statesandinfos.bbox.x = cordResult.x;
+							statesandinfos.bbox.y = cordResult.y;	
+							statesandinfos.isDisplayed = true;					
+							var location = statesandinfos.anchorSide; // top bottom right left
+							var layouts = node.data('auxunitlayouts');
+							if(!layouts[location]) { // layout doesn't exist yet for this location
+								layouts[location] = classes.AuxUnitLayout.construct(node, location);
+							}
+							// populate the layout of this side
+							classes.AuxUnitLayout.addAuxUnit(layouts[location], cy, statesandinfos, undefined, true); //positions are precomputed
+						}
+						else {
+							if(!node.data('auxunitlayouts')) { // ensure minimal initialization
+								node.data('auxunitlayouts', {});
+							}
+							var location = classes.AuxUnitLayout.selectNextAvailable(node, cy);
+							if(!node.data('auxunitlayouts')[location]) {
+								node.data('auxunitlayouts')[location] = classes.AuxUnitLayout.construct(node, location);
+							}
+							var layout = node.data('auxunitlayouts')[location];
+							statesandinfos.anchorSide = location;
+							switch(location) {
+								case "top": statesandinfos.bbox.y = 0; break;
+								case "bottom": statesandinfos.bbox.y = 100; break;
+								case "left": statesandinfos.bbox.x = 0; break;
+								case "right": statesandinfos.bbox.x = 100; break;
+							}
+							classes.AuxUnitLayout.addAuxUnit(layout, cy, statesandinfos);
+						}
+
+					}
+
+							if (isLayoutRequired === true) {
+								var locations = classes.AuxUnitLayout.checkFit(node, cy);
+								if (locations !== undefined && locations.length > 0) {
+									classes.AuxUnitLayout.fitUnits(node, cy, locations);
+								}
+							}
+					
+				};
 
 	      // list all entitytypes andstore them in the global scratch
 	      // only stateful EPN (complex, macromolecule or nucleic acid) are concerned
@@ -338,67 +411,13 @@ module.exports = function () {
 	      cy.endBatch();
 	      cy.scratch('_sbgnviz', {SBGNEntityTypes: entityHash});*/
 
-	      // assign statesandinfos to their layout
-	      cy.startBatch();
+		  // assign statesandinfos to their layout
+		  cy.style().update();
+	     // cy.startBatch();
 	      cy.nodes().forEach(function(node) {
-	        node.data('auxunitlayouts', {});
-			// for each statesandinfos
-			
-			 var correctInfoBoxCoord = true;
-			for(var i=0; i < node.data('statesandinfos').length; i++) {
-				var statesandinfos = node.data('statesandinfos')[i];
-				var bbox = statesandinfos.bbox;
-				var infoBoxOnNode = classes.AuxiliaryUnit.setAnchorSide(statesandinfos, node);
-				correctInfoBoxCoord = correctInfoBoxCoord && infoBoxOnNode;
-			}
-
-	        for(var i=0; i < node.data('statesandinfos').length; i++) {
-	           var statesandinfos = node.data('statesandinfos')[i];
-				var bbox = statesandinfos.bbox;
-				
-
-				if ((isLayoutRequired === undefined || !isLayoutRequired ) && correctInfoBoxCoord) {					
-					classes.AuxiliaryUnit.setAnchorSide(statesandinfos, node);
-					var cordResult = classes.AuxiliaryUnit.convertToRelativeCoord(statesandinfos, bbox.x+bbox.w/2, bbox.y+bbox.h/2, cy, node, Number(node.data().fileCompoundPadding))
-					statesandinfos.bbox.x = cordResult.x;
-					statesandinfos.bbox.y = cordResult.y;						
-					var location = statesandinfos.anchorSide; // top bottom right left
-					var layouts = node.data('auxunitlayouts');
-					if(!layouts[location]) { // layout doesn't exist yet for this location
-						layouts[location] = classes.AuxUnitLayout.construct(node, location);
-					}
-					// populate the layout of this side
-					classes.AuxUnitLayout.addAuxUnit(layouts[location], cy, statesandinfos, undefined, true); //positions are precomputed
-				}
-				else {
-					if(!node.data('auxunitlayouts')) { // ensure minimal initialization
-						node.data('auxunitlayouts', {});
-					}
-					var location = classes.AuxUnitLayout.selectNextAvailable(node, cy);
-					if(!node.data('auxunitlayouts')[location]) {
-						node.data('auxunitlayouts')[location] = classes.AuxUnitLayout.construct(node, location);
-					}
-					var layout = node.data('auxunitlayouts')[location];
-					statesandinfos.anchorSide = location;
-					switch(location) {
-						case "top": statesandinfos.bbox.y = 0; break;
-						case "bottom": statesandinfos.bbox.y = 100; break;
-						case "left": statesandinfos.bbox.x = 0; break;
-						case "right": statesandinfos.bbox.x = 100; break;
-					}
-					classes.AuxUnitLayout.addAuxUnit(layout, cy, statesandinfos);
-				}
-
-	        }
-
-					if (isLayoutRequired === true) {
-						var locations = classes.AuxUnitLayout.checkFit(node, cy);
-						if (locations !== undefined && locations.length > 0) {
-							classes.AuxUnitLayout.fitUnits(node, cy, locations);
-						}
-					}
+	        setCompoundInfoboxes(node,isLayoutRequired,cy);
 	      });
-	      cy.endBatch();
+	      //cy.endBatch();
 	    });
 	  }
 

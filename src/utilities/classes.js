@@ -264,7 +264,7 @@ AuxiliaryUnit.convertToAbsoluteCoord = function(mainObj, relX, relY, cy) {
   var padding = parent.padding();
   var parentWidth = parent.width();
   var parentHeight = parent.height();
-  var borderWidth = parent.data()['border-width'];
+  var borderWidth = Number(parent.css("border-width").replace("px",""));
 
 
   var absX , absY;
@@ -287,7 +287,7 @@ AuxiliaryUnit.convertToAbsoluteCoord = function(mainObj, relX, relY, cy) {
   return {x: absX, y: absY}; 
 };
 
-AuxiliaryUnit.convertToRelativeCoord = function(mainObj, absX, absY, cy, parentNode, extraPadding){
+AuxiliaryUnit.convertToRelativeCoord = function(mainObj, absX, absY, cy, parentNode){
   if (mainObj === undefined) {
     return;
   }
@@ -298,14 +298,13 @@ AuxiliaryUnit.convertToRelativeCoord = function(mainObj, absX, absY, cy, parentN
     var parent = getAuxUnitClass(mainObj).getParent(mainObj, cy);
   }
   var position = parent.position();
-  
+  var parentWidth = parent.width();
+  var parentHeight = parent.height();
   var padding = parent.padding();
-  if(extraPadding > 0){
-    padding+= extraPadding;
-  }
-  var parentWidth = parent.data().bbox.w;
-  var parentHeight = parent.data().bbox.h;
-  var borderWidth = parent.data()['border-width'];
+ 
+ 
+ 
+  var borderWidth = Number(parent.css("border-width").replace("px",""));
 
 
   /* if (parent.data("class") == "compartment"){
@@ -316,13 +315,13 @@ AuxiliaryUnit.convertToRelativeCoord = function(mainObj, absX, absY, cy, parentN
   if (mainObj.anchorSide == "top" || mainObj.anchorSide == "bottom") {
     
    
-    relX = ((absX - (position.x - parentWidth/2 - padding)) * 100 )/ (parentWidth + 2*padding);
+    relX = ((absX - (position.x - parentWidth/2 - padding)) * 100 )/ (parent.outerWidth() - borderWidth);
     relY = mainObj.anchorSide == "top" ? 0 : 100;
   }
   else {
    
     relX = mainObj.anchorSide == "left" ? 0 : 100;
-    relY = ((absY - (position.y - parentHeight/2 - padding)) * 100) / (parentHeight + 2*padding);
+    relY = ((absY - (position.y - parentHeight/2 - padding)) * 100) / (parent.outerHeight() - borderWidth);
    
   }
 
@@ -794,8 +793,8 @@ AuxUnitLayout.addAuxUnit = function(mainObj, cy, unit, position, preComputed) {
     AuxUnitLayout.computeCoords(mainObj, cy, unit);
     var parentNode = AuxUnitLayout.getParentNode(mainObj, cy);
     var locations = AuxUnitLayout.checkFit(parentNode,cy);
-    if(locations.length > 0){
-      AuxUnitLayout.fitUnits(parentNode,cy, locations);
+    if(locations.filter(function(loc){return loc == mainObj.location}).length > 0){
+      AuxUnitLayout.fitUnits(parentNode,cy, [mainObj.location]);
     }
     
     

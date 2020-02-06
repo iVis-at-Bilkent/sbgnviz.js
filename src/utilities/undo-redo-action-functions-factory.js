@@ -4,11 +4,12 @@
 
 module.exports = function () {
 
-  var elementUtilities;
+  var elementUtilities,mainUtilities;
   var cy;
 
   function undoRedoActionFunctions (param) {
     elementUtilities = param.elementUtilities;
+    mainUtilities = param.mainUtilities;
     cy = param.sbgnCyInstance.getCy();
   }
 
@@ -87,6 +88,13 @@ module.exports = function () {
       cy.endBatch();
     }
 
+    return result;
+  };
+
+  undoRedoActionFunctions.setCompoundPadding = function(newPadding) {
+    var result = mainUtilities.getCompoundPadding();   
+    mainUtilities.setCompoundPadding(newPadding);   
+    
     return result;
   };
 

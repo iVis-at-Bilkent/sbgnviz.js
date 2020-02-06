@@ -646,5 +646,14 @@ mainUtilities.getMapProperties = function() {
   mainUtilities.doValidation = function(file) {
     return sbgnmlToJson.doValidation(file);
   }
+
+  mainUtilities.setCompoundPadding = function(newPaddingValue) {
+    options.compoundPadding = newPaddingValue;
+    optionUtilities.extendOptions(options);    
+  }
+
+  mainUtilities.getCompoundPadding = function() {
+    return options.compoundPadding;
+  }
    return mainUtilities;
 };
