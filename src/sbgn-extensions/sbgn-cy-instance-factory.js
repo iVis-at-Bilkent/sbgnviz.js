@@ -118,7 +118,8 @@ module.exports = function () {
 		ur.action("hideFile", undoRedoActionFunctions.hideFile, undoRedoActionFunctions.unhideFile);
 		ur.action("unhideFile", undoRedoActionFunctions.unhideFile, undoRedoActionFunctions.hideFile);
 		ur.action("removeExperiment", undoRedoActionFunctions.removeExp, undoRedoActionFunctions.addExp);
-		
+		ur.action("removeFile", undoRedoActionFunctions.removeFile, undoRedoActionFunctions.addFile);
+		//ur.action("parseData", undoRedoActionFunctions.parseData, undoRedoActionFunctions.removeFile);
 	  }
 
 		function showTooltip(event) {

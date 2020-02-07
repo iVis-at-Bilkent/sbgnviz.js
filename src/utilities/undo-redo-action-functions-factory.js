@@ -132,6 +132,19 @@ module.exports = function () {
     return experimentalDataOverlay.removeExp(fileName, expName);
   }
 
+  undoRedoActionFunctions.addFile = function(param){
+    var fileName = param.fileName;
+    var parsed = param.parsed;
+    var grouped = param.grouped;
+    var visible = param.visible;
+    return experimentalDataOverlay.addFile(fileName,parsed,visible,grouped);
+  }
+
+  undoRedoActionFunctions.removeFile = function(param){
+    var fileName = param.fileName;
+    return experimentalDataOverlay.removeFile(fileName);
+  }
+
   undoRedoActionFunctions.removeAll = function(param){
     return experimentalDataOverlay.removeAll();
   }
@@ -142,5 +155,11 @@ module.exports = function () {
     var visible = param.visible;
     return experimentalDataOverlay.restoreAll(parsed,visible,grouped)
   }
+
+  // undoRedoActionFunctions.parseData = function(param){
+  //   var data = param.data;
+  //   var fileName = param.fileName;
+  //   return experimentalDataOverlay.parseData(data,fileName);
+  // }
   return undoRedoActionFunctions;
 };

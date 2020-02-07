@@ -43,9 +43,6 @@ module.exports = function () {
       visibleDataMapByExp = {};
       groupedDataMap = {};
       this.showData();
-      console.log(parsed);
-      console.log(visible);
-      console.log(grouped);
       params = {parsed, visible, grouped};
       return params;
 
@@ -74,8 +71,13 @@ module.exports = function () {
       return params;
     }
 
-    experimentalDataOverlay.addFile = function(fileName, isVisible, values, groupArray) {
-      
+    experimentalDataOverlay.addFile = function(fileName, parsed, visible, grouped) {
+      parsedDataMap = parsed;
+      visibleDataMapByExp = visible;
+      groupedDataMap = grouped;
+      this.showData();
+      param = {fileName};
+      return param;
     }
 
     experimentalDataOverlay.removeExp = function(fileName, expName) {
@@ -129,6 +131,30 @@ module.exports = function () {
       if(groupedDataMap[fileName] == undefined){
         return;
       }
+
+      var parsed = {};
+      var visible = {};
+      var grouped = {};
+      for(let i in parsedDataMap){
+        if(!parsed[i]){
+          parsed[i] = {};
+        }
+        for(let j in parsedDataMap[i]){
+          parsed[i][j] = parsedDataMap[i][j];
+        }
+      }
+      for(let i in visibleDataMapByExp){
+        visible[i] = visibleDataMapByExp[i];
+      }
+      for(let i in groupedDataMap){
+        if(!grouped[i]){
+          grouped[i] = [];
+        }
+        for(let j in groupedDataMap[i]){
+          grouped[i].push(groupedDataMap[i][j]);
+        }
+      }
+
       for (let j = 0; j < groupedDataMap[fileName].length; j++){
         const expName = groupedDataMap[fileName][j];
         if(visibleDataMapByExp[fileName + '-' + expName] != undefined)
@@ -138,7 +164,10 @@ module.exports = function () {
         }
       }
       delete groupedDataMap[fileName];
+
+      var params = {fileName,parsed,visible,grouped};
       this.showData();
+      return params;
     }
 
     experimentalDataOverlay.hideExp = function(fileName, expName) {
@@ -408,6 +437,9 @@ module.exports = function () {
           parsedDataMap[eleSymbol][fileName + '-' + experiments[j - 1]] = lineContent[j]
         }
       }
+      var params = {fileName};
+      this.showData();
+      return params;
     }
   
     return experimentalDataOverlay;
