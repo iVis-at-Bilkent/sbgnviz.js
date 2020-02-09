@@ -93,12 +93,36 @@ module.exports = function () {
   };
 
   undoRedoActionFunctions.hideExp = function(param){
+  
     var expName = param.expName;
     var fileName = param.fileName;
     return experimentalDataOverlay.hideExp(fileName, expName);
   }
-
+ 
+  undoRedoActionFunctions.expButtonChange = function(param)
+  {
+    var button = param.evt;
+    return experimentalDataOverlay.expButtonChange(button);
+  }
+  
+  undoRedoActionFunctions.fileButtonChangeUnHide = function(param)
+  {
+     console.log("in color change UnHide");
+    
+    var button = param.subExperiments;
+    console.log(button);
+    return experimentalDataOverlay.fileButtonChangeUnHide(button);
+  }
+  undoRedoActionFunctions.fileButtonChangeHide = function(param)
+  {
+    console.log("in color change Hide");
+    
+    var button = param.subExperiments;
+    console.log(button);
+    return experimentalDataOverlay.fileButtonChangeHide(button);
+  }
   undoRedoActionFunctions.unhideExp = function(param){
+  
     var expName = param.expName;
     var fileName = param.fileName;
     return experimentalDataOverlay.unhideExp(fileName, expName);

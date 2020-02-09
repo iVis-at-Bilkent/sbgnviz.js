@@ -119,6 +119,11 @@ module.exports = function () {
 		ur.action("unhideFile", undoRedoActionFunctions.unhideFile, undoRedoActionFunctions.hideFile);
 		ur.action("removeExperiment", undoRedoActionFunctions.removeExp, undoRedoActionFunctions.addExp);
 		ur.action("removeFile", undoRedoActionFunctions.removeFile, undoRedoActionFunctions.addFile);
+		ur.action("expButtonChange", undoRedoActionFunctions.expButtonChange, undoRedoActionFunctions.expButtonChange);
+		ur.action("fileButtonChangeHide", undoRedoActionFunctions.fileButtonChangeHide, undoRedoActionFunctions.fileButtonChangeUnHide);
+		ur.action("fileButtonChangeUnHide", undoRedoActionFunctions.fileButtonChangeUnHide, undoRedoActionFunctions.fileButtonChangeHide);
+
+		//ur.action("expButtonUnhide", undoRedoActionFunctions.changeExpButton2, undoRedoActionFunctions.expButtonHide);
 		//ur.action("parseData", undoRedoActionFunctions.parseData, undoRedoActionFunctions.removeFile);
 	  }
 
