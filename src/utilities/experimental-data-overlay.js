@@ -180,6 +180,7 @@ module.exports = function () {
     }
   
     experimentalDataOverlay.hideFile = function(fileName) {
+      var invisible = {};
       if(groupedDataMap[fileName] == undefined){
         return;
       }
@@ -187,11 +188,23 @@ module.exports = function () {
         const expName = groupedDataMap[fileName][j];
         if(visibleDataMapByExp[fileName + '-' + expName] == undefined)
           continue;
-        visibleDataMapByExp[fileName + '-' + expName] = false;
+        if(visibleDataMapByExp[fileName + '-' + expName] == true){
+          invisible[fileName + '-' + expName] = false;
+          visibleDataMapByExp[fileName + '-' + expName] = false;
+        }
+      }
+
+      this.showData();
+      params = {invisible}
+      return params;
+    }
+
+    experimentalDataOverlay.hideFileUndo = function(fileName, invisible) {
+      for (let j in invisible){
+        visibleDataMapByExp[j] = true;
       }
       this.showData();
-      params = {fileName}
-      return params;
+      return {fileName};
     }
 
     experimentalDataOverlay.unhideExp = function(fileName, expName) {
@@ -204,6 +217,7 @@ module.exports = function () {
     }
   
     experimentalDataOverlay.unhideFile = function(fileName) {
+      var visible = {};
       if(groupedDataMap[fileName] == undefined){
         return;
       }
@@ -211,11 +225,22 @@ module.exports = function () {
         const expName = groupedDataMap[fileName][j];
         if(visibleDataMapByExp[fileName + '-' + expName] == undefined)
           continue;
-        visibleDataMapByExp[fileName + '-' + expName] = true;
+        if(visibleDataMapByExp[fileName + '-' + expName] == false){
+          visibleDataMapByExp[fileName + '-' + expName] = true;
+          visible[fileName + '-' + expName] = true;
+        }
       }
       this.showData();
-      params = {fileName}
+      params = {fileName, visible}
       return params;
+    }
+
+    experimentalDataOverlay.unhideFileUndo = function(fileName, visible) {
+      for (let j in visible){
+        visibleDataMapByExp[j] = false;
+      }
+      this.showData();
+      return {fileName};
     }
 
     experimentalDataOverlay.countVisibleDataByExp = function() {
@@ -441,6 +466,7 @@ module.exports = function () {
       this.showData();
       return params;
     }
+
     experimentalDataOverlay.expButtonChange= function(evt) 
     {
       if(evt.target.value === "true")
@@ -456,29 +482,36 @@ module.exports = function () {
       param = {evt};
       return param;
     }
+
     experimentalDataOverlay.fileButtonChangeHide= function(subExperiments) 
     {
       console.log("sbgnviz for file color change");
+      var params = [];
       for (i = 0; i < subExperiments.length; i++)
       {
-        subExperiments[i].value = false;
-        subExperiments[i].style.backgroundColor = "#777";
+        if(subExperiments[i].value == 'true'){
+          params.push(subExperiments[i])
+          subExperiments[i].value = false;
+          subExperiments[i].style.backgroundColor = "#777";
+        }
       }
-     
-      param = {subExperiments};
-      return param;
+   
+      return params;
     }
+    
     experimentalDataOverlay.fileButtonChangeUnHide= function(subExperiments) 
     {
+      var params = [];
       console.log("sbgnviz for file color change");
       for (i = 0; i < subExperiments.length; i++)
       {
-        subExperiments[i].value = true;
-        subExperiments[i].style.backgroundColor = "";
+        if(subExperiments[i].value == 'false'){
+          params.push(subExperiments[i]);
+          subExperiments[i].value = true;
+          subExperiments[i].style.backgroundColor = "";
+        }
       }
-     
-      param = {subExperiments};
-      return param;
+      return params;
     }
     return experimentalDataOverlay;
 }
