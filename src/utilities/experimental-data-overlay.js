@@ -441,6 +441,44 @@ module.exports = function () {
       this.showData();
       return params;
     }
-  
+    experimentalDataOverlay.expButtonChange= function(evt) 
+    {
+      if(evt.target.value === "true")
+      {
+        evt.target.style.backgroundColor = "#777";
+        evt.target.value = "false";
+      }
+      else
+      {
+        evt.target.value = "true";
+        evt.target.style.backgroundColor = "";
+      }
+      param = {evt};
+      return param;
+    }
+    experimentalDataOverlay.fileButtonChangeHide= function(subExperiments) 
+    {
+      console.log("sbgnviz for file color change");
+      for (i = 0; i < subExperiments.length; i++)
+      {
+        subExperiments[i].value = false;
+        subExperiments[i].style.backgroundColor = "#777";
+      }
+     
+      param = {subExperiments};
+      return param;
+    }
+    experimentalDataOverlay.fileButtonChangeUnHide= function(subExperiments) 
+    {
+      console.log("sbgnviz for file color change");
+      for (i = 0; i < subExperiments.length; i++)
+      {
+        subExperiments[i].value = true;
+        subExperiments[i].style.backgroundColor = "";
+      }
+     
+      param = {subExperiments};
+      return param;
+    }
     return experimentalDataOverlay;
 }
