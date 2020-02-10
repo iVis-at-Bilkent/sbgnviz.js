@@ -7,7 +7,7 @@ var textUtilities = require('./text-utilities');
 var truncateText = textUtilities.truncateText;
 var libs = libUtilities.getLibs();
 var jQuery = $ = libs.jQuery;
-
+var classes = require('./classes');
 module.exports = function () {
   var optionUtilities, graphUtilities;
   var options;
@@ -2102,8 +2102,27 @@ module.exports = function () {
     if (options.showComplexName && elementUtilities.getElementContent(ele)) {
       padding += options.extraComplexPadding * 0.5;
       // if there is something on the bottom side
+
       if (ele.data('auxunitlayouts') && ele.data('auxunitlayouts').bottom && ele.data('auxunitlayouts').bottom.units.length > 0) {
         padding += options.extraComplexPadding * 0.5;
+      }else{  
+        
+        
+        for(var i=0; i < ele.data('statesandinfos').length; i++) {          
+          var statesandinfos = ele.data('statesandinfos')[i]; 
+          
+          var thisY = statesandinfos.bbox.y;
+          var thisH = statesandinfos.bbox.h;
+          var parentY = (ele.data('class') == "compartment" || ele.data('class') == "complex") ? ele.data('bbox').y : ele.position().y;
+          var height = ele.data("originalH") ? ele.data("originalH") : ele.height();
+          var parentY2 = Number((parentY + height/ 2).toFixed(2));
+          var centerY = Number((thisY+thisH/2).toFixed(2));
+          if(centerY == parentY2){
+            padding += options.extraComplexPadding * 0.5;
+            break;
+          }
+        }
+
       }
     }
     // for the case where the padding is the tightest, we need a bit of extra space
