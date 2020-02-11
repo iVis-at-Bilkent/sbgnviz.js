@@ -116,6 +116,9 @@ module.exports = function () {
       layout.run();
     }
 
+    var performLayout = function(){
+      cy.fit( cy.elements(":visible"), 50 )
+    };
     // Update the style
     cy.style().update();
     // Initilize the bend points once the elements are created
@@ -125,7 +128,7 @@ module.exports = function () {
 
 
 
-    $(document).trigger( "updateGraphEnd", [cy, (isLayoutRequired || tileInfoBoxes)]);
+    $(document).trigger( "updateGraphEnd", [cy, (isLayoutRequired || tileInfoBoxes) , performLayout]);
     if (callback) callback();
   };
 

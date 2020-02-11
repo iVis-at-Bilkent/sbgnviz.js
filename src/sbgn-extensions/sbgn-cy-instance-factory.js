@@ -302,7 +302,7 @@ module.exports = function () {
 	      }
 	    });
 
-	    $(document).on('updateGraphEnd', function(event, _cy, isLayoutRequired) {
+	    $(document).on('updateGraphEnd', function(event, _cy, isLayoutRequired,callback) {
 
 
 				// if the event is not triggered for this cy instance return directly
@@ -416,7 +416,12 @@ module.exports = function () {
 	     // cy.startBatch();
 	      cy.nodes().forEach(function(node) {
 	        setCompoundInfoboxes(node,isLayoutRequired,cy);
-	      });
+		  });
+		  
+		  if(callback){
+			  callback();
+		  }
+
 	      //cy.endBatch();
 	    });
 	  }
