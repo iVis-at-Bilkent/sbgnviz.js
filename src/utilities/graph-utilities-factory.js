@@ -107,7 +107,7 @@ module.exports = function () {
         name: 'preset',
         positions: positionMap,
         fit: true,
-        padding: 50
+        padding: 20
       });
     }
 
@@ -117,7 +117,7 @@ module.exports = function () {
     }
 
     var performLayout = function(){
-      cy.fit( cy.elements(":visible"), 50 )
+      cy.fit( cy.elements(":visible"), 20 )
     };
     // Update the style
     cy.style().update();
