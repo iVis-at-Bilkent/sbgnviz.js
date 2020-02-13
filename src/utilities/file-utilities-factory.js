@@ -166,9 +166,7 @@ module.exports = function () {
       var xmlObject = textToXmlObject(text);
       setTimeout(function () {
         updateGraph(nwtToJson.convert(xmlObject));
-  
         fileUtilities.collapseMarkedNodes();
-  
         uiUtilities.endSpinner("load-spinner");
         $(document).trigger( "sbgnvizLoadSampleEnd", [ filename, cy ] ); // Trigger an event signaling that a sample is loaded
         }, 0);
@@ -194,6 +192,9 @@ module.exports = function () {
          }
        }
      }
+
+     cy.fit( cy.elements(":visible"), 20 );
+
    };
 
    fileUtilities.loadFile( file, convert, undefined, callback, undefined, runLayout );
