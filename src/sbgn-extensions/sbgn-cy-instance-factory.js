@@ -304,18 +304,17 @@ module.exports = function () {
 
 	    $(document).on('updateGraphEnd', function(event, _cy, isLayoutRequired,callback) {
 
-
 				// if the event is not triggered for this cy instance return directly
 				if ( _cy != cy ) {
 					return;
 				}
-
-				var setCompoundInfoboxes = function(node, isLayoutRequired,cy){
+				var setCompoundInfoboxes = function(node, isLayoutRequired,cyInstance){
+					if(cyInstance == undefined ) return;
 					if(node.data().infoboxCalculated){
 						return;
 					}else if(node.isParent()){
 						node.children().forEach(function(childNode){
-							setCompoundInfoboxes(childNode,isLayoutRequired);
+							setCompoundInfoboxes(childNode,isLayoutRequired,cyInstance);
 						});						
 
 					}
@@ -340,7 +339,7 @@ module.exports = function () {
 						if ((isLayoutRequired === undefined || !isLayoutRequired ) && correctInfoBoxCoord) {					
 							classes.AuxiliaryUnit.setAnchorSide(statesandinfos, node);
 							//var fileLoadParam = {extraPadding:  Number(node.data().originalPadding)};
-							var cordResult = classes.AuxiliaryUnit.convertToRelativeCoord(statesandinfos, bbox.x+bbox.w/2, bbox.y+bbox.h/2, cy, node)
+							var cordResult = classes.AuxiliaryUnit.convertToRelativeCoord(statesandinfos, bbox.x+bbox.w/2, bbox.y+bbox.h/2, cyInstance, node)
 							statesandinfos.bbox.x = cordResult.x;
 							statesandinfos.bbox.y = cordResult.y;	
 							statesandinfos.isDisplayed = true;					
@@ -350,7 +349,7 @@ module.exports = function () {
 								layouts[location] = classes.AuxUnitLayout.construct(node, location);
 							}
 							// populate the layout of this side
-							classes.AuxUnitLayout.addAuxUnit(layouts[location], cy, statesandinfos, undefined, true); //positions are precomputed
+							classes.AuxUnitLayout.addAuxUnit(layouts[location], cyInstance, statesandinfos, undefined, true); //positions are precomputed
 						}
 						else {
 							if(!node.data('auxunitlayouts')) { // ensure minimal initialization
@@ -368,7 +367,7 @@ module.exports = function () {
 								case "left": statesandinfos.bbox.x = 0; break;
 								case "right": statesandinfos.bbox.x = 100; break;
 							}
-							classes.AuxUnitLayout.addAuxUnit(layout, cy, statesandinfos);
+							classes.AuxUnitLayout.addAuxUnit(layout, cyInstance, statesandinfos);
 						}
 
 					}
@@ -381,7 +380,6 @@ module.exports = function () {
 							}
 					
 				};
-
 	      // list all entitytypes andstore them in the global scratch
 	      // only stateful EPN (complex, macromolecule or nucleic acid) are concerned
 

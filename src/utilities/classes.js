@@ -739,6 +739,7 @@ AuxUnitLayout.construct = function(parentNode, location, alignment) {
 };
 
 AuxUnitLayout.getParentNode = function(mainObj, cy) {
+  //console.log(mainObj);
   var parentNode = mainObj.parentNode;
 
   // If parentNode is id of parent node rather than being itself get the parent node by that id
