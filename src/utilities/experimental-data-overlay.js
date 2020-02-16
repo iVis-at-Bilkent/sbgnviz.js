@@ -5,6 +5,8 @@ module.exports = function () {
     var visibleDataMapByExp;
     var groupedDataMap;
     var colorMap;
+    var fname;
+    var fdesc;
     function experimentalDataOverlay (param) {
       // Init
       cy = param.sbgnCyInstance.getCy();
@@ -12,6 +14,16 @@ module.exports = function () {
       visibleDataMapByExp = {};
       groupedDataMap = {};
       colorMap = {};
+      fname = "";
+      fdesc = "";
+    }
+
+    experimentalDataOverlay.getName = function(){
+      return fname;
+    }
+
+    experimentalDataOverlay.getDesc = function(){
+      return fdesc;
     }
 
     experimentalDataOverlay.getGroupedDataMap = function(){
@@ -345,10 +357,17 @@ module.exports = function () {
 
         var prev = sorted[0];
         var next = sorted[sorted.length-1];
+
+        if(percent < prev || percent > next){
+          return ({r: 210, g: 210, b: 210})
+        }
         
         for(let k in sorted){
           var i = sorted[k];
-          if(i >= percent){
+          if(i == percent){
+            return ({r: colorMap[i][0], g: colorMap[i][1], b: colorMap[i][2]})
+          }
+          else if(i > percent){
             next = i;
             break;
           }
@@ -503,6 +522,13 @@ module.exports = function () {
       return [r,g,b];
     }
 
+    experimentalDataOverlay.isHex = function(hex) {
+      return typeof hex == 'string'
+          && hex.length == 7
+          && !isNaN(Number('0x' + hex.substring(1)))
+          && hex[0] == '#'
+    }
+
     experimentalDataOverlay.parseData= function(data, fileName) {
       parsedDataMap = parsedDataMap || {}
       visibleDataMapByExp = visibleDataMapByExp || {}
@@ -513,22 +539,88 @@ module.exports = function () {
         return
       }
 
+      var intregex = "^(-?)(0|([1-9][0-9]*))(\\.[0-9]+)?$";
+      var version = '1.0';
+      var clr = false;
       // By lines
       const lines = data.split('\n')
       var k = 0;
-      for(let i = 0; i<1; i++){
-        if(lines[i].substring(0,5) == 'color'){
+      for(let i = 0; i<4; i++){
+        if(lines[i].substring(0,7) == 'version'){
           k++;
           const metaLines = lines[i].split('\t');
-          for(let k = 1; k < metaLines.length - 1; k=k+2){
-            if(parseInt(metaLines[k]) <= 100 && parseInt(metaLines[k]) >= -100){
-              if(parseInt(metaLines[k]) != NaN)
-                colorMap[parseInt(metaLines[k])] = this.hexToRgb(metaLines[k+1])
+          if(metaLines[1] && metaLines[1].length > 1){
+            version =  metaLines[1];
+          }
+          else{
+            return "Error";
+          }
+        }
+        if(lines[i].substring(0,4) == 'name'){
+          k++;
+          const metaLines = lines[i].split('\t');
+          if(metaLines[1] && metaLines[1].length > 1){
+            fname =  metaLines[1];
+          }
+          else{
+            return "Error";
+          }
+        }
+        if(lines[i].substring(0,11) == 'description'){
+          k++;
+          const metaLines = lines[i].split('\t');
+          if(metaLines[1] && metaLines[1].length > 1){
+            fdesc =  metaLines[1];
+          }
+          else{
+            return "Error";
+          }
+        }
+        if(lines[i].substring(0,5) == 'color'){
+          clr = true;
+          k++;
+          const metaLines = lines[i].split('\t');
+          if(metaLines.length <= 1 && metaLines.length % 2 == 0){
+            return "Error";
+          }
+
+          for(let t = 1; t < metaLines.length - 1; t=t+2){
+            var hex = metaLines[t+1]
+            if(t == metaLines.length - 2){
+              hex = metaLines[t+1].substring(0,metaLines.length - 2);
+            }
+            if(metaLines[t] == "min" || metaLines[t] == "max"){
+              if(this.isHex(hex)){
+                colorMap[(metaLines[t])] = this.hexToRgb(hex);
+              }
+            }
+            
+            else if(parseInt(metaLines[t]) != NaN){
+              if(this.isHex(hex)){
+                colorMap[parseInt(metaLines[t])] = this.hexToRgb(hex);
+              }
+              else{
+                return "Error";
+              }
+            }
+            else{
+              return "Error";
             }
           }
         }
       }
-      console.log(colorMap)
+
+      //default colors
+      if(!clr){
+        colorMap["min"] = this.hexToRgb('#0000ff');
+        colorMap["max"] = this.hexToRgb('#ff0000');
+        colorMap[0] = this.hexToRgb('#ffffff');
+      }
+
+      var parsed = parsedDataMap;
+      var visible = visibleDataMapByExp;
+      var grouped = groupedDataMap;
+      
       // First line is meta data !
       const metaLineColumns = lines[k].split('\t')
   
@@ -549,6 +641,9 @@ module.exports = function () {
         groupedDataMap[fileName].push(experiments[i - 1])
       }
 
+      var min = Number.MAX_VALUE;
+      var max = Number.MIN_VALUE;
+
       // parse genomic data
       for (let i = k+1; i < lines.length; i++) {
         // EOF check
@@ -566,9 +661,43 @@ module.exports = function () {
   
         // Add each entry of genomic data
         for (let j = 1; j < lineContent.length; j++) {
-          parsedDataMap[eleSymbol][fileName + '-' + experiments[j - 1]] = lineContent[j]
+          if(j == lineContent.length - 1){
+            lineContent[j] = lineContent[j].substring(0,lineContent[j].length - 1)
+          }
+          if(lineContent[j].match(intregex)){
+            parsedDataMap[eleSymbol][fileName + '-' + experiments[j - 1]] = lineContent[j];
+          }
+          else{
+            parsedDataMap = parsed;
+            visibleDataMapByExp = visible;
+            groupedDataMap = grouped;
+            colorMap = {};
+            fname = "";
+            fdesc = "";
+            version = "1.0";
+            return "Error"
+          }
+          if(lineContent[j] > max){
+            max = lineContent[j];
+          }
+          if(lineContent[j] < min){
+            min = lineContent[j];
+          }
         }
       }
+
+      if(colorMap['min']){
+        var colorvalue = colorMap['min'];
+        delete colorMap['min'];
+        colorMap[min] = colorvalue;
+      }
+
+      if(colorMap['max']){
+        var colorvalue = colorMap['max'];
+        delete colorMap['max'];
+        colorMap[max] = colorvalue;
+      }
+
       var params = {fileName};
       this.showData();
       return params;
@@ -619,6 +748,12 @@ module.exports = function () {
         }
       }
       return params;
+    }
+
+    experimentalDataOverlay.updateButtons = function(buttons){
+      for(let i in buttons){
+        console.log(i);
+      }
     }
     return experimentalDataOverlay;
 }
