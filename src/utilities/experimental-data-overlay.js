@@ -4,12 +4,14 @@ module.exports = function () {
     var parsedDataMap;
     var visibleDataMapByExp;
     var groupedDataMap;
+    var colorMap;
     function experimentalDataOverlay (param) {
       // Init
       cy = param.sbgnCyInstance.getCy();
       parsedDataMap = {};
       visibleDataMapByExp = {};
       groupedDataMap = {};
+      colorMap = {};
     }
 
     experimentalDataOverlay.getGroupedDataMap = function(){
@@ -335,36 +337,51 @@ module.exports = function () {
         }
       }
   
+      function interpolateColor(color1, color2, factor) {
+        var result = color1.slice();
+        for (var i = 0; i < 3; i++) {
+            result[i] = Math.round(result[i] + factor * (color2[i] - color1[i]));
+        }
+        return result;
+    };
+
+      function decideColor(percent){
+        var sorted = [];
+        for(let i in colorMap){
+          sorted.push(i);
+        }
+        sorted.sort();
+
+        var prev = sorted[0];
+        var next = sorted[sorted.length-1];
+        
+        for(let k in sorted){
+          var i = sorted[k];
+          if(i >= percent){
+            next = i;
+            break;
+          }
+          else{
+            prev = i;
+          }
+        }
+
+        var steps = 1 / (next - prev);
+        var res = interpolateColor(colorMap[prev], colorMap[next], steps * (percent - prev));
+
+        return ({r: res[0], g: res[1], b: res[2]});
+      }
       function dataRectangleGenerator(x, y, w, h, percent, parentSVG) {
         let colorString = ''
         if (percent) {
-          const isNegativePercent = percent < 0
-          let _percent = Math.abs(percent)
-          // Handle special cases here !
-          _percent = _percent < 0.5 ? 2 : _percent
-          _percent = _percent === 1 ? 2 : _percent
-          // Here we are using non linear regression
-          // Fitting points of (0,0), (25,140), (50,220), (100, 255)
-          const percentColor = 255 - (-7.118 + 53.9765 * Math.log(_percent))
-  
-          if (percent === 0) {
-            colorString = 'rgb(255,255,255)'
-          } else if (isNegativePercent) {
-            colorString =
+          var color = decideColor(parseInt(percent));
+          colorString =
               'rgb(' +
-              Math.round(percentColor) +
+              Math.round(color.r) +
               ',' +
-              Math.round(percentColor) +
-              ',255)'
-            percent = percent.substring(1)
-          } else {
-            colorString =
-              'rgb(255,' +
-              Math.round(percentColor) +
+              Math.round(color.g) +
               ',' +
-              Math.round(percentColor) +
-              ')'
-          }
+              Math.round(color.b) + ')';
           // Rectangle Part
           const overlayRect = document.createElementNS(svgNameSpace, 'rect')
           overlayRect.setAttribute('x', x)
@@ -394,6 +411,67 @@ module.exports = function () {
           parentSVG.appendChild(overlayRect)
         }
       }
+
+      // function dataRectangleGenerator(x, y, w, h, percent, parentSVG) {
+      //   let colorString = ''
+      //   if (percent) {
+      //     const isNegativePercent = percent < 0
+      //     let _percent = Math.abs(percent)
+      //     // Handle special cases here !
+      //     _percent = _percent < 0.5 ? 2 : _percent
+      //     _percent = _percent === 1 ? 2 : _percent
+      //     // Here we are using non linear regression
+      //     // Fitting points of (0,0), (25,140), (50,220), (100, 255)
+          
+      //     const percentColor = 255 - (-7.118 + 53.9765 * Math.log(_percent))
+  
+      //     if (percent === 0) {
+      //       colorString = 'rgb(255,255,255)'
+      //     } else if (isNegativePercent) {
+      //       colorString =
+      //         'rgb(' +
+      //         Math.round(percentColor) +
+      //         ',' +
+      //         Math.round(percentColor) +
+      //         ',255)'
+      //       percent = percent.substring(1)
+      //     } else {
+      //       colorString =
+      //         'rgb(255,' +
+      //         Math.round(percentColor) +
+      //         ',' +
+      //         Math.round(percentColor) +
+      //         ')'
+      //     }
+      //     // Rectangle Part
+      //     const overlayRect = document.createElementNS(svgNameSpace, 'rect')
+      //     overlayRect.setAttribute('x', x)
+      //     overlayRect.setAttribute('y', y)
+      //     overlayRect.setAttribute('width', w)
+      //     overlayRect.setAttribute('height', h)
+      //     overlayRect.setAttribute(
+      //       'style',
+      //       'stroke-width:1;stroke:rgb(0,0,0);opacity:1;fill:' + colorString + ';'
+      //     )
+  
+      //     parentSVG.appendChild(overlayRect)
+      //   } else {
+      //     colorString = 'rgb(210,210,210)'
+  
+      //     // Rectangle Part
+      //     const overlayRect = document.createElementNS(svgNameSpace, 'rect')
+      //     overlayRect.setAttribute('x', x)
+      //     overlayRect.setAttribute('y', y)
+      //     overlayRect.setAttribute('width', w)
+      //     overlayRect.setAttribute('height', h)
+      //     overlayRect.setAttribute(
+      //       'style',
+      //       'stroke-width:1;stroke:rgb(0,0,0);opacity:1;fill:' + colorString + ';'
+      //     )
+  
+      //     parentSVG.appendChild(overlayRect)
+      //   }
+      // }
   
       return svg
     }
@@ -420,10 +498,25 @@ module.exports = function () {
 
     }
   
+    experimentalDataOverlay.hexToRgb = function(hex) {
+      if(hex[0] == '#'){
+        hex = hex.substring(1);
+      }
+      else {
+        return;
+      }
+      var bigint = parseInt(hex, 16);
+      var r = (bigint >> 16) & 255;
+      var g = (bigint >> 8) & 255;
+      var b = bigint & 255;
+      return [r,g,b];
+    }
+
     experimentalDataOverlay.parseData= function(data, fileName) {
       parsedDataMap = parsedDataMap || {}
       visibleDataMapByExp = visibleDataMapByExp || {}
       groupedDataMap = groupedDataMap || {}
+      colorMap = colorMap || {}
       const experiments = [];
       if(fileName in groupedDataMap){
         return
@@ -431,8 +524,22 @@ module.exports = function () {
 
       // By lines
       const lines = data.split('\n')
+      var k = 0;
+      for(let i = 0; i<1; i++){
+        if(lines[i].substring(0,5) == 'color'){
+          k++;
+          const metaLines = lines[i].split('\t');
+          for(let k = 1; k < metaLines.length - 1; k=k+2){
+            if(parseInt(metaLines[k]) <= 100 && parseInt(metaLines[k]) >= -100){
+              if(parseInt(metaLines[k]) != NaN)
+                colorMap[parseInt(metaLines[k])] = this.hexToRgb(metaLines[k+1])
+            }
+          }
+        }
+      }
+      console.log(colorMap)
       // First line is meta data !
-      const metaLineColumns = lines[0].split('\t')
+      const metaLineColumns = lines[k].split('\t')
   
       // Parse experiment types
       for (let i = 1; i < metaLineColumns.length; i++) {
@@ -452,7 +559,7 @@ module.exports = function () {
       }
 
       // parse genomic data
-      for (let i = 1; i < lines.length; i++) {
+      for (let i = k+1; i < lines.length; i++) {
         // EOF check
         if (lines[i].length === 0) {
           break
