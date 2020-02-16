@@ -16,6 +16,9 @@ module.exports = function () {
       return groupedDataMap
     }
 
+    experimentalDataOverlay.getVisibleData = function(){
+      return visibleDataMapByExp;
+    }
     experimentalDataOverlay.removeAll = function(){
       var parsed = {};
       var visible = {};
@@ -167,6 +170,12 @@ module.exports = function () {
 
       var params = {fileName,parsed,visible,grouped};
       this.showData();
+      var k = 0;
+      for (let i in groupedDataMap)
+      {
+        k++;
+      }
+      if(k == 0){groupedDataMap = ""}
       return params;
     }
 
@@ -469,16 +478,22 @@ module.exports = function () {
 
     experimentalDataOverlay.expButtonChange= function(evt) 
     {
-      if(evt.target.value === "true")
+      console.log("change button for hide experimet redo");
+      console.log(evt.target.value)
+      if(evt.target.value === "true" || evt.target.value == true)
       {
+        console.log("here==true")
         evt.target.style.backgroundColor = "#777";
         evt.target.value = "false";
       }
       else
       {
+        console.log("here")
         evt.target.value = "true";
         evt.target.style.backgroundColor = "";
       }
+      console.log("changed taget value is")
+      console.log(evt.target.value);
       param = {evt};
       return param;
     }
@@ -512,6 +527,31 @@ module.exports = function () {
         }
       }
       return params;
+    }
+    experimentalDataOverlay.buttonUpdate = function(param)
+    {
+      console.log("buttonupdate");
+      var document = param
+      for (let i in visibleDataMapByExp)
+      {
+        var index = i.indexOf('-');
+        var fileName = i.substring(0,index);
+        var expName = i.substring(index+1);
+        var buttonName = "experiment-vis-"+ fileName+ "?" + expName;
+        var button = document.getElementById(buttonName);
+        if(button != null){
+        if(visibleDataMapByExp[i] == true ||visibleDataMapByExp[i] === true ){
+         // params.push(subExperiments[i])
+        button.value = "true";
+        button.style.backgroundColor = "";
+        }
+        else {
+          button.value = "false";
+          button.style.backgroundColor = "#777";
+        }
+      }
+    }
+      console.log("button update finished");
     }
     return experimentalDataOverlay;
 }
