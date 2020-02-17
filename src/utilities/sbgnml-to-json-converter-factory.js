@@ -138,7 +138,7 @@ module.exports = function () {
         var childNodeBbox = this.bboxProp(childNode);
         childNode.bbox = childNodeBbox; 
         //var childStyle = styles.filter(style =>{ return style.idList == childNode.id});
-        var borderWidth = 0;
+        var borderWidth = 3.25;
        /*  if(childStyle.length > 0 && childStyle[0].renderGroup !== undefined){
           borderWidth = childStyle[0].renderGroup.strokeWidth;
         } */
@@ -1038,10 +1038,11 @@ module.exports = function () {
       }
     }
     
-    var minDistanceToChildren ;
+    var minDistanceToChildren = 0 ;
     if (!map.extension) {
       for (var i = 0; i < glyphs.length; i++) {
         var glyph = glyphs[i];
+       // if(glyph.class_ == "complex")continue;
         childNodes = glyph.glyphMembers.filter(function(child){ return child.class_ != "state variable" && child.class_ != "unit of information"});
         if(childNodes.length > 0){ // compound node
           for (var j = 0; j < childNodes.length; j++) {
@@ -1054,7 +1055,7 @@ module.exports = function () {
             var top = childNodeBbox.y - glyph.bbox.y;
             var bottom = (glyph.bbox.y + glyph.bbox.h) - (childNodeBbox.y + childNodeBbox.h);
             
-            if(minDistanceToChildren === undefined){
+            if(minDistanceToChildren == 0){
               minDistanceToChildren = Math.min(left,right,top,bottom);              
             }else{
               minDistanceToChildren = Math.min(left,right,top,bottom,minDistanceToChildren);
@@ -1064,7 +1065,7 @@ module.exports = function () {
       }
       var extraCompartmentPadding = typeof options.extraCompartmentPadding === 'function' ? options.extraCompartmentPadding.call() : options.extraCompartmentPadding;
       
-        var newPadding = minDistanceToChildren - extraCompartmentPadding;
+        var newPadding = minDistanceToChildren - extraCompartmentPadding - 1.625;
         if(newPadding < 0){
           newPadding = 0;
         }
