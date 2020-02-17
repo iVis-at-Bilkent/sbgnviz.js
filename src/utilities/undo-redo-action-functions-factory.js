@@ -173,7 +173,8 @@ module.exports = function () {
     var parsed = param.parsed;
     var grouped = param.grouped;
     var visible = param.visible;
-    return experimentalDataOverlay.addFile(fileName,parsed,visible,grouped);
+    var visiblef = param.visiblef;
+    return experimentalDataOverlay.addFile(fileName,parsed,visible,grouped, visiblef);
   }
 
   undoRedoActionFunctions.removeFile = function(param){
@@ -189,7 +190,8 @@ module.exports = function () {
     var parsed = param.parsed;
     var grouped = param.grouped;
     var visible = param.visible;
-    return experimentalDataOverlay.restoreAll(parsed,visible,grouped)
+    var visiblef = param.visiblef;
+    return experimentalDataOverlay.restoreAll(parsed,visible,grouped,visiblef)
   }
 
   // undoRedoActionFunctions.parseData = function(param){

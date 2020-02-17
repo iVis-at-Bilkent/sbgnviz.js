@@ -4,6 +4,7 @@ module.exports = function () {
     var parsedDataMap;
     var visibleDataMapByExp;
     var groupedDataMap;
+    var visibleFiles;
     var colorMap;
     var fname;
     var fdesc;
@@ -12,6 +13,7 @@ module.exports = function () {
       cy = param.sbgnCyInstance.getCy();
       parsedDataMap = {};
       visibleDataMapByExp = {};
+      visibleFiles = {};
       groupedDataMap = {};
       colorMap = {};
       fname = "";
@@ -37,6 +39,8 @@ module.exports = function () {
       var parsed = {};
       var visible = {};
       var grouped = {};
+      var visiblef = {};
+
       for(let i in parsedDataMap){
         if(!parsed[i]){
           parsed[i] = {};
@@ -48,6 +52,10 @@ module.exports = function () {
       for(let i in visibleDataMapByExp){
         visible[i] = visibleDataMapByExp[i];
       }
+
+      for(let i in visibleFiles){
+        visiblef[i] = visibleFiles[i];
+      }
       for(let i in groupedDataMap){
         if(!grouped[i]){
           grouped[i] = [];
@@ -58,17 +66,19 @@ module.exports = function () {
       }
       parsedDataMap = {};
       visibleDataMapByExp = {};
+      visibleFiles = {};
       groupedDataMap = {};
       this.showData();
-      params = {parsed, visible, grouped};
+      params = {parsed, visible, grouped, visiblef};
       return params;
 
     }
 
-    experimentalDataOverlay.restoreAll = function(parsed, visible, grouped){
+    experimentalDataOverlay.restoreAll = function(parsed, visible, grouped, visiblef){
       parsedDataMap = parsed;
       visibleDataMapByExp = visible;
       groupedDataMap = grouped;
+      visibleFiles = visiblef;
       this.showData();
       param = {};
       return param;
@@ -88,10 +98,11 @@ module.exports = function () {
       return params;
     }
 
-    experimentalDataOverlay.addFile = function(fileName, parsed, visible, grouped) {
+    experimentalDataOverlay.addFile = function(fileName, parsed, visible, grouped, visiblef) {
       parsedDataMap = parsed;
       visibleDataMapByExp = visible;
       groupedDataMap = grouped;
+      visibleFiles = visiblef;
       this.showData();
       param = {fileName};
       return param;
@@ -152,6 +163,8 @@ module.exports = function () {
       var parsed = {};
       var visible = {};
       var grouped = {};
+      var visiblef = {};
+
       for(let i in parsedDataMap){
         if(!parsed[i]){
           parsed[i] = {};
@@ -162,6 +175,9 @@ module.exports = function () {
       }
       for(let i in visibleDataMapByExp){
         visible[i] = visibleDataMapByExp[i];
+      }
+      for(let i in visibleFiles){
+        visiblef[i] = visibleFiles[i];
       }
       for(let i in groupedDataMap){
         if(!grouped[i]){
@@ -182,7 +198,7 @@ module.exports = function () {
       }
       delete groupedDataMap[fileName];
 
-      var params = {fileName,parsed,visible,grouped};
+      var params = {fileName,parsed,visible,grouped,visiblef};
       this.showData();
       var k = 0;
       for (let i in groupedDataMap)
@@ -203,6 +219,7 @@ module.exports = function () {
     }
   
     experimentalDataOverlay.hideFile = function(fileName) {
+      visibleFiles[fileName] = false;
       var invisible = {};
       if(groupedDataMap[fileName] == undefined){
         return;
@@ -223,6 +240,7 @@ module.exports = function () {
     }
 
     experimentalDataOverlay.hideFileUndo = function(fileName, invisible) {
+      visibleFiles[fileName] = true;
       for (let j in invisible){
         visibleDataMapByExp[j] = true;
       }
@@ -241,6 +259,7 @@ module.exports = function () {
   
     experimentalDataOverlay.unhideFile = function(fileName) {
       var visible = {};
+      visibleFiles[fileName] = true;
       if(groupedDataMap[fileName] == undefined){
         return;
       }
@@ -259,6 +278,7 @@ module.exports = function () {
     }
 
     experimentalDataOverlay.unhideFileUndo = function(fileName, visible) {
+      visibleFiles[fileName] = true;
       for (let j in visible){
         visibleDataMapByExp[j] = false;
       }
@@ -660,11 +680,11 @@ module.exports = function () {
       }
 
       
-      
 
       var parsed = parsedDataMap;
       var visible = visibleDataMapByExp;
       var grouped = groupedDataMap;
+      var visiblef = visibleFiles;
       
       // First line is meta data !
       const metaLineColumns = lines[k].split('\t')
@@ -685,6 +705,8 @@ module.exports = function () {
         }
         groupedDataMap[fileName].push(experiments[i - 1])
       }
+
+      visibleFiles[fileName] = true;
 
       var min = Number.MAX_VALUE;
       var max = Number.MIN_VALUE;
@@ -717,6 +739,7 @@ module.exports = function () {
             visibleDataMapByExp = visible;
             groupedDataMap = grouped;
             colorMap = colorm;
+            visibleFiles = visiblef;
             fname = "";
             fdesc = "";
             version = "1.0";
@@ -815,16 +838,31 @@ module.exports = function () {
         var buttonName = "experiment-vis-"+ fileName+ "?" + expName;
         var button = document.getElementById(buttonName);
         if(button != null){
-        if(visibleDataMapByExp[i] == true ||visibleDataMapByExp[i] === true ){
-          button.value = "true";
-          button.style.backgroundColor = "";
-        }
-        else {
-          button.value = "false";
-          button.style.backgroundColor = "#777";
+          if(visibleDataMapByExp[i] == true ||visibleDataMapByExp[i] === true ){
+            button.value = "true";
+            button.style.backgroundColor = "";
+          }
+          else {
+            button.value = "false";
+            button.style.backgroundColor = "#777";
+          }
         }
       }
-    }
+      for (let i in visibleFiles){
+
+        var buttonName = "experiment-file-vis-"+ i;
+        var button = document.getElementById(buttonName);
+        if(button != null){
+          if(visibleFiles[i] == true ||visibleFiles[i] === true ){
+            button.value = "true";
+            button.style.backgroundColor = "";
+          }
+          else {
+            button.value = "false";
+            button.style.backgroundColor = "#777";
+          }
+        }
+      }
       console.log("button update finished");
     }
     return experimentalDataOverlay;
