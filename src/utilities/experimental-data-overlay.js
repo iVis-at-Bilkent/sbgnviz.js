@@ -331,7 +331,8 @@ module.exports = function () {
               overLayRectBBox.w / maxDataBoxCount,
               overLayRectBBox.h,
               frequencyData[fileName + '-' + expName],
-              svg
+              svg,
+              fileName
             )
           } else {
             dataRectangleGenerator(
@@ -341,7 +342,8 @@ module.exports = function () {
               overLayRectBBox.w / maxDataBoxCount,
               overLayRectBBox.h,
               null,
-              svg
+              svg,
+              fileName
             )
           }
   
@@ -357,9 +359,9 @@ module.exports = function () {
         return result;
     };
 
-      function decideColor(percent){
+      function decideColor(percent, fileName){
         var sorted = [];
-        for(let i in colorMap){
+        for(let i in colorMap[fileName]){
           sorted.push(i);
         }
         sorted.sort();
@@ -374,7 +376,7 @@ module.exports = function () {
         for(let k in sorted){
           var i = sorted[k];
           if(i == percent){
-            return ({r: colorMap[i][0], g: colorMap[i][1], b: colorMap[i][2]})
+            return ({r: colorMap[fileName][i][0], g: colorMap[fileName][i][1], b: colorMap[fileName][i][2]})
           }
           else if(i > percent){
             next = i;
@@ -386,14 +388,14 @@ module.exports = function () {
         }
 
         var steps = 1 / (next - prev);
-        var res = interpolateColor(colorMap[prev], colorMap[next], steps * (percent - prev));
+        var res = interpolateColor(colorMap[fileName][prev], colorMap[fileName][next], steps * (percent - prev));
 
         return ({r: res[0], g: res[1], b: res[2]});
       }
-      function dataRectangleGenerator(x, y, w, h, percent, parentSVG) {
+      function dataRectangleGenerator(x, y, w, h, percent, parentSVG, fileName) {
         let colorString = ''
         if (percent) {
-          var color = decideColor(parseInt(percent));
+          var color = decideColor(parseInt(percent), fileName);
           colorString =
               'rgb(' +
               Math.round(color.r) +
@@ -544,17 +546,28 @@ module.exports = function () {
       groupedDataMap = groupedDataMap || {}
       colorMap = colorMap || {}
       const experiments = [];
+      var colors = {};
+
       if(fileName in groupedDataMap){
         return
       }
 
+      var colorm = colorMap;
       var intregex = "^(-?)(0|([1-9][0-9]*))(\\.[0-9]+)?$";
       var version = '1.0';
       var clr = false;
       // By lines
       const lines = data.split('\n')
+      if(lines.length < 2){
+        return "Error";
+      }
+      console.log(lines)
       var k = 0;
-      for(let i = 0; i<4; i++){
+      var upto = 4;
+      if(lines.length < 4){
+        upto = lines.length;
+      }
+      for(let i = 0; i<upto; i++){
         if(lines[i].substring(0,7) == 'version'){
           k++;
           const metaLines = lines[i].split('\t');
@@ -562,6 +575,10 @@ module.exports = function () {
             version =  metaLines[1];
           }
           else{
+            fname = "";
+            fdesc = "";
+            version = "1.0";
+            colorMap = colorm;
             return "Error";
           }
         }
@@ -572,6 +589,10 @@ module.exports = function () {
             fname =  metaLines[1];
           }
           else{
+            fname = "";
+            fdesc = "";
+            version = "1.0";
+            colorMap = colorm;
             return "Error";
           }
         }
@@ -582,6 +603,10 @@ module.exports = function () {
             fdesc =  metaLines[1];
           }
           else{
+            fname = "";
+            fdesc = "";
+            version = "1.0";
+            colorMap = colorm;
             return "Error";
           }
         }
@@ -600,19 +625,27 @@ module.exports = function () {
             }
             if(metaLines[t] == "min" || metaLines[t] == "max"){
               if(this.isHex(hex)){
-                colorMap[(metaLines[t])] = this.hexToRgb(hex);
+                colors[(metaLines[t])] = this.hexToRgb(hex);
               }
             }
             
             else if(parseInt(metaLines[t]) != NaN){
               if(this.isHex(hex)){
-                colorMap[parseInt(metaLines[t])] = this.hexToRgb(hex);
+                colors[parseInt(metaLines[t])] = this.hexToRgb(hex);
               }
               else{
+                fname = "";
+                fdesc = "";
+                colorMap = colorm;
+                version = "1.0";
                 return "Error";
               }
             }
             else{
+              fname = "";
+              fdesc = "";
+              colorMap = colorm;
+              version = "1.0";
               return "Error";
             }
           }
@@ -621,10 +654,13 @@ module.exports = function () {
 
       //default colors
       if(!clr){
-        colorMap["min"] = this.hexToRgb('#0000ff');
-        colorMap["max"] = this.hexToRgb('#ff0000');
-        colorMap[0] = this.hexToRgb('#ffffff');
+        colors["min"] = this.hexToRgb('#0000ff');
+        colors["max"] = this.hexToRgb('#ff0000');
+        colors[0] = this.hexToRgb('#ffffff');
       }
+
+      
+      
 
       var parsed = parsedDataMap;
       var visible = visibleDataMapByExp;
@@ -680,11 +716,11 @@ module.exports = function () {
             parsedDataMap = parsed;
             visibleDataMapByExp = visible;
             groupedDataMap = grouped;
-            colorMap = {};
+            colorMap = colorm;
             fname = "";
             fdesc = "";
             version = "1.0";
-            return "Error"
+            return "Error";
           }
           if(lineContent[j] > max){
             max = lineContent[j];
@@ -695,17 +731,20 @@ module.exports = function () {
         }
       }
 
-      if(colorMap['min']){
-        var colorvalue = colorMap['min'];
-        delete colorMap['min'];
-        colorMap[min] = colorvalue;
+      if(colors['min']){
+        var colorvalue = colors['min'];
+        delete colors['min'];
+        colors[min] = colorvalue;
       }
 
-      if(colorMap['max']){
-        var colorvalue = colorMap['max'];
-        delete colorMap['max'];
-        colorMap[max] = colorvalue;
+      if(colors['max']){
+        var colorvalue = colors['max'];
+        delete colors['max'];
+        colors[max] = colorvalue;
       }
+
+      colorMap[fileName] = colors;
+
 
       var params = {fileName};
       this.showData();
@@ -777,9 +816,8 @@ module.exports = function () {
         var button = document.getElementById(buttonName);
         if(button != null){
         if(visibleDataMapByExp[i] == true ||visibleDataMapByExp[i] === true ){
-         // params.push(subExperiments[i])
-        button.value = "true";
-        button.style.backgroundColor = "";
+          button.value = "true";
+          button.style.backgroundColor = "";
         }
         else {
           button.value = "false";
