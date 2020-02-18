@@ -219,6 +219,8 @@ module.exports = function () {
     }
   
     experimentalDataOverlay.hideFile = function(fileName) {
+      console.log("file hide")
+      console.log(fileName)
       visibleFiles[fileName] = false;
       var invisible = {};
       if(groupedDataMap[fileName] == undefined){
@@ -235,16 +237,26 @@ module.exports = function () {
       }
 
       this.showData();
-      params = {invisible}
+      params = {fileName, invisible}
+      console.log("hideFile visible files")
+      console.log(visibleFiles)
       return params;
     }
 
     experimentalDataOverlay.hideFileUndo = function(fileName, invisible) {
-      visibleFiles[fileName] = true;
+      console.log("hidefileundo")
+      console.log(fileName)
+      console.log(visibleFiles)
+      if(visibleFiles[fileName] != undefined)
+        visibleFiles[fileName] = true;
+      else
+        return
       for (let j in invisible){
         visibleDataMapByExp[j] = true;
       }
       this.showData();
+      console.log("end")
+      console.log(visibleFiles)
       return {fileName};
     }
 
@@ -258,6 +270,7 @@ module.exports = function () {
     }
   
     experimentalDataOverlay.unhideFile = function(fileName) {
+      console.log("unfile")
       var visible = {};
       visibleFiles[fileName] = true;
       if(groupedDataMap[fileName] == undefined){
@@ -278,7 +291,8 @@ module.exports = function () {
     }
 
     experimentalDataOverlay.unhideFileUndo = function(fileName, visible) {
-      visibleFiles[fileName] = true;
+      console.log("unfileundo")
+      visibleFiles[fileName] = false;
       for (let j in visible){
         visibleDataMapByExp[j] = false;
       }
@@ -828,6 +842,7 @@ module.exports = function () {
     }
     experimentalDataOverlay.buttonUpdate = function(param)
     {
+      //add file button
       console.log("buttonupdate");
       var document = param
       for (let i in visibleDataMapByExp)
@@ -852,12 +867,16 @@ module.exports = function () {
 
         var buttonName = "experiment-file-vis-"+ i;
         var button = document.getElementById(buttonName);
+        
         if(button != null){
+          console.log(button)
           if(visibleFiles[i] == true ||visibleFiles[i] === true ){
+            console.log("true")
             button.value = "true";
             button.style.backgroundColor = "";
           }
           else {
+            console.log("false")
             button.value = "false";
             button.style.backgroundColor = "#777";
           }
