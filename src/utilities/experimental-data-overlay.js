@@ -6,8 +6,9 @@ module.exports = function () {
     var groupedDataMap;
     var visibleFiles;
     var colorMap;
-    var fname;
-    var fdesc;
+   
+    var fileDescription;
+    var fileTitle ;
     function experimentalDataOverlay (param) {
       // Init
       cy = param.sbgnCyInstance.getCy();
@@ -16,8 +17,9 @@ module.exports = function () {
       visibleFiles = {};
       groupedDataMap = {};
       colorMap = {};
-      fname = "";
-      fdesc = "";
+      
+      fileDescription = {};
+      fileTitle = {};
     }
 
     experimentalDataOverlay.getName = function(){
@@ -587,6 +589,8 @@ module.exports = function () {
       }
 
       var colorm = colorMap;
+      var fileD= fileDescription;
+      var fileN= fileTitle;
       var intregex = "^(-?)(0|([1-9][0-9]*))(\\.[0-9]+)?$";
       var version = '1.0';
       var clr = false;
@@ -609,8 +613,8 @@ module.exports = function () {
             version =  metaLines[1];
           }
           else{
-            fname = "";
-            fdesc = "";
+            fileDescription = fileD;
+            fileTitle = fileN;
             version = "1.0";
             colorMap = colorm;
             return "Error";
@@ -620,11 +624,11 @@ module.exports = function () {
           k++;
           const metaLines = lines[i].split('\t');
           if(metaLines[1] && metaLines[1].length > 1){
-            fname =  metaLines[1];
+            fileTitle[fileName] =  metaLines[1];
           }
           else{
-            fname = "";
-            fdesc = "";
+            fileTitle = fileN;
+            fileDescription = fileD;
             version = "1.0";
             colorMap = colorm;
             return "Error";
@@ -634,11 +638,12 @@ module.exports = function () {
           k++;
           const metaLines = lines[i].split('\t');
           if(metaLines[1] && metaLines[1].length > 1){
-            fdesc =  metaLines[1];
+            fileDescription[fileName] =  metaLines[1];
+
           }
           else{
-            fname = "";
-            fdesc = "";
+            fileTitle = fileN;
+            fileDescription = fileD;
             version = "1.0";
             colorMap = colorm;
             return "Error";
@@ -668,16 +673,16 @@ module.exports = function () {
                 colors[parseInt(metaLines[t])] = this.hexToRgb(hex);
               }
               else{
-                fname = "";
-                fdesc = "";
+                fileTitle = fileN;
+                fileDescription = fileD;
                 colorMap = colorm;
                 version = "1.0";
                 return "Error";
               }
             }
             else{
-              fname = "";
-              fdesc = "";
+              fileTitle = fileN;
+              fileDescription = fileD;
               colorMap = colorm;
               version = "1.0";
               return "Error";
@@ -754,8 +759,8 @@ module.exports = function () {
             groupedDataMap = grouped;
             colorMap = colorm;
             visibleFiles = visiblef;
-            fname = "";
-            fdesc = "";
+            fileTitle = fileN;
+            fileDescription = fileD;
             version = "1.0";
             return "Error";
           }
@@ -869,7 +874,15 @@ module.exports = function () {
         var button = document.getElementById(buttonName);
         
         if(button != null){
-          console.log(button)
+          if(fileTitle[i] != undefined)
+          {
+            button.title = fileTitle[i]
+          }
+          if(fileDescription[i] != undefined)
+          {
+            button.title = button.title +"\n"+ fileDescription[i];
+          }
+       
           if(visibleFiles[i] == true ||visibleFiles[i] === true ){
             console.log("true")
             button.value = "true";
