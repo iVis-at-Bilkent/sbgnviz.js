@@ -6,6 +6,7 @@ module.exports = function () {
     var groupedDataMap;
     var visibleFiles;
     var colorMap;
+    var allVis
    
     var fileDescription;
     var fileTitle ;
@@ -17,6 +18,7 @@ module.exports = function () {
       visibleFiles = {};
       groupedDataMap = {};
       colorMap = {};
+      allVis = true;
       
       fileDescription = {};
       fileTitle = {};
@@ -37,6 +39,88 @@ module.exports = function () {
     experimentalDataOverlay.getVisibleData = function(){
       return visibleDataMapByExp;
     }
+
+    experimentalDataOverlay.hideAll = function() {
+      var invisibleExp = {};
+      var invisibleFile = {};
+      allVis = false;
+
+      for(let i in groupedDataMap){
+        if(visibleFiles[i]){
+          visibleFiles[i] = false;
+          invisibleFile[i] = false;
+        }
+      }
+      for(let fileName in groupedDataMap){
+        for (let j = 0; j < groupedDataMap[fileName].length; j++){
+          const expName = groupedDataMap[fileName][j];
+          if(visibleDataMapByExp[fileName + '?' + expName] == undefined)
+            continue;
+          if(visibleDataMapByExp[fileName + '?' + expName] == true){
+            invisibleExp[fileName + '?' + expName] = false;
+            visibleDataMapByExp[fileName + '?' + expName] = false;
+          }
+        }
+      }
+
+      this.showData();
+      params = {invisibleFile, invisibleExp}
+      return params;
+      
+    }
+
+    experimentalDataOverlay.hideAllUndo = function(invisibleFile, invisibleExp) {
+      for (let j in invisibleFile){
+        visibleFiles[j] = true;
+      }
+      for (let j in invisibleExp){
+        visibleDataMapByExp[j] = true;
+      }
+      allVis = true;
+      this.showData();
+      return;
+    }
+
+    experimentalDataOverlay.unhideAll = function(){
+      var visibleExp = {};
+      var visibleFile = {}
+      allVis = true;
+      for(let i in visibleFiles){
+        if(!visibleFiles[i]){
+          visibleFiles[i] = true;
+          visibleFile[i] = true;
+        }
+      }
+      for(let fileName in groupedDataMap){
+        if(groupedDataMap[fileName] == undefined){
+          return;
+        }
+        for (let j = 0; j < groupedDataMap[fileName].length; j++){
+          const expName = groupedDataMap[fileName][j];
+          if(visibleDataMapByExp[fileName + '?' + expName] == undefined)
+            continue;
+          if(visibleDataMapByExp[fileName + '?' + expName] == false){
+            visibleExp[fileName + '?' + expName] = true;
+            visibleDataMapByExp[fileName + '?' + expName] = true;
+          }
+        }
+      }
+      this.showData();
+      return {visibleExp, visibleFile};
+    }
+
+    experimentalDataOverlay.unhideAllUndo = function(visibleFile, visibleExp) {
+      for (let j in visibleFile){
+        visibleFiles[j] = false;
+      }
+      for (let j in visibleExp){
+        visibleDataMapByExp[j] = false;
+      }
+      allVis = false;
+      this.showData();
+      return;
+    }
+
     experimentalDataOverlay.removeAll = function(){
       var parsed = {};
       var visible = {};
@@ -693,8 +777,8 @@ module.exports = function () {
 
       //default colors
       if(!clr){
-        colors["min"] = this.hexToRgb('#0000ff');
-        colors["max"] = this.hexToRgb('#ff0000');
+        colors[-100] = this.hexToRgb('#0000ff');
+        colors[100] = this.hexToRgb('#ff0000');
         colors[0] = this.hexToRgb('#ffffff');
       }
 
@@ -895,6 +979,23 @@ module.exports = function () {
           }
         }
       }
+
+      var buttonName = "experiment-hide-all";
+      var button = document.getElementById(buttonName);
+
+      if(button != null){
+        if(allVis){
+          console.log("true")
+          button.value = "true";
+          button.style.backgroundColor = "";
+        }
+        else {
+          console.log("false")
+          button.value = "false";
+          button.style.backgroundColor = "#777";
+        }
+      }
+
       console.log("button update finished");
     }
     return experimentalDataOverlay;

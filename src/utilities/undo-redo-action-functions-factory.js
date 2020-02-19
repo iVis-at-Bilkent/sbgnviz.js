@@ -128,6 +128,26 @@ module.exports = function () {
     return experimentalDataOverlay.unhideExp(fileName, expName);
   }
 
+  undoRedoActionFunctions.hideAll = function(){
+    return experimentalDataOverlay.hideAll();
+  }
+
+  undoRedoActionFunctions.hideAllUndo = function(param){
+    var invisibleFile = param.invisibleFile;
+    var invisibleExp = param.invisibleExp;
+    return experimentalDataOverlay.hideAllUndo(invisibleFile, invisibleExp);
+  }
+
+  undoRedoActionFunctions.unhideAll = function(){
+    return experimentalDataOverlay.unhideAll();
+  }
+
+  undoRedoActionFunctions.unhideAllUndo = function(param){
+    var visibleFile = param.visibleFile;
+    var visibleExp = param.visibleExp;
+    return experimentalDataOverlay.unhideFileUndo(visibleFile, visibleExp);
+  }
+
   undoRedoActionFunctions.hideFile = function(param){
     var fileName = param.fileName;
     return experimentalDataOverlay.hideFile(fileName);
