@@ -122,30 +122,28 @@ module.exports = function () {
  */
      /*  var compoundPadding = parseFloat(mapProperties.compoundPadding);
       var extraCompartmentPadding = parseFloat(mapProperties.extraCompartmentPadding); */
-      var extraCompartmentPadding = typeof options.extraCompartmentPadding === 'function' ? options.extraCompartmentPadding.call() : options.extraCompartmentPadding;
-      var compoundPadding;
-      //if(this.calculatedCompoundPadding !== undefined){
-        //compoundPadding = this.calculatedCompoundPadding;
-      //}else{
-        compoundPadding = typeof options.compoundPadding === 'function' ? options.compoundPadding.call() : options.compoundPadding;
-     // } 
-      var padding = extraCompartmentPadding +  compoundPadding;
+      
+     
+      var padding = this.calculateElementPadding(ele);
       var minLeft, maxRight, minTop, maxBottom, childrenBboxW, childrenBboxH,minLeftBorder,maxRightBorder,minTopBorder,maxBottomBorder; 
       // Traverse the other children and update the extreme values
       for (var i = 0; i < childNodes.length; i++) {
         var childNode = childNodes[i];
       
         var childNodeBbox = this.bboxProp(childNode);
-        childNode.bbox = childNodeBbox; 
+        childNode.bbox = childNodeBbox;
+        var borderWidth = elementUtilities.getDefaultProperties(childNode.class_)["border-width"]; 
+        var childPadding = this.calculateElementPadding(childNode);
         //var childStyle = styles.filter(style =>{ return style.idList == childNode.id});
-        var borderWidth = 3.25;
+       
        /*  if(childStyle.length > 0 && childStyle[0].renderGroup !== undefined){
           borderWidth = childStyle[0].renderGroup.strokeWidth;
         } */
-        var left = childNodeBbox.x - childNodeBbox.w/2;
-        var right = childNodeBbox.x + childNodeBbox.w/2;
-        var top = childNodeBbox.y  - childNodeBbox.h/2;
-        var bottom = childNodeBbox.y + childNodeBbox.h/2;
+
+        var left = childNodeBbox.x - childNodeBbox.w/2 - childPadding ;
+        var right = childNodeBbox.x + childNodeBbox.w/2 + childPadding;
+        var top = childNodeBbox.y  - childNodeBbox.h/2 - childPadding;
+        var bottom = childNodeBbox.y + childNodeBbox.h/2 + childPadding;
     
 
         if (minLeft === undefined || left < minLeft) {
@@ -172,18 +170,18 @@ module.exports = function () {
       var averageBorderWidthW = (minLeftBorder + maxRightBorder)/2;
       var averageBorderWidthH = (minTopBorder + maxBottomBorder)/2;
       // The sizes of children bbox are determined by the difference between the extreme coordinates
-      childrenBboxW = maxRight - minLeft;
-      childrenBboxH = maxBottom - minTop;
+      childrenBboxW = maxRight - minLeft + 2; // 2 is from cytoscape internal implementation of infoboxes
+      childrenBboxH = maxBottom - minTop + 2;
 
      
     
       // If children bbox width is less than node bbox width + paddings set minWidth, and horizontal biases
-      if (childrenBboxW + 2 * padding + averageBorderWidthW < bbox.w) {
+      if (Number((childrenBboxW + 2 * padding + averageBorderWidthW).toFixed(2)) < Number(bbox.w.toFixed(2))) {
 
         //ele.minWidth = bbox.w - 2 padding  calculate badding first
         ele.minWidth =  bbox.w - 2 * padding;
-        var extraLeft =  minLeft - bbox.x  - padding - averageBorderWidthW/2;
-        var extraRight = (bbox.x + bbox.w) - maxRight  - padding - averageBorderWidthW/2;
+        var extraLeft =  Number((minLeft - bbox.x  - padding - minLeftBorder/2 -1).toFixed(2)) ;
+        var extraRight = Number(((bbox.x + bbox.w) - maxRight  - padding - maxRightBorder/2 - 1).toFixed(2)) ;
 
        
         ele.minWidthBiasLeft = extraLeft / (extraLeft + extraRight) * 100;
@@ -191,10 +189,10 @@ module.exports = function () {
       }
 
       // If children bbox height is bigger than node bbox height set minHeight, and vertical biases
-      if (childrenBboxH + 2 * padding + averageBorderWidthH < bbox.h) {
+      if (Number((childrenBboxH + 2 * padding + averageBorderWidthH).toFixed(2)) < Number(bbox.h.toFixed(2))) {
         ele.minHeight = bbox.h - 2 * padding;
-        var extraTop = minTop - bbox.y - padding - averageBorderWidthH/2;
-        var extraBottom = (bbox.y + bbox.h) - maxBottom - padding - averageBorderWidthH/2;        
+        var extraTop = Number((minTop - bbox.y - padding - minTopBorder/2 - 1).toFixed(2));
+        var extraBottom = Number(((bbox.y + bbox.h) - maxBottom - padding - maxBottomBorder/2 - 1).toFixed(2));        
 
         ele.minHeightBiasTop = extraTop / (extraTop + extraBottom) * 100;
         ele.minHeightBiasBottom = 100 - ele.minHeightBiasTop;
@@ -210,10 +208,6 @@ module.exports = function () {
 
       return bbox;
      }
-    
-
-  
-
     
   };
 
@@ -238,7 +232,50 @@ module.exports = function () {
 
     return bbox;
   };
+  sbgnmlToJson.calculateElementPadding = function(ele){
+      var padding = 0 ;
+     
+      var childNodes = ele.glyphMembers;
+    //exclude state variables and units of information from child members
+      childNodes = childNodes.filter(function(child){ return child.class_ != "state variable" && child.class_ != "unit of information"});
+      if(childNodes.length <= 0 ) return 0;
+      var compoundPadding = typeof options.compoundPadding === 'function' ? options.compoundPadding.call() : options.compoundPadding;
+     // } 
+      if(ele.class_ == "complex"){
+        var complexPadding = 0;
+        var extraComplexPadding = typeof options.extraComplexPadding === 'function' ? options.extraComplexPadding.call() : options.extraComplexPadding;
+        complexPadding = compoundPadding < 5 ? 5 : compoundPadding;       
 
+        var stateAndInfos = ele.glyphMembers.filter(function(child){ return child.class_ == "state variable" || child.class_ == "unit of information"});
+            
+        if(ele.label != undefined){
+          if(ele.label.text.length > 0){
+            complexPadding = complexPadding + 0.5 * extraComplexPadding;
+            var hasTopBottomInfo = false;
+            stateAndInfos.forEach(function(stateAndInfo){
+              if((stateAndInfo.bbox.y + stateAndInfo.bbox.h == ele.bbox.y)   || stateAndInfo.bbox.y + stateAndInfo.bbox.h == ele.bbox.y + ele.bbox.h){
+                hasTopBottomInfo = true;
+              }
+            });
+
+            if(hasTopBottomInfo){
+              complexPadding = complexPadding + 0.5 * extraComplexPadding;
+            }
+          }
+        }else if(stateAndInfos.length > 0){
+          complexPadding += 2;
+        }
+
+        padding = complexPadding;
+
+      }else{
+        var extraCompartmentPadding = typeof options.extraCompartmentPadding === 'function' ? options.extraCompartmentPadding.call() : options.extraCompartmentPadding;
+        padding = extraCompartmentPadding +  compoundPadding;
+      }
+
+      return padding;
+      
+  };
   sbgnmlToJson.findChildNodes = function (ele, childTagName) {
     // find child nodes at depth level of 1 relative to the element
     var children = [];
@@ -1050,22 +1087,51 @@ module.exports = function () {
           
             var childNodeBbox = childNode.bbox; 
             
-            var left =childNodeBbox.x - glyph.bbox.x;
-            var right =  (glyph.bbox.x + glyph.bbox.w) - (childNodeBbox.x + childNodeBbox.w);
-            var top = childNodeBbox.y - glyph.bbox.y;
-            var bottom = (glyph.bbox.y + glyph.bbox.h) - (childNodeBbox.y + childNodeBbox.h);
+            var borderWidth = elementUtilities.getDefaultProperties(childNode.class_)["border-width"];
+            var left =childNodeBbox.x - glyph.bbox.x - borderWidth/2;
+            var right =  (glyph.bbox.x + glyph.bbox.w) - (childNodeBbox.x + childNodeBbox.w) - borderWidth/2;
+            var top = childNodeBbox.y - glyph.bbox.y - borderWidth/2;
+            var bottom = (glyph.bbox.y + glyph.bbox.h) - (childNodeBbox.y + childNodeBbox.h) - borderWidth/2;
             
             if(minDistanceToChildren == 0){
-              minDistanceToChildren = Math.min(left,right,top,bottom);              
+              minDistanceToChildren = Math.min(left,right,top,bottom);     
+
             }else{
               minDistanceToChildren = Math.min(left,right,top,bottom,minDistanceToChildren);
             }   
           }
+          if(glyph.class_ == "complex"){
+            var stateAndInfos = glyph.glyphMembers.filter(function(child){ return child.class_ == "state variable" || child.class_ == "unit of information"});
+            var extraComplexPadding = typeof options.extraComplexPadding === 'function' ? options.extraComplexPadding.call() : options.extraComplexPadding;
+            if(glyph.label != undefined){
+              if(glyph.label.text.length > 0){
+                minDistanceToChildren = minDistanceToChildren - 0.5 * extraComplexPadding;
+                var hasTopBottomInfo = false;
+                stateAndInfos.forEach(function(stateAndInfo){
+                  if((stateAndInfo.bbox.y + stateAndInfo.bbox.h == glyph.bbox.y)   || stateAndInfo.bbox.y + stateAndInfo.bbox.h == glyph.bbox.y + glyph.bbox.h){
+                    hasTopBottomInfo = true;
+                  }
+                });
+
+                if(hasTopBottomInfo){
+                  minDistanceToChildren = minDistanceToChildren - 0.5 * extraComplexPadding;
+                }
+              }
+            }else if(stateAndInfos.length > 0){
+              minDistanceToChildren -= 2;
+            }
+
+
+
+          }else{
+            var extraCompartmentPadding = typeof options.extraCompartmentPadding === 'function' ? options.extraCompartmentPadding.call() : options.extraCompartmentPadding;
+            minDistanceToChildren = minDistanceToChildren - extraCompartmentPadding;
+          }
+
         }
-      }
-      var extraCompartmentPadding = typeof options.extraCompartmentPadding === 'function' ? options.extraCompartmentPadding.call() : options.extraCompartmentPadding;
-      
-        var newPadding = minDistanceToChildren - extraCompartmentPadding - 1.625;
+      }   
+        minDistanceToChildren = Math.round(minDistanceToChildren);
+        var newPadding = minDistanceToChildren - 1; //one comes from cytoscape internal implementation of bounding box which is outerwidth + 1 (on each side)
         if(newPadding < 0){
           newPadding = 0;
         }

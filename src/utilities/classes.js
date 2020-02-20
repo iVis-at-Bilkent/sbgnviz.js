@@ -336,16 +336,31 @@ AuxiliaryUnit.setAnchorSide = function(mainObj, node) {
   var thisY = mainObj.bbox.y;
   var thisH = mainObj.bbox.h;
   var thisW = mainObj.bbox.w;
-  var width = node.data("originalW") ? node.data("originalW") : node.width();
-  var height = node.data("originalH") ? node.data("originalH") : node.height();
-  var outerWidth = node.outerWidth() + (width - node.width());
+  var width, height, padding;
+  if(node.data("originalW")){
+    width = node.data("originalW");    
+    padding = 0;
+  }else{
+    width = node.width();
+    padding = node.padding();
+  }
+
+  if(node.data("originalH")){
+    height = node.data("originalH");    
+    padding = 0;
+  }else{
+    height = node.height();
+    padding = node.padding();
+  }
+  
  
+  
   var parentX = (node.data('class') == "compartment" || node.data('class') == "complex") ? node.data('bbox').x : node.position().x;
   var parentY = (node.data('class') == "compartment" || node.data('class') == "complex") ? node.data('bbox').y : node.position().y;
-  var parentX1 = Number((parentX - width / 2).toFixed(2));
-  var parentX2 = Number((parentX+width/2).toFixed(2));
-  var parentY1 = Number((parentY - height/ 2).toFixed(2));
-  var parentY2 = Number((parentY + height/ 2).toFixed(2));
+  var parentX1 = Number((parentX - width / 2 - padding).toFixed(2));
+  var parentX2 = Number((parentX+width/2 + padding).toFixed(2));
+  var parentY1 = Number((parentY - height/ 2 - padding).toFixed(2));
+  var parentY2 = Number((parentY + height/ 2+ padding).toFixed(2));
   var centerX = Number((thisX+thisW/2).toFixed(2));
   var centerY = Number((thisY+thisH/2).toFixed(2));
 
