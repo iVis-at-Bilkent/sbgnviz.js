@@ -233,6 +233,8 @@ module.exports = function () {
      // bbox.y = (minTop + maxBottom) / 2;
       bbox.w = bbox.w - 2 * padding - averageBorderWidthW;
       bbox.h = bbox.h - 2 * padding - averageBorderWidthH;
+      bbox.w = bbox.w < 0 ? 0 : bbox.w;
+      bbox.h = bbox.h < 0 ? 0 : bbox.h;
 
       return bbox;
      }
