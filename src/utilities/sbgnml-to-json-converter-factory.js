@@ -1121,20 +1121,20 @@ module.exports = function () {
               for(var k = 0 ; k<stateAndInfos.length; k++){
                 var stateBbox = stateAndInfos[k].bbox;
                 if(stateBbox.y - glyph.bbox.y < minDistanceToChildren){
-                  minDistanceToChildren = stateBbox.y - glyph.bbox.y;
+                  minDistanceToChildren = stateBbox.y - glyph.bbox.y - borderWidth;
                   hasMin = true;
                 }
                 if(stateBbox.x - glyph.bbox.x < minDistanceToChildren){
-                  minDistanceToChildren = stateBbox.x - glyph.bbox.x;
+                  minDistanceToChildren = stateBbox.x - glyph.bbox.x - borderWidth;
                   hasMin = true;
                 }
 
                 if(glyph.bbox.y +  glyph.bbox.h - (stateBbox.y + stateBbox.h)  < minDistanceToChildren){
-                  minDistanceToChildren = glyph.bbox.y +  glyph.bbox.h - (stateBbox.y + stateBbox.h);
+                  minDistanceToChildren = glyph.bbox.y +  glyph.bbox.h - (stateBbox.y + stateBbox.h) - borderWidth;
                   hasMin = true;
                 }
                 if(glyph.bbox.x +  glyph.bbox.w - (stateBbox.x + stateBbox.w)  < minDistanceToChildren){
-                  minDistanceToChildren = glyph.bbox.x +  glyph.bbox.w - (stateBbox.x + stateBbox.w);
+                  minDistanceToChildren = glyph.bbox.x +  glyph.bbox.w - (stateBbox.x + stateBbox.w) - borderWidth;
                   hasMin = true;
                 }
               }
@@ -1174,7 +1174,7 @@ module.exports = function () {
                   minDistanceToChildren = minDistanceToChildren - 0.5 * extraComplexPadding;
                   var hasTopBottomInfo = false;
                   stateAndInfos.forEach(function(stateAndInfo){
-                    if((stateAndInfo.bbox.y + stateAndInfo.bbox.h == glyph.bbox.y)   || stateAndInfo.bbox.y + stateAndInfo.bbox.h == glyph.bbox.y + glyph.bbox.h){
+                    if((Number((stateAndInfo.bbox.y + stateAndInfo.bbox.h/2).toFixed(2)) == Number((glyph.bbox.y).toFixed(2)))   || Number((stateAndInfo.bbox.y + stateAndInfo.bbox.h/2).toFixed(2)) == Number((glyph.bbox.y + glyph.bbox.h).toFixed(2))){
                       hasTopBottomInfo = true;
                     }
                   });
@@ -1199,7 +1199,7 @@ module.exports = function () {
         }
       }   
         minDistanceToChildren = Math.round(minDistanceToChildren);
-        var newPadding = minDistanceToChildren - 1; //one comes from cytoscape internal implementation of bounding box which is outerwidth + 1 (on each side)
+        var newPadding = minDistanceToChildren - 1; // comes from cytoscape internal implementation of bounding box which is outerwidth + 1 (on each side)
         if(newPadding < 0){
           newPadding = 0;
         }
