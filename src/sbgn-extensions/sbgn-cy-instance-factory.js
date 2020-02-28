@@ -330,7 +330,7 @@ module.exports = function () {
 						var infoBoxOnNode = classes.AuxiliaryUnit.setAnchorSide(statesandinfos, node);
 						correctInfoBoxCoord = correctInfoBoxCoord && infoBoxOnNode;
 					}
-
+					var statesToAdd = [];
 					for(var i=0; i < node.data('statesandinfos').length; i++) {
 					var statesandinfos = node.data('statesandinfos')[i];
 						var bbox = statesandinfos.bbox;

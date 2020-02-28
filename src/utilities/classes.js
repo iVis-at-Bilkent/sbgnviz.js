@@ -222,9 +222,15 @@ AuxiliaryUnit.getAbsoluteCoord = function(mainObj, cy) {
   var parent = getAuxUnitClass(mainObj).getParent(mainObj, cy);
   var position = parent.position();
   var padding = parent.padding();
+  /* if(parent.data().complexCalculatedPadding){
+    padding = Number(parent.data().complexCalculatedPadding);
+    //delete parent._private.data.complexCalculatedPadding;
+  }else{
+    padding = parent.padding();
+  } */
   var parentWidth = parent.width();
   var parentHeight = parent.height();
-  var borderWidth = parent.data()['border-width'];
+  var borderWidth = Number(parent.css("border-width").replace("px",""));//parent.data()['border-width'];
   var position = parent.position();
   if (mainObj === undefined || parent === undefined || position === undefined) {
     return;
@@ -301,6 +307,12 @@ AuxiliaryUnit.convertToRelativeCoord = function(mainObj, absX, absY, cy, parentN
   var parentWidth = parent.width();
   var parentHeight = parent.height();
   var padding = parent.padding();
+ /*  if(parent.data().complexCalculatedPadding){
+    padding = Number(parent.data().complexCalculatedPadding)
+  }else{
+    padding = parent.padding();
+  } */
+ 
  
  
  
@@ -324,7 +336,12 @@ AuxiliaryUnit.convertToRelativeCoord = function(mainObj, absX, absY, cy, parentN
     relY = ((absY - (position.y - parentHeight/2 - padding)) * 100) / (parent.outerHeight() - borderWidth);
    
   }
+  relX = relX < 0 ? 0 : relX;
+  relX = relX > 100 ? 100 : relX;
+  relY = relY < 0 ? 0 : relY;
+  relY = relY > 100 ? 100 : relY;
 
+  
   return {x: relX, y: relY};
   
   
@@ -342,7 +359,7 @@ AuxiliaryUnit.setAnchorSide = function(mainObj, node) {
     padding = 0;
   }else{
     width = node.width();
-    padding = node.padding();
+    padding = node.data('class') == "complex" ? Number(node.data().complexCalculatedPadding) : node.padding();
   }
 
   if(node.data("originalH")){
@@ -350,7 +367,7 @@ AuxiliaryUnit.setAnchorSide = function(mainObj, node) {
     padding = 0;
   }else{
     height = node.height();
-    padding = node.padding();
+    padding = node.data('class') == "complex" ? Number(node.data().complexCalculatedPadding) : node.padding();
   }
   
  
@@ -518,7 +535,8 @@ StateVariable.remove = function (mainObj, cy) {
     },
     location: mainObj.anchorSide,
     position: position,
-    index: index
+    index: index,
+    style : mainObj.style
   };
 };
 
@@ -606,7 +624,8 @@ UnitOfInformation.remove = function (mainObj, cy) {
     },
     location: mainObj.anchorSide,
     position: position,
-    index: index
+    index: index,
+    style: mainObj.style
   };
 };
 
