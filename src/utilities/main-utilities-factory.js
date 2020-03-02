@@ -29,8 +29,7 @@ module.exports = function () {
     options = optionUtilities.getOptions();
   }
 
-  // Helpers start
-  function beforePerformLayout() {
+  mainUtilities.beforePerformLayout = function() {
     var parents = cy.nodes(':parent');
     var edges = cy.edges();
 
@@ -59,7 +58,6 @@ module.exports = function () {
     if(parents.length > 0)
       cy.style().update();
   };
-  // Helpers end
 
   // Expand given nodes. Requires expandCollapse extension and considers undoable option.
   mainUtilities.expandNodes = function(nodes) {
@@ -538,10 +536,11 @@ module.exports = function () {
   // Performs layout by given layoutOptions. Considers 'undoable' option. However, by setting notUndoable parameter
   // to a truthy value you can force an undable layout operation independant of 'undoable' option.
   mainUtilities.performLayout = function(layoutOptions, notUndoable) {
-    // Things to do before performing layout
-    beforePerformLayout();
-
+    
     if (!options.undoable || notUndoable) { // 'notUndoable' flag can be used to have composite actions in undo/redo stack
+      // Things to do before performing layout
+      mainUtilities.beforePerformLayout();
+      
       var layout = cy.elements().filter(':visible').layout(layoutOptions);
 
       // Check this for cytoscape.js backward compatibility
@@ -550,10 +549,10 @@ module.exports = function () {
       }
     }
     else {
-      cy.undoRedo().do("layout", {
-        options: layoutOptions,
-        eles: cy.elements().filter(':visible')
-      });
+      var param = {
+        layoutOptions: layoutOptions
+      };
+      cy.undoRedo().do("applyLayout", param);
     }
   };
 
