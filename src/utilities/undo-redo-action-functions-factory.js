@@ -97,6 +97,50 @@ module.exports = function () {
     
     return result;
   };
+  
+  undoRedoActionFunctions.applyLayout = function(param)  {
+    var result = cy.json().elements;
+
+    var ports = {};
+    
+    result.nodes.forEach(function(node){
+      if(node.data.class == "process"){
+        ports[node.data.id] = JSON.parse(JSON.stringify(node.data.ports));
+      }
+    });
+    
+    if (param.firstTime) {
+      mainUtilities.beforePerformLayout();
+      
+      cy.elements().unselect();
+      var layout = cy.elements().filter(':visible').layout(param.layoutOptions);
+   
+      // Check this for cytoscape.js backward compatibility
+      if (layout && layout.run) {
+        layout.run();
+      }
+    }
+    else {
+      cy.json({elements: param.jsonElements});
+    }
+    
+    result.nodes.forEach(function(node){
+      if(node.data.class == "process"){
+        node.data.ports = ports[node.data.id];
+      }
+    });    
+
+    return result;
+  };
+  
+  undoRedoActionFunctions.reverseLayout = function(jsonElements)  {
+    var param = {};
+    param.jsonElements = cy.json().elements;
+    cy.json({elements: jsonElements});
+    cy.elements().unselect();
+    
+    return param;
+  };  
 
   return undoRedoActionFunctions;
 };

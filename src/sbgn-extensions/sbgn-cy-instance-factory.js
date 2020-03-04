@@ -109,6 +109,7 @@ module.exports = function () {
 	    ur.action("deleteElesSimple", undoRedoActionFunctions.deleteElesSimple, undoRedoActionFunctions.restoreEles);
 	    ur.action("deleteNodesSmart", undoRedoActionFunctions.deleteNodesSmart, undoRedoActionFunctions.restoreEles);
 	    ur.action("setPortsOrdering", undoRedoActionFunctions.setPortsOrdering, undoRedoActionFunctions.setPortsOrdering);
+      ur.action("applyLayout", undoRedoActionFunctions.applyLayout, undoRedoActionFunctions.reverseLayout);      
 	  }
 
 		function showTooltip(event) {
