@@ -168,7 +168,9 @@ module.exports = function () {
         matches.push(result[0]);
       };
       matches.forEach(function(match){
-        renderInfoString = renderInfoString.replace(match , textUtilities.FromCamelToKebabCase(match));
+
+        if(match != " idList=")
+          renderInfoString = renderInfoString.replace(match , textUtilities.FromCamelToKebabCase(match));
       });
 
       xmlString = xmlString.replace(renderInfoStringCopy, renderInfoString);
