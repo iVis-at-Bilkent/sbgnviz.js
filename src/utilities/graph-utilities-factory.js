@@ -23,13 +23,13 @@ module.exports = function () {
 
   graphUtilities.disablePorts = function() {
     graphUtilities.portsEnabled = false;
-    cy.undoRedo().do("changeMenu", {id: "enable-ports", type: "checkbox", property: "currentGeneralProperties.enablePorts", update: self.applyUpdate, value : false});
+    
     cy.style().update();
   };
 
   graphUtilities.enablePorts = function() {
     graphUtilities.portsEnabled = true;
-    cy.undoRedo().do("changeMenu", {id: "enable-ports", type: "checkbox", property: "currentGeneralProperties.enablePorts", update: self.applyUpdate, value : true});
+    
     cy.style().update();
   };
 
