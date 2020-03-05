@@ -7,13 +7,17 @@ module.exports = function() {
     cy = param.sbgnCyInstance.getCy();
   }
 
+  function isValidEnd(node) {
+    return elementUtilities.isSIFNode( node ) || node.data('class') == 'topology group';
+  }
+
   jsonToSif.convert = function() {
     var lines = [];
 
     var edges = cy.edges().filter( function( edge ) {
       return elementUtilities.isSIFEdge( edge )
-        && elementUtilities.isSIFNode( edge.source() )
-        && elementUtilities.isSIFNode( edge.target() );
+        && isValidEnd( edge.source() )
+        && isValidEnd( edge.target() );
     } );
 
     var nodes = cy.nodes().filter( function( node ) {
@@ -34,11 +38,30 @@ module.exports = function() {
       return node.data('label');
     };
 
-    edges.forEach( function( edge ) {
-      var srcName = getLabel( edge.source() );
-      var tgtName = getLabel( edge.target() );
+    var isValidLabel = function(label){
+      return !!label;
+    }
 
-      if ( !srcName || !tgtName ) {
+    edges.forEach( function( edge ) {
+      var srcNames, tgtNames;
+
+      var getNames = function(node) {
+        var names;
+
+        if (node.isParent()) {
+          names =  node.children().map( getLabel );
+        }
+        else {
+            names = [ getLabel(node) ];
+        }
+
+        return names && names.filter( isValidLabel );
+      };
+
+      var srcNames = getNames(edge.source());
+      var tgtNames = getNames(edge.target());
+
+      if ( !srcNames || !tgtNames || srcNames.length == 0 || tgtNames.length == 0 ) {
         return;
       }
 
@@ -48,8 +71,12 @@ module.exports = function() {
       var pcIDs = setToStr( pcIDSet );
       var siteLocations = setToStr( siteLocSet );
 
-      var line = [ srcName, type, tgtName, pcIDs, siteLocations ].join( '\t' );
-      lines.push( line );
+      srcNames.forEach( srcName => {
+        tgtNames.forEach( tgtName => {
+          var line = [ srcName, type, tgtName, pcIDs, siteLocations ].join( '\t' );
+          lines.push( line );
+        } );
+      } );
     } );
 
     nodes.forEach( function( node ) {
