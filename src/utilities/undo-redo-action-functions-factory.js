@@ -99,13 +99,15 @@ module.exports = function () {
   };
   
   undoRedoActionFunctions.applyLayout = function(param)  {
-    var result = cy.json().elements;
+    var parents = cy.elements(":parent").jsons();
+    var simples = cy.elements().not(":parent").jsons();
+    var result = parents.concat(simples);
 
     var ports = {};
     
-    result.nodes.forEach(function(node){
-      if(node.data.class == "process"){
-        ports[node.data.id] = JSON.parse(JSON.stringify(node.data.ports));
+    cy.nodes().forEach(function(node){
+      if(elementUtilities.canHavePorts(node)){
+        ports[node.id()] = JSON.parse(JSON.stringify(node.data("ports")));
       }
     });
     
@@ -121,22 +123,26 @@ module.exports = function () {
       }
     }
     else {
-      cy.json({elements: param.jsonElements});
+      cy.json({flatEles: true, elements: param.jsonElements});
     }
     
-    result.nodes.forEach(function(node){
-      if(node.data.class == "process"){
-        node.data.ports = ports[node.data.id];
+    cy.nodes().forEach(function(node){
+      if(elementUtilities.canHavePorts(node)){
+        node.data("ports", ports[node.id()]);
       }
-    });    
+    });   
 
     return result;
   };
   
   undoRedoActionFunctions.reverseLayout = function(jsonElements)  {
     var param = {};
-    param.jsonElements = cy.json().elements;
-    cy.json({elements: jsonElements});
+    var parents = cy.elements(":parent").jsons();
+    var simples = cy.elements().not(":parent").jsons();
+    var result = parents.concat(simples);
+    
+    param.jsonElements = result;
+    cy.json({flatEles: true, elements: jsonElements});
     cy.elements().unselect();
     
     return param;
