@@ -876,63 +876,8 @@ module.exports = function () {
       this.showData();
       return params;
     }
-
-    experimentalDataOverlay.expButtonChange= function(evt) 
-    {
-      console.log("change button for hide experimet redo");
-      console.log(evt.target.value)
-      if(evt.target.value === "true" || evt.target.value == true)
-      {
-        console.log("here==true")
-        evt.target.style.backgroundColor = "#777";
-        evt.target.value = "false";
-      }
-      else
-      {
-        console.log("here")
-        evt.target.value = "true";
-        evt.target.style.backgroundColor = "";
-      }
-      console.log("changed taget value is")
-      console.log(evt.target.value);
-      param = {evt};
-      return param;
-    }
-
-    experimentalDataOverlay.fileButtonChangeHide= function(subExperiments) 
-    {
-      console.log("sbgnviz for file color change");
-      var params = [];
-      for (i = 0; i < subExperiments.length; i++)
-      {
-        if(subExperiments[i].value == 'true'){
-          params.push(subExperiments[i])
-          subExperiments[i].value = false;
-          subExperiments[i].style.backgroundColor = "#777";
-        }
-      }
-   
-      return params;
-    }
-    
-    experimentalDataOverlay.fileButtonChangeUnHide= function(subExperiments) 
-    {
-      var params = [];
-      console.log("sbgnviz for file color change");
-      for (i = 0; i < subExperiments.length; i++)
-      {
-        if(subExperiments[i].value == 'false'){
-          params.push(subExperiments[i]);
-          subExperiments[i].value = true;
-          subExperiments[i].style.backgroundColor = "";
-        }
-      }
-      return params;
-    }
     experimentalDataOverlay.buttonUpdate = function(param)
     {
-      //add file button
-      console.log("buttonupdate");
       var document = param
       for (let i in visibleDataMapByExp)
       {
@@ -948,7 +893,8 @@ module.exports = function () {
           }
           else {
             button.value = "false";
-            button.style.backgroundColor = "#777";
+            button.style.backgroundColor = "#EAEAEA";
+            button.style.color = "#FFFFFF";
           }
         }
       }
@@ -968,14 +914,13 @@ module.exports = function () {
           }
        
           if(visibleFiles[i] == true ||visibleFiles[i] === true ){
-            console.log("true")
             button.value = "true";
             button.style.backgroundColor = "";
           }
           else {
-            console.log("false")
             button.value = "false";
-            button.style.backgroundColor = "#777";
+            button.style.backgroundColor = "#EAEAEA";
+            button.style.color = "#FFFFFF";
           }
         }
       }
@@ -985,18 +930,15 @@ module.exports = function () {
 
       if(button != null){
         if(allVis){
-          console.log("true")
           button.value = "true";
           button.style.backgroundColor = "";
         }
         else {
-          console.log("false")
           button.value = "false";
-          button.style.backgroundColor = "#777";
+          button.style.backgroundColor = "#EAEAEA";
+          button.style.color = "#FFFFFF";
         }
       }
-
-      console.log("button update finished");
     }
     return experimentalDataOverlay;
 }
