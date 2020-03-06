@@ -948,20 +948,15 @@ module.exports = function () {
 
   // general utilities
 
-  elementUtilities.noneIsNotHighlighted = function(){
-      var highlightedNodes = cy.nodes(":visible").nodes(".highlighted");
-      var highlightedEdges = cy.edges(":visible").edges(".highlighted");
-      var highlightedNodes2 = cy.nodes(":visible").nodes(".highlighted2");
-      var highlightedEdges2 = cy.edges(":visible").edges(".highlighted2");
-      var highlightedNodes3 = cy.nodes(":visible").nodes(".highlighted3");
-      var highlightedEdges3 = cy.edges(":visible").edges(".highlighted3");
-      var highlightedNodes4 = cy.nodes(":visible").nodes(".highlighted4");
-      var highlightedEdges4 = cy.edges(":visible").edges(".highlighted4");      
-
-      return highlightedNodes.length + highlightedEdges.length 
-            + highlightedNodes2.length + highlightedEdges2.length 
-            + highlightedNodes3.length + highlightedEdges3.length 
-            + highlightedNodes4.length + highlightedEdges4.length === 0;
+  elementUtilities.noneIsNotHighlighted = function () {
+    var viewUtilities = cy.viewUtilities('get');
+    var highlightClasses = viewUtilities.getAllHighlightClasses();
+    for (var i = 0; i < highlightClasses.length; i++) {
+      if (cy.$('.' + highlightClasses[i]).is(':visible')) {
+        return false;
+      }
+    }
+    return true;
   };
 
   // Section End

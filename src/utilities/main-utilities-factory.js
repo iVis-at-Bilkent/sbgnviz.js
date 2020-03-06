@@ -395,23 +395,31 @@ module.exports = function () {
     }
   };
 
+  function isNeed2Highligth(eles2highligth) {
+    if (eles2highligth.length === 0) {
+      return false;
+    }
+    var viewUtilities = cy.viewUtilities('get');
+    var highlightClass = viewUtilities.getAllHighlightClasses()[0];
+    var highlightedEles = cy.elements('.' + highlightClass).filter(':visible');
+    if (highlightedEles.contains(eles2highligth)) {
+      return false;
+    }
+    return true;
+  }
+
   // Highlights selected elements. Requires viewUtilities extension and considers 'undoable' option.
-  mainUtilities.highlightSelected = function(_eles) {
+  mainUtilities.highlightSelected = function (_eles) {
 
     var elesToHighlight = _eles;
-    if (elesToHighlight.length === 0) {
+    if (!isNeed2Highligth(elesToHighlight)) {
       return;
     }
-    var highlightedEles = cy.elements(".highlighted").filter(":visible");
-    if (highlightedEles.contains(elesToHighlight)) {
-      return;
-    }
-
+    console.log('sbgnviz highlightSelected');
     // If this function is being called we can assume that view utilities extension is on use
     var viewUtilities = cy.viewUtilities('get');
-
     if (options.undoable) {
-      cy.undoRedo().do("highlight", elesToHighlight);
+      cy.undoRedo().do('highlight', { eles: elesToHighlight, idx: 0 });
     }
     else {
       viewUtilities.highlight(elesToHighlight);
@@ -427,16 +435,12 @@ module.exports = function () {
 
     var nodes = _nodes.nodes(); // Ensure that nodes list just include nodes
     var elesToHighlight = elementUtilities.getNeighboursOfNodes(nodes);
-    if (elesToHighlight.length === 0) {
-      return;
-    }
-    var highlightedEles = cy.elements(".highlighted").filter(":visible");
-    if (highlightedEles.contains(elesToHighlight) && !cy.elements(":unselected").empty()) {
+    if (!isNeed2Highligth(elesToHighlight)) {
       return;
     }
 
     if (options.undoable) {
-      cy.undoRedo().do("highlight", elesToHighlight);
+      cy.undoRedo().do('highlight', { eles: elesToHighlight, idx: 0 });
     }
     else {
       viewUtilities.highlight(elesToHighlight);
@@ -473,7 +477,7 @@ module.exports = function () {
     // nodesToHighlight = elementUtilities.extendNodeList(nodesToHighlight);
 
     if (options.undoable) {
-      cy.undoRedo().do("highlight", nodesToHighlight);
+      cy.undoRedo().do('highlight', { eles: nodesToHighlight, idx: 0 });
     }
     else {
       viewUtilities.highlight(nodesToHighlight);
@@ -486,11 +490,7 @@ module.exports = function () {
   mainUtilities.highlightProcesses = function(_nodes) {
     var nodes = _nodes.nodes(); // Ensure that nodes list just include nodes
     var elesToHighlight = elementUtilities.extendNodeList(nodes);
-    if (elesToHighlight.length === 0) {
-      return;
-    }
-    var highlightedEles = cy.elements(".highlighted").filter(":visible");
-    if (highlightedEles.contains(elesToHighlight)) {
+    if (!isNeed2Highligth(elesToHighlight)) {
       return;
     }
 
@@ -498,7 +498,7 @@ module.exports = function () {
     var viewUtilities = cy.viewUtilities('get');
 
     if (options.undoable) {
-      cy.undoRedo().do("highlight", elesToHighlight);
+      cy.undoRedo().do('highlight', elesToHighlight);
     }
     else {
       viewUtilities.highlight(elesToHighlight);
