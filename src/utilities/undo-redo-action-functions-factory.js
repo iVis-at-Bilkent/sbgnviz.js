@@ -107,18 +107,10 @@ module.exports = function () {
   
   undoRedoActionFunctions.fileButtonChangeUnHide = function(param)
   {
-     console.log("in color change UnHide");
-    
-    //var button = param.subExperiments;
-    //console.log(button);
     return experimentalDataOverlay.fileButtonChangeUnHide(param);
   }
   undoRedoActionFunctions.fileButtonChangeHide = function(param)
   {
-    console.log("in color change Hide");
-    
-    //var button = param.subExperiments;
-    //console.log(button);
     return experimentalDataOverlay.fileButtonChangeHide(param);
   }
   undoRedoActionFunctions.unhideExp = function(param){
@@ -176,9 +168,6 @@ module.exports = function () {
     var isVisible = param.isVisible;
     var values = param.values;
     var groupArray = param.groupArray;
-    console.log(values);
-    console.log(groupArray);
-    console.log(isVisible);
     return experimentalDataOverlay.addExp(fileName, expName, isVisible, values, groupArray);
   }
 

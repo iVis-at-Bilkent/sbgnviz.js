@@ -305,8 +305,6 @@ module.exports = function () {
     }
   
     experimentalDataOverlay.hideFile = function(fileName) {
-      console.log("file hide")
-      console.log(fileName)
       visibleFiles[fileName] = false;
       var invisible = {};
       if(groupedDataMap[fileName] == undefined){
@@ -324,15 +322,10 @@ module.exports = function () {
 
       this.showData();
       params = {fileName, invisible}
-      console.log("hideFile visible files")
-      console.log(visibleFiles)
       return params;
     }
 
     experimentalDataOverlay.hideFileUndo = function(fileName, invisible) {
-      console.log("hidefileundo")
-      console.log(fileName)
-      console.log(visibleFiles)
       if(visibleFiles[fileName] != undefined)
         visibleFiles[fileName] = true;
       else
@@ -341,8 +334,6 @@ module.exports = function () {
         visibleDataMapByExp[j] = true;
       }
       this.showData();
-      console.log("end")
-      console.log(visibleFiles)
       return {fileName};
     }
 
@@ -356,7 +347,6 @@ module.exports = function () {
     }
   
     experimentalDataOverlay.unhideFile = function(fileName) {
-      console.log("unfile")
       var visible = {};
       visibleFiles[fileName] = true;
       if(groupedDataMap[fileName] == undefined){
@@ -377,7 +367,6 @@ module.exports = function () {
     }
 
     experimentalDataOverlay.unhideFileUndo = function(fileName, visible) {
-      console.log("unfileundo")
       visibleFiles[fileName] = false;
       for (let j in visible){
         visibleDataMapByExp[j] = false;
@@ -552,67 +541,6 @@ module.exports = function () {
           parentSVG.appendChild(overlayRect)
         }
       }
-
-      // function dataRectangleGenerator(x, y, w, h, percent, parentSVG) {
-      //   let colorString = ''
-      //   if (percent) {
-      //     const isNegativePercent = percent < 0
-      //     let _percent = Math.abs(percent)
-      //     // Handle special cases here !
-      //     _percent = _percent < 0.5 ? 2 : _percent
-      //     _percent = _percent === 1 ? 2 : _percent
-      //     // Here we are using non linear regression
-      //     // Fitting points of (0,0), (25,140), (50,220), (100, 255)
-          
-      //     const percentColor = 255 - (-7.118 + 53.9765 * Math.log(_percent))
-  
-      //     if (percent === 0) {
-      //       colorString = 'rgb(255,255,255)'
-      //     } else if (isNegativePercent) {
-      //       colorString =
-      //         'rgb(' +
-      //         Math.round(percentColor) +
-      //         ',' +
-      //         Math.round(percentColor) +
-      //         ',255)'
-      //       percent = percent.substring(1)
-      //     } else {
-      //       colorString =
-      //         'rgb(255,' +
-      //         Math.round(percentColor) +
-      //         ',' +
-      //         Math.round(percentColor) +
-      //         ')'
-      //     }
-      //     // Rectangle Part
-      //     const overlayRect = document.createElementNS(svgNameSpace, 'rect')
-      //     overlayRect.setAttribute('x', x)
-      //     overlayRect.setAttribute('y', y)
-      //     overlayRect.setAttribute('width', w)
-      //     overlayRect.setAttribute('height', h)
-      //     overlayRect.setAttribute(
-      //       'style',
-      //       'stroke-width:1;stroke:rgb(0,0,0);opacity:1;fill:' + colorString + ';'
-      //     )
-  
-      //     parentSVG.appendChild(overlayRect)
-      //   } else {
-      //     colorString = 'rgb(210,210,210)'
-  
-      //     // Rectangle Part
-      //     const overlayRect = document.createElementNS(svgNameSpace, 'rect')
-      //     overlayRect.setAttribute('x', x)
-      //     overlayRect.setAttribute('y', y)
-      //     overlayRect.setAttribute('width', w)
-      //     overlayRect.setAttribute('height', h)
-      //     overlayRect.setAttribute(
-      //       'style',
-      //       'stroke-width:1;stroke:rgb(0,0,0);opacity:1;fill:' + colorString + ';'
-      //     )
-  
-      //     parentSVG.appendChild(overlayRect)
-      //   }
-      // }
   
       return svg
     }
@@ -683,7 +611,6 @@ module.exports = function () {
       if(lines.length < 2){
         return "Error";
       }
-      console.log(lines)
       var k = 0;
       var upto = 4;
       if(lines.length < 4){
