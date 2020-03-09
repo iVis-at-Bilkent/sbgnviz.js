@@ -29,11 +29,11 @@ module.exports = function() {
                 url: "/utilities/ServerRequest",
                 headers: {"Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"},
                 data: { url: url2, file: xml, token: myToken, postType: "sendData" },
-                success: function (data) {
-                    callback(data.response);                 
+                success: function (data) {                   
+                    callback({result: true, message: data.response , error :""});                 
                 },
                 error: function (error) {
-                    callback(null);   
+                  callback({result: false, error: error, message : ""});
             
                 }
             })
