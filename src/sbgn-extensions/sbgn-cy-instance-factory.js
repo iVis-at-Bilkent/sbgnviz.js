@@ -6,12 +6,13 @@ var Tippy = libs.tippy;
 
 module.exports = function () {
 
-	var elementUtilities, graphUtilities, undoRedoActionFunctions, optionUtilities;
+	var elementUtilities, graphUtilities, mainUtilities, undoRedoActionFunctions, optionUtilities;
 	var refreshPaddings, options, cy;
 
 	var sbgnCyInstance = function (param) {
 		elementUtilities = param.elementUtilities;
 		graphUtilities = param.graphUtilities;
+    mainUtilities = param.mainUtilities;
 		undoRedoActionFunctions = param.undoRedoActionFunctions;
 		refreshPaddings = graphUtilities.refreshPaddings.bind(graphUtilities);
 
@@ -109,7 +110,6 @@ module.exports = function () {
 	    ur.action("deleteElesSimple", undoRedoActionFunctions.deleteElesSimple, undoRedoActionFunctions.restoreEles);
 	    ur.action("deleteNodesSmart", undoRedoActionFunctions.deleteNodesSmart, undoRedoActionFunctions.restoreEles);
 	    ur.action("setPortsOrdering", undoRedoActionFunctions.setPortsOrdering, undoRedoActionFunctions.setPortsOrdering);
-      ur.action("applyLayout", undoRedoActionFunctions.applyLayout, undoRedoActionFunctions.reverseLayout);      
 	  }
 
 		function showTooltip(event) {
@@ -286,6 +286,91 @@ module.exports = function () {
 	        node.removeStyle('content');
 	      }
 	    });
+      
+      cy.on("beforeDo", function (e, name, args) {
+        if(name == "layout" || name == "collapse" || name == "expand" || name == "collapseRecursively" || name == "expandRecursively" || name == "batch"){
+          var parents = cy.elements(":parent").jsons(); // parent nodes
+          var simples = cy.elements().not(":parent").jsons(); // simple nodes and edges
+          var total = parents.concat(simples);  // all elements
+          args.total = total;
+          var ports = {};
+
+          cy.nodes().forEach(function(node){
+            if(elementUtilities.canHavePorts(node)){
+              ports[node.id()] = JSON.parse(JSON.stringify(node.data("ports")));
+            }
+          });
+          args.ports = ports;
+          mainUtilities.beforePerformLayout();
+        }
+      });
+      
+      cy.on("beforeRedo", function (e, name, args) {
+        if(name == "layout" || name == "collapse" || name == "expand" || name == "collapseRecursively" || name == "expandRecursively" || name == "batch"){
+          var parents = cy.elements(":parent").jsons(); // parent nodes
+          var simples = cy.elements().not(":parent").jsons(); // simple nodes and edges
+          var total = parents.concat(simples);  // all elements
+          args.total2 = total;
+          var ports = {};
+
+          cy.nodes().forEach(function(node){
+            if(elementUtilities.canHavePorts(node)){
+              ports[node.id()] = JSON.parse(JSON.stringify(node.data("ports")));
+            }
+          });
+          args.ports2 = ports;
+        }
+      });
+      
+      cy.on("afterDo", function (e, name, args, res) {
+        if(name == "layout" || name == "collapse" || name == "expand" || name == "collapseRecursively" || name == "expandRecursively" || name == "batch"){
+          res.total = args.total;
+          res.ports = args.ports;
+        }
+      });
+      
+      cy.on("afterRedo", function (e, name, args, res) {
+        if(name == "layout" || name == "collapse" || name == "expand" || name == "collapseRecursively" || name == "expandRecursively" || name == "batch"){
+          res.total = args.total2;
+          res.ports = args.ports2;
+          cy.json({flatEles: true, elements: args.total});
+          cy.nodes().forEach(function(node){
+            if(elementUtilities.canHavePorts(node)){
+              node.data("ports", args.ports[node.id()]);
+            }
+          });
+        }
+      });
+      
+      cy.on("beforeUndo", function (e, name, args) {
+        if(name == "layout" || name == "collapse" || name == "expand" || name == "collapseRecursively" || name == "expandRecursively" || name == "batch"){
+          var parents = cy.elements(":parent").jsons(); // parent nodes
+          var simples = cy.elements().not(":parent").jsons(); // simple nodes and edges
+          var total = parents.concat(simples);  // all elements
+          args.total2 = total;
+          var ports = {};
+
+          cy.nodes().forEach(function(node){
+            if(elementUtilities.canHavePorts(node)){
+              ports[node.id()] = JSON.parse(JSON.stringify(node.data("ports")));
+            }
+          });
+          args.ports2 = ports;
+        }
+      });
+      
+      cy.on("afterUndo", function (e, name, args, res) {
+        if(name == "layout" || name == "collapse" || name == "expand" || name == "collapseRecursively" || name == "expandRecursively" || name == "batch"){
+          res.total = args.total2;
+          res.ports = args.ports2;
+          cy.json({flatEles: true, elements: args.total});
+          cy.nodes().forEach(function(node){
+            if(elementUtilities.canHavePorts(node)){
+              node.data("ports", args.ports[node.id()]);
+            }
+          });
+        }
+      });
 
 	    cy.on('layoutstop', function (event) {
 				/*
