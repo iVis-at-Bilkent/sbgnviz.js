@@ -374,14 +374,20 @@ module.exports = function () {
   var sbgnml = this.convertSbgn();
   
   this.convertSbgnmlToSbml(sbgnml, function(data){
-    if(data == null){
-      errorCallback();
-    }else{
+    
+    if(!data.result){
+      errorCallback(sbgnml,data.error);
+    }else if( data.message.indexOf("Internal server error") !== -1)
+    {
+      errorCallback(sbgnml,data.message);
+    }else{    
       var blob = new Blob([data], {
         type: "text/plain;charset=utf-8;",
       });
       saveAs(blob, filename); 
+      
     }
+
     uiUtilities.endSpinner("load-spinner");
     
   });
