@@ -291,16 +291,16 @@ module.exports = function () {
         if(name == "layout" || name == "collapse" || name == "expand" || name == "collapseRecursively" || name == "expandRecursively" || name == "batch"){
           var parents = cy.elements(":parent").jsons(); // parent nodes
           var simples = cy.elements().not(":parent").jsons(); // simple nodes and edges
-          var total = parents.concat(simples);  // all elements
-          args.total = total;
+          var allElements = parents.concat(simples);  // all elements
+          args.allElements = allElements;
           var ports = {};
-
           cy.nodes().forEach(function(node){
             if(elementUtilities.canHavePorts(node)){
               ports[node.id()] = JSON.parse(JSON.stringify(node.data("ports")));
             }
           });
           args.ports = ports;
+          args.viewport = {pan: JSON.parse(JSON.stringify(cy.pan())), zoom: cy.zoom()};
           mainUtilities.beforePerformLayout();
         }
       });
@@ -309,8 +309,8 @@ module.exports = function () {
         if(name == "layout" || name == "collapse" || name == "expand" || name == "collapseRecursively" || name == "expandRecursively" || name == "batch"){
           var parents = cy.elements(":parent").jsons(); // parent nodes
           var simples = cy.elements().not(":parent").jsons(); // simple nodes and edges
-          var total = parents.concat(simples);  // all elements
-          args.total2 = total;
+          var allElements = parents.concat(simples);  // all elements
+          args.allElements2 = allElements;
           var ports = {};
 
           cy.nodes().forEach(function(node){
@@ -319,26 +319,31 @@ module.exports = function () {
             }
           });
           args.ports2 = ports;
+          args.viewport2 = {pan: JSON.parse(JSON.stringify(cy.pan())), zoom: cy.zoom()};
         }
       });
       
       cy.on("afterDo", function (e, name, args, res) {
         if(name == "layout" || name == "collapse" || name == "expand" || name == "collapseRecursively" || name == "expandRecursively" || name == "batch"){
-          res.total = args.total;
+          res.allElements = args.allElements;
           res.ports = args.ports;
+          res.viewport = args.viewport;
         }
       });
       
       cy.on("afterRedo", function (e, name, args, res) {
         if(name == "layout" || name == "collapse" || name == "expand" || name == "collapseRecursively" || name == "expandRecursively" || name == "batch"){
-          res.total = args.total2;
+          res.allElements = args.allElements2;
           res.ports = args.ports2;
-          cy.json({flatEles: true, elements: args.total});
+          res.viewport = args.viewport2;
+          cy.json({flatEles: true, elements: args.allElements});
           cy.nodes().forEach(function(node){
             if(elementUtilities.canHavePorts(node)){
               node.data("ports", args.ports[node.id()]);
             }
           });
+          cy.pan(args.viewport["pan"]);
+          cy.zoom(args.viewport["zoom"]);
         }
       });
       
@@ -346,8 +351,8 @@ module.exports = function () {
         if(name == "layout" || name == "collapse" || name == "expand" || name == "collapseRecursively" || name == "expandRecursively" || name == "batch"){
           var parents = cy.elements(":parent").jsons(); // parent nodes
           var simples = cy.elements().not(":parent").jsons(); // simple nodes and edges
-          var total = parents.concat(simples);  // all elements
-          args.total2 = total;
+          var allElements = parents.concat(simples);  // all elements
+          args.allElements2 = allElements;
           var ports = {};
 
           cy.nodes().forEach(function(node){
@@ -356,19 +361,23 @@ module.exports = function () {
             }
           });
           args.ports2 = ports;
+          args.viewport2 = {pan: JSON.parse(JSON.stringify(cy.pan())), zoom: cy.zoom()};
         }
       });
       
       cy.on("afterUndo", function (e, name, args, res) {
         if(name == "layout" || name == "collapse" || name == "expand" || name == "collapseRecursively" || name == "expandRecursively" || name == "batch"){
-          res.total = args.total2;
+          res.allElements = args.allElements2;
           res.ports = args.ports2;
-          cy.json({flatEles: true, elements: args.total});
+          res.viewport = args.viewport2;
+          cy.json({flatEles: true, elements: args.allElements});
           cy.nodes().forEach(function(node){
             if(elementUtilities.canHavePorts(node)){
               node.data("ports", args.ports[node.id()]);
             }
           });
+          cy.pan(args.viewport["pan"]);
+          cy.zoom(args.viewport["zoom"]);          
         }
       });
 
