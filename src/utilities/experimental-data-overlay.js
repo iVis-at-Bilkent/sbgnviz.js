@@ -671,7 +671,7 @@ module.exports = function () {
           for(let t = 1; t < metaLines.length - 1; t=t+2){
             var hex = metaLines[t+1]
             if(t == metaLines.length - 2){
-              hex = metaLines[t+1].substring(0,metaLines.length - 2);
+              hex = hex.trim();
             }
             if(metaLines[t] == "min" || metaLines[t] == "max"){
               if(this.isHex(hex)){
