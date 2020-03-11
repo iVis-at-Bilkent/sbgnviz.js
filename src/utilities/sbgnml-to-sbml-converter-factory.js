@@ -39,7 +39,7 @@ module.exports = function() {
             })
             },
             error: function (error) {
-                callback(null);   
+                callback({result: false, error: error, message : ""});   
         
             }
 
