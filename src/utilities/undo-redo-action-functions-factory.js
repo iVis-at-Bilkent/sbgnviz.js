@@ -96,57 +96,7 @@ module.exports = function () {
     mainUtilities.setCompoundPadding(newPadding);   
     
     return result;
-  };
-  
-  undoRedoActionFunctions.applyLayout = function(param)  {
-    var parents = cy.elements(":parent").jsons();
-    var simples = cy.elements().not(":parent").jsons();
-    var result = parents.concat(simples);
-
-    var ports = {};
-    
-    cy.nodes().forEach(function(node){
-      if(elementUtilities.canHavePorts(node)){
-        ports[node.id()] = JSON.parse(JSON.stringify(node.data("ports")));
-      }
-    });
-    
-    if (param.firstTime) {
-      mainUtilities.beforePerformLayout();
-      
-      cy.elements().unselect();
-      var layout = cy.elements().filter(':visible').layout(param.layoutOptions);
-   
-      // Check this for cytoscape.js backward compatibility
-      if (layout && layout.run) {
-        layout.run();
-      }
-    }
-    else {
-      cy.json({flatEles: true, elements: param.jsonElements});
-    }
-    
-    cy.nodes().forEach(function(node){
-      if(elementUtilities.canHavePorts(node)){
-        node.data("ports", ports[node.id()]);
-      }
-    });   
-
-    return result;
-  };
-  
-  undoRedoActionFunctions.reverseLayout = function(jsonElements)  {
-    var param = {};
-    var parents = cy.elements(":parent").jsons();
-    var simples = cy.elements().not(":parent").jsons();
-    var result = parents.concat(simples);
-    
-    param.jsonElements = result;
-    cy.json({flatEles: true, elements: jsonElements});
-    cy.elements().unselect();
-    
-    return param;
-  };  
+  }; 
 
   return undoRedoActionFunctions;
 };

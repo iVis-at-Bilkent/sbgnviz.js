@@ -549,10 +549,10 @@ module.exports = function () {
       }
     }
     else {
-      var param = {
-        layoutOptions: layoutOptions
-      };
-      cy.undoRedo().do("applyLayout", param);
+      cy.undoRedo().do("layout", {
+        options: layoutOptions,
+        eles: cy.elements().filter(':visible')
+      });
     }
   };
 
