@@ -381,7 +381,7 @@ module.exports = function () {
     {
       errorCallback(sbgnml,data.message);
     }else{    
-      var blob = new Blob([data], {
+      var blob = new Blob([data.message], {
         type: "text/plain;charset=utf-8;",
       });
       saveAs(blob, filename); 
