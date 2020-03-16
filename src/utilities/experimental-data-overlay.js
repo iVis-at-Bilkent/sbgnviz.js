@@ -455,7 +455,21 @@ module.exports = function () {
               fileName
             )
           }
-  
+          //  draw separator line between data rectangles
+          if(j != groupedDataMap[i].length - 1) {
+            const overlayRect = document.createElementNS(svgNameSpace, 'line');
+            overlayRect.setAttribute('x1', overLayRectBBox.x + (counter * overLayRectBBox.w) / maxDataBoxCount 
+                    + overLayRectBBox.w / maxDataBoxCount);
+            overlayRect.setAttribute('y1', overLayRectBBox.y);
+            overlayRect.setAttribute('x2', overLayRectBBox.x + (counter * overLayRectBBox.w) / maxDataBoxCount 
+                    + overLayRectBBox.w / maxDataBoxCount);
+            overlayRect.setAttribute('y2', overLayRectBBox.y + overLayRectBBox.h);
+            overlayRect.setAttribute(
+              'style',
+              'stroke-width:1;stroke:rgb(0,0,0);'
+            );        
+            svg.appendChild(overlayRect);
+          }
           counter++
         }
       }
@@ -518,10 +532,7 @@ module.exports = function () {
           overlayRect.setAttribute('y', y)
           overlayRect.setAttribute('width', w)
           overlayRect.setAttribute('height', h)
-          overlayRect.setAttribute(
-            'style',
-            'stroke-width:1;stroke:rgb(0,0,0);opacity:1;fill:' + colorString + ';'
-          )
+          overlayRect.setAttribute('style', 'opacity:1;fill:' + colorString + ';')
   
           parentSVG.appendChild(overlayRect)
         } else {
@@ -533,10 +544,7 @@ module.exports = function () {
           overlayRect.setAttribute('y', y)
           overlayRect.setAttribute('width', w)
           overlayRect.setAttribute('height', h)
-          overlayRect.setAttribute(
-            'style',
-            'stroke-width:1;stroke:rgb(0,0,0);opacity:1;fill:' + colorString + ';'
-          )
+          overlayRect.setAttribute('style', 'opacity:1;fill:' + colorString + ';')
   
           parentSVG.appendChild(overlayRect)
         }
