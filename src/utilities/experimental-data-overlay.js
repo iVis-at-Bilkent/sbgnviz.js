@@ -550,7 +550,7 @@ module.exports = function () {
       cy.nodes().forEach(function(node) { 
         const nodeLabel = node.data('label')
         var imageURI = 'data:image/svg+xml;utf8,'
-        if(nodeLabel in parsedDataMap){
+        if(nodeLabel in parsedDataMap && !node.isParent()){
           imageURI = imageURI + encodeURIComponent(self.generateSVGForNode(node).outerHTML)
           node.data('background-image', imageURI),
           node.data('background-position-x', '100%');
