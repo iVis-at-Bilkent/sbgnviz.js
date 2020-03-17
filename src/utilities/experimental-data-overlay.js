@@ -596,7 +596,7 @@ module.exports = function () {
           && hex[0] == '#'
     }
 
-    experimentalDataOverlay.parseData= function(data, fileName) {
+    experimentalDataOverlay.parseData= function(data, fileName, errorCallback) {     
       parsedDataMap = parsedDataMap || {}
       visibleDataMapByExp = visibleDataMapByExp || {}
       groupedDataMap = groupedDataMap || {}
@@ -617,6 +617,7 @@ module.exports = function () {
       // By lines
       const lines = data.split('\n')
       if(lines.length < 2){
+        errorCallback();        
         return "Error";
       }
       var k = 0;
@@ -636,6 +637,7 @@ module.exports = function () {
             fileTitle = fileN;
             version = "1.0";
             colorMap = colorm;
+            errorCallback();     
             return "Error";
           }
         }
@@ -650,6 +652,7 @@ module.exports = function () {
             fileDescription = fileD;
             version = "1.0";
             colorMap = colorm;
+            errorCallback();     
             return "Error";
           }
         }
@@ -665,6 +668,7 @@ module.exports = function () {
             fileDescription = fileD;
             version = "1.0";
             colorMap = colorm;
+            errorCallback();     
             return "Error";
           }
         }
@@ -673,6 +677,7 @@ module.exports = function () {
           k++;
           const metaLines = lines[i].split('\t');
           if(metaLines.length <= 1 && metaLines.length % 2 == 0){
+            errorCallback();     
             return "Error";
           }
 
@@ -696,6 +701,7 @@ module.exports = function () {
                 fileDescription = fileD;
                 colorMap = colorm;
                 version = "1.0";
+                errorCallback();     
                 return "Error";
               }
             }
@@ -704,6 +710,7 @@ module.exports = function () {
               fileDescription = fileD;
               colorMap = colorm;
               version = "1.0";
+              errorCallback();     
               return "Error";
             }
           }
@@ -781,6 +788,7 @@ module.exports = function () {
             fileTitle = fileN;
             fileDescription = fileD;
             version = "1.0";
+            errorCallback();     
             return "Error";
           }
           if(lineContent[j] > max){
