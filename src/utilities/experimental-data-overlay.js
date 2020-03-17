@@ -456,7 +456,7 @@ module.exports = function () {
             )
           }
           //  draw separator line between data rectangles
-          if(j != groupedDataMap[i].length - 1) {
+          if(counter < maxDataBoxCount - 1) {
             const overlayRect = document.createElementNS(svgNameSpace, 'line');
             overlayRect.setAttribute('x1', overLayRectBBox.x + (counter * overLayRectBBox.w) / maxDataBoxCount 
                     + overLayRectBBox.w / maxDataBoxCount);
@@ -466,7 +466,7 @@ module.exports = function () {
             overlayRect.setAttribute('y2', overLayRectBBox.y + overLayRectBBox.h);
             overlayRect.setAttribute(
               'style',
-              'stroke-width:1;stroke:rgb(0,0,0);'
+              'stroke-width:1;stroke:rgb(85,85,85);'
             );        
             svg.appendChild(overlayRect);
           }
