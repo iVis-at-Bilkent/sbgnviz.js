@@ -255,6 +255,11 @@ module.exports = function () {
      var text = this.result;
     var matchResult = text.match("<renderInformation[^]*</renderInformation>");
     if(matchResult != null){
+    var imagesElementMatch = text.match("<listOfBackgroundImages[^]*</listOfBackgroundImages>");
+    var imagesElement;
+    if(imagesElementMatch != null){
+      imagesElement = imagesElementMatch[0];
+    }
     var renderInfoString = matchResult[0];
     var renderInfoStringCopy = (' ' + renderInfoString).slice(1);
       const regex = /\s([\S]+)([\s]*)=/g;
@@ -267,6 +272,10 @@ module.exports = function () {
         renderInfoString = renderInfoString.replace(match , textUtilities.FromKebabToCamelCase(match));
       });      
       text = text.replace(renderInfoStringCopy, renderInfoString);
+      var imagesElementMatchDirty = text.match("<listOfBackgroundImages[^]*</listOfBackgroundImages>");
+      if(imagesElementMatchDirty != null){
+        text = text.replace(imagesElementMatchDirty[0],imagesElement);
+      }
     }
 
      setTimeout(function () {

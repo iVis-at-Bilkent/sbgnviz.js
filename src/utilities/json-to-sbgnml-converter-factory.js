@@ -159,6 +159,11 @@ module.exports = function () {
     // change naming convention from Camel Case (variableName) to Kebab case (variable-name)
     var matchResult = xmlString.match("<renderInformation[^]*</renderInformation>");
     if(matchResult != null){
+      var imagesElementMatch = xmlString.match("<listOfBackgroundImages[^]*</listOfBackgroundImages>");
+      var imagesElement;
+      if(imagesElementMatch != null){
+        imagesElement = imagesElementMatch[0];
+      }
       var renderInfoString = matchResult[0];
       var renderInfoStringCopy = (' ' + renderInfoString).slice(1);
       const regex = /\s([\S]+)([\s]*)=/g;
@@ -174,6 +179,10 @@ module.exports = function () {
       });
 
       xmlString = xmlString.replace(renderInfoStringCopy, renderInfoString);
+      var imagesElementMatchDirty = xmlString.match("<listOfBackgroundImages[^]*</listOfBackgroundImages>");
+      if(imagesElementMatchDirty != null){
+        xmlString = xmlString.replace(imagesElementMatchDirty[0],imagesElement);
+      }
     }
 
   	/* 	dirty hack needed to solve the newline char encoding problem
