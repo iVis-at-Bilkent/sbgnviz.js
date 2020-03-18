@@ -609,9 +609,49 @@ module.exports = function () {
       return;
     }
 
-    var colorm = colorMap;
-    var fileD = fileDescription;
-    var fileN = fileTitle;
+    var parsed = {};
+    var visible = {};
+    var grouped = {};
+    var visiblef = {};
+    var colorm = {};
+    var fileD = {};
+    var fileN = {};
+
+    for (let i in parsedDataMap) {
+      if (!parsed[i]) {
+        parsed[i] = {};
+      }
+      for (let j in parsedDataMap[i]) {
+        parsed[i][j] = parsedDataMap[i][j];
+      }
+    }
+    for (let i in visibleDataMapByExp) {
+      visible[i] = visibleDataMapByExp[i];
+    }
+    for (let i in visibleFiles) {
+      visiblef[i] = visibleFiles[i];
+    }
+    for (let i in groupedDataMap) {
+      if (!grouped[i]) {
+        grouped[i] = [];
+      }
+      for (let j in groupedDataMap[i]) {
+        grouped[i].push(groupedDataMap[i][j]);
+      }
+    }
+
+    for (let i in colorMap) {
+      colorm[i] = colorMap[i];
+    }
+
+    for (let i in visibleFiles) {
+      fileD[i] = fileDescription[i];
+    }
+
+    for (let i in visibleFiles) {
+      fileN[i] = fileTitle[i];
+    }
+
     var intregex = "^(-?)(0|([1-9][0-9]*))(\\.[0-9]+)?$";
     var version = '1.0';
     var clr = false;
@@ -718,19 +758,14 @@ module.exports = function () {
       colors[0] = this.hexToRgb('#ffffff');
     }
 
-    var parsed = parsedDataMap;
-    var visible = visibleDataMapByExp;
-    var grouped = groupedDataMap;
-    var visiblef = visibleFiles;
-
     // First line is meta data !
     const metaLineColumns = lines[k].split('\t');
 
     // Parse experiment types
     for (let i = 1; i < metaLineColumns.length; i++) {
       if (i == metaLineColumns.length - 1) {
-        var length = metaLineColumns[i].length;
-        experiments.push(metaLineColumns[i].substring(0, length - 1));
+        var trimmed = metaLineColumns[i].trim();
+        experiments.push(trimmed);
       } else
         experiments.push(metaLineColumns[i]);
 
@@ -765,7 +800,7 @@ module.exports = function () {
       // Add each entry of genomic data
       for (let j = 1; j < lineContent.length; j++) {
         if (j == lineContent.length - 1) {
-          lineContent[j] = lineContent[j].substring(0, lineContent[j].length - 1);
+          lineContent[j] = lineContent[j].trim();
         }
         if (lineContent[j].match(intregex)) {
           parsedDataMap[eleSymbol][fileName + '?' + experiments[j - 1]] = lineContent[j];
