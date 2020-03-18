@@ -819,7 +819,7 @@ module.exports = function () {
       this.showData();
       return params;
     }
-    experimentalDataOverlay.buttonUpdate = function(param)
+    /* experimentalDataOverlay.buttonUpdate = function(param)
     {
       var document = param
       for (let i in visibleDataMapByExp)
@@ -882,6 +882,16 @@ module.exports = function () {
           button.style.color = "#FFFFFF";
         }
       }
+    } */
+
+    experimentalDataOverlay.getExperimentalData = function(){
+     return {
+      visibleDataMapByExp : visibleDataMapByExp,
+      visibleFiles : visibleFiles,
+      fileDescription : fileDescription,
+      allVis : allVis,
+      fileTitle :fileTitle
+     } 
     }
     return experimentalDataOverlay;
 }
