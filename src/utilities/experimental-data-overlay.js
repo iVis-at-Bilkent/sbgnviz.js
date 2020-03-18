@@ -36,6 +36,10 @@ module.exports = function () {
       return groupedDataMap
     }
 
+    experimentalDataOverlay.getParsedDataMap = function(){
+      return parsedDataMap
+    }
+    
     experimentalDataOverlay.getVisibleData = function(){
       return visibleDataMapByExp;
     }
