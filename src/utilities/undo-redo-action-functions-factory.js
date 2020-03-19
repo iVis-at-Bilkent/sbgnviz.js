@@ -93,28 +93,12 @@ module.exports = function () {
   };
 
   undoRedoActionFunctions.hideExp = function(param){
-  
     var expName = param.expName;
     var fileName = param.fileName;
     return experimentalDataOverlay.hideExp(fileName, expName);
   }
- 
-  undoRedoActionFunctions.expButtonChange = function(param)
-  {
-    var button = param.evt;
-    return experimentalDataOverlay.expButtonChange(button);
-  }
-  
-  undoRedoActionFunctions.fileButtonChangeUnHide = function(param)
-  {
-    return experimentalDataOverlay.fileButtonChangeUnHide(param);
-  }
-  undoRedoActionFunctions.fileButtonChangeHide = function(param)
-  {
-    return experimentalDataOverlay.fileButtonChangeHide(param);
-  }
+
   undoRedoActionFunctions.unhideExp = function(param){
-  
     var expName = param.expName;
     var fileName = param.fileName;
     return experimentalDataOverlay.unhideExp(fileName, expName);
@@ -203,10 +187,5 @@ module.exports = function () {
     return experimentalDataOverlay.restoreAll(parsed,visible,grouped,visiblef)
   }
 
-  // undoRedoActionFunctions.parseData = function(param){
-  //   var data = param.data;
-  //   var fileName = param.fileName;
-  //   return experimentalDataOverlay.parseData(data,fileName);
-  // }
   return undoRedoActionFunctions;
 };

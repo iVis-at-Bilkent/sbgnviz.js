@@ -7,7 +7,6 @@ module.exports = function () {
   var visibleFiles;
   var colorMap;
   var allVis;
-
   var fileDescription;
   var fileTitle;
   function experimentalDataOverlay(param) {
@@ -87,7 +86,7 @@ module.exports = function () {
 
   experimentalDataOverlay.unhideAll = function () {
     var visibleExp = {};
-    var visibleFile = {}
+    var visibleFile = {};
     allVis = true;
     for (let i in visibleFiles) {
       if (!visibleFiles[i]) {
@@ -398,12 +397,6 @@ module.exports = function () {
     // const dataURI = 'data:image/svg+xml;utf8,'
     const svgNameSpace = 'http://www.w3.org/2000/svg';
     const nodeLabel = ele.data('label');
-
-    // // If there is no genomic data for this node return !
-    // if (!(nodeLabel in parsedDataMap)) {
-    //   return dataURI
-    // }
-
     const eleBBox = ele.boundingBox();
     const reqWidth = eleBBox.w;
     const reqHeight = eleBBox.h;
@@ -838,76 +831,10 @@ module.exports = function () {
     }
 
     colorMap[fileName] = colors;
-
-
     var params = {fileName};
     this.showData();
     return params;
   };
-  /* experimentalDataOverlay.buttonUpdate = function(param)
-   {
-   var document = param
-   for (let i in visibleDataMapByExp)
-   {
-   var index = i.indexOf('?');
-   var fileName = i.substring(0,index);
-   var expName = i.substring(index+1);
-   var buttonName = "experiment-vis-"+ fileName+ "?" + expName;
-   var button = document.getElementById(buttonName);
-   if(button != null){
-   if(visibleDataMapByExp[i] == true ||visibleDataMapByExp[i] === true ){
-   button.value = "true";
-   button.style.backgroundColor = "";
-   }
-   else {
-   button.value = "false";
-   button.style.backgroundColor = "#EAEAEA";
-   button.style.color = "#FFFFFF";
-   }
-   }
-   }
-   for (let i in visibleFiles){
-   
-   var buttonName = "experiment-file-vis-"+ i;
-   var button = document.getElementById(buttonName);
-   
-   if(button != null){
-   if(fileTitle[i] != undefined)
-   {
-   button.title = fileTitle[i]
-   }
-   if(fileDescription[i] != undefined)
-   {
-   button.title = button.title +"\n"+ fileDescription[i];
-   }
-   
-   if(visibleFiles[i] == true ||visibleFiles[i] === true ){
-   button.value = "true";
-   button.style.backgroundColor = "";
-   }
-   else {
-   button.value = "false";
-   button.style.backgroundColor = "#EAEAEA";
-   button.style.color = "#FFFFFF";
-   }
-   }
-   }
-   
-   var buttonName = "experiment-hide-all";
-   var button = document.getElementById(buttonName);
-   
-   if(button != null){
-   if(allVis){
-   button.value = "true";
-   button.style.backgroundColor = "";
-   }
-   else {
-   button.value = "false";
-   button.style.backgroundColor = "#EAEAEA";
-   button.style.color = "#FFFFFF";
-   }
-   }
-   } */
 
   experimentalDataOverlay.getExperimentalData = function () {
     return {
