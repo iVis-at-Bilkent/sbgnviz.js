@@ -133,7 +133,7 @@ module.exports = function () {
 
 
 			var canHaveTooltip = function( node ) {
-				return elementUtilities.isSIFNode(node);
+				return elementUtilities.isSIFNode(node) || node.data("tooltip") !==null;
 			}
 
 			if (!canHaveTooltip(node)) {
@@ -150,9 +150,8 @@ module.exports = function () {
 
 			if ( elementUtilities.isSIFNode(node) ) {
 				if (!infobox) {
-					tooltipContent = node.data('tooltip');
-
-					if ( tooltipContent == undefined ) {
+					tooltipContent = node.data('tooltip');					
+					if ( tooltipContent == undefined  || tooltipContent == '') {
 						return;
 					}
 

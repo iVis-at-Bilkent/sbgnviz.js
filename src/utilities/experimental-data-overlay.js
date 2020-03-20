@@ -555,6 +555,14 @@ module.exports = function () {
       const nodeLabel = node.data('label');
       var imageURI = 'data:image/svg+xml;utf8,';
       if (nodeLabel in parsedDataMap && !node.isParent()) {
+
+        if(Object.keys(parsedDataMap[nodeLabel]).length > 0){
+          var tooltip = "(" + Object.values(parsedDataMap[nodeLabel]).join(",") + ")";
+          node.data("tooltip",tooltip );
+        }else{
+          node.data('tooltip','');
+        }
+        
         imageURI = imageURI + encodeURIComponent(self.generateSVGForNode(node).outerHTML);
         node.data('background-image', imageURI),
                 node.data('background-position-x', '100%');
@@ -565,6 +573,7 @@ module.exports = function () {
         node.data('background-image-opacity', '1');
       } else {
         node.data('background-image', imageURI);
+        node.data('tooltip','');
       }
     });
 
