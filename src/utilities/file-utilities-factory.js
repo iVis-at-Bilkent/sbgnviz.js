@@ -193,6 +193,9 @@ module.exports = function () {
          }
        }
      }
+
+     cy.fit( cy.elements(":visible"), 20 );
+
    };
 
    fileUtilities.loadFile( file, convert, undefined, callback, undefined, runLayout );
@@ -253,6 +256,11 @@ module.exports = function () {
      var text = this.result;
     var matchResult = text.match("<renderInformation[^]*</renderInformation>");
     if(matchResult != null){
+    var imagesElementMatch = text.match("<listOfBackgroundImages[^]*</listOfBackgroundImages>");
+    var imagesElement;
+    if(imagesElementMatch != null){
+      imagesElement = imagesElementMatch[0];
+    }
     var renderInfoString = matchResult[0];
     var renderInfoStringCopy = (' ' + renderInfoString).slice(1);
       const regex = /\s([\S]+)([\s]*)=/g;
@@ -265,6 +273,10 @@ module.exports = function () {
         renderInfoString = renderInfoString.replace(match , textUtilities.FromKebabToCamelCase(match));
       });      
       text = text.replace(renderInfoStringCopy, renderInfoString);
+      var imagesElementMatchDirty = text.match("<listOfBackgroundImages[^]*</listOfBackgroundImages>");
+      if(imagesElementMatchDirty != null){
+        text = text.replace(imagesElementMatchDirty[0],imagesElement);
+      }
     }
 
      setTimeout(function () {
@@ -372,14 +384,20 @@ module.exports = function () {
   var sbgnml = this.convertSbgn();
   
   this.convertSbgnmlToSbml(sbgnml, function(data){
-    if(data == null){
-      errorCallback();
-    }else{
-      var blob = new Blob([data], {
+    
+    if(!data.result){
+      errorCallback(sbgnml,data.error);
+    }else if( data.message.indexOf("Internal server error") !== -1)
+    {
+      errorCallback(sbgnml,data.message);
+    }else{    
+      var blob = new Blob([data.message], {
         type: "text/plain;charset=utf-8;",
       });
       saveAs(blob, filename); 
+      
     }
+
     uiUtilities.endSpinner("load-spinner");
     
   });

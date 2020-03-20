@@ -6,11 +6,13 @@ module.exports = function () {
 
   var elementUtilities;
   var experimentalDataOverlay;
+  var mainUtilities;
   var cy;
 
   function undoRedoActionFunctions (param) {
     elementUtilities = param.elementUtilities;
     experimentalDataOverlay = param.experimentalDataOverlay;
+    mainUtilities = param.mainUtilities;
     cy = param.sbgnCyInstance.getCy();
   }
 
@@ -186,6 +188,13 @@ module.exports = function () {
     var visiblef = param.visiblef;
     return experimentalDataOverlay.restoreAll(parsed,visible,grouped,visiblef)
   }
+  
+  undoRedoActionFunctions.setCompoundPadding = function(newPadding) {
+    var result = mainUtilities.getCompoundPadding();   
+    mainUtilities.setCompoundPadding(newPadding);   
+    
+    return result;
+  }; 
 
   return undoRedoActionFunctions;
 };

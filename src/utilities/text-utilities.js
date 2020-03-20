@@ -22,6 +22,7 @@ var textUtilities = {
 
   // same purpose as previous one, but with clearer responsibility
   truncate: function(text, font, width) {
+    text = text + "";
     var context = document.createElement('canvas').getContext("2d");
     context.font = font;
     // check trivial case first, when entire text is already small enough

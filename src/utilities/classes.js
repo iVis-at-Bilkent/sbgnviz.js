@@ -222,9 +222,15 @@ AuxiliaryUnit.getAbsoluteCoord = function(mainObj, cy) {
   var parent = getAuxUnitClass(mainObj).getParent(mainObj, cy);
   var position = parent.position();
   var padding = parent.padding();
+  /* if(parent.data().complexCalculatedPadding){
+    padding = Number(parent.data().complexCalculatedPadding);
+    //delete parent._private.data.complexCalculatedPadding;
+  }else{
+    padding = parent.padding();
+  } */
   var parentWidth = parent.width();
   var parentHeight = parent.height();
-  var borderWidth = parent.data()['border-width'];
+  var borderWidth = Number(parent.css("border-width").replace("px",""));//parent.data()['border-width'];
   var position = parent.position();
   if (mainObj === undefined || parent === undefined || position === undefined) {
     return;
@@ -238,21 +244,21 @@ AuxiliaryUnit.getAbsoluteCoord = function(mainObj, cy) {
   if (mainObj.anchorSide == "top" || mainObj.anchorSide == "bottom") {    
    
     absX = ((mainObj.bbox.x * (parent.outerWidth() - borderWidth)) / 100) + (position.x - parentWidth/2 - padding);
-    absY = mainObj.anchorSide == "top" ? position.y - parentHeight/2 - padding : position.y + parentHeight/2 - padding ;
+    absY = mainObj.anchorSide == "top" ? position.y - parentHeight/2 - padding : position.y + parentHeight/2 + padding ;
    
    
   }
   else {   
     absY = ((mainObj.bbox.y * (parent.outerHeight() - borderWidth)) / 100) + (position.y - parentHeight/2 - padding);
-    absX = mainObj.anchorSide == "left" ? position.x - parentWidth/2 - padding :position.x + parentWidth/2 - padding;  
+    absX = mainObj.anchorSide == "left" ? position.x - parentWidth/2 - padding :position.x + parentWidth/2 + padding;  
     
   }
 
   
   // due to corner of barrel shaped compartment shift absX to right
-  if (parent.data("class") == "compartment"){
+ /*  if (parent.data("class") == "compartment"){
       absX += parent.outerWidth() * 0.1;
-  }
+  } */
 
   return {x: absX, y: absY};
   
@@ -264,26 +270,26 @@ AuxiliaryUnit.convertToAbsoluteCoord = function(mainObj, relX, relY, cy) {
   var padding = parent.padding();
   var parentWidth = parent.width();
   var parentHeight = parent.height();
-  var borderWidth = parent.data()['border-width'];
+  var borderWidth = Number(parent.css("border-width").replace("px",""));
 
 
   var absX , absY;
   if (mainObj.anchorSide == "top" || mainObj.anchorSide == "bottom") {    
    
     absX = ((relX * (parent.outerWidth() - borderWidth)) / 100) + (position.x - parentWidth/2 - padding);
-    absY = mainObj.anchorSide == "top" ? position.y - parentHeight/2 - padding : position.y + parentHeight/2 - padding;
+    absY = mainObj.anchorSide == "top" ? position.y - parentHeight/2 - padding : position.y + parentHeight/2 + padding;
    
    
   }
   else {   
      absY = ((relY * (parent.outerHeight() - borderWidth)) / 100) + (position.y - parentHeight/2 - padding);
-     absX = mainObj.anchorSide == "left" ? position.x - parentWidth/2 - padding :position.x + parentWidth/2 - padding;   
+     absX = mainObj.anchorSide == "left" ? position.x - parentWidth/2 - padding :position.x + parentWidth/2 + padding;   
     
   }
 
-  if (parent.data("class") == "compartment"){
+ /*  if (parent.data("class") == "compartment"){
     absX += parent.outerWidth() * 0.1;
-  };
+  }; */
   return {x: absX, y: absY}; 
 };
 
@@ -298,15 +304,24 @@ AuxiliaryUnit.convertToRelativeCoord = function(mainObj, absX, absY, cy, parentN
     var parent = getAuxUnitClass(mainObj).getParent(mainObj, cy);
   }
   var position = parent.position();
-  var padding = parent.padding();
   var parentWidth = parent.width();
   var parentHeight = parent.height();
-  var borderWidth = parent.data()['border-width'];
+  var padding = parent.padding();
+ /*  if(parent.data().complexCalculatedPadding){
+    padding = Number(parent.data().complexCalculatedPadding)
+  }else{
+    padding = parent.padding();
+  } */
+ 
+ 
+ 
+ 
+  var borderWidth = Number(parent.css("border-width").replace("px",""));
 
 
-  if (parent.data("class") == "compartment"){
+  /* if (parent.data("class") == "compartment"){
     absX -= parent.outerWidth() * 0.1;
-  }
+  } */
 
   var relX , relY;
   if (mainObj.anchorSide == "top" || mainObj.anchorSide == "bottom") {
@@ -321,7 +336,12 @@ AuxiliaryUnit.convertToRelativeCoord = function(mainObj, absX, absY, cy, parentN
     relY = ((absY - (position.y - parentHeight/2 - padding)) * 100) / (parent.outerHeight() - borderWidth);
    
   }
+  relX = relX < 0 ? 0 : relX;
+  relX = relX > 100 ? 100 : relX;
+  relY = relY < 0 ? 0 : relY;
+  relY = relY > 100 ? 100 : relY;
 
+  
   return {x: relX, y: relY};
   
   
@@ -333,26 +353,45 @@ AuxiliaryUnit.setAnchorSide = function(mainObj, node) {
   var thisY = mainObj.bbox.y;
   var thisH = mainObj.bbox.h;
   var thisW = mainObj.bbox.w;
-  var width = (node.data('class') == "compartment" || node.data('class') == "complex") ? node.data('bbox').w : node.width();
-  var height = (node.data('class') == "compartment"|| node.data('class') == "complex") ? node.data('bbox').h : node.height();
-  var outerWidth = node.outerWidth() + (width - node.width());
-  var extraCompartmentPadding = (node.data("class") == "compartment") ? (-outerWidth * 0.1) : 0;
+  var width, height, padding;
+  if(node.data("originalW")){
+    width = node.data("originalW");    
+    padding = 0;
+  }else{
+    width = node.width();
+    padding = node.data('class') == "complex" ? Number(node.data().complexCalculatedPadding) : node.padding();
+  }
+
+  if(node.data("originalH")){
+    height = node.data("originalH");    
+    padding = 0;
+  }else{
+    height = node.height();
+    padding = node.data('class') == "complex" ? Number(node.data().complexCalculatedPadding) : node.padding();
+  }
+  
+ 
+  
   var parentX = (node.data('class') == "compartment" || node.data('class') == "complex") ? node.data('bbox').x : node.position().x;
   var parentY = (node.data('class') == "compartment" || node.data('class') == "complex") ? node.data('bbox').y : node.position().y;
-  var parentX1 = parentX - width / 2 - extraCompartmentPadding;
-  var parentY1 = parentY - height/ 2;
-  var parentY2 = parentY + height/ 2;
+  var parentX1 = Number((parentX - width / 2 - padding).toFixed(2));
+  var parentX2 = Number((parentX+width/2 + padding).toFixed(2));
+  var parentY1 = Number((parentY - height/ 2 - padding).toFixed(2));
+  var parentY2 = Number((parentY + height/ 2+ padding).toFixed(2));
+  var centerX = Number((thisX+thisW/2).toFixed(2));
+  var centerY = Number((thisY+thisH/2).toFixed(2));
 
-  if ((thisY + thisH/2).toFixed(2) == (parentY1).toFixed(2)){
+
+  if (centerY ==parentY1){
     mainObj.anchorSide = "top";
   }
-  else if ((thisY + thisH/2).toFixed(2) == (parentY2).toFixed(2)) {
+  else if (centerY == parentY2) {
     mainObj.anchorSide = "bottom";
   }
-  else if((thisX + thisW/2).toFixed(2) <= (parentX1).toFixed(2)) {
+  else if(centerX == parentX1) {
     mainObj.anchorSide = "left";
   }
-  else if((thisX + thisW/2).toFixed(2) == (parentX1).toFixed(2)){
+  else if((centerX  <=  (parentX2 + 2))  && (centerX  >=  (parentX2 - 2)) ){
     mainObj.anchorSide = "right";
   }else{
     return false;
@@ -496,7 +535,8 @@ StateVariable.remove = function (mainObj, cy) {
     },
     location: mainObj.anchorSide,
     position: position,
-    index: index
+    index: index,
+    style : mainObj.style
   };
 };
 
@@ -584,7 +624,8 @@ UnitOfInformation.remove = function (mainObj, cy) {
     },
     location: mainObj.anchorSide,
     position: position,
-    index: index
+    index: index,
+    style: mainObj.style
   };
 };
 
@@ -732,6 +773,7 @@ AuxUnitLayout.construct = function(parentNode, location, alignment) {
 };
 
 AuxUnitLayout.getParentNode = function(mainObj, cy) {
+  //console.log(mainObj);
   var parentNode = mainObj.parentNode;
 
   // If parentNode is id of parent node rather than being itself get the parent node by that id
@@ -785,7 +827,12 @@ AuxUnitLayout.addAuxUnit = function(mainObj, cy, unit, position, preComputed) {
   if (preComputed === undefined || preComputed === false) {
     AuxUnitLayout.computeCoords(mainObj, cy, unit);
     var parentNode = AuxUnitLayout.getParentNode(mainObj, cy);
-    AuxUnitLayout.fitUnits(parentNode, cy, [mainObj.location]);
+    var locations = AuxUnitLayout.checkFit(parentNode,cy);
+    if(locations.filter(function(loc){return loc == mainObj.location}).length > 0){
+      AuxUnitLayout.fitUnits(parentNode,cy, [mainObj.location]);
+    }
+    
+    
   }
   //AuxUnitLayout.updateLengthCache(mainObj, cy);
   //AuxUnitLayout.update(mainObj, cy, true);
@@ -821,8 +868,9 @@ AuxUnitLayout.computeCoords = function(mainObj, cy, unit){
       unit.bbox.y = relativeCoords.y;
     }
     else {
-      var lastUnit = mainObj.units.length - 2;//Get the position of the last unit
-      var relativeCoords = AuxiliaryUnit.convertToRelativeCoord(unit, unit.bbox.w/2+ mainObj.units[lastUnit].bbox.x + mainObj.units[lastUnit].bbox.w/2 + AuxUnitLayout.getCurrentGap(location), (parentY1) + AuxUnitLayout.getCurrentGap(location), cy);
+      var lastUnit = mainObj.units[mainObj.units.length - 2];//Get the position of the last unit
+      var lastUnitAbsCord = AuxiliaryUnit.convertToAbsoluteCoord(lastUnit, lastUnit.bbox.x, lastUnit.bbox.y, cy);
+      var relativeCoords = AuxiliaryUnit.convertToRelativeCoord(unit, unit.bbox.w/2+ lastUnitAbsCord.x + lastUnit.bbox.w/2 + AuxUnitLayout.getCurrentGap(location), (parentY1) + AuxUnitLayout.getCurrentGap(location), cy);
       unit.bbox.x = relativeCoords.x ;
       unit.bbox.y = relativeCoords.y;
      // unit.bbox.x = mainObj.units[lastUnit].bbox.x +  mainObj.units[lastUnit].bbox.w/2 + unit.bbox.w/2 + AuxUnitLayout.getCurrentGap(location);
@@ -1041,24 +1089,93 @@ AuxUnitLayout.checkFit = function (node, cy, forceCheck){
         var parentX2 = node.position().x + node.width()/2 + padding;
         var firstX1 = coordsFirst.x - firstUnit.bbox.w/2;
         var lastX2 = coordsLast.x + lastUnit.bbox.w/2;
-        if (parentX1 + gap > firstX1 || parentX2 - gap < lastX2) {
-            fitLocations.push(location);
+
+        if(parentX2 < lastX2 + gap){
+          fitLocations.push(location)
         }
+        /* if (parentX1 + gap > firstX1 || parentX2 - gap < lastX2) {
+            fitLocations.push(location);
+        } */
       }
       else {
         var parentY1 = node.position().y - node.height()/2 - padding;
         var parentY2 = node.position().y + node.height()/2 + padding;
         var firstY1 = coordsFirst.y - firstUnit.bbox.h/2;
         var lastY2 = coordsLast.y + lastUnit.bbox.h/2;
-        if (parentY1 + gap > firstY1 || parentY2 - gap < lastY2) {
-            fitLocations.push(location);
+        if(parentY2 < lastY2 + gap){
+          fitLocations.push(location)
         }
+        /* if (parentY1 + gap > firstY1 || parentY2 - gap < lastY2) {
+            fitLocations.push(location);
+        } */
       }
     }
   }
   return fitLocations;
 };
 
+AuxUnitLayout.setIdealGap = function(node, location){
+
+  var parentWidth = node.width();
+  var parentHeight = node.height();
+  var padding = node.padding();
+  var position = node.position();
+  var parentX1 = position.x - parentWidth/2 - padding;
+  var parentY1 = position.y - parentHeight/2 - padding;
+  var estimatedGap;
+   
+    var auxUnit = node.data('auxunitlayouts')[location];
+    if (auxUnit === undefined) {
+      return 0;
+    }
+    if (auxUnit.units.length <= 0 || !auxUnit.units) {
+      return 0;
+    }
+    var units = auxUnit.units;
+    
+    if ( location === "top" || location === "bottom") {
+      usedLength = AuxUnitLayout.getUsedLengthTB(node, auxUnit);
+      var totalWidth = AuxUnitLayout.getUsedWidth(node, auxUnit);
+      estimatedGap = (parentWidth + 2* padding - totalWidth) / (units.length + 1);
+      if (estimatedGap > AuxUnitLayout.unitGap) {
+        estimatedGap = AuxUnitLayout.unitGap;
+      }
+
+      //var firstPosition = AuxiliaryUnit.convertToRelativeCoord(units[0], unit[0].bbox.w/2 + (parentX1) + estimatedGap, (parentY1) + estimatedGap, undefined, node);//Position of the first unit
+      
+      var usedLength = estimatedGap;
+      for (var i = 0; i < units.length; i++) {
+        var relativeCord = AuxiliaryUnit.convertToRelativeCoord(units[i], parentX1 +usedLength + units[i].bbox.w/2, (parentY1) , undefined, node);
+        units[i].bbox.x = relativeCord.x;
+        units[i].bbox.y = relativeCord.y;
+        usedLength += units[i].bbox.w+ estimatedGap;       
+       
+      }
+      AuxUnitLayout.setCurrentGap(location, estimatedGap);
+    }
+    else {
+      //Find total left length
+      usedLength = AuxUnitLayout.getUsedLengthLR(node, auxUnit);
+      //Compare the side lengths
+      var totalHeight = AuxUnitLayout.getUsedHeight(node, auxUnit);
+      estimatedGap = (parentHeight + 2* padding - totalHeight) / (units.length + 1);
+      if (estimatedGap > AuxUnitLayout.unitGap) {
+        estimatedGap = AuxUnitLayout.unitGap;
+      }
+      //Else scale by using available space, reducing margins and gaps.
+      //Check if new gap is enough to fit
+      var usedLength = estimatedGap;
+      for (var i = 0; i < units.length; i++) {
+        var relativeCord = AuxiliaryUnit.convertToRelativeCoord(units[i], parentX1 , (parentY1) + usedLength + units[i].bbox.h/2, undefined, node);
+        units[i].bbox.x = relativeCord.x;
+        units[i].bbox.y = relativeCord.y;
+        usedLength += units[i].bbox.h+ estimatedGap;
+      }
+      //AuxUnitLayout.currentLeftUnitGap = estimatedGap;
+    }
+    AuxUnitLayout.setCurrentGap(location, estimatedGap);
+  
+}
 AuxUnitLayout.fitUnits = function (node, cy, locations) {
 
   var parentWidth = node.width();
@@ -1088,7 +1205,7 @@ AuxUnitLayout.fitUnits = function (node, cy, locations) {
     if ( location === "top" || location === "bottom") {
       usedLength = AuxUnitLayout.getUsedLengthTB(node, auxUnit);
       var totalWidth = AuxUnitLayout.getUsedWidth(node, auxUnit);
-      estimatedGap = (parentWidth - totalWidth) / (units.length + 1);
+      estimatedGap = (parentWidth + 2*padding - totalWidth) / (units.length + 1);
       if (estimatedGap > AuxUnitLayout.unitGap) {
         estimatedGap = AuxUnitLayout.unitGap;
       }
@@ -1110,7 +1227,7 @@ AuxUnitLayout.fitUnits = function (node, cy, locations) {
       usedLength = AuxUnitLayout.getUsedLengthLR(node, auxUnit);
       //Compare the side lengths
       var totalHeight = AuxUnitLayout.getUsedHeight(node, auxUnit);
-      estimatedGap = (parentHeight - totalHeight) / (units.length + 1);
+      estimatedGap = (parentHeight + 2*padding  - totalHeight) / (units.length + 1);
       if (estimatedGap > AuxUnitLayout.unitGap) {
         estimatedGap = AuxUnitLayout.unitGap;
       }

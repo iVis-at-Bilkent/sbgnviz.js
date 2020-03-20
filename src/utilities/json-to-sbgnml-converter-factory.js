@@ -7,6 +7,7 @@ var pkgName = require('../../package.json').name;
 var prettyprint = require('pretty-data').pd;
 var xml2js = require('xml2js');
 var mapPropertiesBuilder = new xml2js.Builder({rootName: "mapProperties"});
+var compoundExtensionBuilder = new xml2js.Builder({rootName: "extraInfo"});
 var textUtilities = require('./text-utilities');
 
 module.exports = function () {
@@ -160,6 +161,11 @@ module.exports = function () {
     // change naming convention from Camel Case (variableName) to Kebab case (variable-name)
     var matchResult = xmlString.match("<renderInformation[^]*</renderInformation>");
     if(matchResult != null){
+      var imagesElementMatch = xmlString.match("<listOfBackgroundImages[^]*</listOfBackgroundImages>");
+      var imagesElement;
+      if(imagesElementMatch != null){
+        imagesElement = imagesElementMatch[0];
+      }
       var renderInfoString = matchResult[0];
       var renderInfoStringCopy = (' ' + renderInfoString).slice(1);
       const regex = /\s([\S]+)([\s]*)=/g;
@@ -169,10 +175,16 @@ module.exports = function () {
         matches.push(result[0]);
       };
       matches.forEach(function(match){
-        renderInfoString = renderInfoString.replace(match , textUtilities.FromCamelToKebabCase(match));
+
+        if(match != " idList=")
+          renderInfoString = renderInfoString.replace(match , textUtilities.FromCamelToKebabCase(match));
       });
 
       xmlString = xmlString.replace(renderInfoStringCopy, renderInfoString);
+      var imagesElementMatchDirty = xmlString.match("<listOfBackgroundImages[^]*</listOfBackgroundImages>");
+      if(imagesElementMatchDirty != null){
+        xmlString = xmlString.replace(imagesElementMatchDirty[0],imagesElement);
+      }
     }
 
   	/* 	dirty hack needed to solve the newline char encoding problem
@@ -312,6 +324,22 @@ module.exports = function () {
        glyph.setClone(new libsbgnjs.CloneType());
     //add bbox information
     glyph.setBbox(this.addGlyphBbox(node));
+
+    if(node.isParent() || node.data().class == 'topology group' || node.data().class == 'submap' || node.data().class == 'complex' || node.data().class == 'compartment'){
+      var extraInfo = {};
+      extraInfo.w = node.width();
+      extraInfo.h = node.height();
+      extraInfo.minW = Number(node.css("min-width").replace("px",""));
+      extraInfo.minH = Number(node.css("min-height").replace("px",""));
+      extraInfo.WLBias = Number(node.css("min-width-bias-left").replace("px",""));
+      extraInfo.WRBias = Number(node.css("min-width-bias-right").replace("px",""));
+      extraInfo.HTBias = Number(node.css("min-height-bias-top").replace("px",""));
+      extraInfo.HBBias = Number(node.css("min-height-bias-bottom").replace("px",""));
+      glyph.setExtension(new libsbgnjs.Extension());
+      glyph.extension.add(compoundExtensionBuilder.buildObject(extraInfo));
+
+    }
+   
     //add port information
     var ports = node._private.data.ports;
     for(var i = 0 ; i < ports.length ; i++){
@@ -484,11 +512,12 @@ module.exports = function () {
   };
 
   jsonToSbgnml.addGlyphBbox = function(node){
-    var width = node.width();
-    var height = node.height();
-
+    
+    var padding = node.padding();
+    var borderWidth = Number(node.css("border-width").replace("px",""));
     var _class = node.data('class');
-
+    var width = node.outerWidth() - borderWidth ;
+    var height = node.outerHeight() - borderWidth;
     // If the node can have ports and it has exactly 2 ports then it is represented by a bigger bbox.
     // This is because we represent it as a polygon and so the whole shape including the ports are rendered in the node bbox.
     if (elementUtilities.canHavePorts(_class)) {
@@ -504,21 +533,28 @@ module.exports = function () {
       }
     }
 
-    var x = node._private.position.x - width/2;
-    var y = node._private.position.y - height/2;
+    var x = node.position().x - width/2;
+    var y = node.position().y- height/2;
+    //var x =node._private.position.x - width/2 - padding;    
+    //var y = node._private.position.y - height/2 - padding;
+    //var x = node._private.position.x - width/2;
+    //var y = node._private.position.y - height/2;
 
     return new libsbgnjs.Bbox({x: x, y: y, w: width, h: height});
   };
 
   jsonToSbgnml.addStateAndInfoBbox = function(node, boxGlyph){
       boxBbox = boxGlyph.bbox;
+      var borderWidth = node.data()['border-width'];
+      var padding = node.padding();
+      var x = ((boxBbox.x * (node.outerWidth() - borderWidth)) / 100) + (node._private.position.x - node.width()/2 - padding - boxBbox.w/2);
+      var y = ((boxBbox.y * (node.outerHeight() - borderWidth)) / 100) + (node._private.position.y - node.height()/2 - padding - boxBbox.h/2);
+      //var x = boxBbox.x / 100 * node.width();
+      //var y = boxBbox.y / 100 * node.height();
 
-      var x = boxBbox.x / 100 * node.width();
-      var y = boxBbox.y / 100 * node.height();
-
-      x = node._private.position.x - node.width()/2 + (x - boxBbox.w/2);
-      y = node._private.position.y - node.height()/2 + (y - boxBbox.h/2);
-
+      //x = node._private.position.x - node.width()/2 + (x - boxBbox.w/2);
+      //y = node._private.position.y - node.height()/2 + (y - boxBbox.h/2);
+      
       return new libsbgnjs.Bbox({x: x, y: y, w: boxBbox.w, h: boxBbox.h});
   };
 

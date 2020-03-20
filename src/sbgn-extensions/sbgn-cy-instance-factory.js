@@ -6,13 +6,14 @@ var Tippy = libs.tippy;
 
 module.exports = function () {
 
-	var elementUtilities, graphUtilities, undoRedoActionFunctions, optionUtilities, experimentalDataOverlay;
+	var elementUtilities, graphUtilities, mainUtilities, undoRedoActionFunctions, optionUtilities, experimentalDataOverlay;
 	var refreshPaddings, options, cy;
 
 	var sbgnCyInstance = function (param) {
 		elementUtilities = param.elementUtilities;
 		graphUtilities = param.graphUtilities;
 		experimentalDataOverlay = param.experimentalDataOverlay;
+    mainUtilities = param.mainUtilities;
 		undoRedoActionFunctions = param.undoRedoActionFunctions;
 		refreshPaddings = graphUtilities.refreshPaddings.bind(graphUtilities);
 
@@ -301,6 +302,100 @@ module.exports = function () {
 	        node.removeStyle('content');
 	      }
 	    });
+      
+      cy.on("beforeDo", function (e, name, args) {
+        if(name == "layout" || name == "collapse" || name == "expand" || name == "collapseRecursively" || name == "expandRecursively" || name == "batch"){
+          var parents = cy.elements(":parent").jsons(); // parent nodes
+          var simples = cy.elements().not(":parent").jsons(); // simple nodes and edges
+          var allElements = parents.concat(simples);  // all elements
+          args.allElements = allElements;
+          var ports = {};
+          cy.nodes().forEach(function(node){
+            if(elementUtilities.canHavePorts(node)){
+              ports[node.id()] = JSON.parse(JSON.stringify(node.data("ports")));
+            }
+          });
+          args.ports = ports;
+          args.viewport = {pan: JSON.parse(JSON.stringify(cy.pan())), zoom: cy.zoom()};
+          mainUtilities.beforePerformLayout();
+        }
+      });
+      
+      cy.on("beforeRedo", function (e, name, args) {
+        if(name == "layout" || name == "collapse" || name == "expand" || name == "collapseRecursively" || name == "expandRecursively" || name == "batch"){
+          var parents = cy.elements(":parent").jsons(); // parent nodes
+          var simples = cy.elements().not(":parent").jsons(); // simple nodes and edges
+          var allElements = parents.concat(simples);  // all elements
+          args.allElements2 = allElements;
+          var ports = {};
+
+          cy.nodes().forEach(function(node){
+            if(elementUtilities.canHavePorts(node)){
+              ports[node.id()] = JSON.parse(JSON.stringify(node.data("ports")));
+            }
+          });
+          args.ports2 = ports;
+          args.viewport2 = {pan: JSON.parse(JSON.stringify(cy.pan())), zoom: cy.zoom()};
+        }
+      });
+      
+      cy.on("afterDo", function (e, name, args, res) {
+        if(name == "layout" || name == "collapse" || name == "expand" || name == "collapseRecursively" || name == "expandRecursively" || name == "batch"){
+          res.allElements = args.allElements;
+          res.ports = args.ports;
+          res.viewport = args.viewport;
+        }
+      });
+      
+      cy.on("afterRedo", function (e, name, args, res) {
+        if(name == "layout" || name == "collapse" || name == "expand" || name == "collapseRecursively" || name == "expandRecursively" || name == "batch"){
+          res.allElements = args.allElements2;
+          res.ports = args.ports2;
+          res.viewport = args.viewport2;
+          cy.json({flatEles: true, elements: args.allElements});
+          cy.nodes().forEach(function(node){
+            if(elementUtilities.canHavePorts(node)){
+              node.data("ports", args.ports[node.id()]);
+            }
+          });
+          cy.pan(args.viewport["pan"]);
+          cy.zoom(args.viewport["zoom"]);
+        }
+      });
+      
+      cy.on("beforeUndo", function (e, name, args) {
+        if(name == "layout" || name == "collapse" || name == "expand" || name == "collapseRecursively" || name == "expandRecursively" || name == "batch"){
+          var parents = cy.elements(":parent").jsons(); // parent nodes
+          var simples = cy.elements().not(":parent").jsons(); // simple nodes and edges
+          var allElements = parents.concat(simples);  // all elements
+          args.allElements2 = allElements;
+          var ports = {};
+
+          cy.nodes().forEach(function(node){
+            if(elementUtilities.canHavePorts(node)){
+              ports[node.id()] = JSON.parse(JSON.stringify(node.data("ports")));
+            }
+          });
+          args.ports2 = ports;
+          args.viewport2 = {pan: JSON.parse(JSON.stringify(cy.pan())), zoom: cy.zoom()};
+        }
+      });
+      
+      cy.on("afterUndo", function (e, name, args, res) {
+        if(name == "layout" || name == "collapse" || name == "expand" || name == "collapseRecursively" || name == "expandRecursively" || name == "batch"){
+          res.allElements = args.allElements2;
+          res.ports = args.ports2;
+          res.viewport = args.viewport2;
+          cy.json({flatEles: true, elements: args.allElements});
+          cy.nodes().forEach(function(node){
+            if(elementUtilities.canHavePorts(node)){
+              node.data("ports", args.ports[node.id()]);
+            }
+          });
+          cy.pan(args.viewport["pan"]);
+          cy.zoom(args.viewport["zoom"]);          
+        }
+      });
 
 	    cy.on('layoutstop', function (event) {
 				/*
@@ -318,13 +413,84 @@ module.exports = function () {
 	      }
 	    });
 
-	    $(document).on('updateGraphEnd', function(event, _cy, isLayoutRequired) {
+	    $(document).on('updateGraphEnd', function(event, _cy, isLayoutRequired,callback) {
 
 				// if the event is not triggered for this cy instance return directly
 				if ( _cy != cy ) {
 					return;
 				}
+				var setCompoundInfoboxes = function(node, isLayoutRequired,cyInstance){
+					if(cyInstance == undefined ) return;
+					if(node.data().infoboxCalculated){
+						return;
+					}else if(node.isParent()){
+						node.children().forEach(function(childNode){
+							setCompoundInfoboxes(childNode,isLayoutRequired,cyInstance);
+						});						
 
+					}
+
+					node.data("infoboxCalculated", true);
+					node.data('auxunitlayouts', {});
+					// for each statesandinfos
+					
+					var correctInfoBoxCoord = true;
+					for(var i=0; i < node.data('statesandinfos').length; i++) {
+						var statesandinfos = node.data('statesandinfos')[i];
+						var bbox = statesandinfos.bbox;
+						var infoBoxOnNode = classes.AuxiliaryUnit.setAnchorSide(statesandinfos, node);
+						correctInfoBoxCoord = correctInfoBoxCoord && infoBoxOnNode;
+					}
+					var statesToAdd = [];
+					for(var i=0; i < node.data('statesandinfos').length; i++) {
+					var statesandinfos = node.data('statesandinfos')[i];
+						var bbox = statesandinfos.bbox;
+						
+
+						if ((isLayoutRequired === undefined || !isLayoutRequired ) && correctInfoBoxCoord) {					
+							classes.AuxiliaryUnit.setAnchorSide(statesandinfos, node);
+							//var fileLoadParam = {extraPadding:  Number(node.data().originalPadding)};
+							var cordResult = classes.AuxiliaryUnit.convertToRelativeCoord(statesandinfos, bbox.x+bbox.w/2, bbox.y+bbox.h/2, cyInstance, node)
+							statesandinfos.bbox.x = cordResult.x;
+							statesandinfos.bbox.y = cordResult.y;	
+							statesandinfos.isDisplayed = true;					
+							var location = statesandinfos.anchorSide; // top bottom right left
+							var layouts = node.data('auxunitlayouts');
+							if(!layouts[location]) { // layout doesn't exist yet for this location
+								layouts[location] = classes.AuxUnitLayout.construct(node, location);
+							}
+							// populate the layout of this side
+							classes.AuxUnitLayout.addAuxUnit(layouts[location], cyInstance, statesandinfos, undefined, true); //positions are precomputed
+						}
+						else {
+							if(!node.data('auxunitlayouts')) { // ensure minimal initialization
+								node.data('auxunitlayouts', {});
+							}
+							var location = classes.AuxUnitLayout.selectNextAvailable(node, cy);
+							if(!node.data('auxunitlayouts')[location]) {
+								node.data('auxunitlayouts')[location] = classes.AuxUnitLayout.construct(node, location);
+							}
+							var layout = node.data('auxunitlayouts')[location];
+							statesandinfos.anchorSide = location;
+							switch(location) {
+								case "top": statesandinfos.bbox.y = 0; break;
+								case "bottom": statesandinfos.bbox.y = 100; break;
+								case "left": statesandinfos.bbox.x = 0; break;
+								case "right": statesandinfos.bbox.x = 100; break;
+							}
+							classes.AuxUnitLayout.addAuxUnit(layout, cyInstance, statesandinfos);
+						}
+
+					}
+
+							if (isLayoutRequired === true) {
+								var locations = classes.AuxUnitLayout.checkFit(node, cy);
+								if (locations !== undefined && locations.length > 0) {
+									classes.AuxUnitLayout.fitUnits(node, cy, locations);
+								}
+							}
+					
+				};
 	      // list all entitytypes andstore them in the global scratch
 	      // only stateful EPN (complex, macromolecule or nucleic acid) are concerned
 
@@ -354,67 +520,18 @@ module.exports = function () {
 	      cy.endBatch();
 	      cy.scratch('_sbgnviz', {SBGNEntityTypes: entityHash});*/
 
-	      // assign statesandinfos to their layout
-	      cy.startBatch();
+		  // assign statesandinfos to their layout
+		  cy.style().update();
+	     // cy.startBatch();
 	      cy.nodes().forEach(function(node) {
-	        node.data('auxunitlayouts', {});
-			// for each statesandinfos
-			
-			/* var correctInfoBoxCoord = true;
-			for(var i=0; i < node.data('statesandinfos').length; i++) {
-				var statesandinfos = node.data('statesandinfos')[i];
-				var bbox = statesandinfos.bbox;
-				var infoBoxOnNode = classes.AuxiliaryUnit.setAnchorSide(statesandinfos, node);
-				correctInfoBoxCoord = correctInfoBoxCoord && infoBoxOnNode;
-			}
- */
-	        for(var i=0; i < node.data('statesandinfos').length; i++) {
-	           var statesandinfos = node.data('statesandinfos')[i];
-				var bbox = statesandinfos.bbox;
-				
+	        setCompoundInfoboxes(node,isLayoutRequired,cy);
+		  });
+		  
+		  if(callback){
+			  callback();
+		  }
 
-				if ((isLayoutRequired === undefined || !isLayoutRequired )) {					
-					classes.AuxiliaryUnit.setAnchorSide(statesandinfos, node);
-					var cordResult = classes.AuxiliaryUnit.convertToRelativeCoord(statesandinfos, bbox.x+bbox.w/2, bbox.y+bbox.h/2, cy, node)
-					statesandinfos.bbox.x = cordResult.x;
-					statesandinfos.bbox.y = cordResult.y;						
-					var location = statesandinfos.anchorSide; // top bottom right left
-					var layouts = node.data('auxunitlayouts');
-					if(!layouts[location]) { // layout doesn't exist yet for this location
-						layouts[location] = classes.AuxUnitLayout.construct(node, location);
-					}
-					// populate the layout of this side
-					classes.AuxUnitLayout.addAuxUnit(layouts[location], cy, statesandinfos, undefined, true); //positions are precomputed
-				}
-				else {
-					if(!node.data('auxunitlayouts')) { // ensure minimal initialization
-						node.data('auxunitlayouts', {});
-					}
-					var location = classes.AuxUnitLayout.selectNextAvailable(node, cy);
-					if(!node.data('auxunitlayouts')[location]) {
-						node.data('auxunitlayouts')[location] = classes.AuxUnitLayout.construct(node, location);
-					}
-					var layout = node.data('auxunitlayouts')[location];
-					statesandinfos.anchorSide = location;
-					switch(location) {
-						case "top": statesandinfos.bbox.y = 0; break;
-						case "bottom": statesandinfos.bbox.y = 100; break;
-						case "left": statesandinfos.bbox.x = 0; break;
-						case "right": statesandinfos.bbox.x = 100; break;
-					}
-					classes.AuxUnitLayout.addAuxUnit(layout, cy, statesandinfos);
-				}
-
-	        }
-
-					if (isLayoutRequired === true) {
-						var locations = classes.AuxUnitLayout.checkFit(node, cy);
-						if (locations !== undefined && locations.length > 0) {
-							classes.AuxUnitLayout.fitUnits(node, cy, locations);
-						}
-					}
-	      });
-	      cy.endBatch();
+	      //cy.endBatch();
 	    });
 	  }
 
@@ -648,7 +765,10 @@ module.exports = function () {
 	          .css({
 	            'border-color': selectionColor,
 	            'target-arrow-color': '#000',
-	            'text-outline-color': '#000'
+				'text-outline-color': '#000',
+				'border-width': function(ele){
+					return Math.max(ele.data("border-width"), 1);
+				  }
 	          })
 	          .selector("node:active")
 	          .css({
@@ -686,7 +806,10 @@ module.exports = function () {
 	          .css({
 	            'line-color': selectionColor,
 	            'source-arrow-color': selectionColor,
-	            'target-arrow-color': selectionColor
+				'target-arrow-color': selectionColor,
+				'width': function(ele){
+					return Math.max(ele.data("width"), 3);
+				  }
 	          })
 	          .selector("edge:active")
 	          .css({

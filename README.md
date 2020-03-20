@@ -476,7 +476,7 @@ The following describes objects used by sbgnviz.js and accessible through `sbgnv
 
  * cytoscape 
  * jQuery
- * filesaverjs
+ * file-saver
  * tippy.js
  * libsbgn.js
  * pretty-data
@@ -505,7 +505,7 @@ CommonJS:
 var sbgnviz = require('sbgnviz');
 var cytoscape = require('cytoscape-for-sbgnviz');
 var jQuery = require('jQuery');
-var filesaverjs = require('filesaverjs');
+var filesaver = require('file-saver');
 var tippy = require('tippy.js');
 
 var options = {
@@ -514,7 +514,7 @@ var options = {
 var libs = {
     cytoscape: cytoscape,
     jQuery: jQuery,
-    filesaverjs: filesaverjs,
+    filesaver: filesaver,
     tippy = tippy;
 };
 

@@ -142,7 +142,7 @@
     var libs = {};
     libs.jQuery = _libs.jQuery || jQuery;
     libs.cytoscape = _libs.cytoscape || cytoscape;
-    libs.saveAs = _libs.filesaverjs ? _libs.filesaverjs.saveAs : saveAs;
+    libs.saveAs = _libs.filesaver ? _libs.filesaver.saveAs : saveAs;
     libs.tippy = _libs.tippy || Tippy;
 
     // Set the libraries to access them from any file
