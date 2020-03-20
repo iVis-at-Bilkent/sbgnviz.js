@@ -842,7 +842,8 @@ module.exports = function () {
       visibleFiles: visibleFiles,
       fileDescription: fileDescription,
       allVis: allVis,
-      fileTitle: fileTitle
+      fileTitle: fileTitle,
+      parsedDataMap:parsedDataMap
     };
   };
   return experimentalDataOverlay;
