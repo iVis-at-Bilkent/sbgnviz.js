@@ -137,8 +137,8 @@ module.exports = function () {
    saveAs(new Blob([svgContent], {type:"image/svg+xml;charset=utf-8"}), filename || "network.svg");
  };
 
- fileUtilities.loadSample = function(filename, folderpath) {
-
+ fileUtilities.loadSample = function(filename, folderpath, callback) {
+  console.log("inside load Sample in SBGNVİZ")
   var file = (folderpath || 'sample-app/samples/') + filename;
 
   
@@ -169,8 +169,9 @@ module.exports = function () {
         fileUtilities.collapseMarkedNodes();
         uiUtilities.endSpinner("load-spinner");
         $(document).trigger( "sbgnvizLoadSampleEnd", [ filename, cy ] ); // Trigger an event signaling that a sample is loaded
-        }, 0);
-  
+        if (typeof callback !== 'undefined') {
+         callback(); }
+      },0);
  };
 
  fileUtilities.loadSIFFile = function(file, layoutBy, callback) {

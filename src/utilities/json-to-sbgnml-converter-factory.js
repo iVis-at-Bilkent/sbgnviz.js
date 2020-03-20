@@ -11,7 +11,7 @@ var compoundExtensionBuilder = new xml2js.Builder({rootName: "extraInfo"});
 var textUtilities = require('./text-utilities');
 
 module.exports = function () {
-  var elementUtilities, graphUtilities;
+  var elementUtilities, graphUtilities, experimentalDataOverlay;
   var cy;
 
   /*
@@ -40,6 +40,7 @@ module.exports = function () {
   function jsonToSbgnml (param) {
     elementUtilities = param.elementUtilities;
     graphUtilities = param.graphUtilities;
+    experimentalDataOverlay = param.experimentalDataOverlay;
     cy = param.sbgnCyInstance.getCy();
   }
 
@@ -100,6 +101,7 @@ module.exports = function () {
        }
        map.setExtension(extension);
        if (mapProperties) {
+           delete mapProperties.experimentDescription;
            var xml = mapPropertiesBuilder.buildObject(mapProperties);
            map.extension.add(xml);
        }
@@ -220,14 +222,16 @@ module.exports = function () {
           listOfColorDefinitions.addColorDefinition(colorDefinition);
       }
       renderInformation.setListOfColorDefinitions(listOfColorDefinitions);
-
-      // populate list of background images
-      var listOfBackgroundImages = new renderExtension.ListOfBackgroundImages();
-      for (var img in renderInfo.images) {
-          var backgroundImage = new renderExtension.BackgroundImage({id: renderInfo.images[img], value: img});
-          listOfBackgroundImages.addBackgroundImage(backgroundImage);
-      }
-      renderInformation.setListOfBackgroundImages(listOfBackgroundImages);
+      
+        // populate list of background images
+        var listOfBackgroundImages = new renderExtension.ListOfBackgroundImages();
+        if(!(Object.keys(experimentalDataOverlay.getParsedDataMap()).length > 0)){
+          for (var img in renderInfo.images) {
+              var backgroundImage = new renderExtension.BackgroundImage({id: renderInfo.images[img], value: img});
+              listOfBackgroundImages.addBackgroundImage(backgroundImage);
+          }
+        }
+        renderInformation.setListOfBackgroundImages(listOfBackgroundImages);
 
       // populates styles
       var listOfStyles = new renderExtension.ListOfStyles();

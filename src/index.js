@@ -14,7 +14,7 @@
     var graphUtilities = require('./utilities/graph-utilities-factory')();
     var mainUtilities = require('./utilities/main-utilities-factory')();
     var keyboardInputUtilities = require('./utilities/keyboard-input-utilities-factory')(); // require keybord input utilities
-
+    var experimentalDataOverlay = require('./utilities/experimental-data-overlay')();
     // Utilities to be exposed as is
     var elementUtilities = require('./utilities/element-utilities-factory')();
     var undoRedoActionFunctions = require('./utilities/undo-redo-action-functions-factory')();
@@ -36,6 +36,7 @@
     var sbgnmlToSbmlConverter = require('./utilities/sbgnml-to-sbml-converter-factory')();
     var sbmlToSbgnmlConverter = require('./utilities/sbml-to-sbgnml-converter-factory')();
     // Fill param object to use it utilities internally
+    
     param.optionUtilities = optionUtilities;
     param.sbgnCyInstance = sbgnCyInstance;
     param.uiUtilities = uiUtilities;
@@ -59,8 +60,10 @@
     param.sbgnmlToCdConverter = sbgnmlToCdConverter;
     param.sbgnmlToSbmlConverter = sbgnmlToSbmlConverter;
     param.sbmlToSbgnmlConverter = sbmlToSbgnmlConverter;
+    param.experimentalDataOverlay = experimentalDataOverlay;
 
     // call constructors of objects with param
+    
     sbgnCyInstance(param);
     optionUtilities(param);
     uiUtilities(param);
@@ -83,6 +86,7 @@
     sbgnmlToCdConverter(param);
     sbgnmlToSbmlConverter(param);
     sbmlToSbgnmlConverter(param);
+    experimentalDataOverlay(param);
 
     // set scratch pad for sbgnviz and init sbgnvizParams inside it
     sbgnCyInstance.getCy().scratch('_sbgnviz', {});
@@ -94,6 +98,12 @@
     // Expose elementUtilities and undoRedoActionFunctions as is, most users will not need these
     api.elementUtilities = elementUtilities;
     api.undoRedoActionFunctions = undoRedoActionFunctions;
+    //api.experimentalDataOverlay = experimentalDataOverlay;
+    
+    //expose utility of experimental data-overlay
+    for (var prop in experimentalDataOverlay) {
+      api[prop] = experimentalDataOverlay[prop];
+    }
 
     // Expose each main utility seperately
     for (var prop in mainUtilities) {

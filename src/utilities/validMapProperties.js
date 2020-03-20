@@ -19,9 +19,11 @@ module.exports = {
   enablePorts: true,
   allowCompoundNodeResize: true,
   mapColorScheme: true,
+  mapColorSchemeStyle: true,
   defaultInfoboxHeight: true,
   defaultInfoboxWidth: true,
   mapName: true,
   mapDescription: true,
-  enableSIFTopologyGrouping: true
+  enableSIFTopologyGrouping: true,
+  experimentDescription: true
 };

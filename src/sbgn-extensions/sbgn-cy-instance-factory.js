@@ -6,12 +6,13 @@ var Tippy = libs.tippy;
 
 module.exports = function () {
 
-	var elementUtilities, graphUtilities, mainUtilities, undoRedoActionFunctions, optionUtilities;
+	var elementUtilities, graphUtilities, mainUtilities, undoRedoActionFunctions, optionUtilities, experimentalDataOverlay;
 	var refreshPaddings, options, cy;
 
 	var sbgnCyInstance = function (param) {
 		elementUtilities = param.elementUtilities;
 		graphUtilities = param.graphUtilities;
+		experimentalDataOverlay = param.experimentalDataOverlay;
     mainUtilities = param.mainUtilities;
 		undoRedoActionFunctions = param.undoRedoActionFunctions;
 		refreshPaddings = graphUtilities.refreshPaddings.bind(graphUtilities);
@@ -109,7 +110,22 @@ module.exports = function () {
 	    // register add remove actions
 	    ur.action("deleteElesSimple", undoRedoActionFunctions.deleteElesSimple, undoRedoActionFunctions.restoreEles);
 	    ur.action("deleteNodesSmart", undoRedoActionFunctions.deleteNodesSmart, undoRedoActionFunctions.restoreEles);
-	    ur.action("setPortsOrdering", undoRedoActionFunctions.setPortsOrdering, undoRedoActionFunctions.setPortsOrdering);
+		ur.action("setPortsOrdering", undoRedoActionFunctions.setPortsOrdering, undoRedoActionFunctions.setPortsOrdering);
+		
+		//experimental data ovarlay
+		ur.action("removeAll", undoRedoActionFunctions.removeAll, undoRedoActionFunctions.restoreAll);
+		ur.action("hideExperiment", undoRedoActionFunctions.hideExp, undoRedoActionFunctions.unhideExp);
+		ur.action("unhideExperiment", undoRedoActionFunctions.unhideExp, undoRedoActionFunctions.hideExp);
+		ur.action("hideFile", undoRedoActionFunctions.hideFile, undoRedoActionFunctions.hideFileUndo);
+		ur.action("unhideFile", undoRedoActionFunctions.unhideFile, undoRedoActionFunctions.unhideFileUndo);
+		ur.action("removeExperiment", undoRedoActionFunctions.removeExp, undoRedoActionFunctions.addExp);
+		ur.action("removeFile", undoRedoActionFunctions.removeFile, undoRedoActionFunctions.addFile);
+		ur.action("expButtonChange", undoRedoActionFunctions.expButtonChange, undoRedoActionFunctions.expButtonChange);
+		ur.action("fileButtonChangeHide", undoRedoActionFunctions.fileButtonChangeHide, undoRedoActionFunctions.fileButtonChangeUnHide);
+		ur.action("fileButtonChangeUnHide", undoRedoActionFunctions.fileButtonChangeUnHide, undoRedoActionFunctions.fileButtonChangeHide);
+
+		//ur.action("expButtonUnhide", undoRedoActionFunctions.changeExpButton2, undoRedoActionFunctions.expButtonHide);
+		//ur.action("parseData", undoRedoActionFunctions.parseData, undoRedoActionFunctions.removeFile);
 	  }
 
 		function showTooltip(event) {
