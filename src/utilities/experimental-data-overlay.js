@@ -390,9 +390,9 @@ module.exports = function () {
     return dataBoxCount;
   };
 
-  experimentalDataOverlay.generateSVGForNode = function (ele) {
+  experimentalDataOverlay.generateSVGForNode = function (ele, tooltip) {
     const dataBoxCount = this.countVisibleDataByExp();
-
+    var values = [];   
     // Experimental data overlay part !
     // const dataURI = 'data:image/svg+xml;utf8,'
     const svgNameSpace = 'http://www.w3.org/2000/svg';
@@ -430,7 +430,8 @@ module.exports = function () {
           continue
         }
 
-        if (frequencyData[fileName + '?' + expName] !== undefined) {
+        if (frequencyData[fileName + '?' + expName] !== undefined) {         
+          values.push(frequencyData[fileName + '?' + expName]);
           dataRectangleGenerator(
                   overLayRectBBox.x +
                   (counter * overLayRectBBox.w) / maxDataBoxCount,
@@ -442,6 +443,7 @@ module.exports = function () {
                   fileName
                   );
         } else {
+          values.push("-");
           dataRectangleGenerator(
                   overLayRectBBox.x +
                   (counter * overLayRectBBox.w) / maxDataBoxCount,
@@ -453,7 +455,8 @@ module.exports = function () {
                   fileName
                   );
         }
-        //  draw separator line between data rectangles
+
+           //  draw separator line between data rectangles
         if (counter < maxDataBoxCount - 1) {
           const overlayRect = document.createElementNS(svgNameSpace, 'line');
           overlayRect.setAttribute('x1', overLayRectBBox.x + (counter * overLayRectBBox.w) / maxDataBoxCount
@@ -471,6 +474,8 @@ module.exports = function () {
         counter++;
       }
     }
+
+    tooltip.content = "(" + values.join(",") + ")";
 
     function interpolateColor(color1, color2, factor) {
       var result = color1.slice();
@@ -556,14 +561,15 @@ module.exports = function () {
       var imageURI = 'data:image/svg+xml;utf8,';
       if (nodeLabel in parsedDataMap && !node.isParent()) {
 
+        var tooltip = {content:''};
+        imageURI = imageURI + encodeURIComponent(self.generateSVGForNode(node,tooltip).outerHTML);
+        
         if(Object.keys(parsedDataMap[nodeLabel]).length > 0){
-          var tooltip = "(" + Object.values(parsedDataMap[nodeLabel]).join(",") + ")";
-          node.data("tooltip",tooltip );
+         // var tooltip = "(" + Object.values(parsedDataMap[nodeLabel]).join(",") + ")";
+          node.data("tooltip",tooltip.content);
         }else{
           node.data('tooltip','');
         }
-        
-        imageURI = imageURI + encodeURIComponent(self.generateSVGForNode(node).outerHTML);
         node.data('background-image', imageURI),
                 node.data('background-position-x', '100%');
         node.data('background-position-y', '100%');
