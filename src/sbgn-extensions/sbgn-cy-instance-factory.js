@@ -148,7 +148,7 @@ module.exports = function () {
 			var infobox = classes.AuxiliaryUnit.checkPoint(pos.x, pos.y, node, 0);
 			var tooltipContent;
 
-			if ( elementUtilities.isSIFNode(node) ) {
+			
 				if (!infobox) {
 					tooltipContent = node.data('tooltip');					
 					if ( tooltipContent == undefined  || tooltipContent == '') {
@@ -184,7 +184,7 @@ module.exports = function () {
 						}
 					});
 				}
-			}
+			
 
 			var placement = infobox ? infobox.anchorSide : 'bottom';
 			var destroyTippy;
@@ -217,13 +217,13 @@ module.exports = function () {
 			node.on('position', destroyTippy);
 			cy.on('tapdrag', destroyTippy);
 
-			setTimeout( () => tippy.show(), 0 );
+			setTimeout( () => tippy.show(),250 );
 		}
 
 	  function bindCyEvents() {
 
 			cy.on('tapdragover', 'node', function(event) {
-				var waitDuration = 1000;
+				var waitDuration = 200;
 				var nodeTapdragout;
 				var currEvent = event;
 				var node = currEvent.target || currEvent.cyTarget;
