@@ -556,7 +556,22 @@ module.exports = function () {
 
   experimentalDataOverlay.showData = function () {
     const self = this;
-    cy.nodes().forEach(function (node) {
+    var nodeCollection = cy.collection();
+    var collapsedChildren = cy.expandCollapse('get').getAllCollapsedChildrenRecursively().filter("node");
+    var collapsedChildrenNotParent = cy.collection();
+    var parentSet = new Set();  // parent ids of collapsed children
+    collapsedChildren.forEach(function(node){
+      parentSet.add(node.parent().id());
+    });
+    // filter parent nodes from collapsed children
+    collapsedChildren.forEach(function(node){
+      if(!parentSet.has(node.id())){ // this means removed node is not parent
+        collapsedChildrenNotParent = collapsedChildrenNotParent.union(node);
+      }
+    });
+    var expandableNodes = cy.expandCollapse('get').expandableNodes();
+    nodeCollection = nodeCollection.union(cy.nodes()).union(collapsedChildrenNotParent).difference(expandableNodes);
+    nodeCollection.forEach(function (node) {
       const nodeLabel = node.data('label');
       var imageURI = 'data:image/svg+xml;utf8,';
       if (nodeLabel in parsedDataMap && !node.isParent()) {
