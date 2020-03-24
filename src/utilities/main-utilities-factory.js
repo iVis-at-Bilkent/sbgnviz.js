@@ -498,7 +498,7 @@ module.exports = function () {
     var viewUtilities = cy.viewUtilities('get');
 
     if (options.undoable) {
-      cy.undoRedo().do('highlight', elesToHighlight);
+      cy.undoRedo().do('highlight', { eles: elesToHighlight, idx: 0 });
     }
     else {
       viewUtilities.highlight(elesToHighlight);
