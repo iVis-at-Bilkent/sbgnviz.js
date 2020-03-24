@@ -397,15 +397,14 @@ module.exports = function () {
     // const dataURI = 'data:image/svg+xml;utf8,'
     const svgNameSpace = 'http://www.w3.org/2000/svg';
     const nodeLabel = ele.data('label');
-    const eleBBox = ele.boundingBox();
-    const reqWidth = eleBBox.w;
-    const reqHeight = eleBBox.h;
+    const reqWidth = ele.outerWidth();
+    const reqHeight = ele.outerHeight();
     const overlayRecBoxW = reqWidth;
     const overlayRecBoxH = reqHeight;
     const svg = document.createElementNS(svgNameSpace, 'svg');
     // It seems this should be set according to the node size !
     svg.setAttribute('width', reqWidth);
-    svg.setAttribute('height', eleBBox.h);
+    svg.setAttribute('height', reqHeight);
     // This is important you need to include this to succesfully render in cytoscape.js!
     svg.setAttribute('xmlns', svgNameSpace);
 
@@ -556,7 +555,22 @@ module.exports = function () {
 
   experimentalDataOverlay.showData = function () {
     const self = this;
-    cy.nodes().forEach(function (node) {
+    var nodeCollection = cy.collection();
+    var collapsedChildren = cy.expandCollapse('get').getAllCollapsedChildrenRecursively().filter("node");
+    var collapsedChildrenNotParent = cy.collection();
+    var parentSet = new Set();  // parent ids of collapsed children
+    collapsedChildren.forEach(function(node){
+      parentSet.add(node.parent().id());
+    });
+    // filter parent nodes from collapsed children
+    collapsedChildren.forEach(function(node){
+      if(!parentSet.has(node.id())){ // this means removed node is not parent
+        collapsedChildrenNotParent = collapsedChildrenNotParent.union(node);
+      }
+    });
+    var expandableNodes = cy.expandCollapse('get').expandableNodes();
+    nodeCollection = nodeCollection.union(cy.nodes()).union(collapsedChildrenNotParent).difference(expandableNodes);
+    nodeCollection.forEach(function (node) {
       const nodeLabel = node.data('label');
       var imageURI = 'data:image/svg+xml;utf8,';
       if (nodeLabel in parsedDataMap && !node.isParent()) {

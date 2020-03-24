@@ -138,10 +138,8 @@ module.exports = function () {
  };
 
  fileUtilities.loadSample = function(filename, folderpath, callback) {
-  console.log("inside load Sample in SBGNVİZ")
-  var file = (folderpath || 'sample-app/samples/') + filename;
+   var file = (folderpath || 'sample-app/samples/') + filename;
 
-  
    uiUtilities.startSpinner("load-spinner");
    // Users may want to do customized things while a sample is being loaded
    // Trigger an event for this purpose and specify the 'filename' as an event parameter
