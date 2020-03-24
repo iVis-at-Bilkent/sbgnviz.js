@@ -397,15 +397,14 @@ module.exports = function () {
     // const dataURI = 'data:image/svg+xml;utf8,'
     const svgNameSpace = 'http://www.w3.org/2000/svg';
     const nodeLabel = ele.data('label');
-    const eleBBox = ele.boundingBox();
-    const reqWidth = eleBBox.w;
-    const reqHeight = eleBBox.h;
+    const reqWidth = ele.outerWidth();
+    const reqHeight = ele.outerHeight();
     const overlayRecBoxW = reqWidth;
     const overlayRecBoxH = reqHeight;
     const svg = document.createElementNS(svgNameSpace, 'svg');
     // It seems this should be set according to the node size !
     svg.setAttribute('width', reqWidth);
-    svg.setAttribute('height', eleBBox.h);
+    svg.setAttribute('height', reqHeight);
     // This is important you need to include this to succesfully render in cytoscape.js!
     svg.setAttribute('xmlns', svgNameSpace);
 

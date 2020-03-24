@@ -415,7 +415,7 @@ module.exports = function () {
     if (!isNeed2Highligth(elesToHighlight)) {
       return;
     }
-    console.log('sbgnviz highlightSelected');
+
     // If this function is being called we can assume that view utilities extension is on use
     var viewUtilities = cy.viewUtilities('get');
     if (options.undoable) {
