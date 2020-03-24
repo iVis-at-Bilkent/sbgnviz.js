@@ -74,20 +74,28 @@ module.exports = function () {
     }
 
     // check version validity
-    if(version !== "0.2" && version !== "0.3" && version !== "plain") {
-      console.error("Invalid SBGN-ML version provided. Expected 0.2, 0.3 or plain, got: " + version);
+    if(version !== "0.2" && version !== "0.3" && version !== "plain" && version !== "plain3") {
+      console.error("Invalid SBGN-ML version provided. Expected 0.2, 0.3, plain or plain3, got: " + version);
       return "Error";
     }
 
     var mapLanguage = elementUtilities.mapTypeToLanguage(mapType);
 
     //add headers
-    xmlHeader = "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>\n";
-    var versionNo = (version === "plain") ? "0.2" : version;
+    xmlHeader = "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>\n";  
+    var versionNo;
+    if(version === "plain"){
+      versionNo = "0.2";
+    }else if(version === "plain3"){
+      versionNo = "0.3";
+    }else{
+      versionNo = version;
+    }
+    //var versionNo = (version === "plain") ? "0.2" : version;
     var sbgn = new libsbgnjs.Sbgn({xmlns: 'http://sbgn.org/libsbgn/' + versionNo});
 
     var map;
-    if(version === "0.3") {
+    if(version === "0.3" || version ==="plain3") {
       var map = new libsbgnjs.Map({language: mapLanguage, id: mapID});
     }
     else if(version === "0.2" || version === "plain") {
@@ -125,7 +133,7 @@ module.exports = function () {
     });
     // add them to the map
     for(var i=0; i<glyphList.length; i++) {
-       if (version === "plain")
+       if (version === "plain" || version ==="plain3")
          glyphList[i].extension = null;
        map.addGlyph(glyphList[i]);
     }
@@ -136,7 +144,7 @@ module.exports = function () {
          ele = i;
        }
        var arc = self.getArcSbgnml(ele);
-       if (version === "plain")
+       if (version === "plain" || version ==="plain3")
          arc.extension = null;
        map.addArc(self.getArcSbgnml(ele));
     });
