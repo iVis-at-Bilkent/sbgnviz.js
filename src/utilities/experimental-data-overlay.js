@@ -294,7 +294,7 @@ module.exports = function () {
       k++;
     }
     if (k == 0) {
-      groupedDataMap = "";
+      groupedDataMap = {};
     }
     return params;
   };
