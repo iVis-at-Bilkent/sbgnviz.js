@@ -465,6 +465,9 @@ module.exports = function () {
     nodeObj.class = ele.class_;
     // add label information
     nodeObj.label = (ele.label && ele.label.text) || undefined;
+    if(nodeObj.label != undefined){
+      nodeObj.label = ""+ nodeObj.label;
+    }
     // add state and info box information
     nodeObj.statesandinfos = self.stateAndInfoProp(ele, nodeObj);
     // adding parent information
