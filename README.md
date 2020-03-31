@@ -1,5 +1,3 @@
-todos: https://docs.google.com/document/d/1vrK_w1RO55eopStj6aq4Joy5wnETkiLg6ohsSyiXFu8/edit?usp=sharing
-
 # SBGNViz
 
 SBGNViz is a web based library developed to visualize pathway models represented by process description (PD) and activity flow (AF) languages of [SBGN](http://sbgn.org) or in [simple interaction format (SIF)](https://www.pathwaycommons.org/pc/sif_interaction_rules.do).
