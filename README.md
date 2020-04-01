@@ -503,12 +503,6 @@ Accessible through `sbgnviz.tdParser`. Provides the following methods.
 `getTabsArray(line)` Converts the give tab delimeted line into array of data and returns it.
 `getLinesArray(content)` Converts the content into an array of tab delimeted lines and returns it.
 
-### Classes
-
-The following describes objects used by sbgnviz.js and accessible through `sbgnviz.classes`.
-
-
-
 ## Events
 `$(document).on('sbgnvizLoadSampleStart', function(event, filename, cy) { ... });` Triggered when a sample is being loaded. Aliases `sbgnvizLoadSample`.
 
