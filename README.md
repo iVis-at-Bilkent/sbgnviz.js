@@ -445,6 +445,57 @@ an extension library of sbgnviz.
  * `restoreEles(eles)` Undo function for 'deleteElesSimple' and 'deleteNodesSmart' undo redo commands.
  * `setPortsOrdering(param)` Do/Undo/Redo function for 'setPortsOrdering' undo redo command.
 
+### Experimental Data Overlay
+
+`instance.getVisibleData()`
+Returns the visible experimental data.
+
+`instance.getParsedDataMap()`
+Returns the experimental data in a parsed format.
+
+`instance.getGroupedDataMap()`
+Returns the experimental data in raw format.
+
+`instance.getExperimentalData()`
+Returns all the related experimental data variables (parsed, raw, visibile, by experiement etc).
+
+`instance.parseData (data, fileName, errorCallback)`
+Parses the given data with a given file name and stores it in experimental data variables, errorCallback is the call back function if parsing fails.
+
+`instance.showData()`
+Shows the presentation of the loaded experimental data on the elements of cytoscape instance.
+
+`instance.generateSVGForNode(ele,tooltip)`
+Creates an SVG image presenting the experimental data corrosponding to the given element, and calcuates the tooltip for the element.
+
+`instance.hideAll()`
+Hides all experimental data.
+
+`instance.unhideAll()`
+Unhides all experimental data.
+
+`instance.removeAll()`
+Removes all experimental data.
+
+`instance.removeExp(filename, expName)`
+Removes the given experiment in the given file.
+
+`instance.removeFile(filename)`
+Removes all the experimental data associated with the given data file.
+
+`instance.hideExp(fileName, expName)`
+Hides the given experiment in the given file.
+
+`instance.hideFile(fileName)`
+Hides all the experimental in the given file.
+
+`instance.unhideExp(fileName, expName)`
+Unhides the given experiment in the given file.
+
+`instance.unhideFile(fileName)`
+unHides all the experimental in the given file.
+
+
 ### TabDelimetedParser
 Accessible through `sbgnviz.tdParser`. Provides the following methods.
 
@@ -492,7 +543,7 @@ The following extensions are used by this library if they are registered.
  for exact versions of dependencies refer to [package.json](https://github.com/iVis-at-Bilkent/sbgnviz.js/blob/master/package.json)
 
 ## Usage instructions
-Download the library:
+Download the library (we recommend the use of LTS version 10.x.x of node.js):
  * via npm: `npm install sbgnviz` or
  * via direct download in the repository (probably from a tag).
 
