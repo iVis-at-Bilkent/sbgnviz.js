@@ -7,8 +7,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build-sbgnviz-js": "gulp build",
-    "debug-js": "nodemon -e js --watch src -x \"npm run build-sbgnviz-js\"",
-    "preinstall": "npx npm-force-resolutions"
+    "debug-js": "nodemon -e js --watch src -x \"npm run build-sbgnviz-js\""
   },
   "repository": {
     "type": "git",
@@ -43,8 +42,5 @@
     "run-sequence": "^1.2.2",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0"
-  },
-  "resolutions": {
-    "graceful-fs": "4.2.3"
   }
 }
