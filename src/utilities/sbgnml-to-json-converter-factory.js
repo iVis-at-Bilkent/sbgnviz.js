@@ -945,7 +945,8 @@ module.exports = function () {
       'background-position-y': 'backgroundPosY',
       'background-width': 'backgroundWidth',
       'background-height': 'backgroundHeight',
-      'background-image-opacity': 'backgroundImageOpacity'
+      'background-image-opacity': 'backgroundImageOpacity',
+      'background-opacity': 'backgroundOpacity'
     };
 
     var edgePropMap = {
@@ -969,10 +970,10 @@ module.exports = function () {
         'converter': convertHexColor,
         'extra-field': 'color'
       },
-      'background-opacity': {
+     /*  'background-opacity': {
         'converter': convertHexColor,
         'extra-field': 'opacity'
-      },
+      }, */
       'border-color': {
         'converter': convertHexColor,
         'extra-field': 'color'
