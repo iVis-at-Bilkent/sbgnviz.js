@@ -946,7 +946,7 @@ module.exports = function () {
       'background-width': 'backgroundWidth',
       'background-height': 'backgroundHeight',
       'background-image-opacity': 'backgroundImageOpacity',
-      'background-opacity': 'backgroundOpacity'
+      
     };
 
     var edgePropMap = {

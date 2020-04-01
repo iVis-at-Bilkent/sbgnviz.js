@@ -2224,6 +2224,7 @@ module.exports = function () {
       'border-color': '#555555',
       'background-color': '#ffffff',
       'background-opacity': 1,
+      'background-image-opacity': 1,
       'text-wrap': 'wrap'
     };
   };
