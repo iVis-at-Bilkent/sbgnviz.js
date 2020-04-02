@@ -76,7 +76,7 @@ module.exports = function () {
  // Helper functions End
 
  var sbgnmlToJson, jsonToSbgnml, jsonToNwt, uiUtilities, tdToJson,
-     sifToJson, graphUtilities, layoutToText, nwtToJson, jsonToSif;
+     sifToJson, graphUtilities, layoutToText, nwtToJson, jsonToSif,sbgnmlToCd,cdToSbgnml,sbgnmlToSbml,sbmlToSbgnml;
  var updateGraph;
  var options, cy;
 
@@ -94,6 +94,10 @@ module.exports = function () {
    updateGraph = graphUtilities.updateGraph.bind(graphUtilities);
    options = param.optionUtilities.getOptions();
    cy = param.sbgnCyInstance.getCy();
+   sbgnmlToCd = param.sbgnmlToCdConverter;
+   cdToSbgnml = param.cdToSbgnmlConverter;
+   sbgnmlToSbml = param.sbgnmlToSbmlConverter;
+   sbmlToSbgnml = param.sbmlToSbgnmlConverter;
  }
 
  fileUtilities.loadXMLDoc = loadXMLDoc;
@@ -133,11 +137,9 @@ module.exports = function () {
    saveAs(new Blob([svgContent], {type:"image/svg+xml;charset=utf-8"}), filename || "network.svg");
  };
 
- fileUtilities.loadSample = function(filename, folderpath) {
+ fileUtilities.loadSample = function(filename, folderpath, callback) {
+   var file = (folderpath || 'sample-app/samples/') + filename;
 
-  var file = (folderpath || 'sample-app/samples/') + filename;
-
-  
    uiUtilities.startSpinner("load-spinner");
    // Users may want to do customized things while a sample is being loaded
    // Trigger an event for this purpose and specify the 'filename' as an event parameter
@@ -162,13 +164,12 @@ module.exports = function () {
       var xmlObject = textToXmlObject(text);
       setTimeout(function () {
         updateGraph(nwtToJson.convert(xmlObject));
-  
         fileUtilities.collapseMarkedNodes();
-  
         uiUtilities.endSpinner("load-spinner");
         $(document).trigger( "sbgnvizLoadSampleEnd", [ filename, cy ] ); // Trigger an event signaling that a sample is loaded
-        }, 0);
-  
+        if (typeof callback !== 'undefined') {
+         callback(); }
+      },0);
  };
 
  fileUtilities.loadSIFFile = function(file, layoutBy, callback) {
@@ -190,6 +191,9 @@ module.exports = function () {
          }
        }
      }
+
+     cy.fit( cy.elements(":visible"), 20 );
+
    };
 
    fileUtilities.loadFile( file, convert, undefined, callback, undefined, runLayout );
@@ -250,6 +254,11 @@ module.exports = function () {
      var text = this.result;
     var matchResult = text.match("<renderInformation[^]*</renderInformation>");
     if(matchResult != null){
+    var imagesElementMatch = text.match("<listOfBackgroundImages[^]*</listOfBackgroundImages>");
+    var imagesElement;
+    if(imagesElementMatch != null){
+      imagesElement = imagesElementMatch[0];
+    }
     var renderInfoString = matchResult[0];
     var renderInfoStringCopy = (' ' + renderInfoString).slice(1);
       const regex = /\s([\S]+)([\s]*)=/g;
@@ -262,6 +271,10 @@ module.exports = function () {
         renderInfoString = renderInfoString.replace(match , textUtilities.FromKebabToCamelCase(match));
       });      
       text = text.replace(renderInfoStringCopy, renderInfoString);
+      var imagesElementMatchDirty = text.match("<listOfBackgroundImages[^]*</listOfBackgroundImages>");
+      if(imagesElementMatchDirty != null){
+        text = text.replace(imagesElementMatchDirty[0],imagesElement);
+      }
     }
 
      setTimeout(function () {
@@ -326,6 +339,89 @@ module.exports = function () {
    });
    saveAs(blob, filename);
  };
+
+ fileUtilities.saveAsCellDesigner = function(filename, errorCallback){
+  uiUtilities.startSpinner("load-spinner");
+  var sbgnml = jsonToSbgnml.createSbgnml(); 
+  this.convertSbgnmlToCD(sbgnml, function(data){
+    if(data == null){
+      errorCallback();
+    }else{
+      var blob = new Blob([data], {
+        type: "text/plain;charset=utf-8;",
+      });
+      saveAs(blob, filename); 
+    }
+    uiUtilities.endSpinner("load-spinner");
+    
+  });
+  
+
+ }
+
+ fileUtilities.loadCellDesigner = function(file, successCallback, errorCallback){
+  var reader = new FileReader();
+
+  reader.onload = function (e) { 
+  
+    this.convertCDToSbgnml(e.target.result, function(data){
+      uiUtilities.endSpinner("load-spinner");
+      if(data == null){
+        errorCallback();
+      }else{
+        successCallback(data);
+      }
+    });
+  }.bind(this);
+  uiUtilities.startSpinner("load-spinner");
+  reader.readAsText(file);
+ }
+
+ fileUtilities.saveAsSbml = function(filename,errorCallback){
+  uiUtilities.startSpinner("load-spinner");
+  var sbgnml = this.convertSbgn();
+  
+  this.convertSbgnmlToSbml(sbgnml, function(data){
+    
+    if(!data.result){
+      errorCallback(sbgnml,data.error);
+    }else if( data.message.indexOf("Internal server error") !== -1)
+    {
+      errorCallback(sbgnml,data.message);
+    }else{    
+      var blob = new Blob([data.message], {
+        type: "text/plain;charset=utf-8;",
+      });
+      saveAs(blob, filename); 
+      
+    }
+
+    uiUtilities.endSpinner("load-spinner");
+    
+  });
+
+ }
+
+ fileUtilities.loadSbml = function(file, successCallback, errorCallback){
+  var reader = new FileReader();
+
+  reader.onload = function (e) { 
+    
+    this.convertSbmlToSbgnml(e.target.result, function(data){
+      uiUtilities.endSpinner("load-spinner");
+      if(data == null){
+        errorCallback();
+      }else{
+        successCallback(data);
+      }
+    });
+  }.bind(this);
+  uiUtilities.startSpinner("load-spinner");
+  reader.readAsText(file);
+
+ }
+
+
  fileUtilities.convertSbgn= function(filename, version, renderInfo, mapProperties, nodes, edges) {
   var sbgnmlText = jsonToSbgnml.createSbgnml(filename, "plain", renderInfo, mapProperties, nodes, edges);
  
@@ -358,7 +454,7 @@ module.exports = function () {
         return sifToJson.convert(sifText);
  };
  
-  fileUtilities.createJsonFromSBGN = function(){
+fileUtilities.createJsonFromSBGN = function(){
 
 
     var sbgnmlText = jsonToSbgnml.createSbgnml();
@@ -371,5 +467,24 @@ fileUtilities.createJsonFromSif = function(){
     return sifToJson.convert(sifText);
     
 };
+
+fileUtilities.convertSbgnmlToCD = function(sbgnml, callback){
+   
+  return sbgnmlToCd.convert(sbgnml,callback);
+};
+
+fileUtilities.convertSbgnmlToSbml = function(sbgnml, callback){
+   
+  return sbgnmlToSbml.convert(sbgnml,callback);
+};
+
+fileUtilities.convertSbmlToSbgnml = function(sbml, callback){
+  return sbmlToSbgnml.convert(sbml,callback);
+}
+fileUtilities.convertCDToSbgnml = function(xml,callback){
+  return cdToSbgnml.convert(xml,callback);
+}
+
+
  return fileUtilities;
 };

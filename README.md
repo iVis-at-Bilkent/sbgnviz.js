@@ -2,6 +2,7 @@
 
 SBGNViz is a web based library developed to visualize pathway models represented by process description (PD) and activity flow (AF) languages of [SBGN](http://sbgn.org) or in [simple interaction format (SIF)](https://www.pathwaycommons.org/pc/sif_interaction_rules.do).
 It accepts the pathway models represented in [SBGN-ML](https://github.com/sbgn/sbgn/wiki/LibSBGN) format as well as import facilities from various formats from SIF to SBML to CellDesigner.
+The library also supports overlay of experiment data on maps.
 
 ## Software
 
@@ -234,6 +235,31 @@ Loads the given nwt file. Optionally apply a callback function upon loading. Cal
 `instance.getMapProperties()`
 Get map properties from SBGNML file. Needs to be called after file is loaded - sbgnvizLoadFileEnd event. Return: map properties as object
 
+`instance.loadCellDesigner(file, successCallback, errorCallback)`
+Loads the given celldesigner file. successCallback is the callback function applied upon success and accepts file data as sbgnml text.
+
+`instance.loadSbml(file, successCallback, errorCallback)`
+Loads the given sbml file. successCallback is the callback function applied upon success and accepts file data as sbgnml text.
+
+
+`instance.saveAsCellDesigner = function(filename, errorCallback)`
+ Exports the current graph to an CellDesigner file with the given filename.
+
+`instance.saveAsSbml = function(filename, errorCallback)`
+ Exports the current graph to an SBML file with the given filename.
+
+`instance.convertSbgnmlToCD = function(sbgnml, callback)`
+Converts the given sbgnml text to a cell designer format.
+
+`instance.convertSbgnmlToSbml = function(sbgnml, callback)`
+Converts the given sbgnml text to sbml format.
+
+`instance.convertSbmlToSbgnml = function(sbml, callback)`
+Converts the given sbml text to sbgnml format.
+
+`instance.convertCDToSbgnml = function(xml,callback)`
+Converts the given celldesginer text to sbgnml format.
+
 `instance.exportLayoutData(filename, byName)`
 
 
@@ -420,17 +446,62 @@ an extension library of sbgnviz.
  * `restoreEles(eles)` Undo function for 'deleteElesSimple' and 'deleteNodesSmart' undo redo commands.
  * `setPortsOrdering(param)` Do/Undo/Redo function for 'setPortsOrdering' undo redo command.
 
+### Experimental Data Overlay
+
+`instance.getVisibleData()`
+Returns the visible experimental data.
+
+`instance.getParsedDataMap()`
+Returns the experimental data in a parsed format.
+
+`instance.getGroupedDataMap()`
+Returns the experimental data in raw format.
+
+`instance.getExperimentalData()`
+Returns all the related experimental data variables (parsed, raw, visibile, by experiement etc).
+
+`instance.parseData (data, fileName, errorCallback)`
+Parses the given data with a given file name and stores it in experimental data variables, errorCallback is the call back function if parsing fails.
+
+`instance.showData()`
+Shows the presentation of the loaded experimental data on the elements of cytoscape instance.
+
+`instance.generateSVGForNode(ele,tooltip)`
+Creates an SVG image presenting the experimental data corrosponding to the given element, and calcuates the tooltip for the element.
+
+`instance.hideAll()`
+Hides all experimental data.
+
+`instance.unhideAll()`
+Unhides all experimental data.
+
+`instance.removeAll()`
+Removes all experimental data.
+
+`instance.removeExp(filename, expName)`
+Removes the given experiment in the given file.
+
+`instance.removeFile(filename)`
+Removes all the experimental data associated with the given data file.
+
+`instance.hideExp(fileName, expName)`
+Hides the given experiment in the given file.
+
+`instance.hideFile(fileName)`
+Hides all the experimental in the given file.
+
+`instance.unhideExp(fileName, expName)`
+Unhides the given experiment in the given file.
+
+`instance.unhideFile(fileName)`
+unHides all the experimental in the given file.
+
+
 ### TabDelimetedParser
 Accessible through `sbgnviz.tdParser`. Provides the following methods.
 
 `getTabsArray(line)` Converts the give tab delimeted line into array of data and returns it.
 `getLinesArray(content)` Converts the content into an array of tab delimeted lines and returns it.
-
-### Classes
-
-The following describes objects used by sbgnviz.js and accessible through `sbgnviz.classes`.
-
-
 
 ## Events
 `$(document).on('sbgnvizLoadSampleStart', function(event, filename, cy) { ... });` Triggered when a sample is being loaded. Aliases `sbgnvizLoadSample`.
@@ -449,7 +520,7 @@ The following describes objects used by sbgnviz.js and accessible through `sbgnv
 
  * cytoscape 
  * jQuery
- * filesaverjs
+ * file-saver
  * tippy.js
  * libsbgn.js
  * pretty-data
@@ -467,7 +538,7 @@ The following extensions are used by this library if they are registered.
  for exact versions of dependencies refer to [package.json](https://github.com/iVis-at-Bilkent/sbgnviz.js/blob/master/package.json)
 
 ## Usage instructions
-Download the library:
+Download the library (we recommend the use of LTS version 10.x.x of node.js):
  * via npm: `npm install sbgnviz` or
  * via direct download in the repository (probably from a tag).
 
@@ -478,7 +549,7 @@ CommonJS:
 var sbgnviz = require('sbgnviz');
 var cytoscape = require('cytoscape-for-sbgnviz');
 var jQuery = require('jQuery');
-var filesaverjs = require('filesaverjs');
+var filesaver = require('file-saver');
 var tippy = require('tippy.js');
 
 var options = {
@@ -487,7 +558,7 @@ var options = {
 var libs = {
     cytoscape: cytoscape,
     jQuery: jQuery,
-    filesaverjs: filesaverjs,
+    filesaver: filesaver,
     tippy = tippy;
 };
 
@@ -509,4 +580,4 @@ This project is set up to automatically be published to npm.  To publish:
 
 ## Credits
 
-SBGNViz.js has been mainly developed by [i-Vis at Bilkent University](http://www.cs.bilkent.edu.tr/~ivis).
+SBGNViz.js has been developed by [i-Vis at Bilkent University](http://www.cs.bilkent.edu.tr/~ivis).

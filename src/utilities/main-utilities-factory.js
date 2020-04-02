@@ -29,8 +29,7 @@ module.exports = function () {
     options = optionUtilities.getOptions();
   }
 
-  // Helpers start
-  function beforePerformLayout() {
+  mainUtilities.beforePerformLayout = function() {
     var parents = cy.nodes(':parent');
     var edges = cy.edges();
 
@@ -59,7 +58,6 @@ module.exports = function () {
     if(parents.length > 0)
       cy.style().update();
   };
-  // Helpers end
 
   // Expand given nodes. Requires expandCollapse extension and considers undoable option.
   mainUtilities.expandNodes = function(nodes) {
@@ -397,23 +395,31 @@ module.exports = function () {
     }
   };
 
+  function isNeed2Highligth(eles2highligth) {
+    if (eles2highligth.length === 0) {
+      return false;
+    }
+    var viewUtilities = cy.viewUtilities('get');
+    var highlightClass = viewUtilities.getAllHighlightClasses()[0];
+    var highlightedEles = cy.elements('.' + highlightClass).filter(':visible');
+    if (highlightedEles.contains(eles2highligth)) {
+      return false;
+    }
+    return true;
+  }
+
   // Highlights selected elements. Requires viewUtilities extension and considers 'undoable' option.
-  mainUtilities.highlightSelected = function(_eles) {
+  mainUtilities.highlightSelected = function (_eles) {
 
     var elesToHighlight = _eles;
-    if (elesToHighlight.length === 0) {
-      return;
-    }
-    var highlightedEles = cy.elements(".highlighted").filter(":visible");
-    if (highlightedEles.contains(elesToHighlight)) {
+    if (!isNeed2Highligth(elesToHighlight)) {
       return;
     }
 
     // If this function is being called we can assume that view utilities extension is on use
     var viewUtilities = cy.viewUtilities('get');
-
     if (options.undoable) {
-      cy.undoRedo().do("highlight", elesToHighlight);
+      cy.undoRedo().do('highlight', { eles: elesToHighlight, idx: 0 });
     }
     else {
       viewUtilities.highlight(elesToHighlight);
@@ -429,16 +435,12 @@ module.exports = function () {
 
     var nodes = _nodes.nodes(); // Ensure that nodes list just include nodes
     var elesToHighlight = elementUtilities.getNeighboursOfNodes(nodes);
-    if (elesToHighlight.length === 0) {
-      return;
-    }
-    var highlightedEles = cy.elements(".highlighted").filter(":visible");
-    if (highlightedEles.contains(elesToHighlight) && !cy.elements(":unselected").empty()) {
+    if (!isNeed2Highligth(elesToHighlight)) {
       return;
     }
 
     if (options.undoable) {
-      cy.undoRedo().do("highlight", elesToHighlight);
+      cy.undoRedo().do('highlight', { eles: elesToHighlight, idx: 0 });
     }
     else {
       viewUtilities.highlight(elesToHighlight);
@@ -475,7 +477,7 @@ module.exports = function () {
     // nodesToHighlight = elementUtilities.extendNodeList(nodesToHighlight);
 
     if (options.undoable) {
-      cy.undoRedo().do("highlight", nodesToHighlight);
+      cy.undoRedo().do('highlight', { eles: nodesToHighlight, idx: 0 });
     }
     else {
       viewUtilities.highlight(nodesToHighlight);
@@ -488,11 +490,7 @@ module.exports = function () {
   mainUtilities.highlightProcesses = function(_nodes) {
     var nodes = _nodes.nodes(); // Ensure that nodes list just include nodes
     var elesToHighlight = elementUtilities.extendNodeList(nodes);
-    if (elesToHighlight.length === 0) {
-      return;
-    }
-    var highlightedEles = cy.elements(".highlighted").filter(":visible");
-    if (highlightedEles.contains(elesToHighlight)) {
+    if (!isNeed2Highligth(elesToHighlight)) {
       return;
     }
 
@@ -500,7 +498,7 @@ module.exports = function () {
     var viewUtilities = cy.viewUtilities('get');
 
     if (options.undoable) {
-      cy.undoRedo().do("highlight", elesToHighlight);
+      cy.undoRedo().do('highlight', { eles: elesToHighlight, idx: 0 });
     }
     else {
       viewUtilities.highlight(elesToHighlight);
@@ -538,10 +536,11 @@ module.exports = function () {
   // Performs layout by given layoutOptions. Considers 'undoable' option. However, by setting notUndoable parameter
   // to a truthy value you can force an undable layout operation independant of 'undoable' option.
   mainUtilities.performLayout = function(layoutOptions, notUndoable) {
-    // Things to do before performing layout
-    beforePerformLayout();
-
+    
     if (!options.undoable || notUndoable) { // 'notUndoable' flag can be used to have composite actions in undo/redo stack
+      // Things to do before performing layout
+      mainUtilities.beforePerformLayout();
+      
       var layout = cy.elements().filter(':visible').layout(layoutOptions);
 
       // Check this for cytoscape.js backward compatibility
@@ -575,6 +574,7 @@ module.exports = function () {
   mainUtilities.convertNwtToJson = function(data) {
     return nwtToJson.convert(data);
   };
+
 
   // Create the qtip contents of the given node and returns it.
   mainUtilities.getQtipContent = function(node) {
@@ -644,6 +644,15 @@ mainUtilities.getMapProperties = function() {
  };
   mainUtilities.doValidation = function(file) {
     return sbgnmlToJson.doValidation(file);
+  }
+
+  mainUtilities.setCompoundPadding = function(newPaddingValue) {
+    options.compoundPadding = newPaddingValue;
+    optionUtilities.extendOptions(options);    
+  }
+
+  mainUtilities.getCompoundPadding = function() {
+    return options.compoundPadding;
   }
    return mainUtilities;
 };

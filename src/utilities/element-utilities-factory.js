@@ -7,7 +7,7 @@ var textUtilities = require('./text-utilities');
 var truncateText = textUtilities.truncateText;
 var libs = libUtilities.getLibs();
 var jQuery = $ = libs.jQuery;
-
+var classes = require('./classes');
 module.exports = function () {
   var optionUtilities, graphUtilities;
   var options;
@@ -26,7 +26,7 @@ module.exports = function () {
   };
 
   // initialize map type
-  elementUtilities.mapType = undefined;
+  elementUtilities.mapType = 'PD';
   elementUtilities.fileFormat = undefined;
 
   elementUtilities.PD = {}; // namespace for all PD specific stuff
@@ -521,7 +521,7 @@ module.exports = function () {
       return true;
     }
     else if (parentClass.startsWith('complex') && (!node || node.connectedEdges().length == 0  // Complexes can only include EPNs which do not have edges
-            || elementUtilities.mapType == "Unknown")) { // When map type is unknown, allow complexes to include EPNs with edges
+            || elementUtilities.mapType == "HybridAny" ||elementUtilities.mapType == "HybridSbgn")) { // When map type is unknown, allow complexes to include EPNs with edges
       return elementUtilities.isEPNClass(nodeClass);
     }
 
@@ -948,20 +948,15 @@ module.exports = function () {
 
   // general utilities
 
-  elementUtilities.noneIsNotHighlighted = function(){
-      var highlightedNodes = cy.nodes(":visible").nodes(".highlighted");
-      var highlightedEdges = cy.edges(":visible").edges(".highlighted");
-      var highlightedNodes2 = cy.nodes(":visible").nodes(".highlighted2");
-      var highlightedEdges2 = cy.edges(":visible").edges(".highlighted2");
-      var highlightedNodes3 = cy.nodes(":visible").nodes(".highlighted3");
-      var highlightedEdges3 = cy.edges(":visible").edges(".highlighted3");
-      var highlightedNodes4 = cy.nodes(":visible").nodes(".highlighted4");
-      var highlightedEdges4 = cy.edges(":visible").edges(".highlighted4");      
-
-      return highlightedNodes.length + highlightedEdges.length 
-            + highlightedNodes2.length + highlightedEdges2.length 
-            + highlightedNodes3.length + highlightedEdges3.length 
-            + highlightedNodes4.length + highlightedEdges4.length === 0;
+  elementUtilities.noneIsNotHighlighted = function () {
+    var viewUtilities = cy.viewUtilities('get');
+    var highlightClasses = viewUtilities.getAllHighlightClasses();
+    for (var i = 0; i < highlightClasses.length; i++) {
+      if (cy.$('.' + highlightClasses[i]).is(':visible')) {
+        return false;
+      }
+    }
+    return true;
   };
 
   // Section End
@@ -1860,23 +1855,27 @@ module.exports = function () {
       {
           targetingEdges.forEach(function(edge){
               var source = cy.getElementById(edge.data('source'));
-              if (edge.data('class') === 'consumption')
-              {
-                  elementUtilities.addSimpleNodeToArray(ele, source, bestOrientation, inputPort, "input");
-              }
-              else
-              {
-                  elementUtilities.addSimpleNodeToArray(ele, source, bestOrientation, notConnectedToPort, "notConnected");
+              if(!source.isParent()){
+                if (edge.data('class') === 'consumption')
+                {
+                    elementUtilities.addSimpleNodeToArray(ele, source, bestOrientation, inputPort, "input");
+                }
+                else
+                {
+                    elementUtilities.addSimpleNodeToArray(ele, source, bestOrientation, notConnectedToPort, "notConnected");
+                }
               }
           });
           sourcingEdges.forEach(function (edge) {
               var target = cy.getElementById(edge.data('target'));
-              if (edge.data('class') === 'production') {
-                  elementUtilities.addSimpleNodeToArray(ele, target, bestOrientation, outputPort, "output");
-              }
-              else
-              {
-                  elementUtilities.addSimpleNodeToArray(ele, target, bestOrientation, notConnectedToPort, "notConnected");
+              if(!target.isParent()){
+                if (edge.data('class') === 'production') {
+                    elementUtilities.addSimpleNodeToArray(ele, target, bestOrientation, outputPort, "output");
+                }
+                else
+                {
+                    elementUtilities.addSimpleNodeToArray(ele, target, bestOrientation, notConnectedToPort, "notConnected");
+                }
               }
           });
       }
@@ -1884,24 +1883,28 @@ module.exports = function () {
       {
           targetingEdges.forEach(function(edge){
               var source = cy.getElementById(edge.data('source'));
-              if (edge.data('class') === 'logic arc')
-              {
-                  elementUtilities.addSimpleNodeToArray(ele, source, bestOrientation, inputPort, "input");
-              }
-              else
-              {
-                  elementUtilities.addSimpleNodeToArray(ele, source, bestOrientation, notConnectedToPort, "notConnected");
+              if(!source.isParent()){
+                if (edge.data('class') === 'logic arc')
+                {
+                    elementUtilities.addSimpleNodeToArray(ele, source, bestOrientation, inputPort, "input");
+                }
+                else
+                {
+                    elementUtilities.addSimpleNodeToArray(ele, source, bestOrientation, notConnectedToPort, "notConnected");
+                }
               }
           });
           sourcingEdges.forEach(function (edge) {
               var target = cy.getElementById(edge.data('target'));
-              if (edge.data('class') === 'modulation' || edge.data('class') === 'stimulation' || edge.data('class') === 'catalysis' || edge.data('class') === 'inhibition' || edge.data('class') === 'necessary stimulation' || edge.data('class') === 'logic arc')
-              {
-                  elementUtilities.addSimpleNodeToArray(ele, target, bestOrientation, outputPort, "output");
-              }
-              else
-              {
-                  elementUtilities.addSimpleNodeToArray(ele, target, bestOrientation, notConnectedToPort, "notConnected");
+              if(!target.isParent()){
+                if (edge.data('class') === 'modulation' || edge.data('class') === 'stimulation' || edge.data('class') === 'catalysis' || edge.data('class') === 'inhibition' || edge.data('class') === 'necessary stimulation' || edge.data('class') === 'logic arc')
+                {
+                    elementUtilities.addSimpleNodeToArray(ele, target, bestOrientation, outputPort, "output");
+                }
+                else
+                {
+                    elementUtilities.addSimpleNodeToArray(ele, target, bestOrientation, notConnectedToPort, "notConnected");
+                }
               }
           });
       }
@@ -2090,11 +2093,31 @@ module.exports = function () {
     // - option to display complex labels
     // - presence of states and info box on the bottom
     var padding = graphUtilities.getCompoundPaddings();
+    padding = padding < 5 ? 5 : padding;
     if (options.showComplexName && elementUtilities.getElementContent(ele)) {
       padding += options.extraComplexPadding * 0.5;
       // if there is something on the bottom side
+
       if (ele.data('auxunitlayouts') && ele.data('auxunitlayouts').bottom && ele.data('auxunitlayouts').bottom.units.length > 0) {
         padding += options.extraComplexPadding * 0.5;
+      }else{  
+        
+        
+        for(var i=0; i < ele.data('statesandinfos').length; i++) {          
+          var statesandinfos = ele.data('statesandinfos')[i]; 
+          
+          var thisY = statesandinfos.bbox.y;
+          var thisH = statesandinfos.bbox.h;
+          var parentY = (ele.data('class') == "compartment" || ele.data('class') == "complex") ? ele.data('bbox').y : ele.position().y;
+          var height = ele.data("originalH") ? ele.data("originalH") : ele.height();
+          var parentY2 = Number((parentY + height/ 2).toFixed(2));
+          var centerY = Number((thisY+thisH/2).toFixed(2));
+          if(centerY == parentY2){
+            padding += options.extraComplexPadding * 0.5;
+            break;
+          }
+        }
+
       }
     }
     // for the case where the padding is the tightest, we need a bit of extra space
@@ -2198,16 +2221,17 @@ module.exports = function () {
   var getDefaultNodeProperties = function() {
     return {
       'border-width': 1.25,
-      'border-color': '#555',
+      'border-color': '#555555',
       'background-color': '#ffffff',
       'background-opacity': 1,
+      'background-image-opacity': 1,
       'text-wrap': 'wrap'
     };
   };
 
   var getDefaultEdgeProperties = function() {
     return {
-      'line-color': '#555',
+      'line-color': '#555555',
       'width': 1.25
     };
   };
@@ -2353,8 +2377,8 @@ module.exports = function () {
       'font-style': 'normal',
       'font-weight': 'normal',
       'font-color': '#0f0f0f',
-      'border-width': 2.25,
-      'border-color': '#555',
+      'border-width': 1,
+      'border-color': '#555555',
       'background-color': '#ffffff',
       'shape-name': getDefaultInfoboxShapeName( nodeClass, infoboxType ),
       'width': getDefaultInfoboxSize( nodeClass, infoboxType ).w,
@@ -2554,8 +2578,10 @@ module.exports = function () {
         return 'AF';
       case 'sif':
         return 'SIF';
+      case 'hybrid sbgn':
+        return 'HybridSbgn';
       default:
-        return 'Unknown';
+        return 'HybridAny';
     }
   };
 
@@ -2567,8 +2593,10 @@ module.exports = function () {
         return 'activity flow';
       case 'SIF':
         return 'sif';
+      case 'HybridSbgn':
+        return 'hybrid sbgn';
       default:
-        return 'unknown';
+        return 'hybrid any';
     }
   };
 

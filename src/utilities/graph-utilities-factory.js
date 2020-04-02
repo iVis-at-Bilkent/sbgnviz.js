@@ -14,7 +14,7 @@ module.exports = function () {
   function graphUtilities (param) {
     optionUtilities = param.optionUtilities;
     options = optionUtilities.getOptions();
-    cy = param.sbgnCyInstance.getCy();
+    cy = param.sbgnCyInstance.getCy();    
   }
 
   // TODO make these initial values user options instead of hardcoding them here
@@ -23,13 +23,13 @@ module.exports = function () {
 
   graphUtilities.disablePorts = function() {
     graphUtilities.portsEnabled = false;
-    cy.undoRedo().do("changeMenu", {id: "enable-ports", type: "checkbox", property: "currentGeneralProperties.enablePorts", update: self.applyUpdate, value : false});
+    
     cy.style().update();
   };
 
   graphUtilities.enablePorts = function() {
     graphUtilities.portsEnabled = true;
-    cy.undoRedo().do("changeMenu", {id: "enable-ports", type: "checkbox", property: "currentGeneralProperties.enablePorts", update: self.applyUpdate, value : true});
+    
     cy.style().update();
   };
 
@@ -48,11 +48,11 @@ module.exports = function () {
   };
 
   graphUtilities.areCompoundSizesConsidered = function() {
-    return graphUtilities.compoundSizesConsidered = true;
+    return graphUtilities.compoundSizesConsidered == true;
   };
 
   graphUtilities.updateGraph = function(cyGraph, callback, layoutOptions, tileInfoBoxes) {
-    console.log('cy update called');
+   
 
     var isLayoutRequired;
     if(layoutOptions === undefined){
@@ -89,7 +89,7 @@ module.exports = function () {
     });
 
 
-    this.refreshPaddings(); // Recalculates/refreshes the compound paddings
+    //this.refreshPaddings(); // Recalculates/refreshes the compound paddings
     cy.endBatch();
 
     if(isLayoutRequired) {
@@ -107,7 +107,7 @@ module.exports = function () {
         name: 'preset',
         positions: positionMap,
         fit: true,
-        padding: 50
+        padding: 20
       });
     }
 
@@ -116,6 +116,9 @@ module.exports = function () {
       layout.run();
     }
 
+    var performLayout = function(){
+      cy.fit( cy.elements(":visible"), 20 )
+    };
     // Update the style
     cy.style().update();
     // Initilize the bend points once the elements are created
@@ -125,7 +128,7 @@ module.exports = function () {
 
 
 
-    $(document).trigger( "updateGraphEnd", [cy, (isLayoutRequired || tileInfoBoxes)]);
+    $(document).trigger( "updateGraphEnd", [cy, (isLayoutRequired || tileInfoBoxes) , performLayout]);
     if (callback) callback();
   };
 
@@ -159,13 +162,18 @@ module.exports = function () {
   graphUtilities.recalculatePaddings = graphUtilities.refreshPaddings = function() {
     // this.calculatedPaddings is not working here
     // TODO: replace this reference with this.calculatedPaddings once the reason is figured out
-    graphUtilities.calculatedPaddings = this.calculatePaddings();
-    return graphUtilities.calculatedPaddings;
+    //graphUtilities.calculatedPaddings = this.calculatePaddings();
+    var compoundPadding = options.compoundPadding;
+    return ( typeof compoundPadding === 'function') ? compoundPadding.call() : compoundPadding
+    //return graphUtilities.calculatedPaddings;
   };
 
   graphUtilities.getCompoundPaddings = function() {
     // Return calculated paddings in case of that data is invalid return 5
-    return graphUtilities.calculatedPaddings || 5;
+    var compoundPadding = options.compoundPadding;
+    return ( typeof compoundPadding === 'function') ? compoundPadding.call() : compoundPadding
+
+    //return graphUtilities.calculatedPaddings || 5;
   };
 
   return graphUtilities;

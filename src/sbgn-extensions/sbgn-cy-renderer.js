@@ -748,7 +748,68 @@ module.exports = function () {
 
   $$.sbgn.plainCheckPoint = {
     "simple chemical": function( x, y, padding, width, height, centerX, centerY ) {
-      return cyBaseNodeShapes["roundrectangle"].checkPoint( x, y, padding, width, height, centerX, centerY );
+
+      var points = cyMath.generateUnitNgonPointsFitToSquare( 4, 0 );
+      var halfWidth = width / 2;
+      var halfHeight = height / 2;
+    //var cornerRadius = $$.math.getRoundRectangleRadius(width, height);
+      var cornerRadius = Math.min(halfWidth, halfHeight);
+      //var cornerRadius = math.getRoundRectangleRadius( width, height );
+      var diam = cornerRadius * 2;
+
+      // Check hBox
+      if( cyMath.pointInsidePolygon( x, y, points,
+        centerX, centerY, width, height - diam, [0, -1], padding ) ){
+        return true;
+      }
+
+      // Check vBox
+      if( cyMath.pointInsidePolygon( x, y, points,
+        centerX, centerY, width - diam, height, [0, -1], padding ) ){
+        return true;
+      }
+
+      // Check top left quarter circle
+      if( cyMath.checkInEllipse( x, y,
+        diam, diam,
+        centerX - width / 2 + cornerRadius,
+        centerY - height / 2 + cornerRadius,
+        padding ) ){
+
+        return true;
+      }
+
+      // Check top right quarter circle
+      if( cyMath.checkInEllipse( x, y,
+        diam, diam,
+        centerX + width / 2 - cornerRadius,
+        centerY - height / 2 + cornerRadius,
+        padding ) ){
+
+        return true;
+      }
+
+      // Check bottom right quarter circle
+      if( cyMath.checkInEllipse( x, y,
+        diam, diam,
+        centerX + width / 2 - cornerRadius,
+        centerY + height / 2 - cornerRadius,
+        padding ) ){
+
+        return true;
+      }
+
+      // Check bottom left quarter circle
+      if( cyMath.checkInEllipse( x, y,
+        diam, diam,
+        centerX - width / 2 + cornerRadius,
+        centerY + height / 2 - cornerRadius,
+        padding ) ){
+
+        return true;
+      }
+      return false;
+      //return cyBaseNodeShapes["ellipse"].checkPoint( x, y, padding, width, height, centerX, centerY );
     },
     "macromolecule": function( x, y, padding, width, height, centerX, centerY ) {
       return cyBaseNodeShapes["roundrectangle"].checkPoint( x, y, padding, width, height, centerX, centerY );

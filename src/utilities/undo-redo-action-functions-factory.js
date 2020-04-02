@@ -5,10 +5,14 @@
 module.exports = function () {
 
   var elementUtilities;
+  var experimentalDataOverlay;
+  var mainUtilities;
   var cy;
 
   function undoRedoActionFunctions (param) {
     elementUtilities = param.elementUtilities;
+    experimentalDataOverlay = param.experimentalDataOverlay;
+    mainUtilities = param.mainUtilities;
     cy = param.sbgnCyInstance.getCy();
   }
 
@@ -89,6 +93,108 @@ module.exports = function () {
 
     return result;
   };
+
+  undoRedoActionFunctions.hideExp = function(param){
+    var expName = param.expName;
+    var fileName = param.fileName;
+    return experimentalDataOverlay.hideExp(fileName, expName);
+  }
+
+  undoRedoActionFunctions.unhideExp = function(param){
+    var expName = param.expName;
+    var fileName = param.fileName;
+    return experimentalDataOverlay.unhideExp(fileName, expName);
+  }
+
+  undoRedoActionFunctions.hideAll = function(){
+    return experimentalDataOverlay.hideAll();
+  }
+
+  undoRedoActionFunctions.hideAllUndo = function(param){
+    var invisibleFile = param.invisibleFile;
+    var invisibleExp = param.invisibleExp;
+    return experimentalDataOverlay.hideAllUndo(invisibleFile, invisibleExp);
+  }
+
+  undoRedoActionFunctions.unhideAll = function(){
+    return experimentalDataOverlay.unhideAll();
+  }
+
+  undoRedoActionFunctions.unhideAllUndo = function(param){
+    var visibleFile = param.visibleFile;
+    var visibleExp = param.visibleExp;
+    return experimentalDataOverlay.unhideFileUndo(visibleFile, visibleExp);
+  }
+
+  undoRedoActionFunctions.hideFile = function(param){
+    var fileName = param.fileName;
+    return experimentalDataOverlay.hideFile(fileName);
+  }
+
+  undoRedoActionFunctions.hideFileUndo = function(param){
+    var fileName = param.fileName;
+    var invisible = param.invisible;
+    return experimentalDataOverlay.hideFileUndo(fileName, invisible);
+  }
+
+  undoRedoActionFunctions.unhideFile = function(param){
+    var fileName = param.fileName;
+    return experimentalDataOverlay.unhideFile(fileName);
+  }
+
+  undoRedoActionFunctions.unhideFileUndo = function(param){
+    var fileName = param.fileName;
+    var visible = param.visible;
+    return experimentalDataOverlay.unhideFileUndo(fileName, visible);
+  }
+
+  undoRedoActionFunctions.addExp = function(param){
+    var fileName = param.fileName;
+    var expName = param.expName;
+    var isVisible = param.isVisible;
+    var values = param.values;
+    var groupArray = param.groupArray;
+    return experimentalDataOverlay.addExp(fileName, expName, isVisible, values, groupArray);
+  }
+
+  undoRedoActionFunctions.removeExp = function(param){
+    var fileName = param.fileName;
+    var expName = param.expName;
+    return experimentalDataOverlay.removeExp(fileName, expName);
+  }
+
+  undoRedoActionFunctions.addFile = function(param){
+    var fileName = param.fileName;
+    var parsed = param.parsed;
+    var grouped = param.grouped;
+    var visible = param.visible;
+    var visiblef = param.visiblef;
+    return experimentalDataOverlay.addFile(fileName,parsed,visible,grouped, visiblef);
+  }
+
+  undoRedoActionFunctions.removeFile = function(param){
+    var fileName = param.fileName;
+    return experimentalDataOverlay.removeFile(fileName);
+  }
+
+  undoRedoActionFunctions.removeAll = function(param){
+    return experimentalDataOverlay.removeAll();
+  }
+
+  undoRedoActionFunctions.restoreAll = function(param){
+    var parsed = param.parsed;
+    var grouped = param.grouped;
+    var visible = param.visible;
+    var visiblef = param.visiblef;
+    return experimentalDataOverlay.restoreAll(parsed,visible,grouped,visiblef)
+  }
+  
+  undoRedoActionFunctions.setCompoundPadding = function(newPadding) {
+    var result = mainUtilities.getCompoundPadding();   
+    mainUtilities.setCompoundPadding(newPadding);   
+    
+    return result;
+  }; 
 
   return undoRedoActionFunctions;
 };
