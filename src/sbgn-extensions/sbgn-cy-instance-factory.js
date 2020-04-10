@@ -330,7 +330,6 @@ module.exports = function () {
           var allElements = parents.concat(simples);  // all elements
           args.allElements2 = allElements;
           var ports = {};
-
           cy.nodes().forEach(function(node){
             if(elementUtilities.canHavePorts(node)){
               ports[node.id()] = JSON.parse(JSON.stringify(node.data("ports")));
@@ -357,10 +356,12 @@ module.exports = function () {
           res.ports = args.ports2;
           res.viewport = args.viewport2;
           cy.json({flatEles: true, elements: args.allElements});
-          cy.nodes().forEach(function(node){
-            if(elementUtilities.canHavePorts(node)){
-              node.data("ports", args.ports[node.id()]);
-            }
+          cy.batch(function(){
+            cy.nodes().forEach(function(node){
+              if(elementUtilities.canHavePorts(node)){
+                node.data("ports", args.ports[node.id()]);
+              }
+            });
           });
           cy.pan(args.viewport["pan"]);
           cy.zoom(args.viewport["zoom"]);
@@ -375,7 +376,6 @@ module.exports = function () {
           var allElements = parents.concat(simples);  // all elements
           args.allElements2 = allElements;
           var ports = {};
-
           cy.nodes().forEach(function(node){
             if(elementUtilities.canHavePorts(node)){
               ports[node.id()] = JSON.parse(JSON.stringify(node.data("ports")));
@@ -393,10 +393,12 @@ module.exports = function () {
           res.ports = args.ports2;
           res.viewport = args.viewport2;
           cy.json({flatEles: true, elements: args.allElements});
-          cy.nodes().forEach(function(node){
-            if(elementUtilities.canHavePorts(node)){
-              node.data("ports", args.ports[node.id()]);
-            }
+          cy.batch(function(){
+            cy.nodes().forEach(function(node){
+              if(elementUtilities.canHavePorts(node)){
+                node.data("ports", args.ports[node.id()]);
+              }
+            });
           });
           cy.pan(args.viewport["pan"]);
           cy.zoom(args.viewport["zoom"]);          
