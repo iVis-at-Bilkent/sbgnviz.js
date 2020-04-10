@@ -593,7 +593,7 @@ module.exports = function () {
           node.data('background-fit', 'contain');
           node.data('background-image-opacity', '1');
         } else {
-          node.data('background-image', imageURI);
+          node.data('background-image', "");
           node.data('tooltip','');
         }
       });
