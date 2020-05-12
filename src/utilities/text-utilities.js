@@ -3,23 +3,6 @@
  */
 
 var textUtilities = {
-  //TODO: use CSS's "text-overflow:ellipsis" style instead of function below?
-  truncateText: function (textProp, font) {
-    var context = document.createElement('canvas').getContext("2d");
-    context.font = font;
-
-    var text = textProp.label || "";
-    var width;
-    var len = text.length;
-    var ellipsis = "..";
-    var textWidth = (textProp.width > 30) ? textProp.width - 16 : textProp.width;
-    while ((width = context.measureText(text).width) > textWidth) {
-      --len;
-      text = text.substring(0, len) + ellipsis;
-    }
-    return text;
-  },
-
   // same purpose as previous one, but with clearer responsibility
   truncate: function(text, font, width) {
     text = text + "";

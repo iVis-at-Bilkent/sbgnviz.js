@@ -625,9 +625,25 @@ module.exports = function () {
 			      })
 			      .selector("node[class][text-wrap]")
 			      .style({
-			        'text-wrap': function( ele ) {
-								return ele.data('text-wrap');
-							}
+              'text-wrap': function (ele) {
+                var opt = options.fitLabelsToNodes;
+                var isFit = typeof opt === 'function' ? opt() : opt;
+                if (isFit) {
+                  return 'ellipsis';
+                }
+                return ele.data('text-wrap');
+              }
+            })
+            .selector("node")
+			      .style({
+              'text-max-width': function (ele) {
+                var opt = options.fitLabelsToNodes;
+                var isFit = typeof opt === 'function' ? opt() : opt;
+                if (isFit) {
+                  return ele.width();
+                }
+                return '1000px';
+              }
 			      })
 						.selector("edge[class][line-color]")
 			      .style({

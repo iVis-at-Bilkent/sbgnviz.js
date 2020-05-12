@@ -4,7 +4,6 @@
 
 var libUtilities = require('./lib-utilities');
 var textUtilities = require('./text-utilities');
-var truncateText = textUtilities.truncateText;
 var libs = libUtilities.getLibs();
 var jQuery = $ = libs.jQuery;
 var classes = require('./classes');
@@ -1165,13 +1164,8 @@ module.exports = function () {
           label: content,
           width: ( _class == 'perturbing agent' ? textWidth / 2 : textWidth)
       };
-
-      var font = parseInt(ele.css('font-size')) + "px Arial";
-
-      var fitLabelsToNodes = options.fitLabelsToNodes;
-      fitLabelsToNodes = typeof fitLabelsToNodes === 'function' ? fitLabelsToNodes.call() : fitLabelsToNodes;
-
-      return fitLabelsToNodes ? truncateText(textProp, font) : textProp.label;
+      
+      return textProp.label;
   };
 
   elementUtilities.getLabelTextSize = function (ele) {
