@@ -13,7 +13,7 @@ module.exports = {
   fitLabelsToNodes: true,
   fitLabelsToInfoboxes: true,
   recalculateLayoutOnComplexityManagement: true,
-  rearrangeAfterExpandCollapse: true,
+  rearrangeOnComplexityManagement: true,
   animateOnDrawingChanges: true,
   adjustNodeLabelFontSizeAutomatically: true,
   enablePorts: true,
