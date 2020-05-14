@@ -296,6 +296,10 @@ module.exports = function () {
 	    cy.on("expandcollapse.afterexpand", "node", function (event) {
 	      var node = this;
 	      cy.nodes().updateCompoundBounds();
+        
+        if(!options.recalculateOnComplexityManagement){
+          cy.style().update();
+        }
 	      //Don't show children info when the complex node is expanded
 	      if (node._private.data.class.startsWith("complex")) {
 	        node.removeStyle('content');
