@@ -20,8 +20,6 @@ module.exports = {
   allowCompoundNodeResize: true,
   mapColorScheme: true,
   mapColorSchemeStyle: true,
-  defaultInfoboxHeight: true,
-  defaultInfoboxWidth: true,
   mapName: true,
   mapDescription: true,
   enableSIFTopologyGrouping: true,
