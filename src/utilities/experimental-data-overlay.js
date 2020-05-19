@@ -570,33 +570,35 @@ module.exports = function () {
     });
     var expandableNodes = cy.expandCollapse('get').expandableNodes();
     nodeCollection = nodeCollection.union(cy.nodes()).union(collapsedChildrenNotParent).difference(expandableNodes);
-    nodeCollection.forEach(function (node) {
-      const nodeLabel = node.data('label');
-      var imageURI = 'data:image/svg+xml;utf8,';
-      if (nodeLabel in parsedDataMap && !node.isParent()) {
+    cy.batch(function(){
+      nodeCollection.forEach(function (node) {
+        const nodeLabel = node.data('label');
+        var imageURI = 'data:image/svg+xml;utf8,';
+        if (nodeLabel in parsedDataMap && !node.isParent()) {
 
-        var tooltip = {content:''};
-        imageURI = imageURI + encodeURIComponent(self.generateSVGForNode(node,tooltip).outerHTML);
-        
-        if(Object.keys(parsedDataMap[nodeLabel]).length > 0){
-         // var tooltip = "(" + Object.values(parsedDataMap[nodeLabel]).join(",") + ")";
-          node.data("tooltip",tooltip.content);
-        }else{
+          var tooltip = {content:''};
+          imageURI = imageURI + encodeURIComponent(self.generateSVGForNode(node,tooltip).outerHTML);
+
+          if(Object.keys(parsedDataMap[nodeLabel]).length > 0){
+           // var tooltip = "(" + Object.values(parsedDataMap[nodeLabel]).join(",") + ")";
+            node.data("tooltip",tooltip.content);
+          }else{
+            node.data('tooltip','');
+          }
+          node.data('background-image', imageURI),
+                  node.data('background-position-x', '100%');
+          node.data('background-position-y', '100%');
+          node.data('background-width', '100%');
+          node.data('background-height', '100%');
+          node.data('background-fit', 'contain');
+          node.data('background-image-opacity', '1');
+        } else {
+          node.data('background-image', "");
           node.data('tooltip','');
         }
-        node.data('background-image', imageURI),
-                node.data('background-position-x', '100%');
-        node.data('background-position-y', '100%');
-        node.data('background-width', '100%');
-        node.data('background-height', '100%');
-        node.data('background-fit', 'contain');
-        node.data('background-image-opacity', '1');
-      } else {
-        node.data('background-image', imageURI);
-        node.data('tooltip','');
-      }
-    });
-
+      });
+    });      
+      
   };
 
   experimentalDataOverlay.hexToRgb = function (hex) {

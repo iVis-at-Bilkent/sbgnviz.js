@@ -296,6 +296,10 @@ module.exports = function () {
 	    cy.on("expandcollapse.afterexpand", "node", function (event) {
 	      var node = this;
 	      cy.nodes().updateCompoundBounds();
+        
+        if(!options.recalculateOnComplexityManagement){
+          cy.style().update();
+        }
 	      //Don't show children info when the complex node is expanded
 	      if (node._private.data.class.startsWith("complex")) {
 	        node.removeStyle('content');
@@ -330,7 +334,6 @@ module.exports = function () {
           var allElements = parents.concat(simples);  // all elements
           args.allElements2 = allElements;
           var ports = {};
-
           cy.nodes().forEach(function(node){
             if(elementUtilities.canHavePorts(node)){
               ports[node.id()] = JSON.parse(JSON.stringify(node.data("ports")));
@@ -357,10 +360,12 @@ module.exports = function () {
           res.ports = args.ports2;
           res.viewport = args.viewport2;
           cy.json({flatEles: true, elements: args.allElements});
-          cy.nodes().forEach(function(node){
-            if(elementUtilities.canHavePorts(node)){
-              node.data("ports", args.ports[node.id()]);
-            }
+          cy.batch(function(){
+            cy.nodes().forEach(function(node){
+              if(elementUtilities.canHavePorts(node)){
+                node.data("ports", args.ports[node.id()]);
+              }
+            });
           });
           cy.pan(args.viewport["pan"]);
           cy.zoom(args.viewport["zoom"]);
@@ -375,7 +380,6 @@ module.exports = function () {
           var allElements = parents.concat(simples);  // all elements
           args.allElements2 = allElements;
           var ports = {};
-
           cy.nodes().forEach(function(node){
             if(elementUtilities.canHavePorts(node)){
               ports[node.id()] = JSON.parse(JSON.stringify(node.data("ports")));
@@ -393,10 +397,12 @@ module.exports = function () {
           res.ports = args.ports2;
           res.viewport = args.viewport2;
           cy.json({flatEles: true, elements: args.allElements});
-          cy.nodes().forEach(function(node){
-            if(elementUtilities.canHavePorts(node)){
-              node.data("ports", args.ports[node.id()]);
-            }
+          cy.batch(function(){
+            cy.nodes().forEach(function(node){
+              if(elementUtilities.canHavePorts(node)){
+                node.data("ports", args.ports[node.id()]);
+              }
+            });
           });
           cy.pan(args.viewport["pan"]);
           cy.zoom(args.viewport["zoom"]);          
@@ -623,9 +629,25 @@ module.exports = function () {
 			      })
 			      .selector("node[class][text-wrap]")
 			      .style({
-			        'text-wrap': function( ele ) {
-								return ele.data('text-wrap');
-							}
+              'text-wrap': function (ele) {
+                var opt = options.fitLabelsToNodes;
+                var isFit = typeof opt === 'function' ? opt() : opt;
+                if (isFit) {
+                  return 'ellipsis';
+                }
+                return ele.data('text-wrap');
+              }
+            })
+            .selector("node")
+			      .style({
+              'text-max-width': function (ele) {
+                var opt = options.fitLabelsToNodes;
+                var isFit = typeof opt === 'function' ? opt() : opt;
+                if (isFit) {
+                  return ele.width();
+                }
+                return '1000px';
+              }
 			      })
 						.selector("edge[class][line-color]")
 			      .style({
