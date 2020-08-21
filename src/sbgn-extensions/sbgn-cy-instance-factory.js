@@ -795,7 +795,7 @@ module.exports = function () {
 	            'target-arrow-color': '#000',
 				'text-outline-color': '#000',
 				'border-width': function(ele){
-					return Math.max(ele.data("border-width") + 2, 3);
+					return Math.max(parseFloat(ele.data('border-width')) + 2, 3);
 				  }
 	          })
 	          .selector("node:active")
@@ -836,7 +836,7 @@ module.exports = function () {
 	            'source-arrow-color': selectionColor,
 				'target-arrow-color': selectionColor,
 				'width': function(ele){
-					return Math.max(ele.data("width") + 2, 3);
+					return Math.max(parseFloat(ele.data('width')) + 2, 3);
 				  }
 	          })
 	          .selector("edge:active")
