@@ -1412,16 +1412,16 @@ AuxUnitLayout.resizeParent = function (mainObj, cy, length) {
   var parentNode = AuxUnitLayout.getParentNode(mainObj, cy);
   if(AuxUnitLayout.isTorB(mainObj)) {
     if(parentNode.data('bbox').w < length) {
-      cy.trigger("noderesize.resizestart", ["centerright", parentNode]);
+      cy.trigger("nodeediting.resizestart", ["centerright", parentNode]);
       parentNode.data('bbox').w = length;
-      cy.trigger("noderesize.resizeend", ["centerright", parentNode]);
+      cy.trigger("nodeediting.resizeend", ["centerright", parentNode]);
     }
   }
   else {
     if(parentNode.data('bbox').h < length) {
-      cy.trigger("noderesize.resizestart", ["bottomcenter", parentNode]);
+      cy.trigger("nodeediting.resizestart", ["bottomcenter", parentNode]);
       parentNode.data('bbox').h = length;
-      cy.trigger("noderesize.resizeend", ["bottomcenter", parentNode]);
+      cy.trigger("nodeediting.resizeend", ["bottomcenter", parentNode]);
     }
   }
 };
