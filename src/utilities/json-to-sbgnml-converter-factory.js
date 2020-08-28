@@ -477,15 +477,15 @@ module.exports = function () {
 
     arc.setStart(new libsbgnjs.StartType({x: edge._private.rscratch.startX, y: edge._private.rscratch.startY}));
 
-    // Export bend points if edgeBendEditingExtension is registered
+    // Export anchor points if edgeEditingExtension is registered
     if (cy.edgeEditing && cy.edgeEditing('initialized')) {
-     var segpts = cy.edgeEditing('get').getSegmentPoints(edge);
+     var segpts = cy.edgeEditing('get').getAnchorsAsArray(edge);
      if(typeof segpts !== 'undefined'){
        if(segpts.length > 0){
         for(var i = 0; segpts && i < segpts.length; i = i + 2){
-          var bendX = segpts[i];
-          var bendY = segpts[i + 1];
-          arc.addNext(new libsbgnjs.NextType({x: bendX, y: bendY}));
+          var anchorX = segpts[i];
+          var anchorY = segpts[i + 1];
+          arc.addNext(new libsbgnjs.NextType({x: anchorX, y: anchorY}));
         }
        }
 

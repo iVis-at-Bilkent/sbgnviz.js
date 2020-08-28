@@ -121,9 +121,9 @@ module.exports = function () {
     };
     // Update the style
     cy.style().update();
-    // Initilize the bend points once the elements are created
+    // Initilize the anchor points once the elements are created
     if (cy.edgeEditing && cy.edgeEditing('initialized')) {
-      cy.edgeEditing('get').initBendPoints(cy.edges());
+      cy.edgeEditing('get').initAnchorPoints(cy.edges());
     }
 
 

@@ -90,8 +90,11 @@ edge.data('portsource');
 // The following is set if the edge is connected to its target node by a specific port of that node.
 edge.data('porttarget');
 // Bend point positions of an edge. Includes x and y coordinates. This data is to be passed to
-// edgeBendEditing extension.
+// edgeEditing extension.
 edge.data('bendPointPositions');
+// Control point positions of an edge. Includes x and y coordinates. This data is to be passed to
+// edgeEditing extension.
+edge.data('controlPointPositions');
 ```
 
 ## API
@@ -532,7 +535,7 @@ for exact versions of dependencies refer to [package.json](https://github.com/iV
 The following extensions are used by this library if they are registered.
  * cytoscape-undo-redo
  * cytoscape-expand-collapse
- * cytoscape-edge-bend-editing
+ * cytoscape-edge-editing
  * cytoscape-view-utilities
 
  for exact versions of dependencies refer to [package.json](https://github.com/iVis-at-Bilkent/sbgnviz.js/blob/master/package.json)
