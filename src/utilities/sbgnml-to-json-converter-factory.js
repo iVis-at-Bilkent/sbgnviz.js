@@ -765,8 +765,8 @@ module.exports = function () {
     return {'source': sourceNodeId, 'target': targetNodeId};
   };
 
-  sbgnmlToJson.getArcBendPointPositions = function (ele) {
-    var bendPointPositions = [];
+  sbgnmlToJson.getArcAnchorPointPositions = function (ele) {
+    var anchorPointPositions = [];
 
     var children = ele.nexts;
 
@@ -774,13 +774,13 @@ module.exports = function () {
       var posX = children[i].x;
       var posY = children[i].y;
 
-      bendPointPositions.push({
+      anchorPointPositions.push({
         x: posX,
         y: posY
       });
     }
 
-    return bendPointPositions;
+    return anchorPointPositions;
   };
 
   sbgnmlToJson.addCytoscapeJsEdge = function (ele, jsonArray, xmlObject) {
@@ -797,16 +797,27 @@ module.exports = function () {
 
     var edgeObj = {};
     var styleObj = {};
-    var bendPointPositions = [];
+    var anchorPointPositions = [];
     if (sourceAndTarget.source !== sourceAndTarget.target) {
-      bendPointPositions = self.getArcBendPointPositions(ele);
+      anchorPointPositions = self.getArcAnchorPointPositions(ele);
     }
 
     edgeObj.id = ele.id || undefined;
     edgeObj.class = ele.class_;
-    edgeObj.bendPointPositions = bendPointPositions;
 
-
+    var curveStyle = "bezier";
+    if (ele.extension && ele.extension.has("curveStyle")) {
+      parseString(ele.extension.get("curveStyle"), function (err, result) {
+        curveStyle = result.curveStyle;
+        styleObj['curve-style'] = curveStyle;
+      })
+    }
+    if (curveStyle == "unbundled-bezier") {
+      edgeObj.controlPointPositions = anchorPointPositions;
+    }
+    else {
+      edgeObj.bendPointPositions = anchorPointPositions;
+    }
 
     // add language info, this will always be the mapType if not hybrid
     var PdEdges = ["consumption","production","modulation","stimulation","catalysis","inhibition","necessary stimulation","logic arc","equivalence arc"];
@@ -829,10 +840,6 @@ module.exports = function () {
         edgeObj.language = 'SIF';
       }
     }
-
-
-    
-    
 
     elementUtilities.extendEdgeDataWithClassDefaults( edgeObj, edgeObj.class );
 

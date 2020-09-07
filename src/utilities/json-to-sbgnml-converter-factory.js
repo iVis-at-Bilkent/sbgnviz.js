@@ -517,6 +517,12 @@ module.exports = function () {
        extension.add("<sbgnviz><hidden/></sbgnviz>");
     }
 
+    // add info about edge type
+    if (edge.css('curve-style')) {
+      var extension = self.getOrCreateExtension(arc);
+      extension.add("<curveStyle>" + edge.css('curve-style') + "</curveStyle>");
+    }
+
     return arc;
   };
 
