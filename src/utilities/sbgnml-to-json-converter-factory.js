@@ -805,11 +805,12 @@ module.exports = function () {
     edgeObj.id = ele.id || undefined;
     edgeObj.class = ele.class_;
 
+    // bezier edge is the default edge style
+    // change if the file being loaded has curveStyle field
     var curveStyle = "bezier";
     if (ele.extension && ele.extension.has("curveStyle")) {
       parseString(ele.extension.get("curveStyle"), function (err, result) {
         curveStyle = result.curveStyle;
-        styleObj['curve-style'] = curveStyle;
       })
     }
     if (curveStyle == "unbundled-bezier") {
