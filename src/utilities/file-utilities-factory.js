@@ -123,7 +123,7 @@ module.exports = function () {
  fileUtilities.saveAsJpg = function(filename, scale=3, bg, maxWidth, maxHeight, quality) {
    var jpgContent = cy.jpg({
     scale: scale, full: true, bg: bg, 
-    maxWidth: maxWidth, maxHeight, maxHeight, 
+    maxWidth: maxWidth, maxHeight: maxHeight, 
     quality: quality
   });
 
