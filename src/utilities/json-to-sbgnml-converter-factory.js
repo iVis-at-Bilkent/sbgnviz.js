@@ -146,7 +146,7 @@ module.exports = function () {
        var arc = self.getArcSbgnml(ele);
        if (version === "plain" || version ==="plain3")
          arc.extension = null;
-       map.addArc(self.getArcSbgnml(ele));
+       map.addArc(arc);
     });
 
     sbgn.addMap(map);
