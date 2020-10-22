@@ -129,11 +129,11 @@ module.exports = function () {
          ele = i;
        }
        if(jsonToSbgnml.childOfNone(ele, self.nodes))
-           glyphList = glyphList.concat(self.getGlyphSbgnml(ele)); // returns potentially more than 1 glyph
+           glyphList = glyphList.concat(self.getGlyphSbgnml(ele, version)); // returns potentially more than 1 glyph
     });
     // add them to the map
     for(var i=0; i<glyphList.length; i++) {
-       if (version === "plain" || version ==="plain3")
+       if (version === "plain")
          glyphList[i].extension = null;
        map.addGlyph(glyphList[i]);
     }
@@ -143,10 +143,10 @@ module.exports = function () {
        if(typeof ele === "number") {
          ele = i;
        }
-       var arc = self.getArcSbgnml(ele);
-       if (version === "plain" || version ==="plain3")
+       var arc = self.getArcSbgnml(ele, version);
+       if (version === "plain")
          arc.extension = null;
-       map.addArc(self.getArcSbgnml(ele));
+       map.addArc(arc);
     });
 
     sbgn.addMap(map);
@@ -300,7 +300,7 @@ module.exports = function () {
       return annotExt;
   };
 
-  jsonToSbgnml.getGlyphSbgnml = function(node){
+  jsonToSbgnml.getGlyphSbgnml = function(node, version){
     var self = this;
     var nodeClass = node._private.data.class;
     var glyphList = [];
@@ -374,10 +374,10 @@ module.exports = function () {
        }
     }
     // check for annotations
-    if (node.data('annotations') && !$.isEmptyObject(node.data('annotations'))) {
-       var extension = self.getOrCreateExtension(glyph);
-       var annotExt = self.getAnnotationExtension(node);
-       extension.add(annotExt);
+    if (version !== "plain" && node.data('annotations') && !$.isEmptyObject(node.data('annotations'))) {
+      var extension = self.getOrCreateExtension(glyph);
+      var annotExt = self.getAnnotationExtension(node);
+      extension.add(annotExt);
     }
     // add glyph members that are not state variables or unit of info: subunits
     if(nodeClass === "complex" || nodeClass === "complex multimer" || nodeClass === "submap"){
@@ -393,7 +393,7 @@ module.exports = function () {
            if(typeof ele === "number") {
              ele = i;
            }
-           var glyphMemberList = self.getGlyphSbgnml(ele);
+           var glyphMemberList = self.getGlyphSbgnml(ele, version);
            for (var i=0; i < glyphMemberList.length; i++) {
                glyph.addGlyphMember(glyphMemberList[i]);
            }
@@ -440,7 +440,7 @@ module.exports = function () {
            if(typeof ele === "number") {
              ele = i;
            }
-           glyphList = glyphList.concat(self.getGlyphSbgnml(ele));
+           glyphList = glyphList.concat(self.getGlyphSbgnml(ele, version));
        });
     }
 
@@ -460,7 +460,7 @@ module.exports = function () {
       return extension;
   };
 
-  jsonToSbgnml.getArcSbgnml = function(edge){
+  jsonToSbgnml.getArcSbgnml = function(edge, version){
     var self = this;
     //Temporary hack to resolve "undefined" arc source and targets
     var arcTarget = edge._private.data.porttarget;
@@ -518,7 +518,8 @@ module.exports = function () {
     }
 
     // add info about edge type
-    if (edge.css('curve-style')) {
+    // since curve style is not standard we shouldn't have it for either version
+    if (edge.css('curve-style') && version !== "plain" && version !== "plain3") {
       var extension = self.getOrCreateExtension(arc);
       extension.add("<curveStyle>" + edge.css('curve-style') + "</curveStyle>");
     }
