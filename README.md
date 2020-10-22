@@ -193,17 +193,18 @@ As this percentadge takes the given paddingPercent or compoundPadding option.
 `instance.recalculatePaddings()`
 Recalculates/refreshes the compound paddings. Aliases `instance.refreshPaddings()`.
 
-`instance.saveAsPng(filename)`
+`instance.saveAsPng(filename, scale, bg, maxWidth, maxHeight)`
 Exports the current graph to a png file. The name of the file is determined by the filename parameter which is
-'network.png' by default.
+'network.png' by default. If maxWidth/maxHeight parameter is defined, then scale is ignored. bg is background color. 
 
-`instance.saveAsJpg(filename)`
+`instance.saveAsJpg(filename, scale, bg, maxWidth, maxHeight, quality)`
 Exports the current graph to a jpg file. The name of the file is determined by the filename parameter which is
-'network.jpg' by default.
+'network.jpg' by default. If maxWidth/maxHeight parameter is defined, then scale is ignored. bg is background color. 
+quality specifies the quality of the image from 0 to 1.
 
-`instance.saveAsSVG(filename)`
+`instance.saveAsSVG(filename, scale, bg, maxWidth, maxHeight)`
 Exports the current graph to a svg file. The name of the file is determined by the filename parameter which is
-'network.svg' by default.
+'network.svg' by default. If maxWidth/maxHeight parameter is defined, then scale is ignored. bg is background color.
 
 `instance.loadFile(file, convertFcn, callback1, callback2, callback3, callback4)`
 

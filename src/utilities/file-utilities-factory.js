@@ -102,38 +102,68 @@ module.exports = function () {
 
  fileUtilities.loadXMLDoc = loadXMLDoc;
 
- fileUtilities.saveAsPng = function(filename) {
-   var pngContent = cy.png({scale: 3, full: true});
+ fileUtilities.saveAsPng = function(filename, scale, bg, maxWidth, maxHeight) {
+   if(maxWidth || maxHeight) {
+     var pngContent = cy.png({
+       full: true, bg: bg, 
+       maxWidth: maxWidth, maxHeight: maxHeight
+     });
+   }
+   else {
+     var pngContent = cy.png({
+       scale: scale || 3, full: true, bg: bg
+     });
+   }
 
    // this is to remove the beginning of the pngContent: data:img/png;base64,
    var b64data = pngContent.substr(pngContent.indexOf(",") + 1);
 
    // lower quality when response is empty
    if(!b64data || b64data === ""){
-     pngContent = cy.png({maxWidth: 15000, maxHeight: 15000, full: true});
+     pngContent = cy.png({maxWidth: 15000, maxHeight: 15000, full: true, bg: bg});
      b64data = pngContent.substr(pngContent.indexOf(",") + 1);
    }
 
    saveAs(b64toBlob(b64data, "image/png"), filename || "network.png");
  };
 
- fileUtilities.saveAsJpg = function(filename) {
-   var jpgContent = cy.jpg({scale: 3, full: true});
-
+ fileUtilities.saveAsJpg = function(filename, scale, bg, maxWidth, maxHeight, quality) {
+   if(maxWidth || maxHeight) {
+     var jpgContent = cy.jpg({
+       full: true, bg: bg, 
+       maxWidth: maxWidth, maxHeight: maxHeight, 
+       quality: quality
+     });
+   }
+   else {
+     var jpgContent = cy.jpg({
+       scale: scale || 3, full: true, bg: bg, 
+       quality: quality
+     });
+   }
+   
    // this is to remove the beginning of the pngContent: data:img/png;base64,
    var b64data = jpgContent.substr(jpgContent.indexOf(",") + 1);
 
    // lower quality when response is empty
    if(!b64data || b64data === ""){
-     jpgContent = cy.jpg({maxWidth: 15000, maxHeight: 15000, full: true});
+     jpgContent = cy.jpg({maxWidth: 15000, maxHeight: 15000, full: true, bg: bg});
      b64data = jpgContent.substr(jpgContent.indexOf(",") + 1);
    }
 
    saveAs(b64toBlob(b64data, "image/jpg"), filename || "network.jpg");
  };
 
- fileUtilities.saveAsSvg = function(filename) {
-   var svgContent = cy.svg({scale: 1, full: true});
+ fileUtilities.saveAsSvg = function(filename, scale, bg, maxWidth, maxHeight) {
+   if (maxWidth || maxHeight) {
+     var svgContent = cy.svg({
+       full: true, bg: bg, 
+       maxWidth: maxWidth, maxHeight: maxHeight
+     });
+   }
+   else {
+     var svgContent = cy.svg({scale: scale || 1, full: true, bg: bg});
+   }
    saveAs(new Blob([svgContent], {type:"image/svg+xml;charset=utf-8"}), filename || "network.svg");
  };
 
