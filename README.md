@@ -132,6 +132,9 @@ Collapse the nodes whose collapse data field is set
 `instance.expandAll()`
 Expands all nodes in the graph recursively. Requires expandCollapse extension and considers undoable option.
 
+`instance.hideElesSimple(eles)`
+Hides the given collection of elements.
+
 `instance.hideNodesSmart(nodes)`
 Extends the given nodes list in a smart way to leave the map intact and hides the resulting list. Requires viewUtilities extension and considers 'undoable' option.
 

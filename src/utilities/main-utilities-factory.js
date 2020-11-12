@@ -42,11 +42,8 @@ module.exports = function () {
     for(var i = 0; i < edges.length; i++){
       var edge = edges[i];
       edge.removeClass('edgebendediting-hasbendpoints');
-      edge.removeClass('edgecontrolediting-hascontrolpoints');
       edge.data('cyedgebendeditingDistances', []);
       edge.data('cyedgebendeditingWeights', []);
-      edge.data('cyedgecontroleditingDistances', []);
-      edge.data('cyedgecontroleditingWeigths', []);
     }
 
     parents.removeData('minWidth');
@@ -221,6 +218,38 @@ module.exports = function () {
     });
     eles.removeData("thickBorder");
     return eles;
+  }
+
+  mainUtilities.hideElesSimple = function(eles) {
+    var viewUtilities = cy.viewUtilities('get');
+
+    if (eles.length === 0) {
+      return;
+    }
+
+    if(options.undoable) {
+
+      var ur = cy.undoRedo();
+      ur.action("thickenBorder", mainUtilities.thickenBorder, mainUtilities.thinBorder);
+      ur.action("thinBorder", mainUtilities.thinBorder, mainUtilities.thickenBorder);
+
+      // Batching
+      var actions = [];
+      var nodesWithHiddenNeighbor = cy.edges(":hidden").connectedNodes().intersection(eles);
+      actions.push({name: "thinBorder", param: nodesWithHiddenNeighbor});
+      actions.push({name: "hide", param: eles});
+      nodesWithHiddenNeighbor = eles.neighborhood(":visible")
+              .nodes().difference(eles).difference(cy.nodes("[thickBorder]"));
+      actions.push({name: "thickenBorder", param: nodesWithHiddenNeighbor});
+      cy.undoRedo().do("batch", actions);
+    }
+    else {
+      var nodesWithHiddenNeighbor = cy.edges(":hidden").connectedNodes(':visible');
+      mainUtilities.thinBorder(nodesWithHiddenNeighbor);
+      viewUtilities.hide(eles);
+      var nodesWithHiddenNeighbor = cy.edges(":hidden").connectedNodes(':visible');
+      mainUtilities.thickenBorder(nodesWithHiddenNeighbor);
+    }
   }
 
   // Extends the given nodes list in a smart way to leave the map intact and hides the resulting list.
