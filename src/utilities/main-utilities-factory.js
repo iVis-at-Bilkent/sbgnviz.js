@@ -42,8 +42,11 @@ module.exports = function () {
     for(var i = 0; i < edges.length; i++){
       var edge = edges[i];
       edge.removeClass('edgebendediting-hasbendpoints');
+      edge.removeClass('edgecontrolediting-hascontrolpoints');
       edge.data('cyedgebendeditingDistances', []);
       edge.data('cyedgebendeditingWeights', []);
+      edge.data('cyedgecontroleditingDistances', []);	
+      edge.data('cyedgecontroleditingWeigths', []);
     }
 
     parents.removeData('minWidth');
