@@ -621,7 +621,7 @@ module.exports = function () {
             && hex[0] == '#';
   };
 
-  experimentalDataOverlay.parseData = function (data, fileName, errorCallback) {
+  experimentalDataOverlay.parseData = function (data, fileName, errorCallback, sampleExperiment) {
     parsedDataMap = parsedDataMap || {};
     visibleDataMapByExp = visibleDataMapByExp || {};
     groupedDataMap = groupedDataMap || {};
@@ -629,8 +629,11 @@ module.exports = function () {
     const experiments = [];
     var colors = {};
 
-    if (fileName in groupedDataMap) {
+    if (fileName in groupedDataMap && !sampleExperiment) {
       return;
+    }
+    else if (fileName in groupedDataMap && sampleExperiment) {
+      this.removeAll();
     }
 
     var parsed = {};
