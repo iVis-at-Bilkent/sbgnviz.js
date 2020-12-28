@@ -380,7 +380,7 @@ module.exports = function () {
       extension.add(annotExt);
     }
     // add glyph members that are not state variables or unit of info: subunits
-    if(nodeClass === "complex" || nodeClass === "complex multimer" || nodeClass === "submap"){
+    if(nodeClass === "complex" || nodeClass === "complex multimer" || nodeClass === "submap" || nodeClass === "topology group"){
        var children = node.children();
        children = children.union(this.allCollapsedNodes);
        if(node.data('collapsedChildren')) {
@@ -522,6 +522,11 @@ module.exports = function () {
     if (edge.css('curve-style') && version !== "plain" && version !== "plain3") {
       var extension = self.getOrCreateExtension(arc);
       extension.add("<curveStyle>" + edge.css('curve-style') + "</curveStyle>");
+    }
+    
+    if (edge.data('sif-meta') && version !== "plain" && version !== "plain3") {
+      var extension = self.getOrCreateExtension(arc);
+      extension.add("<sifMetaEdge>true</sifMetaEdge>");
     }
 
     return arc;

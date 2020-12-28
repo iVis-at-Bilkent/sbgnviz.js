@@ -647,7 +647,7 @@ module.exports = function () {
 
     var eleClass = ele.class_;
 
-    if (eleClass === 'complex' || eleClass === 'complex multimer' || eleClass === 'submap') {
+    if (eleClass === 'complex' || eleClass === 'complex multimer' || eleClass === 'submap' || eleClass === 'topology group') {
       self.addCytoscapeJsNode(ele, jsonArray, parent, compartments);
 
       var childGlyphs = ele.glyphMembers;
@@ -818,6 +818,16 @@ module.exports = function () {
     }
     else {
       edgeObj.bendPointPositions = anchorPointPositions;
+    }
+
+    var isSifMetaEdge;
+    if (ele.extension && ele.extension.has("sifMetaEdge")) {
+      parseString(ele.extension.get("sifMetaEdge"), function (err, result) {
+        isSifMetaEdge = result.sifMetaEdge;
+      });
+    }
+    if (isSifMetaEdge) {
+      edgeObj["sif-meta"] = true;
     }
 
     // add language info, this will always be the mapType if not hybrid
