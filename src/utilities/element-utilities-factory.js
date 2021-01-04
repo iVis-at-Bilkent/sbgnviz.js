@@ -430,6 +430,15 @@ module.exports = function () {
       "SIF macromolecule": {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
       "SIF simple chemical": {asSource: {},   asTarget: {}}
     },
+    "activates-gtpase": {
+      "SIF macromolecule": {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "SIF simple chemical": {asSource: {},   asTarget: {}}
+    },
+    "inhibits-gtpase": {
+      "SIF macromolecule": {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "SIF simple chemical": {asSource: {},   asTarget: {}}
+    },
+
   };
 
   elementUtilities.logicalOperatorTypes = ['and', 'or', 'not', 'delay'];
@@ -461,7 +470,8 @@ module.exports = function () {
     'catalysis-precedes', 'controls-expression-of', 'consumption-controled-by',
     'controls-production-of', 'controls-transport-of-chemical', 'chemical-affects',
     'reacts-with', 'used-to-produce', 'phosphorylates', 'dephosphorylates',
-    'upregulates-expression', 'downregulates-expression', 'activates', 'inhibits'];
+    'upregulates-expression', 'downregulates-expression', 'activates', 'inhibits',
+    'activates-gtpase', 'inhibits-gtpase'];
 
   elementUtilities.edgeTypes = ['consumption', 'production', 'modulation',
     'stimulation', 'catalysis', 'inhibition', 'necessary stimulation',
@@ -473,7 +483,8 @@ module.exports = function () {
     'controls-production-of', 'controls-transport-of-chemical',
     'chemical-affects', 'reacts-with', 'used-to-produce',
     'activates', 'inhibits', 'phosphorylates', 'dephosphorylates',
-    'upregulates-expression', 'downregulates-expression'
+    'upregulates-expression', 'downregulates-expression', 'activates-gtpase',
+    'inhibits-gtpase'
   ];
 
   elementUtilities.undirectedEdgeTypes = ['in-complex-with', 'interacts-with',
@@ -1082,6 +1093,7 @@ module.exports = function () {
           return 'triangle-cross';
         case 'inhibition': case 'negative influence': case 'inhibits':
         case 'downregulates-expression': case 'dephosphorylates':
+        case 'inhibits-gtpase':
           return 'tee';
         case 'catalysis':
           return 'circle';
@@ -1092,6 +1104,7 @@ module.exports = function () {
         case 'controls-expression-of': case 'catalysis-precedes':
         case 'consumption-controled-by': case 'controls-production-of':
         case 'controls-transport-of-chemical': case 'used-to-produce':
+        case 'activates-gtpase':
           return 'triangle';
         case 'modulation': case 'unknown influence':
           return 'diamond';
@@ -2266,12 +2279,14 @@ module.exports = function () {
     'chemical-affects': '#D95F23',
     'reacts-with': '#4E214B',
     'used-to-produce': '#FF2F07',
-    'phosphorylates': '#62392D',
-    'dephosphorylates': '#CC8E12',
-    'upregulates-expression': '#32D849',
-    'downregulates-expression': '#CC8E12',
+    'phosphorylates': '#009600',
+    'dephosphorylates': '#960000',
+    'upregulates-expression': '#009600',
+    'downregulates-expression': '#960000',
     'activates': '#32D849',
-    'inhibits': '#4886A5'
+    'inhibits': '#4886A5',
+    'activates-gtpase': '#0096C8',
+    'inhibits-gtpase': '#C800AA',
   };
 
   var defaultSizeMap = {
