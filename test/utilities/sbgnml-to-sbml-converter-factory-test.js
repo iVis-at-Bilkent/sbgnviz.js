@@ -3,13 +3,7 @@ var assert = chai.assert;
 
 var factory = require('../../src/utilities/sbgnml-to-sbml-converter-factory')();
 
-var jsdom = require('jsdom');
-const {JSDOM} = jsdom;
-const {window} = new JSDOM();
-const {document} = (new JSDOM('')).window;
-global.document = document;
-
-global.$ = jQuery = require('jquery')(window);
+global.$ = jQuery = require('jquery');
 
 describe('sbgnmlToSbml', function () {
     it('error handling', function () {
