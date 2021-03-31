@@ -30,6 +30,7 @@
   },
   "devDependencies": {
     "browserify": "^11.2.0",
+    "chai": "^4.3.4",
     "gulp": "^3.9.1",
     "gulp-derequire": "^2.1.0",
     "gulp-jshint": "^1.12.0",
@@ -37,7 +38,10 @@
     "gulp-replace": "^0.5.4",
     "gulp-shell": "^0.5.2",
     "gulp-util": "^3.0.8",
+    "jquery": "^2.2.4",
+    "jsdom": "^16.5.2",
     "jshint-stylish": "^2.0.1",
+    "mocha": "^8.3.2",
     "node-notifier": "^4.3.1",
     "run-sequence": "^1.2.2",
     "vinyl-buffer": "^1.0.0",
