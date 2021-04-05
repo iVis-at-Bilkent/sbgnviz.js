@@ -889,10 +889,12 @@ module.exports = function () {
 
   sbgnmlToJson.applyStyle = function (renderInformation, nodes, edges) {
     // get all color id references to their value
-    var colorList = renderInformation.listOfColorDefinitions.colorDefinitions;
-    var colorIDToValue = {};
-    for (var i=0; i < colorList.length; i++) {
-      colorIDToValue[colorList[i].id] = colorList[i].value;
+    if (renderInformation.listOfColorDefinitions) {
+      var colorList = renderInformation.listOfColorDefinitions.colorDefinitions;
+      var colorIDToValue = {};
+      for (var i=0; i < colorList.length; i++) {
+        colorIDToValue[colorList[i].id] = colorList[i].value;
+      }
     }
     // get all background image id references to their value
     if(renderInformation.listOfBackgroundImages){
@@ -912,10 +914,10 @@ module.exports = function () {
       var renderGroup = style.renderGroup;
 
       // convert color references
-      if (renderGroup.stroke != null) {
+      if (renderGroup.stroke != null && colorIDToValue) {
         renderGroup.stroke = colorIDToValue[renderGroup.stroke];
       }
-      if (renderGroup.fill != null) {
+      if (renderGroup.fill != null && colorIDToValue) {
         renderGroup.fill = colorIDToValue[renderGroup.fill];
       }
       // convert background image references
