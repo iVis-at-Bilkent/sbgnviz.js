@@ -344,9 +344,10 @@ module.exports = function () {
    reader.readAsText(file);
  };
 
- fileUtilities.loadSBGNMLText = function(textData, tileInfoBoxes){
+ fileUtilities.loadSBGNMLText = function(textData, tileInfoBoxes, filename, cy){
      setTimeout(function () {
          updateGraph(sbgnmlToJson.convert(textToXmlObject(textData)), undefined, undefined, tileInfoBoxes);
+         $(document).trigger("sbgnvizLoadFileEnd",  [filename, cy]);
          uiUtilities.endSpinner("load-file-spinner");
      }, 0);
 
