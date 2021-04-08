@@ -567,8 +567,8 @@ module.exports = function () {
 
   // Converts given sbgnml data to a json object in a special format
   // (http://js.cytoscape.org/#notation/elements-json) and returns it.
-  mainUtilities.convertSbgnmlToJson = function(data) {
-    return sbgnmlToJson.convert(data);
+  mainUtilities.convertSbgnmlToJson = function(data, urlParams) {
+    return sbgnmlToJson.convert(data, urlParams);
   };
 
   mainUtilities.convertNwtToJson = function(data) {

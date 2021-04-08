@@ -1073,7 +1073,7 @@ module.exports = function () {
     
   };
 
-  sbgnmlToJson.convert = function (xmlObject) {
+  sbgnmlToJson.convert = function (xmlObject, urlParams) {
     var self = this;
     var cytoscapeJsNodes = [];
     var cytoscapeJsEdges = [];
@@ -1129,8 +1129,12 @@ module.exports = function () {
       }
     }
     
-    var minDistanceToChildren = Number.MAX_SAFE_INTEGER ;
-    if (!map.extension) {
+    var minDistanceToChildren = Number.MAX_SAFE_INTEGER;
+
+    if(urlParams && urlParams.compoundPadding) {
+      mainUtilities.setCompoundPadding(Number(urlParams.compoundPadding)); 
+    }
+    else if (!map.extension) {
       for (var i = 0; i < glyphs.length; i++) {
         var glyph = glyphs[i];
        // if(glyph.class_ == "complex")continue;

@@ -140,8 +140,8 @@ module.exports = function() {
     } );
   }
 
-  nwtToJson.convert = function(xmlObject) {
-    var graphData = sbgnmlToJson.convert(xmlObject);
+  nwtToJson.convert = function(xmlObject, urlParams) {
+    var graphData = sbgnmlToJson.convert(xmlObject, urlParams);
     var mapType = elementUtilities.mapType;
 
     if (mapType !== 'PD' && mapType !== 'AF' && elementUtilities.mapType !== 'HybridSbgn') {
