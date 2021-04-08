@@ -245,9 +245,9 @@ module.exports = function () {
    fileUtilities.loadFile( file, convert, callback1, callback2, fileUtilities.collapseMarkedNodes );
  };
 
- fileUtilities.loadNwtFile = function(file, callback1, callback2) {
+ fileUtilities.loadNwtFile = function(file, callback1, callback2, urlParams) {
    var convert = function( text ) {
-     return nwtToJson.convert(textToXmlObject(text));
+     return nwtToJson.convert(textToXmlObject(text), urlParams);
    };
 
    fileUtilities.loadFile( file, convert, callback1, callback2, fileUtilities.collapseMarkedNodes );
@@ -344,9 +344,9 @@ module.exports = function () {
    reader.readAsText(file);
  };
 
- fileUtilities.loadSBGNMLText = function(textData, tileInfoBoxes, filename, cy){
+ fileUtilities.loadSBGNMLText = function(textData, tileInfoBoxes, filename, cy, urlParams){
      setTimeout(function () {
-         updateGraph(sbgnmlToJson.convert(textToXmlObject(textData)), undefined, undefined, tileInfoBoxes);
+         updateGraph(sbgnmlToJson.convert(textToXmlObject(textData), urlParams), undefined, undefined, tileInfoBoxes);
          $(document).trigger("sbgnvizLoadFileEnd",  [filename, cy]);
          uiUtilities.endSpinner("load-file-spinner");
      }, 0);
