@@ -438,6 +438,22 @@ module.exports = function () {
       "SIF macromolecule": {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
       "SIF simple chemical": {asSource: {},   asTarget: {}}
     },
+    "acetylates": {
+      "SIF macromolecule": {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "SIF simple chemical": {asSource: {},   asTarget: {}}
+    },
+    "deacetylates": {
+      "SIF macromolecule": {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "SIF simple chemical": {asSource: {},   asTarget: {}}
+    },
+    "methylates": {
+      "SIF macromolecule": {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "SIF simple chemical": {asSource: {},   asTarget: {}}
+    },
+    "demethylates": {
+      "SIF macromolecule": {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "SIF simple chemical": {asSource: {},   asTarget: {}}
+    },
 
   };
 
@@ -471,7 +487,8 @@ module.exports = function () {
     'controls-production-of', 'controls-transport-of-chemical', 'chemical-affects',
     'reacts-with', 'used-to-produce', 'phosphorylates', 'dephosphorylates',
     'upregulates-expression', 'downregulates-expression', 'activates', 'inhibits',
-    'activates-gtpase', 'inhibits-gtpase'];
+    'activates-gtpase', 'inhibits-gtpase', 'acetylates', 'deacetylates',
+    'methylates', 'demethylates'];
 
   elementUtilities.edgeTypes = ['consumption', 'production', 'modulation',
     'stimulation', 'catalysis', 'inhibition', 'necessary stimulation',
@@ -484,7 +501,7 @@ module.exports = function () {
     'chemical-affects', 'reacts-with', 'used-to-produce',
     'activates', 'inhibits', 'phosphorylates', 'dephosphorylates',
     'upregulates-expression', 'downregulates-expression', 'activates-gtpase',
-    'inhibits-gtpase'
+    'inhibits-gtpase', 'acetylates', 'deacetylates', 'methylates', 'demethylates'
   ];
 
   elementUtilities.undirectedEdgeTypes = ['in-complex-with', 'interacts-with',
@@ -1093,7 +1110,7 @@ module.exports = function () {
           return 'triangle-cross';
         case 'inhibition': case 'negative influence': case 'inhibits':
         case 'downregulates-expression': case 'dephosphorylates':
-        case 'inhibits-gtpase':
+        case 'inhibits-gtpase': case 'deacetylates': case 'demethylates':
           return 'tee';
         case 'catalysis':
           return 'circle';
@@ -1104,7 +1121,7 @@ module.exports = function () {
         case 'controls-expression-of': case 'catalysis-precedes':
         case 'consumption-controled-by': case 'controls-production-of':
         case 'controls-transport-of-chemical': case 'used-to-produce':
-        case 'activates-gtpase':
+        case 'activates-gtpase': case 'acetylates': case 'methylates':
           return 'triangle';
         case 'modulation': case 'unknown influence':
           return 'diamond';
@@ -2279,14 +2296,18 @@ module.exports = function () {
     'chemical-affects': '#D95F23',
     'reacts-with': '#4E214B',
     'used-to-produce': '#FF2F07',
-    'phosphorylates': '#009600',
-    'dephosphorylates': '#960000',
-    'upregulates-expression': '#009600',
-    'downregulates-expression': '#960000',
+    'phosphorylates': '#43A93C',
+    'dephosphorylates': '#CD4F32',
+    'upregulates-expression': '#43A93C',
+    'downregulates-expression': '#CD4F32',
     'activates': '#32D849',
     'inhibits': '#4886A5',
-    'activates-gtpase': '#0096C8',
-    'inhibits-gtpase': '#C800AA',
+    'activates-gtpase': '#468DE3',
+    'inhibits-gtpase': '#C364BF',
+    'acetylates': '#55B1B6',
+    'deacetylates': '#EE5F78',
+    'methylates': '#B0B03D',
+    'demethylates': '#DB6F21'
   };
 
   var defaultSizeMap = {
