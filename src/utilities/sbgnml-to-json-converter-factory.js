@@ -518,6 +518,14 @@ module.exports = function () {
 
       relativeXPos = relativeXPos / parseFloat(nodeObj.bbox.w) * 100;
       relativeYPos = relativeYPos / parseFloat(nodeObj.bbox.h) * 100;
+      
+      // In case port position is not vertically/horizontally aligned with the node center, decide a direction
+      if(Math.abs(relativeXPos) > 0 && Math.abs(relativeYPos) > 0) {
+        if(Math.abs(relativeXPos) >= Math.abs(relativeYPos))
+          relativeYPos = 0;
+        else
+          relativeXPos = 0;
+      }
 
       // We assume that ports are not inside the node shape.
       // Therefore, abs. value of their relative x and y coordinates (relative to node center) should be bigger than 50.
@@ -532,6 +540,15 @@ module.exports = function () {
       if (relativeXPos === 0 && relativeYPos === 0) {
         continue;
       }
+      
+      // If port length is longer than the node size (for example, some sbgn files generated from Reactome database has very long ports),
+      // set the port length to 70 which is default in sbgnviz
+      if(Math.abs(relativeXPos) > 150 || Math.abs(relativeYPos) > 150) {
+        if(Math.abs(relativeXPos) > 150)
+          relativeXPos = relativeXPos / Math.abs(relativeXPos) * 70;
+        else
+          relativeYPos = relativeYPos / Math.abs(relativeYPos) * 70;
+      }      
 
       ports.push({
         id: id,
