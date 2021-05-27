@@ -859,9 +859,7 @@ module.exports = function () {
 	              return '' + ele.data('cardinality');
 	            },
 	            'source-text-margin-y': '-10',
-	            'source-text-offset': function (ele) {
-	              return elementUtilities.getCardinalityDistance(ele);
-	            },
+	            'source-text-offset': '18',
 							'font-size': '13'
 	          })
 	          .selector("edge[class='production'][cardinality > 0]")
@@ -870,9 +868,7 @@ module.exports = function () {
 	              return '' + ele.data('cardinality');
 	            },
 	            'target-text-margin-y': '-10',
-	            'target-text-offset': function (ele) {
-	              return elementUtilities.getCardinalityDistance(ele);
-	            },
+	            'target-text-offset': '18',
 							'font-size': '13'
 	          })
 	          .selector("edge[class]")
