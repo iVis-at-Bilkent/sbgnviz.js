@@ -861,7 +861,8 @@ module.exports = function () {
 	            'source-text-margin-y': '-10',
 	            'source-text-offset': function (ele) {
 	              return elementUtilities.getCardinalityDistance(ele);
-	            }
+	            },
+							'font-size': '13'
 	          })
 	          .selector("edge[class='production'][cardinality > 0]")
 	          .css({
@@ -871,7 +872,8 @@ module.exports = function () {
 	            'target-text-margin-y': '-10',
 	            'target-text-offset': function (ele) {
 	              return elementUtilities.getCardinalityDistance(ele);
-	            }
+	            },
+							'font-size': '13'
 	          })
 	          .selector("edge[class]")
 	          .css({

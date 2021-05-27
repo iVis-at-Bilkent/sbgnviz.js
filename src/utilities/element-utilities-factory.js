@@ -1293,7 +1293,7 @@ module.exports = function () {
     var tgtPos = ele.target().position();
 
     var distance = Math.sqrt(Math.pow((srcPos.x - tgtPos.x), 2) + Math.pow((srcPos.y - tgtPos.y), 2));
-    return distance * 0.15;
+    return distance * 0.25;
   };
 
   elementUtilities.getInfoLabel = function(node) {
