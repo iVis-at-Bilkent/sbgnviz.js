@@ -405,7 +405,7 @@ library of sbgnviz. Most users will not need to use this. It includes the follow
 * `getSbgnClass(ele)`  Returns sbgnclass of the given element. If the parameter is a string return it by assuming that it is the sbgnclass itself. 
 * `getPureSbgnClass(ele)` Returns sbgn class omitting the multimer information.
 * `canHaveUnitOfInformation(ele)` Returns whether the give element have unit of information.
-* `isEmptySetClass(ele)` Returns wether the given element or string is of the special empty set/source and sink class.
+* `isEmptySetClass(ele)` Returns wether the given element or string is of the special empty set class.
 * `isModulationArcClass(ele)` Returns whether the class of given element is a modulation arc as defined in PD specs.
 * `convertToRenderedPosition(modelPos, pan, zoom)` Returns rendered position of a given model position.
 * `getArrayLineStyle(ele)` Returns whether the line style is dashed or solid.

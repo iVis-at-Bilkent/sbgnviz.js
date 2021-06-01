@@ -92,7 +92,7 @@ module.exports = function () {
       "nucleic acid feature": {asSource: {isAllowed: true},    asTarget: {}},
       "compartment":          {asSource: {},   asTarget: {}},
       "tag":                  {asSource: {},   asTarget: {}},
-      "source and sink":      {asSource: {isAllowed: true},    asTarget: {}},
+      "empty set":            {asSource: {isAllowed: true},    asTarget: {}},
       "perturbing agent":     {asSource: {},   asTarget: {}},
       "submap":               {asSource: {},   asTarget: {}},
       "process":              {asSource: {},   asTarget: {isAllowed: true}},
@@ -113,7 +113,7 @@ module.exports = function () {
       "nucleic acid feature": {asSource: {},   asTarget: {isAllowed: true}},
       "compartment":          {asSource: {},   asTarget: {}},
       "tag":                  {asSource: {},   asTarget: {}},
-      "source and sink":      {asSource: {},   asTarget: {isAllowed: true}},
+      "empty set":            {asSource: {},   asTarget: {isAllowed: true}},
       "perturbing agent":     {asSource: {},   asTarget: {}},
       "submap":               {asSource: {},   asTarget: {}},
       "process":              {asSource: {isAllowed: true},    asTarget: {}},
@@ -134,7 +134,7 @@ module.exports = function () {
       "nucleic acid feature": {asSource: {isAllowed: true},    asTarget: {}},
       "compartment":          {asSource: {},   asTarget: {}},
       "tag":                  {asSource: {},   asTarget: {}},
-      "source and sink":      {asSource: {isAllowed: true},    asTarget: {}},
+      "empty set":            {asSource: {isAllowed: true},    asTarget: {}},
       "perturbing agent":     {asSource: {isAllowed: true},    asTarget: {}},
       "submap":               {asSource: {},   asTarget: {}},
       "process":              {asSource: {},   asTarget: {isAllowed: true}},
@@ -155,7 +155,7 @@ module.exports = function () {
       "nucleic acid feature": {asSource: {isAllowed: true},    asTarget: {}},
       "compartment":          {asSource: {},   asTarget: {}},
       "tag":                  {asSource: {},   asTarget: {}},
-      "source and sink":      {asSource: {isAllowed: true},    asTarget: {}},
+      "empty set":            {asSource: {isAllowed: true},    asTarget: {}},
       "perturbing agent":     {asSource: {isAllowed: true},    asTarget: {}},
       "submap":               {asSource: {},   asTarget: {}},
       "process":              {asSource: {},   asTarget: {isAllowed: true}},
@@ -176,7 +176,7 @@ module.exports = function () {
       "nucleic acid feature": {asSource: {},   asTarget: {}},
       "compartment":          {asSource: {},   asTarget: {}},
       "tag":                  {asSource: {},   asTarget: {}},
-      "source and sink":      {asSource: {isAllowed: true},    asTarget: {}},
+      "empty set":            {asSource: {isAllowed: true},    asTarget: {}},
       "perturbing agent":     {asSource: {},   asTarget: {}},
       "submap":               {asSource: {},   asTarget: {}},
       "process":              {asSource: {},   asTarget: {isAllowed: true, maxEdge: 1}},
@@ -197,7 +197,7 @@ module.exports = function () {
       "nucleic acid feature": {asSource: {isAllowed: true},    asTarget: {}},
       "compartment":          {asSource: {},   asTarget: {}},
       "tag":                  {asSource: {},   asTarget: {}},
-      "source and sink":      {asSource: {isAllowed: true},    asTarget: {}},
+      "empty set":            {asSource: {isAllowed: true},    asTarget: {}},
       "perturbing agent":     {asSource: {isAllowed: true},    asTarget: {}},
       "submap":               {asSource: {},   asTarget: {}},
       "process":              {asSource: {},   asTarget: {isAllowed: true}},
@@ -218,7 +218,7 @@ module.exports = function () {
       "nucleic acid feature": {asSource: {isAllowed: true},    asTarget: {}},
       "compartment":          {asSource: {},   asTarget: {}},
       "tag":                  {asSource: {},   asTarget: {}},
-      "source and sink":      {asSource: {isAllowed: true},    asTarget: {}},
+      "empty set":            {asSource: {isAllowed: true},    asTarget: {}},
       "perturbing agent":     {asSource: {isAllowed: true},    asTarget: {}},
       "submap":               {asSource: {},   asTarget: {}},
       "process":              {asSource: {},   asTarget: {isAllowed: true, maxEdge: 1}},
@@ -239,7 +239,7 @@ module.exports = function () {
       "nucleic acid feature": {asSource: {isAllowed: true},    asTarget: {}},
       "compartment":          {asSource: {},   asTarget: {}},
       "tag":                  {asSource: {},   asTarget: {}},
-      "source and sink":      {asSource: {isAllowed: true},    asTarget: {}},
+      "empty set":            {asSource: {isAllowed: true},    asTarget: {}},
       "perturbing agent":     {asSource: {},   asTarget: {}},
       "submap":               {asSource: {},   asTarget: {}},
       "process":              {asSource: {},   asTarget: {}},
@@ -260,7 +260,7 @@ module.exports = function () {
       "nucleic acid feature": {asSource: {isAllowed: true},   asTarget: {}},
       "compartment":          {asSource: {},   asTarget: {}},
       "tag":                  {asSource: {},   asTarget: {isAllowed: true}},
-      "source and sink":      {asSource: {},   asTarget: {}},
+      "empty set":            {asSource: {},   asTarget: {}},
       "perturbing agent":     {asSource: {},   asTarget: {}},
       "submap":               {asSource: {},   asTarget: {isAllowed: true}},
       "process":              {asSource: {},   asTarget: {}},
@@ -464,7 +464,7 @@ module.exports = function () {
     'BA simple chemical', 'BA macromolecule', 'BA nucleic acid feature',
     'BA perturbing agent', 'BA complex'];
   elementUtilities.epnTypes = ['macromolecule', 'nucleic acid feature', 'simple chemical',
-    'source and sink', 'unspecified entity', 'perturbing agent', 'complex', 
+    'empty set', 'unspecified entity', 'perturbing agent', 'complex', 
     'nucleic acid feature multimer', 'macromolecule multimer', 'simple chemical multimer', 'complex multimer'];
   elementUtilities.sifTypes = ['SIF macromolecule', 'SIF simple chemical'];
   elementUtilities.otherNodeTypes = ['compartment', 'tag', 'submap', 'topology group'];
@@ -614,7 +614,7 @@ module.exports = function () {
     var sbgnclass = elementUtilities.getPureSbgnClass( ele );
 
     return sbgnclass != 'and' && sbgnclass != 'or' && sbgnclass != 'not' && sbgnclass != 'delay'
-            && sbgnclass != 'association' && sbgnclass != 'dissociation' && sbgnclass != 'source and sink' && !sbgnclass.endsWith('process');
+            && sbgnclass != 'association' && sbgnclass != 'dissociation' && sbgnclass != 'empty set' && !sbgnclass.endsWith('process');
   };
 
   // Returns whether the give element have unit of information
@@ -656,7 +656,7 @@ module.exports = function () {
   elementUtilities.mustBeSquare = function (ele) {
     var sbgnclass = elementUtilities.getPureSbgnClass( ele );
 
-    return (sbgnclass.indexOf('process') != -1 || sbgnclass == 'source and sink'
+    return (sbgnclass.indexOf('process') != -1 || sbgnclass == 'empty set'
             || sbgnclass == 'and' || sbgnclass == 'or' || sbgnclass == 'not'
             || sbgnclass == 'association' || sbgnclass == 'dissociation' || sbgnclass == 'delay');
   };
@@ -745,10 +745,10 @@ module.exports = function () {
     return inArray( sbgnclass, elementUtilities.processTypes );
   };
 
-  // Returns wether the given element or string is of the special empty set/source and sink class
+  // Returns wether the given element or string is of the special empty set/empty set class
   elementUtilities.isEmptySetClass = function (ele) {
     var sbgnclass = elementUtilities.getPureSbgnClass( ele );
-    return sbgnclass == 'source and sink';
+    return sbgnclass == 'empty set';
   };
 
   // Returns whether the given element is a logical operator
@@ -1068,7 +1068,7 @@ module.exports = function () {
       }
 
       // We need to define new node shapes with their class names for these nodes
-      if (_class == 'source and sink' || _class == 'nucleic acid feature' || _class == 'macromolecule'
+      if (_class == 'empty set' || _class == 'nucleic acid feature' || _class == 'macromolecule'
               || _class == 'simple chemical' || _class == 'complex' || _class == 'biological activity' ) {
           return _class;
       }
@@ -2323,7 +2323,7 @@ module.exports = function () {
       width: 30,
       height: 30
     },
-    'source and sink': {
+    'empty set': {
       width: 22,
       height: 22
     },

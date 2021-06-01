@@ -136,7 +136,7 @@ module.exports = function () {
   };
   
   var sbgnShapes = $$.sbgn.sbgnShapes = {
-    'source and sink': true,
+    'empty set': true,
     'nucleic acid feature': true,
     'complex': true,
     'macromolecule': true,
@@ -470,7 +470,7 @@ module.exports = function () {
   };
 
   cyStyleProperties.types.nodeShape.enums.push(
-    'source and sink', 'nucleic acid feature', 'complex', 'macromolecule',
+    'empty set', 'nucleic acid feature', 'complex', 'macromolecule',
     'simple chemical', 'biological activity', 'compartment'
   );
 
@@ -606,7 +606,7 @@ module.exports = function () {
     }
 
     var shapeNames = [ "simple chemical", "macromolecule", "complex",
-      "nucleic acid feature", "source and sink", "biological activity",
+      "nucleic acid feature", "empty set", "biological activity",
       "compartment", "oldCompartment"
     ];
 
@@ -695,7 +695,7 @@ module.exports = function () {
     "macromolecule": $$.sbgn.drawRoundRectangle,
     "complex": $$.sbgn.drawComplex,
     "nucleic acid feature": $$.sbgn.drawBottomRoundRectangle,
-    "source and sink": $$.sbgn.drawEllipse,
+    "empty set": $$.sbgn.drawEllipse,
     "biological activity": $$.sbgn.drawBiologicalActivity,
     "compartment": $$.sbgn.drawBarrel,
     "oldCompartment": $$.sbgn.drawRoundRectangle
@@ -703,9 +703,9 @@ module.exports = function () {
 
   // To define an extra drawing for the node that is rendered at the very end,
   // even after the node background image is drawn.
-  // E.g. cross lines of "source and sink" nodes.
+  // E.g. cross lines of "empty set" nodes.
   $$.sbgn.extraDraw = {
-    "source and sink": $$.sbgn.drawCrossLine
+    "empty set": $$.sbgn.drawCrossLine
   };
 
   $$.sbgn.plainIntersectLine = {
@@ -727,7 +727,7 @@ module.exports = function () {
     "nucleic acid feature": function( centerX, centerY, width, height, x, y, padding ) {
       return cyBaseNodeShapes["bottomroundrectangle"].intersectLine( centerX, centerY, width, height, x, y, padding );
     },
-    "source and sink": function( centerX, centerY, width, height, x, y, padding ) {
+    "empty set": function( centerX, centerY, width, height, x, y, padding ) {
       return cyBaseNodeShapes["ellipse"].intersectLine( centerX, centerY, width, height, x, y, padding );
     },
     "biological activity": function( centerX, centerY, width, height, x, y, padding ) {
@@ -822,7 +822,7 @@ module.exports = function () {
     "nucleic acid feature": function( x, y, padding, width, height, centerX, centerY ) {
       return cyBaseNodeShapes["bottomroundrectangle"].checkPoint( x, y, padding, width, height, centerX, centerY );
     },
-    "source and sink": function( x, y, padding, width, height, centerX, centerY ) {
+    "empty set": function( x, y, padding, width, height, centerX, centerY ) {
       return cyBaseNodeShapes["ellipse"].checkPoint( x, y, padding, width, height, centerX, centerY );
     },
     "biological activity": function( x, y, padding, width, height, centerX, centerY ) {
