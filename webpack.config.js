@@ -5,9 +5,7 @@ const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
 const NodeExternals = require('webpack-node-externals');
 
 let config = {
-  // unless we are in production, use inline-source-map development tool
-  // which helps track down bugs
-  devtool: 'inline-source-map',
+  devtool: 'eval-source-map',
 
   // entry point - src/index.js
   entry: path.join(__dirname, SRC_DIR, 'index.js'),
