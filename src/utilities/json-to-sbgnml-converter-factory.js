@@ -309,6 +309,12 @@ module.exports = function () {
        nodeClass = "biological activity";
     }
 
+    // Workaround: In application we use 'empty set' class but SBGN-ML files 
+    // use 'source and sink' so we read and write as 'source and sink'
+    if (nodeClass === "empty set") {
+      nodeClass = "source and sink";
+    }
+
     var glyph = new libsbgnjs.Glyph({id: node._private.data.id, class_: nodeClass});
 
     // assign compartmentRef

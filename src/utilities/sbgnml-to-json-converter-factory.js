@@ -462,7 +462,12 @@ module.exports = function () {
     }
 
     // add class information
-    nodeObj.class = ele.class_;
+    if (ele.class_ === "source and sink" || ele.class_ === "emptyset") {
+      nodeObj.class = "empty set";
+    }
+    else {
+      nodeObj.class = ele.class_;
+    }
     // add label information
     nodeObj.label = (ele.label && ele.label.text) || undefined;
     if(nodeObj.label != undefined){
@@ -655,7 +660,10 @@ module.exports = function () {
 
   sbgnmlToJson.traverseNodes = function (ele, jsonArray, parent, compartments) {
     var elId = ele.id; 
-    if (!handledElements[ele.class_]) {
+
+    // Workaround: In application we use class 'empty set' but on read write we use 'source and sink'
+    // SBGN-ML files can also have 'emptyset' class  
+    if (!handledElements[ele.class_] && ele.class_ !== "source and sink" && ele.class_ !== "emptyset") {
       return;
     }
     this.insertedNodes[elId] = true;
@@ -1172,13 +1180,17 @@ module.exports = function () {
     else if (!map.extension) {
       for (var i = 0; i < glyphs.length; i++) {
         var glyph = glyphs[i];
-       // if(glyph.class_ == "complex")continue;
+
         childNodes = glyph.glyphMembers.filter(function(child){ return child.class_ != "state variable" && child.class_ != "unit of information"});
         if(childNodes.length > 0){ // compound node
           var hasMin = false;
           for (var j = 0; j < childNodes.length; j++) {           
             var childNode = childNodes[j];
-            var borderWidth = elementUtilities.getDefaultProperties(childNode.class_)["border-width"];
+            const childClass = childNode.class_;
+            if (childClass === "source and sink" || childClass === "emptyset") {
+              childClass = "empty set";
+            }
+            var borderWidth = elementUtilities.getDefaultProperties(childClass)["border-width"];
             var stateAndInfos = childNode.glyphMembers.filter(function(child){ return child.class_ == "state variable" || child.class_ == "unit of information"});
             if(stateAndInfos.length > 0){
               for(var k = 0 ; k<stateAndInfos.length; k++){
