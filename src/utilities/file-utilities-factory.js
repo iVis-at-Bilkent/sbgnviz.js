@@ -102,6 +102,8 @@ module.exports = function () {
 
  fileUtilities.loadXMLDoc = loadXMLDoc;
 
+ fileUtilities.textToXmlObject = textToXmlObject;
+
  fileUtilities.saveAsPng = function(filename, scale, bg, maxWidth, maxHeight) {
    if(maxWidth || maxHeight) {
      var pngContent = cy.png({
