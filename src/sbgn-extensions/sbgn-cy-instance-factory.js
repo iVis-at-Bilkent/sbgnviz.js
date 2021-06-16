@@ -308,7 +308,7 @@ module.exports = function () {
       
       cy.on("beforeDo", function (e, name, args) {
         if(name == "layout" || name == "collapse" || name == "expand" || name == "collapseRecursively" || name == "expandRecursively" 
-          || (name == "batch" && (args[0]['name'] == "thinBorder" || args[0]['name'] == "thickenBorder"))){
+          || (name == "batch" && ((args.length > 0 && args[0]['name'] == "thinBorder") || (args.length > 0 && args[0]['name'] == "thickenBorder")))){
           var parents = cy.elements(":parent").jsons(); // parent nodes
           var simples = cy.elements().not(":parent").jsons(); // simple nodes and edges
           var allElements = parents.concat(simples);  // all elements
@@ -328,7 +328,7 @@ module.exports = function () {
       
       cy.on("beforeRedo", function (e, name, args) {
         if(name == "layout" || name == "collapse" || name == "expand" || name == "collapseRecursively" || name == "expandRecursively" 
-          || (name == "batch" && (args[0]['name'] == "thinBorder" || args[0]['name'] == "thickenBorder"))){
+          || (name == "batch" && ((args.length > 0 && args[0]['name'] == "thinBorder") || (args.length > 0 && args[0]['name'] == "thickenBorder")))){
           var parents = cy.elements(":parent").jsons(); // parent nodes
           var simples = cy.elements().not(":parent").jsons(); // simple nodes and edges
           var allElements = parents.concat(simples);  // all elements
@@ -346,7 +346,7 @@ module.exports = function () {
       
       cy.on("afterDo", function (e, name, args, res) {
         if(name == "layout" || name == "collapse" || name == "expand" || name == "collapseRecursively" || name == "expandRecursively" 
-          || (name == "batch" && (args[0]['name'] == "thinBorder" || args[0]['name'] == "thickenBorder"))){
+          || (name == "batch" && ((args.length > 0 && args[0]['name'] == "thinBorder") || (args.length > 0 && args[0]['name'] == "thickenBorder")))){
           res.allElements = args.allElements;
           res.ports = args.ports;
           res.viewport = args.viewport;
@@ -355,7 +355,7 @@ module.exports = function () {
       
       cy.on("afterRedo", function (e, name, args, res) {
         if(name == "layout" || name == "collapse" || name == "expand" || name == "collapseRecursively" || name == "expandRecursively" 
-          || (name == "batch" && (args[0]['name'] == "thinBorder" || args[0]['name'] == "thickenBorder"))){
+          || (name == "batch" && ((args.length > 0 && args[0]['name'] == "thinBorder") || (args.length > 0 && args[0]['name'] == "thickenBorder")))){
           res.allElements = args.allElements2;
           res.ports = args.ports2;
           res.viewport = args.viewport2;
@@ -374,7 +374,7 @@ module.exports = function () {
       
       cy.on("beforeUndo", function (e, name, args) {
         if(name == "layout" || name == "collapse" || name == "expand" || name == "collapseRecursively" || name == "expandRecursively" 
-          || (name == "batch" && (args[0]['name'] == "thinBorder" || args[0]['name'] == "thickenBorder"))){
+          || (name == "batch" && ((args.length > 0 && args[0]['name'] == "thinBorder") || (args.length > 0 && args[0]['name'] == "thickenBorder")))){
           var parents = cy.elements(":parent").jsons(); // parent nodes
           var simples = cy.elements().not(":parent").jsons(); // simple nodes and edges
           var allElements = parents.concat(simples);  // all elements
@@ -392,7 +392,7 @@ module.exports = function () {
       
       cy.on("afterUndo", function (e, name, args, res) {
         if(name == "layout" || name == "collapse" || name == "expand" || name == "collapseRecursively" || name == "expandRecursively" 
-          || (name == "batch" && (args[0]['name'] == "thinBorder" || args[0]['name'] == "thickenBorder"))){
+          || (name == "batch" && ((args.length > 0 && args[0]['name'] == "thinBorder") || (args.length > 0 && args[0]['name'] == "thickenBorder")))){
           res.allElements = args.allElements2;
           res.ports = args.ports2;
           res.viewport = args.viewport2;
