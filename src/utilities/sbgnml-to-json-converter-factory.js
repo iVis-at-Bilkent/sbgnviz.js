@@ -1072,7 +1072,7 @@ module.exports = function () {
         Object.keys( propMap ).forEach( function( propName ) {
           var fieldName = propMap[ propName ];
           var fieldVal = memberStyle[ fieldName ];
-          if ( fieldVal ) {
+          if ( fieldVal !== undefined && fieldVal !== null ) {
             var details = propDetails && propDetails[ propName ];
             if ( details ) {
               if ( details[ 'converter' ] ) {
