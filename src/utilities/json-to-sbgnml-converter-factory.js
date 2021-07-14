@@ -168,7 +168,7 @@ module.exports = function () {
     return sbgn.buildJsObj();
   };
 
-  jsonToSbgnml.createSbgnml = function(filename, version, renderInfo, mapProperties, nodes, edges, hidden) {
+  jsonToSbgnml.createSbgnml = function(filename, version, renderInfo, mapProperties, nodes, edges, hidden = false) {
     var jsObj = jsonToSbgnml.buildJsObj(filename, version, renderInfo, mapProperties, nodes, edges, hidden);
     return jsonToSbgnml.buildString({sbgn: jsObj});
   }
