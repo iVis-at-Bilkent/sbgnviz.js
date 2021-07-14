@@ -50,7 +50,7 @@ module.exports = function () {
    Serious changes occur between the format version for submaps content. Those changes are not implemented yet.
    TODO implement 0.3 changes when submap support is fully there.
    */
-  jsonToSbgnml.buildJsObj = function(filename, version, renderInfo, mapProperties, nodes, edges){
+  jsonToSbgnml.buildJsObj = function(filename, version, renderInfo, mapProperties, nodes, edges, hidden = false){
     var self = this;
     var mapID = textUtilities.getXMLValidId(filename);
     var hasExtension = false;
@@ -58,6 +58,13 @@ module.exports = function () {
     var mapType = ( mapProperties && mapProperties.mapType ) || elementUtilities.mapType;
     this.nodes = nodes || cy.nodes();
     this.edges = edges || cy.edges();
+    
+    var id = [];
+    var i = 0;
+    this.nodes.forEach(node => ()=>{
+      id[i] = node._private.data.id;
+      i++;
+    });
 
     var collapsedChildren = elementUtilities.getAllCollapsedChildrenRecursively(this.nodes);
     this.allCollapsedNodes = collapsedChildren.filter("node");
@@ -128,13 +135,19 @@ module.exports = function () {
        if(typeof ele === "number") {
          ele = i;
        }
-       if(jsonToSbgnml.childOfNone(ele, self.nodes))
-           glyphList = glyphList.concat(self.getGlyphSbgnml(ele, version)); // returns potentially more than 1 glyph
+       if(jsonToSbgnml.childOfNone(ele, self.nodes)){
+        var vis = true;
+        if(hidden)
+          vis = id.includes(ele._private.data.id);
+        glyphList = glyphList.concat(self.getGlyphSbgnml(ele, version, vis)); // returns potentially more than 1 glyph
+      }
     });
     // add them to the map
     for(var i=0; i<glyphList.length; i++) {
-       if (version === "plain")
+      
+       if (version === "plain" && (!hidden ))
          glyphList[i].extension = null;
+      if(glyphList[i] != undefined)
        map.addGlyph(glyphList[i]);
     }
     // get all arcs
@@ -143,8 +156,9 @@ module.exports = function () {
        if(typeof ele === "number") {
          ele = i;
        }
-       var arc = self.getArcSbgnml(ele, version);
-       if (version === "plain")
+
+       var arc = self.getArcSbgnml(ele, version, hidden);
+       if (version === "plain" && (!hidden || (hidden && ele.visible())))
          arc.extension = null;
        map.addArc(arc);
     });
@@ -154,8 +168,8 @@ module.exports = function () {
     return sbgn.buildJsObj();
   };
 
-  jsonToSbgnml.createSbgnml = function(filename, version, renderInfo, mapProperties, nodes, edges) {
-    var jsObj = jsonToSbgnml.buildJsObj(filename, version, renderInfo, mapProperties, nodes, edges);
+  jsonToSbgnml.createSbgnml = function(filename, version, renderInfo, mapProperties, nodes, edges, hidden) {
+    var jsObj = jsonToSbgnml.buildJsObj(filename, version, renderInfo, mapProperties, nodes, edges, hidden);
     return jsonToSbgnml.buildString({sbgn: jsObj});
   }
 
@@ -230,7 +244,6 @@ module.exports = function () {
           listOfColorDefinitions.addColorDefinition(colorDefinition);
       }
       renderInformation.setListOfColorDefinitions(listOfColorDefinitions);
-      
         // populate list of background images
         var listOfBackgroundImages = new renderExtension.ListOfBackgroundImages();
         if(!(Object.keys(experimentalDataOverlay.getParsedDataMap()).length > 0)){
@@ -240,7 +253,6 @@ module.exports = function () {
           }
         }
         renderInformation.setListOfBackgroundImages(listOfBackgroundImages);
-
       // populates styles
       var listOfStyles = new renderExtension.ListOfStyles();
       for (var key in renderInfo.styles) {
@@ -268,7 +280,6 @@ module.exports = function () {
           listOfStyles.addStyle(xmlStyle);
       }
       renderInformation.setListOfStyles(listOfStyles);
-
       return renderInformation;
   };
 
@@ -300,11 +311,12 @@ module.exports = function () {
       return annotExt;
   };
 
-  jsonToSbgnml.getGlyphSbgnml = function(node, version){
+  jsonToSbgnml.getGlyphSbgnml = function(node, version, visible = true){
     var self = this;
     var nodeClass = node._private.data.class;
     var glyphList = [];
-
+    if(!visible && !node.visible())
+      return; 
     if( nodeClass.startsWith('BA')) {
        nodeClass = "biological activity";
     }
@@ -399,7 +411,7 @@ module.exports = function () {
            if(typeof ele === "number") {
              ele = i;
            }
-           var glyphMemberList = self.getGlyphSbgnml(ele, version);
+           var glyphMemberList = self.getGlyphSbgnml(ele, version, visible);
            for (var i=0; i < glyphMemberList.length; i++) {
                glyph.addGlyphMember(glyphMemberList[i]);
            }
@@ -446,7 +458,7 @@ module.exports = function () {
            if(typeof ele === "number") {
              ele = i;
            }
-           glyphList = glyphList.concat(self.getGlyphSbgnml(ele, version));
+           glyphList = glyphList.concat(self.getGlyphSbgnml(ele, version, visible));
        });
     }
 
@@ -466,12 +478,13 @@ module.exports = function () {
       return extension;
   };
 
-  jsonToSbgnml.getArcSbgnml = function(edge, version){
+  jsonToSbgnml.getArcSbgnml = function(edge, version, hidden = false){
     var self = this;
     //Temporary hack to resolve "undefined" arc source and targets
     var arcTarget = edge._private.data.porttarget;
     var arcSource = edge._private.data.portsource;
-
+    if(hidden && !edge.visible())
+      return;
     if (arcSource == null || arcSource.length === 0)
        arcSource = edge._private.data.source;
 
