@@ -455,8 +455,8 @@ module.exports = function () {
  }
 
 
- fileUtilities.convertSbgn= function(filename, version, renderInfo, mapProperties, nodes, edges) {
-  var sbgnmlText = jsonToSbgnml.createSbgnml(filename, "plain", renderInfo, mapProperties, nodes, edges);
+ fileUtilities.convertSbgn= function(filename, version, renderInfo, mapProperties, nodes, edges, hidden = false) {
+  var sbgnmlText = jsonToSbgnml.createSbgnml(filename, "plain", renderInfo, mapProperties, nodes, edges, hidden);
  
   return sbgnmlText;
 };
