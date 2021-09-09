@@ -1,0 +1,49 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: "Sari"
+  given-names: "Mecit"
+- family-names: "Bahceci"
+  given-names: "Istemi"
+- family-names: "Dogrusoz"
+  given-names: "Ugur"
+  orcid: "https://orcid.org/0000-0002-7153-0784"  
+- family-names: "Sumer"
+  given-names: "Selcuk Onur"
+- family-names: "Aksoy"
+  given-names: "Bülent Arman"
+- family-names: "Babur"
+  given-names: "Özgün"
+- family-names: "Demir"
+  given-names: "Emek" 
+title: "SBGNViz"
+version: 6.0.4
+date-released: 2021-04-08
+url: "https://github.com/iVis-at-Bilkent/sbgnviz.js"
+preferred-citation:
+  type: article
+  authors:
+  - family-names: "Sari"
+    given-names: "Mecit"
+  - family-names: "Bahceci"
+    given-names: "Istemi"
+  - family-names: "Dogrusoz"
+    given-names: "Ugur"
+    orcid: "https://orcid.org/0000-0002-7153-0784"  
+  - family-names: "Sumer"
+    given-names: "Selcuk Onur"
+  - family-names: "Aksoy"
+    given-names: "Bülent Arman"
+  - family-names: "Babur"
+    given-names: "Özgün"
+  - family-names: "Demir"
+    given-names: "Emek" 
+  doi: "10.1371/journal.pone.0128985"
+  journal: "PLOS ONE"
+  month: 6
+  start: 1 # First page number
+  end: 14 # Last page number
+  title: "SBGNViz: A Tool for Visualization and Complexity Management of SBGN Process Description Maps"
+  issue: 6
+  volume: 10
+  year: 2015
