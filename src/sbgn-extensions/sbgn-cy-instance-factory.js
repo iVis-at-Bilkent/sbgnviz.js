@@ -3,6 +3,7 @@ var libs = require('../utilities/lib-utilities').getLibs();
 var jQuery = $ = libs.jQuery;
 var cytoscape = libs.cytoscape;
 var Tippy = libs.tippy;
+alert("checking if dependency works");
 
 module.exports = function () {
 
@@ -915,7 +916,6 @@ module.exports = function () {
 	};
 
 	sbgnCyInstance.getCy = function () {
-		alert("checking if dependency works");
 		return cy;
 	};
 
