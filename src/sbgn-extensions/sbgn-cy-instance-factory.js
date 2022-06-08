@@ -915,6 +915,7 @@ module.exports = function () {
 	};
 
 	sbgnCyInstance.getCy = function () {
+		alert("checking if dependency works");
 		return cy;
 	};
 
