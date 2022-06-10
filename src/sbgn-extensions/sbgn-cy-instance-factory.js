@@ -6,7 +6,6 @@ var Tippy = libs.tippy;
 
 
 module.exports = function () {
-	alert("checking if dependency works");
 
 	var elementUtilities, graphUtilities, mainUtilities, undoRedoActionFunctions, optionUtilities, experimentalDataOverlay;
 	var refreshPaddings, options, cy;
@@ -917,7 +916,6 @@ module.exports = function () {
 	};
 
 	sbgnCyInstance.getCy = function () {
-		alert("checking if dependency works");
 		return cy;
 	};
 

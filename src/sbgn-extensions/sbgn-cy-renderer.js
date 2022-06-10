@@ -11,7 +11,7 @@ var cyBaseNodeShapes = cytoscape.baseNodeShapes;
 var cyStyleProperties = cytoscape.styleProperties;
 
 var classes = require('../utilities/classes');
-alert("here");
+
 module.exports = function () {
   var $$ = cytoscape;
 
