@@ -2801,6 +2801,8 @@ module.exports = function () {
         return 'AF';
       case 'sif':
         return 'SIF';
+      case 'sbml':
+        return 'SBML'
       case 'hybrid sbgn':
         return 'HybridSbgn';
       default:
@@ -2816,6 +2818,8 @@ module.exports = function () {
         return 'activity flow';
       case 'SIF':
         return 'sif';
+      case 'SBML':
+        return 'sbml'
       case 'HybridSbgn':
         return 'hybrid sbgn';
       default:
