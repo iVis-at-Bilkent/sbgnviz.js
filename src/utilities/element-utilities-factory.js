@@ -823,7 +823,7 @@ module.exports = function () {
       "not":                  {asSource: {},   asTarget: {}},
       "unknown logical operator":  {asSource: {},   asTarget: {}},
    },
-    "positive influence": {
+    "positive influence sbml": {
       "macromolecule":        {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
       "simple molecule":      {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
       "unknown molecule":     {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
@@ -1131,8 +1131,15 @@ module.exports = function () {
     'chemical-affects', 'reacts-with', 'used-to-produce',
     'activates', 'inhibits', 'phosphorylates', 'dephosphorylates',
     'upregulates-expression', 'downregulates-expression', 'activates-gtpase',
-    'inhibits-gtpase', 'acetylates', 'deacetylates', 'methylates', 'demethylates'
+    'inhibits-gtpase', 'acetylates', 'deacetylates', 'methylates', 'demethylates',
+    'trigger', 'transport', 'unkown inhibition', 'unknown catalysis', 'transcription consumption', 
+    'transcription production', 'translation consumption', 'translation production', 'negative influence', 
+    'positive influence sbml', 'reduced modulation', 'reduced stimulation', 'reduced trigger' , 
+    'unknown negative influence',  'unknown postive influence', 'unknown reduced stimulation',
+    'unknown reduced modulation', 'unknown reduced trigger'
   ];
+
+
 
   elementUtilities.undirectedEdgeTypes = ['in-complex-with', 'interacts-with',
     'neighbor-of', 'logic arc', 'equivalence arc'];
@@ -1659,7 +1666,12 @@ module.exports = function () {
 
     switch (sbgnclass) {
       case 'controls-expression-of': case 'upregulates-expression':
-      case 'downregulates-expression':
+      case 'downregulates-expression': case 'unknown inhibition':
+      case 'unknown catalysis':  case 'transcription consumption':
+      case 'transcription production': case 'translation consumption':
+      case 'translation production':   case 'unknown negative influnce':
+      case 'unknown positive influence': case 'unknown reduced stimulation':
+      case 'unknown reduced modulation': case 'unknown reduced trigger':
         return 'dashed';
       default:
         return 'solid';
@@ -1727,8 +1739,10 @@ module.exports = function () {
     var _class = ele.data('class');
 
     if ( _class == 'inhibition' || _class == 'negative influence' ||
-          _class == 'production' || elementUtilities.isSIFEdge( _class ) ) {
-      return 'filled';
+          _class == 'production' || _class == 'transport' || _class == 'transcription production' || _class == 'translation production' || 
+          _class == 'unknown inhibition' || _class == 'unknown negative influence' || _class == 'positive influnce sbml' || _class == 'unknown positive influence'
+          || _class ==  'positive influence sbml' || elementUtilities.isSIFEdge( _class ) ) {
+      return 'filled'; 
     }
 
     return 'hollow';
@@ -1737,14 +1751,17 @@ module.exports = function () {
   elementUtilities.getCyArrowShape = function(ele) {
       var _class = ele.data('class');
 
+      console.log('class', _class)
       switch ( _class ) {
-        case 'necessary stimulation':
+        case 'necessary stimulation': case 'trigger': case 'reduced trigger': 
+        case 'transport': case 'reduced trigger': case 'unknown reduced trigger':
           return 'triangle-cross';
         case 'inhibition': case 'negative influence': case 'inhibits':
         case 'downregulates-expression': case 'dephosphorylates':
         case 'inhibits-gtpase': case 'deacetylates': case 'demethylates':
+        case 'unknown inhibition': case 'unknown negative influence':
           return 'tee';
-        case 'catalysis':
+        case 'catalysis': case 'unknown catalysis':
           return 'circle';
         case 'stimulation': case 'production': case 'positive influence':
         case 'activates': case 'phosphorylates': case 'upregulates-expression':
@@ -1754,8 +1771,13 @@ module.exports = function () {
         case 'consumption-controled-by': case 'controls-production-of':
         case 'controls-transport-of-chemical': case 'used-to-produce':
         case 'activates-gtpase': case 'acetylates': case 'methylates':
+        case 'transcription production': case 'translation production':
+        case 'reduced stimulation': case 'unknown reduced stimulation':
           return 'triangle';
-        case 'modulation': case 'unknown influence':
+        case 'positive influence sbml': case 'unknown positive influence':
+           return 'vee';
+        case 'modulation': case 'unknown influence': case 'reduced modulation':
+        case 'unknown reduced modulation':
           return 'diamond';
         default:
           return 'none';

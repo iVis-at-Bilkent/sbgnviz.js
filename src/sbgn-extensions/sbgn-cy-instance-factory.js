@@ -666,6 +666,7 @@ module.exports = function () {
 			      .selector("edge[class][width]")
 			      .style({
 			        'width': function( ele ) {
+								console.log('got with')
 								return ele.data('width');
 							}
 			      })
