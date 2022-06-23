@@ -51,6 +51,7 @@ module.exports = function () {
    TODO implement 0.3 changes when submap support is fully there.
    */
   jsonToSbgnml.buildJsObj = function(filename, version, renderInfo, mapProperties, nodes, edges, hidden = false){
+
     var self = this;
     var mapID = textUtilities.getXMLValidId(filename);
     var hasExtension = false;
@@ -61,6 +62,7 @@ module.exports = function () {
     
     var id = [];
     var i = 0;
+    //console.log("this.nodes",this.nodes)
     this.nodes.forEach(node => ()=>{
       id[i] = node._private.data.id;
       i++;
@@ -99,6 +101,7 @@ module.exports = function () {
       versionNo = version;
     }
     //var versionNo = (version === "plain") ? "0.2" : version;
+    console.log("Version number", versionNo)
     var sbgn = new libsbgnjs.Sbgn({xmlns: 'http://sbgn.org/libsbgn/' + versionNo});
 
     var map;

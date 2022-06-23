@@ -650,8 +650,8 @@ module.exports = function () {
     }
   };
 
-  elementUtilities.logicalOperatorTypes = ['and', 'or', 'not', 'delay'];
-  elementUtilities.processTypes = ['process', 'omitted process', 'uncertain process',
+  elementUtilities.logicalOperatorTypes = ['and', 'or', 'not', 'delay', 'unknown logical operator'];
+  elementUtilities.processTypes = ['process', 'omitted process', 'uncertain process', 'truncated process',
     'association', 'dissociation', 'phenotype'];
   elementUtilities.biologicalActivityTypes = ['biological activity', 'BA plain', 'BA unspecified entity',
     'BA simple chemical', 'BA macromolecule', 'BA nucleic acid feature',
@@ -661,13 +661,15 @@ module.exports = function () {
     'nucleic acid feature multimer', 'macromolecule multimer', 'simple chemical multimer', 'complex multimer'];
   elementUtilities.sifTypes = ['SIF macromolecule', 'SIF simple chemical'];
   elementUtilities.otherNodeTypes = ['compartment', 'tag', 'submap', 'topology group'];
+  elementUtilities.sbmlType = ['gene', 'rna', 'simple molecule', 'unknown molecule', 'phenotype', 'drug', 'ion', 'protein', 'truncated protein', 'ion channel', 'receptor'];
 
   elementUtilities.nodeTypes = elementUtilities.epnTypes
     .concat( elementUtilities.logicalOperatorTypes )
     .concat( elementUtilities.processTypes )
     .concat( elementUtilities.biologicalActivityTypes )
     .concat( elementUtilities.sifTypes )
-    .concat( elementUtilities.otherNodeTypes );
+    .concat( elementUtilities.otherNodeTypes )
+    .concat( elementUtilities.sbmlType);
 
   elementUtilities.compoundNodeTypes = ['complex', 'compartment', 'submap'];
 
@@ -806,7 +808,7 @@ module.exports = function () {
   elementUtilities.canHaveSBGNLabel = function (ele) {
     var sbgnclass = elementUtilities.getPureSbgnClass( ele );
 
-    return sbgnclass != 'and' && sbgnclass != 'or' && sbgnclass != 'not' && sbgnclass != 'delay'
+    return sbgnclass != 'and' && sbgnclass != 'or' && sbgnclass != 'not' && sbgnclass != 'delay' && sbgnclass != 'unknown logical operator'
             && sbgnclass != 'association' && sbgnclass != 'dissociation' && sbgnclass != 'empty set' && !sbgnclass.endsWith('process');
   };
 
@@ -850,7 +852,7 @@ module.exports = function () {
     var sbgnclass = elementUtilities.getPureSbgnClass( ele );
 
     return (sbgnclass.indexOf('process') != -1 || sbgnclass == 'empty set'
-            || sbgnclass == 'and' || sbgnclass == 'or' || sbgnclass == 'not'
+            || sbgnclass == 'and' || sbgnclass == 'or' || sbgnclass == 'not' || sbgnclass == 'unknown logical operator' 
             || sbgnclass == 'association' || sbgnclass == 'dissociation' || sbgnclass == 'delay');
   };
 
@@ -1105,8 +1107,8 @@ module.exports = function () {
       // var nonProcesses = nodesToShow.nodes("node[class!='process']");
       // var neighborProcesses = nonProcesses.neighborhood("node[class='process']");
 
-      extendNodeTypes = ['process', 'omitted process', 'uncertain process',
-      'association', 'dissociation', 'phenotype', 'and', 'or', 'not', 'delay'];
+      extendNodeTypes = ['process', 'omitted process', 'uncertain process', 'truncated process',
+      'association', 'dissociation', 'phenotype', 'and', 'or', 'not', 'delay', 'unknown logical operator'];
 
       //Here, logical operators are also considered as processes, since they also get inputs and outputs
       var processes = nodesToShow.filter(function(ele, i){
@@ -1242,7 +1244,7 @@ module.exports = function () {
       if (_class == 'phenotype') {
           return 'hexagon';
       }
-      if (_class == 'perturbing agent' || _class == 'tag') {
+      if (_class == 'perturbing agent' || _class == 'tag' || _class == 'rna' || _class == 'receptor') {
           return 'polygon';
       }
       if (_class == 'SIF macromolecule') {
@@ -1256,13 +1258,15 @@ module.exports = function () {
           return 'biological activity';
       }
 
-      if (_class == 'submap' || _class == 'topology group'){
+      if (_class == 'submap' || _class == 'topology group' || _class == 'gene'){
           return 'rectangle';
       }
 
+
       // We need to define new node shapes with their class names for these nodes
       if (_class == 'empty set' || _class == 'nucleic acid feature' || _class == 'macromolecule'
-              || _class == 'simple chemical' || _class == 'complex' || _class == 'biological activity' ) {
+              || _class == 'simple chemical' || _class == 'complex' || _class == 'biological activity' || _class == 'cule' 
+              || _class == 'unknown molecule' || _class == 'drug' || _class == 'ion' || _class == 'truncated protein' || _class == 'ion channel') {
           return _class;
       }
 
@@ -1273,7 +1277,7 @@ module.exports = function () {
         if (graphUtilities.portsEnabled === true && ele.data('ports').length === 2) {
           return 'polygon'; // The node has ports represent it by polygon
         }
-        else if (_class == 'process' || _class == 'omitted process' || _class == 'uncertain process') {
+        else if (_class == 'process' || _class == 'omitted process' || _class == 'uncertain process' || _class == 'truncated process' ) {
           return 'rectangle'; // If node has no port and has one of these classes it should be in a rectangle shape
         }
 
@@ -1368,11 +1372,18 @@ module.exports = function () {
       else if (_class == 'not') {
           content = 'NOT';
       }
+      else if (_class == 'unknown logical operator') {
+        content = '?';
+    }
       else if (_class == 'omitted process') {
           content = '\\\\';
       }
       else if (_class == 'uncertain process') {
           content = '?';
+      }
+      else if (_class == 'truncated process')
+      {
+        content = '/\\/'
       }
       else if (_class == 'dissociation') {
           content = 'o';
@@ -1928,7 +1939,7 @@ module.exports = function () {
   elementUtilities.changePortsOrientationAfterLayout = function() {
       //Check all processes and logical operators with ports
       cy.nodes().forEach(function(ele){
-          if (ele.data('class') === 'process' || ele.data('class') === 'omitted process' || ele.data('class') === 'uncertain process' || ele.data('class') === 'association' || ele.data('class') === 'dissociation' || ele.data('class') === 'and' || ele.data('class') === 'or' || ele.data('class') === 'not')
+          if (ele.data('class') === 'process' || ele.data('class') === 'omitted process' || ele.data('class') === 'uncertain process' || ele.data('class') === 'truncated process' || ele.data('class') === 'association' || ele.data('class') === 'dissociation' || ele.data('class') === 'and' || ele.data('class') === 'or' || ele.data('class') === 'not' || ele.data('class') === 'unknown logical operator')
           {
               if ( ele.data('ports').length === 2 )
               {
@@ -1956,7 +1967,7 @@ module.exports = function () {
       var targetingEdges = cy.edges("[target='"+processId+"']"); // Holds edges who have the input port as a target
       var sourcingEdges = cy.edges("[source='"+processId+"']"); // Holds edges who have the output port as a source
       // Checks if the ports belong to a process or logial operator, it does the calculations based on the edges connected to its ports
-      if (ele.data('class') === 'process' || ele.data('class') === 'omitted process' || ele.data('class') === 'uncertain process' || ele.data('class') === 'association' || ele.data('class') === 'dissociation')
+      if (ele.data('class') === 'process' || ele.data('class') === 'omitted process' || ele.data('class') === 'uncertain process' || ele.data('class') === 'truncated process' || ele.data('class') === 'association' || ele.data('class') === 'dissociation')
       {
           targetingEdges.forEach(function(edge){
               if (edge.data('class') === 'consumption')
@@ -1980,7 +1991,7 @@ module.exports = function () {
               }
           });
       }
-      else if (ele.data('class') === 'and' || ele.data('class') === 'or' || ele.data('class') === 'not')
+      else if (ele.data('class') === 'and' || ele.data('class') === 'or' || ele.data('class') === 'not' || ele.data('class') === 'unknown logical operator')
       {
           targetingEdges.forEach(function(edge){
               if (edge.data('class') === 'logic arc')
@@ -2068,7 +2079,7 @@ module.exports = function () {
       var targetingEdges = cy.edges("[target='"+processId+"']");
       var sourcingEdges = cy.edges("[source='"+processId+"']");
       // Checks simple nodes and add them to one of the arrays mentioned above
-      if (ele.data('class') === 'process' || ele.data('class') === 'omitted process' || ele.data('class') === 'uncertain process' || ele.data('class') === 'association' || ele.data('class') === 'dissociation')
+      if (ele.data('class') === 'process' || ele.data('class') === 'omitted process' || ele.data('class') === 'truncated process' || ele.data('class') === 'uncertain process' || ele.data('class') === 'association' || ele.data('class') === 'dissociation')
       {
           targetingEdges.forEach(function(edge){
               var source = cy.getElementById(edge.data('source'));
@@ -2096,7 +2107,7 @@ module.exports = function () {
               }
           });
       }
-      else if (ele.data('class') === 'and' || ele.data('class') === 'or' || ele.data('class') === 'not')
+      else if (ele.data('class') === 'and' || ele.data('class') === 'or' || ele.data('class') === 'not' || ele.data('class') === 'unknown logical operator')
       {
           targetingEdges.forEach(function(edge){
               var source = cy.getElementById(edge.data('source'));
@@ -2559,6 +2570,51 @@ module.exports = function () {
     'topology group': {
       width: 44,
       height: 44
+    },
+    'gene': {
+      width: 50,
+      height: 30
+    },
+    'rna': {
+      width: 50,
+      height: 44
+    },
+    'simple-molecule': {
+      width: 30,
+      height: 30
+    },
+    'unknown molecule': {
+      width: 60,
+      height: 30
+    },
+    'ion': {
+      width: 30,
+      height: 30
+    },
+    'drug': {
+      width: 60,
+      height: 40
+    },
+    'phenotype': {
+      width: 30,
+      height: 30
+    },
+    'simple molecule': {
+      width: 50,
+      height: 40
+    },
+    'truncated protein': {
+      width: 60,
+      height: 40
+    },
+    'ion channel': {
+      width: 60,
+      height: 40
+    },
+    'receptor':
+    {
+      width: 60,
+      height: 40
     }
   };
 
@@ -2671,6 +2727,10 @@ module.exports = function () {
     'background-color': '#707070'
   } );
 
+  $.extend( defaultProperties['unknown molecule'], {
+    'background-color': '#707070'
+  } );
+
   elementUtilities.epnTypes
     .concat( elementUtilities.sifTypes )
     .concat( elementUtilities.otherNodeTypes )
@@ -2764,6 +2824,7 @@ module.exports = function () {
     var pureClass = elementUtilities.getPureSbgnClass( sbgnclass );
 
     // init default properties for the class if not initialized yet
+    //console.log('defaultProperties[ pureClass ] ', defaultProperties[ pureClass ] )
     if ( defaultProperties[ pureClass ] == null ) {
       defaultProperties[ pureClass ] = {};
     }

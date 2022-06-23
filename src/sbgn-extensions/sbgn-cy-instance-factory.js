@@ -10,11 +10,12 @@ module.exports = function () {
 	var elementUtilities, graphUtilities, mainUtilities, undoRedoActionFunctions, optionUtilities, experimentalDataOverlay;
 	var refreshPaddings, options, cy;
 
-	var sbgnCyInstance = function (param) {
+	var sbgnCyInstance = function (param) 
+	{
 		elementUtilities = param.elementUtilities;
 		graphUtilities = param.graphUtilities;
 		experimentalDataOverlay = param.experimentalDataOverlay;
-    mainUtilities = param.mainUtilities;
+    	mainUtilities = param.mainUtilities;
 		undoRedoActionFunctions = param.undoRedoActionFunctions;
 		refreshPaddings = graphUtilities.refreshPaddings.bind(graphUtilities);
 
@@ -668,8 +669,8 @@ module.exports = function () {
 								return ele.data('width');
 							}
 			      })
-	          .selector("node[class='association'],[class='dissociation'],[class='and'],[class='or'],[class='not'],[class='process'],[class='omitted process'],[class='uncertain process']")
-	          .css({
+				  .selector("node[class='association'],[class='dissociation'],[class='and'],[class='or'],[class='not'],[class='process'],[class='omitted process'],[class='uncertain process'],[class='truncated process'],[class='unknown logical operator']")
+				  .css({
 	            'shape-polygon-points': function(ele) {
 	              if (graphUtilities.portsEnabled === true && ele.data('ports').length === 2) {
 	                // We assume that the ports of the edge are symetric according to the node center so just checking one port is enough for us
@@ -694,6 +695,14 @@ module.exports = function () {
 	          .selector("node[class='perturbing agent']")
 	          .css({
 	            'shape-polygon-points': '-1, -1,   -0.5, 0,  -1, 1,   1, 1,   0.5, 0, 1, -1'
+	          })
+			  .selector("node[class='rna']")
+	          .css({
+	            'shape-polygon-points': '-0.5, -1,   1, -1,   0.5, 0,   -1, 0'
+	          })
+			  .selector("node[class='receptor']")
+	          .css({
+	            'shape-polygon-points': '-1, -1,   0, -0.5,   1, -1,   1, 0.5,   0, 1,   -1,  0.5'
 	          })
 	          .selector("node[class='tag']")
 	          .css({

@@ -116,6 +116,52 @@ module.exports = function () {
 
     context.closePath();
   };
+
+  var drawRoundDrugPath= $$.sbgn.drawRoundDrug = function(
+    context, x, y, width, height, radius )
+    {
+
+    var halfWidth = width / 2;
+    var halfHeight = height / 2;
+    var cornerRadius = radius || cyMath.getRoundRectangleRadius( width, height );
+
+    if( context.beginPath ){ context.beginPath(); }
+
+    // Start at top middle
+    context.moveTo( x, y - halfHeight );
+    // Arc from middle top to right side
+    context.arcTo( x + halfWidth, y - halfHeight, x + halfWidth, y, cornerRadius );
+    // Arc from right side to bottom
+    context.arcTo( x + halfWidth, y + halfHeight, x, y + halfHeight, cornerRadius );
+    // Arc from bottom to left side
+    context.arcTo( x - halfWidth, y + halfHeight, x - halfWidth, y, cornerRadius );
+    // Arc from left side to topBorder
+    context.arcTo( x - halfWidth, y - halfHeight, x, y - halfHeight, cornerRadius );
+    // Join line
+    context.lineTo( x, y - halfHeight );
+
+
+    var halfWidthInner = width / 2 - 5;
+    var halfHeightInner = height / 2 - 5;
+    var cornerRadius = radius || cyMath.getRoundRectangleRadius( width, height );
+
+
+    // Start at top middle
+    context.moveTo( x, y - halfHeightInner );
+    // Arc from middle top to right side
+    context.arcTo( x + halfWidthInner, y - halfHeightInner, x + halfWidthInner, y, cornerRadius );
+    // Arc from right side to bottom
+    context.arcTo( x + halfWidthInner, y + halfHeightInner, x, y + halfHeightInner, cornerRadius );
+    // Arc from bottom to left side
+    context.arcTo( x - halfWidthInner, y + halfHeightInner, x - halfWidthInner, y, cornerRadius );
+    // Arc from left side to topBorder
+    context.arcTo( x - halfWidthInner, y - halfHeightInner, x, y - halfHeightInner, cornerRadius );
+    // Join line
+    context.lineTo( x, y - halfHeightInner );
+
+
+    context.closePath();
+  };
   
   // Taken from cytoscape.js
   var drawPolygonPath = function(
@@ -142,7 +188,16 @@ module.exports = function () {
     'macromolecule': true,
     'simple chemical': true,
     'biological activity': true,
-    'compartment': true
+    'compartment': true,
+    'gene': true,
+    'simple molecule': true,
+    'unknown molecule': true,
+    'drug': true,
+    'truncated protein': true,
+    'ion channel': true,
+    'receptor': true,
+    'ion': true,
+    'ion channel': true
   };
 
   var totallyOverridenNodeShapes = $$.sbgn.totallyOverridenNodeShapes = {
@@ -379,6 +434,7 @@ module.exports = function () {
   $$.sbgn.drawEllipsePath = function (context, x, y, width, height) {
     cyBaseNodeShapes['ellipse'].drawPath(context, x, y, width, height);
   };
+  
 
   $$.sbgn.drawBarrel = function (context, x, y, width, height) {
     cyBaseNodeShapes['barrel'].draw(context, x, y, width, height);
@@ -471,7 +527,7 @@ module.exports = function () {
 
   cyStyleProperties.types.nodeShape.enums.push(
     'empty set', 'nucleic acid feature', 'complex', 'macromolecule',
-    'simple chemical', 'biological activity', 'compartment'
+    'simple chemical', 'biological activity', 'compartment', 'gene', 'simple molecule', 'unknown molecule', 'drug', 'truncated protein', 'ion', 'ion channel'
   );
 
   $$.sbgn.registerSbgnNodeShapes = function () {
@@ -480,7 +536,6 @@ module.exports = function () {
       canHaveInfoBox, multimerPadding } ) {
 
       return function( context, node, imgObj ) {
-
         var borderWidth = parseFloat(node.css('border-width'));
         var width = node.outerWidth() - borderWidth;
         var height = node.outerHeight() - borderWidth;
@@ -607,7 +662,7 @@ module.exports = function () {
 
     var shapeNames = [ "simple chemical", "macromolecule", "complex",
       "nucleic acid feature", "empty set", "biological activity",
-      "compartment", "oldCompartment"
+      "compartment", "oldCompartment", "gene", "simple molecule", "unknown molecule", "drug", "ion", "truncated protein", "ion channel"
     ];
 
     shapeNames.forEach( function( shapeName ) {
@@ -644,6 +699,73 @@ module.exports = function () {
     //$$.sbgn.drawEllipsePath(context, x, y, width, height);
     //context.fill();
     cyBaseNodeShapes['ellipse'].draw(context, x, y, width, height);
+  };
+
+  $$.sbgn.drawIonChannel = function (context, x, y, width, height, radius) {
+
+    var halfWidth = width / 2;
+    var halfHeight = height / 2;
+    var cornerRadius = radius || cyMath.getRoundRectangleRadius( width, height );
+
+    if( context.beginPath ){ context.beginPath(); }
+
+    // Start at top middle
+    context.moveTo( x + halfWidth/4, y - halfHeight );
+    // Arc from middle top to right side
+    context.arcTo( x + halfWidth/2, y - halfHeight, x + halfWidth/2, y, cornerRadius );
+    // Arc from right side to bottom
+    context.arcTo( x + halfWidth/2, y + halfHeight, x/2 + halfWidth/4, y + halfHeight, cornerRadius );
+    // Arc from bottom to left side
+    context.arcTo( x - halfWidth, y + halfHeight, x - halfWidth, y, cornerRadius );
+    // Arc from left side to topBorder
+    context.arcTo( x - halfWidth, y - halfHeight, x + halfWidth/4, y - halfHeight, cornerRadius );
+    // Join line
+    context.lineTo( x + halfWidth/4, y - halfHeight );
+
+    // Start at top middle
+    context.moveTo( x + 3 *halfWidth/4, y - halfHeight );
+    // Arc from middle top to right side
+    context.arcTo( x + halfWidth, y - halfHeight, x + halfWidth, y, cornerRadius );
+    // Arc from right side to bottom
+    context.arcTo( x + halfWidth, y + halfHeight, x + 3 * halfWidth/4, y + halfHeight, cornerRadius );
+    // Arc from bottom to left side
+    context.arcTo( x + halfWidth/2, y + halfHeight, x +  halfWidth/2, y, cornerRadius );
+    // Arc from left side to topBorder
+    context.arcTo( x + halfWidth/2, y - halfHeight, x + 3 * halfWidth/4 , y - halfHeight, cornerRadius );
+    // Join line
+    //context.lineTo( x, y - halfHeight );
+
+
+    context.closePath();
+  }
+
+  $$.sbgn.drawTruncatedProtein = function (context, x, y, width, height, radius) {
+   
+    var halfWidth = width / 2;
+    var halfHeight = height / 2;
+    var cornerRadius = radius || cyMath.getRoundRectangleRadius( width, height );
+
+    if( context.beginPath ){ context.beginPath(); }
+
+    // Start at top middle
+    context.moveTo( x, y - halfHeight );
+    //Draw a line till right top
+    context.lineTo( x + halfWidth, y - halfHeight );
+    //Draw a line to middle right
+    context.lineTo( x + halfWidth, y + halfHeight/2);
+    //Draw a line inner
+    context.lineTo( x + halfWidth/2, y );
+    //Draw a line to bottom right
+    context.lineTo( x + halfWidth/2, y + halfHeight );
+    //Draw a line to bottom middle
+    context.lineTo( x, y + halfHeight );
+    // Arc from bottom to left side
+    context.arcTo( x - halfWidth, y + halfHeight, x - halfWidth, y, cornerRadius );
+    // Arc from left side to topBorder
+    context.arcTo( x - halfWidth, y - halfHeight, x, y - halfHeight, cornerRadius );
+
+
+    context.closePath();
   };
 
   $$.sbgn.drawComplex = function( context, x, y, width, height, cornerLength ) {
@@ -698,7 +820,14 @@ module.exports = function () {
     "empty set": $$.sbgn.drawEllipse,
     "biological activity": $$.sbgn.drawBiologicalActivity,
     "compartment": $$.sbgn.drawBarrel,
-    "oldCompartment": $$.sbgn.drawRoundRectangle
+    "oldCompartment": $$.sbgn.drawRoundRectangle,
+    "gene":  $$.sbgn.drawRoundRectangle,
+    "simple molecule": $$.sbgn.drawEllipse,
+    "unknown molecule": $$.sbgn.drawEllipse,
+    "drug": $$.sbgn.drawRoundDrug,
+    "ion": $$.sbgn.drawEllipse,
+    "truncated protein": $$.sbgn.drawTruncatedProtein,
+    "ion channel" : $$.sbgn.drawIonChannel
   };
 
   // To define an extra drawing for the node that is rendered at the very end,
@@ -740,6 +869,11 @@ module.exports = function () {
       return cyBaseNodeShapes["barrel"].intersectLine( centerX, centerY, width, height, x, y, padding );
     },
     "oldCompartment": function( centerX, centerY, width, height, x, y, padding ) {
+      return cyMath.roundRectangleIntersectLine(
+        x, y, centerX, centerY, width, height, padding
+      );
+    },
+    "drug": function( centerX, centerY, width, height, x, y, padding ) {
       return cyMath.roundRectangleIntersectLine(
         x, y, centerX, centerY, width, height, padding
       );
@@ -833,7 +967,28 @@ module.exports = function () {
     },
     "oldCompartment": function( x, y, padding, width, height, centerX, centerY ) {
       return cyBaseNodeShapes["roundrectangle"].checkPoint( x, y, padding, width, height, centerX, centerY );
-    }
+    },
+    "gene": function( x, y, padding, width, height, centerX, centerY ) {
+      return cyBaseNodeShapes["roundrectangle"].checkPoint( x, y, padding, width, height, centerX, centerY );
+   },
+   "simple molecule": function( x, y, padding, width, height, centerX, centerY ) {
+    return cyBaseNodeShapes["roundrectangle"].checkPoint( x, y, padding, width, height, centerX, centerY );
+   },
+   "unknown molecule": function( x, y, padding, width, height, centerX, centerY ) {
+    return cyBaseNodeShapes["roundrectangle"].checkPoint( x, y, padding, width, height, centerX, centerY );
+   },
+   "drug": function( x, y, padding, width, height, centerX, centerY ) {
+    return cyBaseNodeShapes["roundrectangle"].checkPoint( x, y, padding, width, height, centerX, centerY );
+   },
+   "ion": function( x, y, padding, width, height, centerX, centerY ) {
+    return cyBaseNodeShapes["roundrectangle"].checkPoint( x, y, padding, width, height, centerX, centerY );
+   },
+   "truncated protein": function( x, y, padding, width, height, centerX, centerY ) {
+    return cyBaseNodeShapes["roundrectangle"].checkPoint( x, y, padding, width, height, centerX, centerY );
+   },
+   "ion channel": function( x, y, padding, width, height, centerX, centerY ) {
+    return cyBaseNodeShapes["roundrectangle"].checkPoint( x, y, padding, width, height, centerX, centerY );
+   }
   };
 
   $$.sbgn.cloneMarker = {

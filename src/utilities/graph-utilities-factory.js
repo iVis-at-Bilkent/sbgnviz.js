@@ -52,7 +52,6 @@ module.exports = function () {
   };
 
   graphUtilities.updateGraph = function(cyGraph, callback, layoutOptions, tileInfoBoxes) {
-   
 
     var isLayoutRequired;
     if(layoutOptions === undefined){

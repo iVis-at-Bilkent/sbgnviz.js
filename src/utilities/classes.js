@@ -522,7 +522,6 @@ StateVariable.remove = function (mainObj, cy) {
   var position = StateVariable.getPositionIndex(mainObj, cy);
   var index = StateVariable.getParent(mainObj, cy).data('statesandinfos').indexOf(mainObj);
   StateVariable.removeFromParent(mainObj, cy);
-  //console.log("after remove", this.parent.data('auxunitlayouts'), this.parent.data('statesandinfos'));
   return {
     clazz: "state variable",
     state: {
@@ -773,7 +772,6 @@ AuxUnitLayout.construct = function(parentNode, location, alignment) {
 };
 
 AuxUnitLayout.getParentNode = function(mainObj, cy) {
-  //console.log(mainObj);
   var parentNode = mainObj.parentNode;
 
   // If parentNode is id of parent node rather than being itself get the parent node by that id
