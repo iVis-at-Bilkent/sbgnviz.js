@@ -1132,10 +1132,10 @@ module.exports = function () {
     'activates', 'inhibits', 'phosphorylates', 'dephosphorylates',
     'upregulates-expression', 'downregulates-expression', 'activates-gtpase',
     'inhibits-gtpase', 'acetylates', 'deacetylates', 'methylates', 'demethylates',
-    'trigger', 'transport', 'unkown inhibition', 'unknown catalysis', 'transcription consumption', 
+    'trigger', 'transport', 'unknown inhibition', 'unknown catalysis', 'transcription consumption', 
     'transcription production', 'translation consumption', 'translation production', 'negative influence', 
     'positive influence sbml', 'reduced modulation', 'reduced stimulation', 'reduced trigger' , 
-    'unknown negative influence',  'unknown postive influence', 'unknown reduced stimulation',
+    'unknown negative influence',  'unknown positive influence', 'unknown reduced stimulation',
     'unknown reduced modulation', 'unknown reduced trigger'
   ];
 
@@ -1669,7 +1669,7 @@ module.exports = function () {
       case 'downregulates-expression': case 'unknown inhibition':
       case 'unknown catalysis':  case 'transcription consumption':
       case 'transcription production': case 'translation consumption':
-      case 'translation production':   case 'unknown negative influnce':
+      case 'translation production':   case 'unknown negative influence':
       case 'unknown positive influence': case 'unknown reduced stimulation':
       case 'unknown reduced modulation': case 'unknown reduced trigger':
         return 'dashed';
@@ -1740,7 +1740,7 @@ module.exports = function () {
 
     if ( _class == 'inhibition' || _class == 'negative influence' ||
           _class == 'production' || _class == 'transport' || _class == 'transcription production' || _class == 'translation production' || 
-          _class == 'unknown inhibition' || _class == 'unknown negative influence' || _class == 'positive influnce sbml' || _class == 'unknown positive influence'
+          _class == 'unknown inhibition' || _class == 'unknown negative influence' || _class == 'unknown positive influence'
           || _class ==  'positive influence sbml' || elementUtilities.isSIFEdge( _class ) ) {
       return 'filled'; 
     }
