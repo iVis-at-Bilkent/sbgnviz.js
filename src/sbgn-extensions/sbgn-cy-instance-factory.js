@@ -894,9 +894,13 @@ module.exports = function () {
 	            'target-endpoint': function(ele) {
 	              return elementUtilities.getEndPoint(ele, 'target');
 	            },
-							'line-style': function (ele) {
+				'line-style': function (ele) {
 	              return elementUtilities.getArrayLineStyle(ele);
-	            }
+	            },
+				'line-dash-pattern':  function (ele) {
+					console.log("in dash line pattern")
+					return elementUtilities.getArrayLineDashStyle(ele);
+				}
 	          })
 	          .selector("core")
 	          .css({

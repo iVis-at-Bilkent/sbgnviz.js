@@ -1678,6 +1678,21 @@ module.exports = function () {
     }
   };
 
+  elementUtilities.getArrayLineDashStyle = function (ele) {
+    var sbgnclass = elementUtilities.getPureSbgnClass( ele );
+
+    switch (sbgnclass) {
+      case 'transcription consumption': case 'transcription production':
+        return [20,10,2,5,2,10];
+      case 'translation consumption': case 'translation production':
+        return [15, 7, 2, 7 ];
+      default:
+        return [6, 3];
+    }
+
+    
+  };
+
   elementUtilities.getCyShape = function (ele) {
       var _class = ele.data('class');
       // Get rid of rectangle postfix to have the actual node class
