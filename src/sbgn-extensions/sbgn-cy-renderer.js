@@ -222,7 +222,17 @@ module.exports = function () {
     'macromolecule': true,
     'complex': true,
     'nucleic acid feature': true,
-    'simple chemical': true
+    'simple chemical': true,
+    'receptor': true,
+    'ion channel': true,
+    'truncated protein': true,
+    'gene': true,
+    'rna': true,
+    'phenotype': true,
+    'ion': true,
+    'simple molecule': true,
+    'unknown molecule': true,
+    'drug': true
   };
 
   cyMath.calculateDistance = function (point1, point2) {
@@ -235,6 +245,10 @@ module.exports = function () {
   };
 
   $$.sbgn.getDefaultComplexCornerLength = function() {
+    return 24;
+  };
+
+  $$.sbgn.getDefaultGeneCornerLength = function() {
     return 24;
   };
 
@@ -508,6 +522,17 @@ module.exports = function () {
     return complexPoints;
   };
 
+  $$.sbgn.generateGeneShapePoints = function (cornerLength, width, height) {
+    //cp stands for corner proportion
+    var cpX = Math.min(cornerLength, 0.5 * width) / width;
+    var cpY = Math.min(cornerLength, 0.5 * height) / height;
+
+    var complexPoints = [-1 + cpX, -1, -1, -1 + cpY, -1, 1 - cpY, -1 + cpX,
+      1, 1 - cpX, 1, 1, 1 - cpY, 1, -1 + cpY, 1 - cpX, -1];
+
+    return complexPoints;
+  };
+
   $$.sbgn.generatePerturbingAgentPoints = function() {
     return [-1, -1,   -0.5, 0,  -1, 1,   1, 1,   0.5, 0, 1, -1];
   };
@@ -771,6 +796,15 @@ module.exports = function () {
   $$.sbgn.drawComplex = function( context, x, y, width, height, cornerLength ) {
     cornerLength = cornerLength || $$.sbgn.getDefaultComplexCornerLength();
     var points = $$.sbgn.generateComplexShapePoints(cornerLength, width, height);
+
+    drawPolygonPath(context, x, y, width, height, points);
+
+    context.fill();
+  };
+
+  $$.sbgn.drawGene = function( context, x, y, width, height, cornerLength ) {
+    cornerLength = cornerLength || $$.sbgn.getDefaultGeneCornerLength();
+    var points = $$.sbgn.generateGeneShapePoints(cornerLength, width, height);
 
     drawPolygonPath(context, x, y, width, height, points);
 

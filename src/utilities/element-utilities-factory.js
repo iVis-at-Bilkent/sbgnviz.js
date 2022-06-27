@@ -1097,6 +1097,8 @@ module.exports = function () {
   elementUtilities.sifTypes = ['SIF macromolecule', 'SIF simple chemical'];
   elementUtilities.otherNodeTypes = ['compartment', 'tag', 'submap', 'topology group'];
   elementUtilities.sbmlType = ['gene', 'rna', 'simple molecule', 'unknown molecule', 'phenotype', 'drug', 'ion', 'protein', 'truncated protein', 'ion channel', 'receptor'];
+  elementUtilities.sbmlTypeMultimer = ['gene multimer', 'rna multimer', 'ion channel multimer', 'receptor multimer', 'truncated protein multimer', 'rna multimer', 'phenotype multimer',
+    'ion multimer', 'simple molecule multimer', 'unknown molecule multimer', 'drug multimer', 'complex multimer']
 
   elementUtilities.nodeTypes = elementUtilities.epnTypes
     .concat( elementUtilities.logicalOperatorTypes )
@@ -1334,7 +1336,18 @@ module.exports = function () {
       'macromolecule': true,
       'complex': true,
       'nucleic acid feature': true,
-      'simple chemical': true
+      'simple chemical': true,
+      'receptor': true,
+      'ion channel': true,
+      'truncated protein': true,
+      'gene': true,
+      'rna': true,
+      'phenotype': true,
+      'ion': true,
+      'simple molecule': true,
+      'unknown molecule': true,
+      'drug': true,
+      'complex': true
     };
 
     return list[sbgnclass] ? true : false;
