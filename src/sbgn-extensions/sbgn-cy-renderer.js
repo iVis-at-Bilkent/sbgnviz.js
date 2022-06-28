@@ -190,6 +190,7 @@ module.exports = function () {
     'biological activity': true,
     'compartment': true,
     'gene': true,
+    'rna': true,
     'simple molecule': true,
     'unknown molecule': true,
     'drug': true,
@@ -197,7 +198,9 @@ module.exports = function () {
     'ion channel': true,
     'receptor': true,
     'ion': true,
-    'ion channel': true
+    'ion channel': true,
+    'phenotype sbml': true,
+    'complex sbml': true
   };
 
   var totallyOverridenNodeShapes = $$.sbgn.totallyOverridenNodeShapes = {
@@ -232,7 +235,9 @@ module.exports = function () {
     'ion': true,
     'simple molecule': true,
     'unknown molecule': true,
-    'drug': true
+    'drug': true,
+    'phenotype sbml': true,
+    'complex sbml': true
   };
 
   cyMath.calculateDistance = function (point1, point2) {
@@ -243,6 +248,7 @@ module.exports = function () {
   $$.sbgn.colors = {
     clone: "#838383"
   };
+  
 
   $$.sbgn.getDefaultComplexCornerLength = function() {
     return 24;
@@ -448,7 +454,7 @@ module.exports = function () {
   $$.sbgn.drawEllipsePath = function (context, x, y, width, height) {
     cyBaseNodeShapes['ellipse'].drawPath(context, x, y, width, height);
   };
-  
+
 
   $$.sbgn.drawBarrel = function (context, x, y, width, height) {
     cyBaseNodeShapes['barrel'].draw(context, x, y, width, height);
@@ -522,15 +528,20 @@ module.exports = function () {
     return complexPoints;
   };
 
-  $$.sbgn.generateGeneShapePoints = function (cornerLength, width, height) {
-    //cp stands for corner proportion
-    var cpX = Math.min(cornerLength, 0.5 * width) / width;
-    var cpY = Math.min(cornerLength, 0.5 * height) / height;
+  $$.sbgn.generateGeneShapePoints = function (width, height) {
 
-    var complexPoints = [-1 + cpX, -1, -1, -1 + cpY, -1, 1 - cpY, -1 + cpX,
-      1, 1 - cpX, 1, 1, 1 - cpY, 1, -1 + cpY, 1 - cpX, -1];
+    return [-1, -1,   1, -1 ,   1, 1,   -1 , 1 ];
+  };
 
-    return complexPoints;
+
+  $$.sbgn.generateRNAShapePoints = function (width, height) {
+
+    return [-1, 1,   0, 1 ,   0.5, 0,   -0.5 , 0 ];
+  };
+
+  $$.sbgn.generateReceptorShapePoints = function (width, height) {
+
+    return [-1, -1,   0, -0.5,   1, -1,   1, 0.5,   0, 1,   -1,  0.5 ];
   };
 
   $$.sbgn.generatePerturbingAgentPoints = function() {
@@ -552,7 +563,8 @@ module.exports = function () {
 
   cyStyleProperties.types.nodeShape.enums.push(
     'empty set', 'nucleic acid feature', 'complex', 'macromolecule',
-    'simple chemical', 'biological activity', 'compartment', 'gene', 'simple molecule', 'unknown molecule', 'drug', 'truncated protein', 'ion', 'ion channel'
+    'simple chemical', 'biological activity', 'compartment', 'gene', 'simple molecule', 'unknown molecule', 'drug', 
+    'truncated protein', 'ion', 'ion channel', 'rna', 'phenotype sbml', 'receptor', 'complex sbml'
   );
 
   $$.sbgn.registerSbgnNodeShapes = function () {
@@ -687,7 +699,8 @@ module.exports = function () {
 
     var shapeNames = [ "simple chemical", "macromolecule", "complex",
       "nucleic acid feature", "empty set", "biological activity",
-      "compartment", "oldCompartment", "gene", "simple molecule", "unknown molecule", "drug", "ion", "truncated protein", "ion channel"
+      "compartment", "oldCompartment", "gene", "simple molecule", 'receptor', 'complex sbml',
+      "unknown molecule", "drug", "ion", "truncated protein", "ion channel", "rna", "phenotype sbml"
     ];
 
     shapeNames.forEach( function( shapeName ) {
@@ -802,13 +815,30 @@ module.exports = function () {
     context.fill();
   };
 
-  $$.sbgn.drawGene = function( context, x, y, width, height, cornerLength ) {
-    cornerLength = cornerLength || $$.sbgn.getDefaultGeneCornerLength();
-    var points = $$.sbgn.generateGeneShapePoints(cornerLength, width, height);
+  $$.sbgn.drawGene = function( context, x, y, width, height ) {
+    cyBaseNodeShapes['rectangle'].draw(context, x, y, width, height);
+
+  };
+
+  $$.sbgn.drawRNA = function( context, x, y, width, height ) {
+    var points = $$.sbgn.generateRNAShapePoints(width, height);
 
     drawPolygonPath(context, x, y, width, height, points);
 
     context.fill();
+  };
+
+  $$.sbgn.drawPhenotype = function( context, x, y, width, height ) {
+    cyBaseNodeShapes['hexagon'].draw(context, x, y, width, height);
+
+  };
+  $$.sbgn.drawReceptor= function( context, x, y, width, height ) {
+    var points = $$.sbgn.generateReceptorShapePoints( width, height);
+
+    drawPolygonPath(context, x, y, width, height, points);
+
+    context.fill();
+
   };
 
   $$.sbgn.drawCrossLine = function( context, x, y, width, height ) {
@@ -855,13 +885,17 @@ module.exports = function () {
     "biological activity": $$.sbgn.drawBiologicalActivity,
     "compartment": $$.sbgn.drawBarrel,
     "oldCompartment": $$.sbgn.drawRoundRectangle,
-    "gene":  $$.sbgn.drawRoundRectangle,
+    "gene":  $$.sbgn.drawGene,
+    "rna": $$.sbgn.drawRNA,
     "simple molecule": $$.sbgn.drawEllipse,
     "unknown molecule": $$.sbgn.drawEllipse,
     "drug": $$.sbgn.drawRoundDrug,
     "ion": $$.sbgn.drawEllipse,
     "truncated protein": $$.sbgn.drawTruncatedProtein,
-    "ion channel" : $$.sbgn.drawIonChannel
+    "ion channel" : $$.sbgn.drawIonChannel,
+    "phenotype sbml": $$.sbgn.drawPhenotype,
+    "receptor": $$.sbgn.drawReceptor,
+    "complex sbml": $$.sbgn.drawComplex
   };
 
   // To define an extra drawing for the node that is rendered at the very end,
@@ -987,6 +1021,11 @@ module.exports = function () {
       return cyMath.pointInsidePolygon(
         x, y, points, centerX, centerY, width, height, [0, -1], padding);
     },
+    "complex sbml" : function( x, y, padding, width, height, centerX, centerY ) {
+      var points = $$.sbgn.generateComplexShapePoints( $$.sbgn.getDefaultComplexCornerLength(), width, height );
+      return cyMath.pointInsidePolygon(
+        x, y, points, centerX, centerY, width, height, [0, -1], padding);
+    },
     "nucleic acid feature": function( x, y, padding, width, height, centerX, centerY ) {
       return cyBaseNodeShapes["bottomroundrectangle"].checkPoint( x, y, padding, width, height, centerX, centerY );
     },
@@ -1021,6 +1060,15 @@ module.exports = function () {
     return cyBaseNodeShapes["roundrectangle"].checkPoint( x, y, padding, width, height, centerX, centerY );
    },
    "ion channel": function( x, y, padding, width, height, centerX, centerY ) {
+    return cyBaseNodeShapes["roundrectangle"].checkPoint( x, y, padding, width, height, centerX, centerY );
+   },
+   "rna": function( x, y, padding, width, height, centerX, centerY ) {
+    return cyBaseNodeShapes["roundrectangle"].checkPoint( x, y, padding, width, height, centerX, centerY );
+   },
+   "phenotype sbml": function( x, y, padding, width, height, centerX, centerY ) {
+    return cyBaseNodeShapes["roundrectangle"].checkPoint( x, y, padding, width, height, centerX, centerY );
+   },
+   "receptor": function( x, y, padding, width, height, centerX, centerY ) {
     return cyBaseNodeShapes["roundrectangle"].checkPoint( x, y, padding, width, height, centerX, centerY );
    }
   };

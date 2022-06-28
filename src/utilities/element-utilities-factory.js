@@ -1096,9 +1096,11 @@ module.exports = function () {
     'nucleic acid feature multimer', 'macromolecule multimer', 'simple chemical multimer', 'complex multimer'];
   elementUtilities.sifTypes = ['SIF macromolecule', 'SIF simple chemical'];
   elementUtilities.otherNodeTypes = ['compartment', 'tag', 'submap', 'topology group'];
-  elementUtilities.sbmlType = ['gene', 'rna', 'simple molecule', 'unknown molecule', 'phenotype', 'drug', 'ion', 'protein', 'truncated protein', 'ion channel', 'receptor'];
-  elementUtilities.sbmlTypeMultimer = ['gene multimer', 'rna multimer', 'ion channel multimer', 'receptor multimer', 'truncated protein multimer', 'rna multimer', 'phenotype multimer',
-    'ion multimer', 'simple molecule multimer', 'unknown molecule multimer', 'drug multimer', 'complex multimer']
+  elementUtilities.sbmlType = ['gene', 'rna', 'simple molecule', 'unknown molecule', 'phenotype', 'drug', 'ion', 'protein', 'truncated protein', 
+  'ion channel', 'receptor', 'phenotype sbml', 'receptor', 'complex sbml'];
+  elementUtilities.sbmlTypeMultimer = ['gene multimer', 'rna multimer', 'ion channel multimer', 'receptor multimer', 'truncated protein multimer', 'phenotype multimer',
+    'ion multimer', 'simple molecule multimer', 'unknown molecule multimer', 'drug multimer', 'complex multimer', 'phenotype sbml multimer', 'receptor multimer',
+  'complex sbml multimer']
 
   elementUtilities.nodeTypes = elementUtilities.epnTypes
     .concat( elementUtilities.logicalOperatorTypes )
@@ -1347,7 +1349,10 @@ module.exports = function () {
       'simple molecule': true,
       'unknown molecule': true,
       'drug': true,
-      'complex': true
+      'complex': true,
+      'phenotype sbml': true,
+      'receptor': true,
+      'complex sbml': true
     };
 
     return list[sbgnclass] ? true : false;
@@ -1719,7 +1724,7 @@ module.exports = function () {
       if (_class == 'phenotype') {
           return 'hexagon';
       }
-      if (_class == 'perturbing agent' || _class == 'tag' || _class == 'rna' || _class == 'receptor') {
+      if (_class == 'perturbing agent' || _class == 'tag' ) {
           return 'polygon';
       }
       if (_class == 'SIF macromolecule') {
@@ -1733,15 +1738,16 @@ module.exports = function () {
           return 'biological activity';
       }
 
-      if (_class == 'submap' || _class == 'topology group' || _class == 'gene'){
+      if (_class == 'submap' || _class == 'topology group'){
           return 'rectangle';
       }
 
 
       // We need to define new node shapes with their class names for these nodes
       if (_class == 'empty set' || _class == 'nucleic acid feature' || _class == 'macromolecule'
-              || _class == 'simple chemical' || _class == 'complex' || _class == 'biological activity' || _class == 'cule' 
-              || _class == 'unknown molecule' || _class == 'drug' || _class == 'ion' || _class == 'truncated protein' || _class == 'ion channel') {
+              || _class == 'simple chemical' || _class == 'complex' || _class == 'biological activity' || _class == 'cule' || _class == 'gene'
+              || _class == 'unknown molecule' || _class == 'drug' || _class == 'ion' || _class == 'truncated protein' || _class == 'ion channel'
+              || _class == 'rna'   || _class == 'simple molecule' || _class == 'phenotype sbml'|| _class == 'receptor' || _class == 'complex sbml') {
           return _class;
       }
 
@@ -3100,6 +3106,16 @@ module.exports = function () {
     {
       width: 60,
       height: 40
+    },
+    'phenotype sbml':
+    {
+      width: 50,
+      height: 50
+    },
+    'complex sbml':
+    {
+      width: 44,
+      height: 44
     }
   };
 

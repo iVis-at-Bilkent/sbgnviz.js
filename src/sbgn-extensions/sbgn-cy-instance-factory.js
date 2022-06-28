@@ -697,14 +697,6 @@ module.exports = function () {
 	          .css({
 	            'shape-polygon-points': '-1, -1,   -0.5, 0,  -1, 1,   1, 1,   0.5, 0, 1, -1'
 	          })
-			  .selector("node[class='rna']")
-	          .css({
-	            'shape-polygon-points': '-0.5, -1,   1, -1,   0.5, 0,   -1, 0'
-	          })
-			  .selector("node[class='receptor']")
-	          .css({
-	            'shape-polygon-points': '-1, -1,   0, -0.5,   1, -1,   1, 0.5,   0, 1,   -1,  0.5'
-	          })
 	          .selector("node[class='tag']")
 	          .css({
 	            'shape-polygon-points': '-1, -1,   0.25, -1,   1, 0,    0.25, 1,    -1, 1'
