@@ -460,7 +460,7 @@ module.exports = function () {
 
   elementUtilities.SBML.connectivityConstraints = {
     "consumption": {
-      "macromolecule":        {asSource: {isAllowed: true},    asTarget: {}},
+      "protein":        {asSource: {isAllowed: true},    asTarget: {}},
       "simple molecule":      {asSource: {isAllowed: true},    asTarget: {}},
       "unknown molecule":     {asSource: {isAllowed: true},    asTarget: {}},
       "complex":              {asSource: {isAllowed: true},    asTarget: {}},
@@ -486,7 +486,7 @@ module.exports = function () {
       "unknown logical operator":  {asSource: {},   asTarget: {isAllowed: true}},
     },
     "production": {
-      "macromolecule":        {asSource: {},    asTarget: {isAllowed: true}},
+      "protein":        {asSource: {},    asTarget: {isAllowed: true}},
       "simple molecule":      {asSource: {},    asTarget: {isAllowed: true}},
       "unknown molecule":     {asSource: {},    asTarget: {isAllowed: true}},
       "complex":              {asSource: {},    asTarget: {isAllowed: true}},
@@ -512,7 +512,7 @@ module.exports = function () {
       "unknown logical operator":  {asSource: {},   asTarget: {}},
     },
     "modulation": {
-      "macromolecule":        {asSource: {isAllowed: true},   asTarget: {}},
+      "protein":        {asSource: {isAllowed: true},   asTarget: {}},
       "simple molecule":      {asSource: {isAllowed: true},   asTarget: {}},
       "unknown molecule":     {asSource: {isAllowed: true},   asTarget: {}},
       "complex":              {asSource: {isAllowed: true},   asTarget: {}},
@@ -538,7 +538,7 @@ module.exports = function () {
       "unknown logical operator":  {asSource: {},   asTarget: {}},
     },
     "stimulation": {
-      "macromolecule":        {asSource: {isAllowed: true},   asTarget: {}},
+      "protein":        {asSource: {isAllowed: true},   asTarget: {}},
       "simple molecule":      {asSource: {isAllowed: true},   asTarget: {}},
       "unknown molecule":     {asSource: {isAllowed: true},   asTarget: {}},
       "complex":              {asSource: {isAllowed: true},   asTarget: {}},
@@ -564,7 +564,7 @@ module.exports = function () {
       "unknown logical operator":  {asSource: {},   asTarget: {}},
     },
     "catalysis": {
-      "macromolecule":        {asSource: {isAllowed: true},   asTarget: {}},
+      "protein":        {asSource: {isAllowed: true},   asTarget: {}},
       "simple molecule":      {asSource: {isAllowed: true},   asTarget: {}},
       "unknown molecule":     {asSource: {isAllowed: true},   asTarget: {}},
       "complex":              {asSource: {isAllowed: true},   asTarget: {}},
@@ -590,7 +590,7 @@ module.exports = function () {
       "unknown logical operator":  {asSource: {},   asTarget: {}},
    },
     "inhibition": {
-      "macromolecule":        {asSource: {isAllowed: true},   asTarget: {}},
+      "protein":        {asSource: {isAllowed: true},   asTarget: {}},
       "simple molecule":      {asSource: {isAllowed: true},   asTarget: {}},
       "unknown molecule":     {asSource: {isAllowed: true},   asTarget: {}},
       "complex":              {asSource: {isAllowed: true},   asTarget: {}},
@@ -616,7 +616,7 @@ module.exports = function () {
       "unknown logical operator":  {asSource: {},   asTarget: {}},
    },
     "trigger": {
-      "macromolecule":        {asSource: {isAllowed: true},   asTarget: {}},
+      "protein":        {asSource: {isAllowed: true},   asTarget: {}},
       "simple molecule":      {asSource: {isAllowed: true},   asTarget: {}},
       "unknown molecule":     {asSource: {isAllowed: true},   asTarget: {}},
       "complex":              {asSource: {isAllowed: true},   asTarget: {}},
@@ -642,7 +642,7 @@ module.exports = function () {
       "unknown logical operator":  {asSource: {isAllowed: true},   asTarget: {}},
    },
     "transport": {
-      "macromolecule":        {asSource: {},   asTarget: {isAllowed: true}},
+      "protein":        {asSource: {},   asTarget: {isAllowed: true}},
       "simple molecule":      {asSource: {},   asTarget: {isAllowed: true}},
       "unknown molecule":     {asSource: {},   asTarget: {isAllowed: true}},
       "complex":              {asSource: {},   asTarget: {isAllowed: true}},
@@ -668,7 +668,7 @@ module.exports = function () {
       "unknown logical operator":  {asSource: {},   asTarget: {}},
    },
     "unknown inhibition": {
-      "macromolecule":        {asSource: {isAllowed: true},   asTarget: {}},
+      "protein":        {asSource: {isAllowed: true},   asTarget: {}},
       "simple molecule":      {asSource: {isAllowed: true},   asTarget: {}},
       "unknown molecule":     {asSource: {isAllowed: true},   asTarget: {}},
       "complex":              {asSource: {isAllowed: true},   asTarget: {}},
@@ -694,7 +694,7 @@ module.exports = function () {
       "unknown logical operator":  {asSource: {},   asTarget: {}},
    },
     "unknown catalysis": {
-      "macromolecule":        {asSource: {isAllowed: true},   asTarget: {}},
+      "protein":        {asSource: {isAllowed: true},   asTarget: {}},
       "simple molecule":      {asSource: {isAllowed: true},   asTarget: {}},
       "unknown molecule":     {asSource: {isAllowed: true},   asTarget: {}},
       "complex":              {asSource: {isAllowed: true},   asTarget: {}},
@@ -720,7 +720,7 @@ module.exports = function () {
       "unknown logical operator":  {asSource: {},   asTarget: {}},
    },
     "transcription consumption": {
-      "macromolecule":        {asSource: {isAllowed: true},   asTarget: {}},
+      "protein":        {asSource: {isAllowed: true},   asTarget: {}},
       "simple molecule":      {asSource: {isAllowed: true},   asTarget: {}},
       "unknown molecule":     {asSource: {isAllowed: true},   asTarget: {}},
       "complex":              {asSource: {isAllowed: true},   asTarget: {}},
@@ -746,7 +746,7 @@ module.exports = function () {
       "unknown logical operator":  {asSource: {},   asTarget: {}},
    },
     "transcription production": {
-      "macromolecule":        {asSource: {},   asTarget: {isAllowed: true}},
+      "protein":        {asSource: {},   asTarget: {isAllowed: true}},
       "simple molecule":      {asSource: {},   asTarget: {isAllowed: true}},
       "unknown molecule":     {asSource: {},   asTarget: {isAllowed: true}},
       "complex":              {asSource: {},   asTarget: {isAllowed: true}},
@@ -772,7 +772,7 @@ module.exports = function () {
       "unknown logical operator":  {asSource: {},   asTarget: {}},
    },
     "translation consumption": {
-      "macromolecule":        {asSource: {isAllowed: true},   asTarget: {}},
+      "protein":        {asSource: {isAllowed: true},   asTarget: {}},
       "simple molecule":      {asSource: {isAllowed: true},   asTarget: {}},
       "unknown molecule":     {asSource: {isAllowed: true},   asTarget: {}},
       "complex":              {asSource: {isAllowed: true},   asTarget: {}},
@@ -798,7 +798,7 @@ module.exports = function () {
       "unknown logical operator":  {asSource: {},   asTarget: {}},
    },
     "translation production": {
-      "macromolecule":        {asSource: {},   asTarget: {isAllowed: true}},
+      "protein":        {asSource: {},   asTarget: {isAllowed: true}},
       "simple molecule":      {asSource: {},   asTarget: {isAllowed: true}},
       "unknown molecule":     {asSource: {},   asTarget: {isAllowed: true}},
       "complex":              {asSource: {},   asTarget: {isAllowed: true}},
@@ -824,7 +824,7 @@ module.exports = function () {
       "unknown logical operator":  {asSource: {},   asTarget: {}},
    },
     "positive influence sbml": {
-      "macromolecule":        {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "protein":        {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
       "simple molecule":      {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
       "unknown molecule":     {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
       "complex":              {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
@@ -850,7 +850,7 @@ module.exports = function () {
       "unknown logical operator":  {asSource: {},   asTarget: {}},
    },
     "negative influence": {
-      "macromolecule":        {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "protein":        {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
       "simple molecule":      {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
       "unknown molecule":     {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
       "complex":              {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
@@ -876,7 +876,7 @@ module.exports = function () {
       "unknown logical operator":  {asSource: {},   asTarget: {}},
    },
     "reduced modulation": {
-      "macromolecule":        {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "protein":        {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
       "simple molecule":      {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
       "unknown molecule":     {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
       "complex":              {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
@@ -902,7 +902,7 @@ module.exports = function () {
       "unknown logical operator":  {asSource: {},   asTarget: {}},
    },
     "reduced stimulation": {
-      "macromolecule":        {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "protein":        {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
       "simple molecule":      {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
       "unknown molecule":     {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
       "complex":              {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
@@ -928,7 +928,7 @@ module.exports = function () {
       "unknown logical operator":  {asSource: {},   asTarget: {}},
    },
     "reduced trigger": {
-      "macromolecule":        {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "protein":        {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
       "simple molecule":      {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
       "unknown molecule":     {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
       "complex":              {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
@@ -954,7 +954,7 @@ module.exports = function () {
       "unknown logical operator":  {asSource: {},   asTarget: {}},
    },
     "unknown negative influence": {
-      "macromolecule":        {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "protein":        {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
       "simple molecule":      {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
       "unknown molecule":     {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
       "complex":              {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
@@ -980,7 +980,7 @@ module.exports = function () {
       "unknown logical operator":  {asSource: {},   asTarget: {}},
    },
     "unknown positive influence": {
-      "macromolecule":        {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "protein":        {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
       "simple molecule":      {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
       "unknown molecule":     {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
       "complex":              {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
@@ -1006,7 +1006,7 @@ module.exports = function () {
       "unknown logical operator":  {asSource: {},   asTarget: {}},
    },
     "unknown reduced stimulation": {
-      "macromolecule":        {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "protein":        {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
       "simple molecule":      {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
       "unknown molecule":     {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
       "complex":              {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
@@ -1032,7 +1032,7 @@ module.exports = function () {
       "unknown logical operator":  {asSource: {},   asTarget: {}},
    },
     "unknown reduced modulation": {
-      "macromolecule":        {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "protein":        {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
       "simple molecule":      {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
       "unknown molecule":     {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
       "complex":              {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
@@ -1058,7 +1058,7 @@ module.exports = function () {
       "unknown logical operator":  {asSource: {},   asTarget: {}},
    },
     "unknown reduced trigger": {
-      "macromolecule":        {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "protein":        {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
       "simple molecule":      {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
       "unknown molecule":     {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
       "complex":              {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
@@ -1097,10 +1097,11 @@ module.exports = function () {
   elementUtilities.sifTypes = ['SIF macromolecule', 'SIF simple chemical'];
   elementUtilities.otherNodeTypes = ['compartment', 'tag', 'submap', 'topology group'];
   elementUtilities.sbmlType = ['gene', 'rna', 'simple molecule', 'unknown molecule', 'phenotype', 'drug', 'ion', 'protein', 'truncated protein', 
-  'ion channel', 'receptor', 'phenotype sbml', 'receptor', 'complex sbml'];
+  'ion channel', 'receptor', 'phenotype sbml', 'receptor', 'complex sbml', 'protein'];
   elementUtilities.sbmlTypeMultimer = ['gene multimer', 'rna multimer', 'ion channel multimer', 'receptor multimer', 'truncated protein multimer', 'phenotype multimer',
     'ion multimer', 'simple molecule multimer', 'unknown molecule multimer', 'drug multimer', 'complex multimer', 'phenotype sbml multimer', 'receptor multimer',
-  'complex sbml multimer']
+  'complex sbml multimer', 'protein multimer']
+  elementUtilities.sbmlTypeActive = ['active protein', 'active receptor', 'active ion channel', 'active truncated protein', 'active complex']
 
   elementUtilities.nodeTypes = elementUtilities.epnTypes
     .concat( elementUtilities.logicalOperatorTypes )
@@ -1173,7 +1174,7 @@ module.exports = function () {
       return null;
     }
 
-    return elementUtilities.getSbgnClass( ele ).replace( ' multimer', '' );
+    return elementUtilities.getSbgnClass( ele ).replace( ' multimer', '' ).replace( 'active ', '' );
   };
 
   /*
@@ -1352,7 +1353,22 @@ module.exports = function () {
       'complex': true,
       'phenotype sbml': true,
       'receptor': true,
-      'complex sbml': true
+      'complex sbml': true,
+      'protein': true
+    };
+
+    return list[sbgnclass] ? true : false;
+  };
+
+  elementUtilities.canBeActive = function (ele) {
+    var sbgnclass = elementUtilities.getPureSbgnClass( ele );
+
+    var list = {
+      'protein': true,
+      'complex sbml': true,
+      'receptor': true,
+      'ion channel': true,
+      'truncated protein': true
     };
 
     return list[sbgnclass] ? true : false;
@@ -1717,6 +1733,9 @@ module.exports = function () {
       if (_class.endsWith(' multimer')) {
           _class = _class.replace(' multimer', '');
       }
+      if (_class.startsWith('active ')) {
+        _class = _class.replace('active ', '');
+      }
 
       if (_class == 'compartment') {
           return 'compartment';
@@ -1747,7 +1766,7 @@ module.exports = function () {
       if (_class == 'empty set' || _class == 'nucleic acid feature' || _class == 'macromolecule'
               || _class == 'simple chemical' || _class == 'complex' || _class == 'biological activity' || _class == 'cule' || _class == 'gene'
               || _class == 'unknown molecule' || _class == 'drug' || _class == 'ion' || _class == 'truncated protein' || _class == 'ion channel'
-              || _class == 'rna'   || _class == 'simple molecule' || _class == 'phenotype sbml'|| _class == 'receptor' || _class == 'complex sbml') {
+              || _class == 'rna'   || _class == 'simple molecule' || _class == 'phenotype sbml'|| _class == 'receptor' || _class == 'complex sbml' || _class == 'protein') {
           return _class;
       }
 
@@ -1823,6 +1842,10 @@ module.exports = function () {
 
       if (_class.endsWith(' multimer')) {
           _class = _class.replace(' multimer', '');
+      }
+
+      if (_class.startsWith('active ')) {
+        _class = _class.replace('active ', '');
       }
 
       var content = "";
@@ -3010,6 +3033,11 @@ module.exports = function () {
       width: 60,
       height: 30
     },
+    'protein':
+     {
+      width: 60,
+      height: 30
+     },
     'nucleic acid feature': {
       width: 60,
       height: 30
@@ -3292,7 +3320,8 @@ module.exports = function () {
       'unit of information': true,
       'multimer': true,
       'clonemarker': true,
-      'ports-ordering': true
+      'ports-ordering': true,
+      'active': true,
     };
 
     extendDataWithClassDefaults( data, className, propsToSkip );

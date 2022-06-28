@@ -200,7 +200,8 @@ module.exports = function () {
     'ion': true,
     'ion channel': true,
     'phenotype sbml': true,
-    'complex sbml': true
+    'complex sbml': true,
+    'protein': true
   };
 
   var totallyOverridenNodeShapes = $$.sbgn.totallyOverridenNodeShapes = {
@@ -237,7 +238,8 @@ module.exports = function () {
     'unknown molecule': true,
     'drug': true,
     'phenotype sbml': true,
-    'complex sbml': true
+    'complex sbml': true,
+    'protein': true
   };
 
   cyMath.calculateDistance = function (point1, point2) {
@@ -515,6 +517,13 @@ module.exports = function () {
     return false;
   };
 
+  $$.sbgn.isActive = function (node) {
+    var sbgnClass = node._private.data.class;
+    if (sbgnClass && startsWith(sbgnClass, "active"))
+      return true;
+    return false;
+  };
+
   //this function is created to have same corner length when
   //complex's width or height is changed
   $$.sbgn.generateComplexShapePoints = function (cornerLength, width, height) {
@@ -552,6 +561,7 @@ module.exports = function () {
     return 5;
   };
 
+
   // draw background image of nodes
   $$.sbgn.drawImage = function( context, imgObj ) {
     if(imgObj){
@@ -564,12 +574,12 @@ module.exports = function () {
   cyStyleProperties.types.nodeShape.enums.push(
     'empty set', 'nucleic acid feature', 'complex', 'macromolecule',
     'simple chemical', 'biological activity', 'compartment', 'gene', 'simple molecule', 'unknown molecule', 'drug', 
-    'truncated protein', 'ion', 'ion channel', 'rna', 'phenotype sbml', 'receptor', 'complex sbml'
+    'truncated protein', 'ion', 'ion channel', 'rna', 'phenotype sbml', 'receptor', 'complex sbml', 'protein'
   );
 
   $$.sbgn.registerSbgnNodeShapes = function () {
 
-    function generateDrawFcn( { plainDrawFcn, extraDrawFcn, canBeMultimer, cloneMarkerFcn,
+    function generateDrawFcn( { plainDrawFcn, extraDrawFcn, canBeMultimer, cloneMarkerFcn, canBeActive,
       canHaveInfoBox, multimerPadding } ) {
 
       return function( context, node, imgObj ) {
@@ -585,6 +595,7 @@ module.exports = function () {
           //add multimer shape
           plainDrawFcn( context, centerX + multimerPadding,
                   centerY + multimerPadding, width, height );
+          
 
           $$.sbgn.drawBorder( { context, node } );
 
@@ -700,7 +711,7 @@ module.exports = function () {
     var shapeNames = [ "simple chemical", "macromolecule", "complex",
       "nucleic acid feature", "empty set", "biological activity",
       "compartment", "oldCompartment", "gene", "simple molecule", 'receptor', 'complex sbml',
-      "unknown molecule", "drug", "ion", "truncated protein", "ion channel", "rna", "phenotype sbml"
+      "unknown molecule", "drug", "ion", "truncated protein", "ion channel", "rna", "phenotype sbml", "protein"
     ];
 
     shapeNames.forEach( function( shapeName ) {
@@ -895,7 +906,8 @@ module.exports = function () {
     "ion channel" : $$.sbgn.drawIonChannel,
     "phenotype sbml": $$.sbgn.drawPhenotype,
     "receptor": $$.sbgn.drawReceptor,
-    "complex sbml": $$.sbgn.drawComplex
+    "complex sbml": $$.sbgn.drawComplex,
+    "protein": $$.sbgn.drawRoundRectangle
   };
 
   // To define an extra drawing for the node that is rendered at the very end,
@@ -942,6 +954,11 @@ module.exports = function () {
       );
     },
     "drug": function( centerX, centerY, width, height, x, y, padding ) {
+      return cyMath.roundRectangleIntersectLine(
+        x, y, centerX, centerY, width, height, padding
+      );
+    },
+    "protein": function( centerX, centerY, width, height, x, y, padding ) {
       return cyMath.roundRectangleIntersectLine(
         x, y, centerX, centerY, width, height, padding
       );
@@ -1069,6 +1086,9 @@ module.exports = function () {
     return cyBaseNodeShapes["roundrectangle"].checkPoint( x, y, padding, width, height, centerX, centerY );
    },
    "receptor": function( x, y, padding, width, height, centerX, centerY ) {
+    return cyBaseNodeShapes["roundrectangle"].checkPoint( x, y, padding, width, height, centerX, centerY );
+   },
+   "protein": function( x, y, padding, width, height, centerX, centerY ) {
     return cyBaseNodeShapes["roundrectangle"].checkPoint( x, y, padding, width, height, centerX, centerY );
    }
   };
