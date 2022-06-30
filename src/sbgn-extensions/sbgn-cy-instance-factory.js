@@ -133,7 +133,6 @@ module.exports = function () {
 		function showTooltip(event) {
 			var node = event.target || event.cyTarget;
 
-
 			var canHaveTooltip = function( node ) {
 				return elementUtilities.isSIFNode(node) || node.data("tooltip") !==null;
 			}
@@ -356,6 +355,7 @@ module.exports = function () {
       });
       
       cy.on("afterRedo", function (e, name, args, res) {
+
         if(name == "layout" || name == "collapse" || name == "expand" || name == "collapseRecursively" || name == "expandRecursively" 
           || (name == "batch" && ((args.length > 0 && args[0]['name'] == "thinBorder") || (args.length > 0 && args[0]['name'] == "thickenBorder")))){
           res.allElements = args.allElements2;
@@ -666,7 +666,6 @@ module.exports = function () {
 			      .selector("edge[class][width]")
 			      .style({
 			        'width': function( ele ) {
-								console.log('got with')
 								return ele.data('width');
 							}
 			      })
@@ -890,7 +889,6 @@ module.exports = function () {
 	              return elementUtilities.getArrayLineStyle(ele);
 	            },
 				'line-dash-pattern':  function (ele) {
-					console.log("in dash line pattern")
 					return elementUtilities.getArrayLineDashStyle(ele);
 				}
 	          })
