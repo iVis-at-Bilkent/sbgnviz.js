@@ -1092,8 +1092,8 @@ module.exports = function () {
     'BA simple chemical', 'BA macromolecule', 'BA nucleic acid feature',
     'BA perturbing agent', 'BA complex'];
   elementUtilities.epnTypes = ['macromolecule', 'nucleic acid feature', 'simple chemical',
-    'empty set', 'unspecified entity', 'perturbing agent', 'complex', 
-    'nucleic acid feature multimer', 'macromolecule multimer', 'simple chemical multimer', 'complex multimer'];
+    'empty set', 'unspecified entity', 'perturbing agent', 'complex',  'protein',
+    'nucleic acid feature multimer', 'macromolecule multimer', 'simple chemical multimer', 'complex multimer', 'active protein'];
   elementUtilities.sifTypes = ['SIF macromolecule', 'SIF simple chemical'];
   elementUtilities.otherNodeTypes = ['compartment', 'tag', 'submap', 'topology group'];
   elementUtilities.sbmlType = ['gene', 'rna', 'simple molecule', 'unknown molecule', 'phenotype', 'drug', 'ion', 'protein', 'truncated protein', 
@@ -1109,7 +1109,8 @@ module.exports = function () {
     .concat( elementUtilities.biologicalActivityTypes )
     .concat( elementUtilities.sifTypes )
     .concat( elementUtilities.otherNodeTypes )
-    .concat( elementUtilities.sbmlType);
+    .concat( elementUtilities.sbmlType)
+    .concat( elementUtilities.sbmlTypeActive);
 
   elementUtilities.compoundNodeTypes = ['complex', 'compartment', 'submap'];
 
@@ -1268,7 +1269,8 @@ module.exports = function () {
             || sbgnclass == 'complex' || sbgnclass == 'simple chemical multimer'
             || sbgnclass == 'macromolecule multimer' || sbgnclass == 'nucleic acid feature multimer'
             || sbgnclass == 'complex multimer' || (sbgnclass.startsWith('BA') && sbgnclass != "BA plain")
-            || sbgnclass == 'compartment' || sbgnclass == 'SIF macromolecule' || sbgnclass == 'SIF simple chemical') {
+            || sbgnclass == 'compartment' || sbgnclass == 'SIF macromolecule' || sbgnclass == 'SIF simple chemical'
+            || sbgnclass == 'active protein' || sbgnclass == 'protein') {
       return true;
     }
     return false;
@@ -1288,7 +1290,7 @@ module.exports = function () {
     if (sbgnclass == 'macromolecule' || sbgnclass == 'nucleic acid feature'
             || sbgnclass == 'complex'
             || sbgnclass == 'macromolecule multimer' || sbgnclass == 'nucleic acid feature multimer'
-            || sbgnclass == 'complex multimer') {
+            || sbgnclass == 'complex multimer' || sbgnclass == 'active protein' || sbgnclass == 'protein') {
       return true;
     }
     return false;
@@ -1363,6 +1365,7 @@ module.exports = function () {
   elementUtilities.canBeActive = function (ele) {
     var sbgnclass = elementUtilities.getPureSbgnClass( ele );
 
+    console.log("sbgnClass", sbgnclass)
     var list = {
       'protein': true,
       'complex sbml': true,
@@ -1804,7 +1807,6 @@ module.exports = function () {
   elementUtilities.getCyArrowShape = function(ele) {
       var _class = ele.data('class');
 
-      console.log('class', _class)
       switch ( _class ) {
         case 'necessary stimulation': case 'trigger': case 'reduced trigger': 
         case 'transport': case 'reduced trigger': case 'unknown reduced trigger':
@@ -1855,7 +1857,7 @@ module.exports = function () {
           || _class == 'perturbing agent' || _class == 'tag'
           || _class == 'biological activity' || _class.startsWith('BA')
           || _class == 'submap' || _class == 'SIF macromolecule'
-          || _class == 'SIF simple chemical') {
+          || _class == 'SIF simple chemical' || _class == 'protein') {
           content = ele.data('label') ? ele.data('label') : "";
       }
       else if(_class == 'compartment'){

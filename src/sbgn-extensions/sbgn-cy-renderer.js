@@ -31,8 +31,10 @@ module.exports = function () {
     if( borderWidth > 0 ){
       var parentOpacity = ( node && node.effectiveOpacity() ) || 1;
 
+      
       borderStyle = borderStyle || ( node && node.css( 'border-style' ) );
       borderColor = borderColor || ( node && node.css( 'border-color' ) );
+      console.log("borderStyle",node, borderStyle);
       borderOpacity = (
           borderOpacity || ( node && node.css( 'border-opacity' ) )
         ) * parentOpacity;
@@ -49,6 +51,7 @@ module.exports = function () {
       context.strokeStyle = borderColor;
       context.globalAlpha = borderOpacity;
 
+      
       if( context.setLineDash ){ // for very outofdate browsers
         switch( borderStyle ){
           case 'dotted':
@@ -210,7 +213,8 @@ module.exports = function () {
     'simple chemical': true,
     'complex': true,
     'biological activity': true,
-    'compartment': true
+    'compartment': true,
+    'protein':true
   };
 
   var canHaveInfoBoxShapes = $$.sbgn.canHaveInfoBoxShapes = {
@@ -240,6 +244,14 @@ module.exports = function () {
     'phenotype sbml': true,
     'complex sbml': true,
     'protein': true
+  };
+
+  var canBeActiveShapes = $$.sbgn.canBeActiveShapes = {
+      'protein': true,
+      'complex sbml': true,
+      'receptor': true,
+      'ion channel': true,
+      'truncated protein': true
   };
 
   cyMath.calculateDistance = function (point1, point2) {
@@ -519,7 +531,7 @@ module.exports = function () {
 
   $$.sbgn.isActive = function (node) {
     var sbgnClass = node._private.data.class;
-    if (sbgnClass && startsWith(sbgnClass, "active"))
+    if (sbgnClass && sbgnClass.startsWith( "active"))
       return true;
     return false;
   };
@@ -561,6 +573,9 @@ module.exports = function () {
     return 5;
   };
 
+  $$.sbgn.getDefaultActivePadding = function() {
+    return 7;
+  };
 
   // draw background image of nodes
   $$.sbgn.drawImage = function( context, imgObj ) {
@@ -580,7 +595,7 @@ module.exports = function () {
   $$.sbgn.registerSbgnNodeShapes = function () {
 
     function generateDrawFcn( { plainDrawFcn, extraDrawFcn, canBeMultimer, cloneMarkerFcn, canBeActive,
-      canHaveInfoBox, multimerPadding } ) {
+      canHaveInfoBox, multimerPadding, activePadding} ) {
 
       return function( context, node, imgObj ) {
         var borderWidth = parseFloat(node.css('border-width'));
@@ -590,6 +605,9 @@ module.exports = function () {
         var centerY = node._private.position.y;
         var bgOpacity = node.css('background-opacity');
         var isCloned = cloneMarkerFcn != null && node._private.data.clonemarker;
+
+      
+        //This is where the multimer is drawn
 
         if ( canBeMultimer && $$.sbgn.isMultimer( node ) ) {
           //add multimer shape
@@ -613,6 +631,34 @@ module.exports = function () {
                     width - borderWidth, height - borderWidth, isCloned, true, bgOpacity);
           }
         }
+
+        //This is where the active is drawn
+        if ( canBeActive && $$.sbgn.isActive( node ) ) {
+       
+           //add multimer shape
+           plainDrawFcn( context, centerX ,
+            centerY , width+ activePadding , height+ activePadding );
+    
+            borderStyle = 'dashed'
+            context.setLineDash([3, 6]);
+            $$.sbgn.drawBorder( { context, node, borderStyle } );
+
+          if ( extraDrawFcn ) {
+                extraDrawFcn( context, centerX,
+                  centerY, width + activePadding, height + activePadding);
+
+
+             $$.sbgn.drawBorder( { context, node } );
+          }
+
+          if ( isCloned ) {
+            cloneMarkerFcn(context,
+              centerX + multimerPadding, centerY + multimerPadding,
+              width - borderWidth, height - borderWidth, isCloned, true, bgOpacity);
+          }
+
+        }
+        
 
         plainDrawFcn( context, centerX, centerY, width, height );
 
@@ -639,8 +685,8 @@ module.exports = function () {
       };
     }
 
-    function generateIntersectLineFcn( { plainIntersectLineFcn, canBeMultimer, cloneMarkerFcn,
-      canHaveInfoBox, multimerPadding } ) {
+    function generateIntersectLineFcn( { plainIntersectLineFcn, canBeMultimer, cloneMarkerFcn, canBeActive,
+      canHaveInfoBox, multimerPadding, activePadding } ) {
 
       return function( node, x, y ) {
         var borderWidth = parseFloat(node.css('border-width'));
@@ -672,12 +718,20 @@ module.exports = function () {
           intersections = intersections.concat( multimerIntersectionLines );
         }
 
+        if ( canBeActive && $$.sbgn.isActive(node) ) {
+          var activeIntersectionLines = plainIntersectLineFcn(
+                  centerX + activePadding, centerY + activePadding, width,
+                  height, x, y, padding);
+
+          intersections = intersections.concat( activeIntersectionLines );
+        }
+
         return $$.sbgn.closestIntersectionPoint([x, y], intersections);
       };
     }
 
-    function generateCheckPointFcn( { plainCheckPointFcn, canBeMultimer, cloneMarkerFcn,
-      canHaveInfoBox, multimerPadding } ) {
+    function generateCheckPointFcn( { plainCheckPointFcn, canBeMultimer, cloneMarkerFcn, canBeActive,
+      canHaveInfoBox, multimerPadding, activePadding } ) {
 
       return function( x, y, node, threshold ) {
 
@@ -704,7 +758,14 @@ module.exports = function () {
                                           centerY + multimerPadding );
         };
 
-        return nodeCheck() || stateAndInfoCheck() || multimerCheck();
+        var activeCheck = function() {
+          return canBeActive && $$.sbgn.isActive(node)
+                  && plainCheckPointFcn( x, y, padding, width, height,
+                                          centerX + multimerPadding,
+                                          centerY + multimerPadding );
+        };
+
+        return nodeCheck() || stateAndInfoCheck() || multimerCheck() || activeCheck();
       };
     }
 
@@ -719,26 +780,27 @@ module.exports = function () {
       var plainIntersectLineFcn = $$.sbgn.plainIntersectLine[ shapeName ];
       var plainCheckPointFcn = $$.sbgn.plainCheckPoint[ shapeName ];
       var canBeMultimer = $$.sbgn.canBeMultimerShapes[ shapeName ];
+      var canBeActive = $$.sbgn.canBeActiveShapes[ shapeName ];
       var cloneMarkerFcn = $$.sbgn.cloneMarker[ shapeName ];
       var canHaveInfoBox = $$.sbgn.canHaveInfoBoxShapes[ shapeName ];
       var multimerPadding = $$.sbgn.getDefaultMultimerPadding();
+      var activePadding = $$.sbgn.getDefaultActivePadding();
       var extraDrawFcn = $$.sbgn.extraDraw[ shapeName ];
 
-      var draw = generateDrawFcn( { plainDrawFcn, canBeMultimer, cloneMarkerFcn,
-        canHaveInfoBox, multimerPadding, extraDrawFcn
+      var draw = generateDrawFcn( { plainDrawFcn, canBeMultimer, cloneMarkerFcn, canBeActive,
+        canHaveInfoBox, multimerPadding, activePadding, extraDrawFcn
       } );
 
       var intersectLine = totallyOverridenNodeShapes[ shapeName ] ?
-        generateIntersectLineFcn( { plainIntersectLineFcn, canBeMultimer, cloneMarkerFcn,
-          canHaveInfoBox, multimerPadding
+        generateIntersectLineFcn( { plainIntersectLineFcn, canBeMultimer, cloneMarkerFcn, canBeActive,
+          canHaveInfoBox, multimerPadding, activePadding
         } ) : plainIntersectLineFcn;
 
       var checkPoint = totallyOverridenNodeShapes[ shapeName ] ?
-        generateCheckPointFcn( { plainCheckPointFcn, canBeMultimer, cloneMarkerFcn,
-          canHaveInfoBox, multimerPadding
+        generateCheckPointFcn( { plainCheckPointFcn, canBeMultimer, cloneMarkerFcn, canBeActive,
+          canHaveInfoBox, multimerPadding, activePadding
         } ) : plainCheckPointFcn;
-
-      var shape = { draw, intersectLine, checkPoint, multimerPadding };
+      var shape = { draw, intersectLine, checkPoint, multimerPadding, activePadding };
 
       cyBaseNodeShapes[ shapeName ] = shape;
     } );

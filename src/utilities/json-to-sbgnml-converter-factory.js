@@ -401,7 +401,7 @@ module.exports = function () {
       extension.add(annotExt);
     }
     // add glyph members that are not state variables or unit of info: subunits
-    if(nodeClass === "complex" || nodeClass === "complex multimer" || nodeClass === "submap" || nodeClass === "topology group"){
+    if(nodeClass === "complex" || nodeClass === "complex multimer" || nodeClass === "submap" || nodeClass === "topology group" || nodeClass == "active protein"){
        var children = node.children();
        children = children.union(this.allCollapsedNodes);
        if(node.data('collapsedChildren')) {
