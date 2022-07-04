@@ -1102,7 +1102,7 @@ module.exports = function () {
     'ion multimer', 'simple molecule multimer', 'unknown molecule multimer', 'drug multimer', 'complex multimer', 'phenotype sbml multimer', 'receptor multimer',
   'complex sbml multimer', 'protein multimer']
   elementUtilities.sbmlTypeActive = ['active protein', 'active receptor', 'active ion channel', 'active truncated protein', 'active complex']
-
+  //elementUtilities.sbmlTypeHypothetical = [''] //Do I need this?
   elementUtilities.nodeTypes = elementUtilities.epnTypes
     .concat( elementUtilities.logicalOperatorTypes )
     .concat( elementUtilities.processTypes )
@@ -1175,7 +1175,8 @@ module.exports = function () {
       return null;
     }
 
-    return elementUtilities.getSbgnClass( ele ).replace( ' multimer', '' ).replace( 'active ', '' );
+    console.log("pure sbgn", elementUtilities.getSbgnClass( ele ).replace( ' multimer', '' ).replace( 'active ', '' ).replace('hypothetical ', ''))
+    return elementUtilities.getSbgnClass( ele ).replace( ' multimer', '' ).replace( 'active ', '' ).replace('hypothetical ', '');
   };
 
   /*
@@ -1371,6 +1372,29 @@ module.exports = function () {
       'receptor': true,
       'ion channel': true,
       'truncated protein': true
+    };
+
+    return list[sbgnclass] ? true : false;
+  };
+
+  elementUtilities.canBeHypothetical = function (ele) {
+    var sbgnclass = elementUtilities.getPureSbgnClass( ele );
+
+    var list = {
+      'protein': true,
+      'complex sbml': true,
+      'receptor': true,
+      'ion channel': true,
+      'truncated protein': true,
+      'gene': true,
+      'rna': true,
+      'phenotype': true,
+      'ion': true,
+      'simple molecule': true,
+      'unknown molecule': true,
+      'drug': true,
+      'complex': true,
+      'degradation': true
     };
 
     return list[sbgnclass] ? true : false;
@@ -1739,6 +1763,10 @@ module.exports = function () {
         _class = _class.replace('active ', '');
       }
 
+      if (_class.includes('hypothetical')) {
+        _class = _class.replace('hypothetical ', '');
+      }
+
       if (_class == 'compartment') {
           return 'compartment';
       }
@@ -1847,6 +1875,10 @@ module.exports = function () {
 
       if (_class.startsWith('active ')) {
         _class = _class.replace('active ', '');
+      }
+
+      if (_class.includes('hypothetical')) {
+        _class = _class.replace('hypothetical ', '');
       }
 
       var content = "";
@@ -3325,6 +3357,7 @@ module.exports = function () {
       'clonemarker': true,
       'ports-ordering': true,
       'active': true,
+      'hypothetical': true
     };
 
     extendDataWithClassDefaults( data, className, propsToSkip );

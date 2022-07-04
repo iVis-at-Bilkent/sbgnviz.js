@@ -265,6 +265,23 @@ module.exports = function () {
       'truncated protein': true
   };
 
+  var canBeHypotheticalShapes = $$.sbgn.canBeHypotheticalShapes = {
+    'protein': true,
+    'complex sbml': true,
+    'receptor': true,
+    'ion channel': true,
+    'truncated protein': true,
+    'gene': true,
+    'rna': true,
+    'phenotype': true,
+    'ion': true,
+    'simple molecule': true,
+    'unknown molecule': true,
+    'drug': true,
+    'complex': true,
+    'degradation': true
+};
+
   cyMath.calculateDistance = function (point1, point2) {
     var distance = Math.pow(point1[0] - point2[0], 2) + Math.pow(point1[1] - point2[1], 2);
     return Math.sqrt(distance);
@@ -547,6 +564,13 @@ module.exports = function () {
     return false;
   };
 
+  $$.sbgn.isHypothetical = function (node) {
+    var sbgnClass = node._private.data.class;
+    if (sbgnClass && sbgnClass.includes( "hypothetical"))
+      return true;
+    return false;
+  };
+
   //this function is created to have same corner length when
   //complex's width or height is changed
   $$.sbgn.generateComplexShapePoints = function (cornerLength, width, height) {
@@ -605,7 +629,7 @@ module.exports = function () {
 
   $$.sbgn.registerSbgnNodeShapes = function () {
 
-    function generateDrawFcn( { plainDrawFcn, extraDrawFcn, canBeMultimer, cloneMarkerFcn, canBeActive,
+    function generateDrawFcn( { plainDrawFcn, extraDrawFcn, canBeMultimer, cloneMarkerFcn, canBeActive, canBeHypothetical,
       canHaveInfoBox, multimerPadding, activePadding} ) {
 
       return function( context, node, imgObj ) {
@@ -669,6 +693,36 @@ module.exports = function () {
           }
 
         }
+
+        //This is where the active is drawn
+        if ( canBeHypothetical && $$.sbgn.isHypothetical( node ) ) {
+
+          //Clear the canvas
+          console.log("context.canvas.width", context.canvas.width)
+          console.log("context.canvas.height", context.canvas.height)
+          context.fillRect(0, 0, 300, 150);
+          context.beginPath()
+          context.clearRect(0, 0, 1000, 1000);
+
+          /*
+          context.setLineDash([3, 6]);
+          borderStyle = 'dashed'
+          //add new shape
+          plainDrawFcn( context, centerX ,
+           centerY , width , height );
+   
+           $$.sbgn.drawBorder( { context, node, borderStyle } );
+
+         if ( extraDrawFcn ) {
+               extraDrawFcn( context, centerX,
+                 centerY, width + activePadding, height + activePadding);
+
+
+            $$.sbgn.drawBorder( { context, node } );
+         }
+         */
+
+       }
         
 
         plainDrawFcn( context, centerX, centerY, width, height );
@@ -696,7 +750,7 @@ module.exports = function () {
       };
     }
 
-    function generateIntersectLineFcn( { plainIntersectLineFcn, canBeMultimer, cloneMarkerFcn, canBeActive,
+    function generateIntersectLineFcn( { plainIntersectLineFcn, canBeMultimer, cloneMarkerFcn, canBeActive, canBeHypothetical,
       canHaveInfoBox, multimerPadding, activePadding } ) {
 
       return function( node, x, y ) {
@@ -738,11 +792,19 @@ module.exports = function () {
           intersections = intersections.concat( activeIntersectionLines );
         }
 
+        if ( canBeHypothetical && $$.sbgn.isHypothetical(node) ) {
+          var hypotheticalIntersectionLines = plainIntersectLineFcn(
+                  centerX + activePadding, centerY + activePadding, width,
+                  height, x, y, padding);
+
+          intersections = intersections.concat( hypotheticalIntersectionLines );
+        }
+
         return $$.sbgn.closestIntersectionPoint([x, y], intersections);
       };
     }
 
-    function generateCheckPointFcn( { plainCheckPointFcn, canBeMultimer, cloneMarkerFcn, canBeActive,
+    function generateCheckPointFcn( { plainCheckPointFcn, canBeMultimer, cloneMarkerFcn, canBeActive, canBeHypothetical,
       canHaveInfoBox, multimerPadding, activePadding } ) {
 
       return function( x, y, node, threshold ) {
@@ -773,11 +835,18 @@ module.exports = function () {
         var activeCheck = function() {
           return canBeActive && $$.sbgn.isActive(node)
                   && plainCheckPointFcn( x, y, padding, width, height,
+                                          centerX + activePadding,
+                                          centerY + activePadding );
+        };
+
+        var hypotheticalCheck = function() {
+          return canBeHypothetical && $$.sbgn.isHypothetical(node)
+                  && plainCheckPointFcn( x, y, padding, width, height,
                                           centerX + multimerPadding,
                                           centerY + multimerPadding );
         };
 
-        return nodeCheck() || stateAndInfoCheck() || multimerCheck() || activeCheck();
+        return nodeCheck() || stateAndInfoCheck() || multimerCheck() || activeCheck() || hypotheticalCheck();
       };
     }
 
@@ -793,24 +862,25 @@ module.exports = function () {
       var plainCheckPointFcn = $$.sbgn.plainCheckPoint[ shapeName ];
       var canBeMultimer = $$.sbgn.canBeMultimerShapes[ shapeName ];
       var canBeActive = $$.sbgn.canBeActiveShapes[ shapeName ];
+      var canBeHypothetical = $$.sbgn.canBeHypotheticalShapes[ shapeName ];
       var cloneMarkerFcn = $$.sbgn.cloneMarker[ shapeName ];
       var canHaveInfoBox = $$.sbgn.canHaveInfoBoxShapes[ shapeName ];
       var multimerPadding = $$.sbgn.getDefaultMultimerPadding();
       var activePadding = $$.sbgn.getDefaultActivePadding();
       var extraDrawFcn = $$.sbgn.extraDraw[ shapeName ];
 
-      var draw = generateDrawFcn( { plainDrawFcn, canBeMultimer, cloneMarkerFcn, canBeActive,
+      var draw = generateDrawFcn( { plainDrawFcn, canBeMultimer, cloneMarkerFcn, canBeActive, canBeHypothetical,
         canHaveInfoBox, multimerPadding, activePadding, extraDrawFcn
       } );
 
-      console.log("totallyOverridenNodeShapes[ shapeName ]", shapeName, totallyOverridenNodeShapes[ shapeName ])
+      //console.log("totallyOverridenNodeShapes[ shapeName ]", shapeName, totallyOverridenNodeShapes[ shapeName ])
       var intersectLine = totallyOverridenNodeShapes[ shapeName ] ?
-        generateIntersectLineFcn( { plainIntersectLineFcn, canBeMultimer, cloneMarkerFcn, canBeActive,
+        generateIntersectLineFcn( { plainIntersectLineFcn, canBeMultimer, cloneMarkerFcn, canBeActive, canBeHypothetical,
           canHaveInfoBox, multimerPadding, activePadding
         } ) : plainIntersectLineFcn;
 
       var checkPoint = totallyOverridenNodeShapes[ shapeName ] ?
-        generateCheckPointFcn( { plainCheckPointFcn, canBeMultimer, cloneMarkerFcn, canBeActive,
+        generateCheckPointFcn( { plainCheckPointFcn, canBeMultimer, cloneMarkerFcn, canBeActive, canBeHypothetical,
           canHaveInfoBox, multimerPadding, activePadding
         } ) : plainCheckPointFcn;
       var shape = { draw, intersectLine, checkPoint, multimerPadding, activePadding };
