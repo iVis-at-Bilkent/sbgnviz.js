@@ -346,12 +346,10 @@ module.exports = function () {
    reader.readAsText(file);
  };
 
- fileUtilities.loadSBGNMLText = function(textData, tileInfoBoxes, filename, cy, urlParams){
-     setTimeout(function () {
-         updateGraph(sbgnmlToJson.convert(textToXmlObject(textData), urlParams), undefined, undefined, tileInfoBoxes);
-         $(document).trigger("sbgnvizLoadFileEnd",  [filename, cy]);
+ fileUtilities.loadSBGNMLText = async function(textData, tileInfoBoxes, filename, cy, urlParams){
+        await updateGraph(sbgnmlToJson.convert(textToXmlObject(textData), urlParams), undefined, undefined, tileInfoBoxes);
+         await $(document).trigger("sbgnvizLoadFileEnd",  [filename, cy]);
          uiUtilities.endSpinner("load-file-spinner");
-     }, 0);
 
  };
 
@@ -413,6 +411,7 @@ module.exports = function () {
  fileUtilities.saveAsSbml = function(filename,errorCallback){
   uiUtilities.startSpinner("load-spinner");
   var sbgnml = this.convertSbgn();
+  
   this.convertSbgnmlToSbml(sbgnml, function(data){
     
     if(!data.result){
@@ -436,11 +435,9 @@ module.exports = function () {
 
  fileUtilities.loadSbml = function(file, successCallback, errorCallback){
   var reader = new FileReader();
-
   reader.onload = function (e) { 
     
-    this.convertSbmlToSbgnml(e.target.result, function(data){
-      uiUtilities.endSpinner("load-spinner");
+      this.convertSbmlToSbgnml(e.target.result, function(data){
       if(data == null){
         errorCallback();
       }else{
@@ -448,7 +445,6 @@ module.exports = function () {
       }
     });
   }.bind(this);
-  uiUtilities.startSpinner("load-spinner");
   reader.readAsText(file);
 
  }
