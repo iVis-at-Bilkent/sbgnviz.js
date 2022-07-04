@@ -214,7 +214,18 @@ module.exports = function () {
     'complex': true,
     'biological activity': true,
     'compartment': true,
-    'protein':true
+    'protein':true,
+    'gene':true,
+    'rna':true,
+    'receptor': true,
+    'ion channel': true,
+    'truncated protein': true,
+    'phenotype sbml': true,
+    'ion': true,
+    'simple molecule': true,
+    'unknown molecule': true,
+    'drug': true,
+    'complex sbml': true
   };
 
   var canHaveInfoBoxShapes = $$.sbgn.canHaveInfoBoxShapes = {
@@ -689,6 +700,7 @@ module.exports = function () {
       canHaveInfoBox, multimerPadding, activePadding } ) {
 
       return function( node, x, y ) {
+        console.log("generateIntersectLineFcn", node)
         var borderWidth = parseFloat(node.css('border-width'));
         var padding = borderWidth / 2;
         var width = node.outerWidth() - borderWidth;
@@ -791,6 +803,7 @@ module.exports = function () {
         canHaveInfoBox, multimerPadding, activePadding, extraDrawFcn
       } );
 
+      console.log("totallyOverridenNodeShapes[ shapeName ]", shapeName, totallyOverridenNodeShapes[ shapeName ])
       var intersectLine = totallyOverridenNodeShapes[ shapeName ] ?
         generateIntersectLineFcn( { plainIntersectLineFcn, canBeMultimer, cloneMarkerFcn, canBeActive,
           canHaveInfoBox, multimerPadding, activePadding
@@ -1024,7 +1037,59 @@ module.exports = function () {
       return cyMath.roundRectangleIntersectLine(
         x, y, centerX, centerY, width, height, padding
       );
-    }
+    },
+    "gene": function( centerX, centerY, width, height, x, y, padding ) {
+      return cyBaseNodeShapes["rectangle"].intersectLine( centerX, centerY, width, height, x, y, padding );
+    },
+    "rna": function( centerX, centerY, width, height, x, y, padding ) {
+      var points = $$.sbgn.generateRNAShapePoints(  width, height );
+      return cyMath.polygonIntersectLine(
+        x, y, points, centerX, centerY, width / 2, height / 2, padding
+      );
+    },
+    "receptor": function( centerX, centerY, width, height, x, y, padding ) {
+      var points = $$.sbgn.generateReceptorShapePoints(  width, height );
+      return cyMath.polygonIntersectLine(
+        x, y, points, centerX, centerY, width / 2, height / 2, padding
+      );
+    },
+    "ion channel": function( centerX, centerY, width, height, x, y, padding ) {
+      return cyMath.roundRectangleIntersectLine(
+        x, y, centerX, centerY, width, height, padding
+      );
+    },
+    "truncated protein": function( centerX, centerY, width, height, x, y, padding ) {
+      return cyMath.roundRectangleIntersectLine(
+        x, y, centerX, centerY, width, height, padding
+      );
+    },
+    "ion": function( centerX, centerY, width, height, x, y, padding ) {
+      return cyBaseNodeShapes["ellipse"].intersectLine( centerX, centerY, width, height, x, y, padding );
+
+    },
+    "simple molecule": function( centerX, centerY, width, height, x, y, padding ) {
+      return cyBaseNodeShapes["ellipse"].intersectLine( centerX, centerY, width, height, x, y, padding );
+
+    },
+    "unknown molecule": function( centerX, centerY, width, height, x, y, padding ) {
+    return cyBaseNodeShapes["ellipse"].intersectLine( centerX, centerY, width, height, x, y, padding );
+
+    },
+    "drug": function( centerX, centerY, width, height, x, y, padding ) {
+      return cyMath.roundRectangleIntersectLine(
+        x, y, centerX, centerY, width, height, padding
+      );
+    },
+    "phenotype sbml": function( centerX, centerY, width, height, x, y, padding ) {
+      return cyBaseNodeShapes["ellipse"].intersectLine( centerX, centerY, width, height, x, y, padding );
+
+    },
+    "complex sbml": function( centerX, centerY, width, height, x, y, padding ) {
+      var points = $$.sbgn.generateComplexShapePoints( $$.sbgn.getDefaultComplexCornerLength(), width, height );
+      return cyMath.polygonIntersectLine(
+        x, y, points, centerX, centerY, width / 2, height / 2, padding
+      );
+    },
   };
 
   $$.sbgn.plainCheckPoint = {
