@@ -34,7 +34,7 @@ module.exports = function () {
       
       borderStyle = borderStyle || ( node && node.css( 'border-style' ) );
       borderColor = borderColor || ( node && node.css( 'border-color' ) );
-      console.log("borderStyle",node, borderStyle);
+      
       borderOpacity = (
           borderOpacity || ( node && node.css( 'border-opacity' ) )
         ) * parentOpacity;

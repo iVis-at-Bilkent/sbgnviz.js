@@ -1365,7 +1365,6 @@ module.exports = function () {
   elementUtilities.canBeActive = function (ele) {
     var sbgnclass = elementUtilities.getPureSbgnClass( ele );
 
-    console.log("sbgnClass", sbgnclass)
     var list = {
       'protein': true,
       'complex sbml': true,
@@ -2969,7 +2968,8 @@ module.exports = function () {
       'background-color': '#ffffff',
       'background-opacity': 1,
       'background-image-opacity': 1,
-      'text-wrap': 'wrap'
+      'text-wrap': 'wrap',
+      'border-style': 'solid'
     };
   };
 
@@ -3188,6 +3188,7 @@ module.exports = function () {
       'font-weight': 'normal',
       'font-color': '#0f0f0f',
       'border-width': 1,
+      'border-style': 'solid',
       'border-color': '#555555',
       'background-color': '#ffffff',
       'shape-name': getDefaultInfoboxShapeName( nodeClass, infoboxType ),
