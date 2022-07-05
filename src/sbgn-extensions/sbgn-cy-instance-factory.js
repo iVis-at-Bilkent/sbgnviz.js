@@ -417,8 +417,8 @@ module.exports = function () {
 				* and ports are enabled call 'elementUtilities.changePortsOrientationAfterLayout()'
 				*/
 	      if (event.layout.options.name !== 'preset' && event.layout.options.name !== 'grid')
-	      {
-	        if (graphUtilities.portsEnabled === true)
+	      {	// 3000 nodes/edges check is for performance improvement
+	        if (graphUtilities.portsEnabled === true && !(cy.nodes().length > 3000 || cy.edges().length > 3000))
 	        {
 	          elementUtilities.changePortsOrientationAfterLayout();
 	        }
@@ -535,9 +535,13 @@ module.exports = function () {
 		  // assign statesandinfos to their layout
 		  cy.style().update();
 	     // cy.startBatch();
-	      cy.nodes().forEach(function(node) {
-	        setCompoundInfoboxes(node,isLayoutRequired,cy);
-		  });
+
+			// this check is for performance improvement
+			if (!(cy.nodes().length > 3000 || cy.edges().length > 3000)) {
+				cy.nodes().forEach(function(node) {
+					setCompoundInfoboxes(node,isLayoutRequired,cy);
+				});
+			}
 		  
 		  if(callback){
 			  callback();
