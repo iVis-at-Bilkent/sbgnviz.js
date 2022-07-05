@@ -1101,7 +1101,7 @@ module.exports = function () {
   elementUtilities.sbmlTypeMultimer = ['gene multimer', 'rna multimer', 'ion channel multimer', 'receptor multimer', 'truncated protein multimer', 'phenotype multimer',
     'ion multimer', 'simple molecule multimer', 'unknown molecule multimer', 'drug multimer', 'complex multimer', 'phenotype sbml multimer', 'receptor multimer',
   'complex sbml multimer', 'protein multimer']
-  elementUtilities.sbmlTypeActive = ['active protein', 'active receptor', 'active ion channel', 'active truncated protein', 'active complex']
+  elementUtilities.sbmlTypeActive = ['active protein', 'active receptor', 'active truncated protein', 'active complex']
   //elementUtilities.sbmlTypeHypothetical = [''] //Do I need this?
   elementUtilities.nodeTypes = elementUtilities.epnTypes
     .concat( elementUtilities.logicalOperatorTypes )
@@ -1175,7 +1175,7 @@ module.exports = function () {
       return null;
     }
 
-    console.log("pure sbgn", elementUtilities.getSbgnClass( ele ).replace( ' multimer', '' ).replace( 'active ', '' ).replace('hypothetical ', ''))
+    //console.log("pure sbgn", elementUtilities.getSbgnClass( ele ).replace( ' multimer', '' ).replace( 'active ', '' ).replace('hypothetical ', ''))
     return elementUtilities.getSbgnClass( ele ).replace( ' multimer', '' ).replace( 'active ', '' ).replace('hypothetical ', '');
   };
 

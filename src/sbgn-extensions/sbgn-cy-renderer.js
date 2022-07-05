@@ -26,6 +26,8 @@ module.exports = function () {
   */
   $$.sbgn.drawBorder = function({ context, node, borderWidth, borderColor, borderStyle, borderOpacity }) {
 
+   // console.log('context in draw border', context.canvas.id)
+
     borderWidth = borderWidth || ( node && parseFloat( node.css( 'border-width' ) ) );
 
     if( borderWidth > 0 ){
@@ -34,7 +36,7 @@ module.exports = function () {
       
       borderStyle = borderStyle || ( node && node.css( 'border-style' ) );
       borderColor = borderColor || ( node && node.css( 'border-color' ) );
-      
+      console.log('borderStyle', borderStyle)
       borderOpacity = (
           borderOpacity || ( node && node.css( 'border-opacity' ) )
         ) * parentOpacity;
@@ -53,6 +55,7 @@ module.exports = function () {
 
       
       if( context.setLineDash ){ // for very outofdate browsers
+        console.log("ccontext.setLineDash", borderStyle)
         switch( borderStyle ){
           case 'dotted':
             context.setLineDash( [ 1, 1 ] );
@@ -97,6 +100,8 @@ module.exports = function () {
   var drawRoundRectanglePath = $$.sbgn.drawRoundRectanglePath = function(
     context, x, y, width, height, radius ){
 
+      console.log("drainf round rectangel")
+
     var halfWidth = width / 2;
     var halfHeight = height / 2;
     var cornerRadius = radius || cyMath.getRoundRectangleRadius( width, height );
@@ -116,8 +121,12 @@ module.exports = function () {
     // Join line
     context.lineTo( x, y - halfHeight );
 
-
     context.closePath();
+
+
+    //context.clearRect(0, 0, width, height);
+    //context.beginPath()
+
   };
 
   var drawRoundDrugPath= $$.sbgn.drawRoundDrug = function(
@@ -201,7 +210,6 @@ module.exports = function () {
     'ion channel': true,
     'receptor': true,
     'ion': true,
-    'ion channel': true,
     'phenotype sbml': true,
     'complex sbml': true,
     'protein': true
@@ -609,7 +617,7 @@ module.exports = function () {
   };
 
   $$.sbgn.getDefaultActivePadding = function() {
-    return 7;
+    return 5;
   };
 
   // draw background image of nodes
@@ -641,92 +649,135 @@ module.exports = function () {
         var bgOpacity = node.css('background-opacity');
         var isCloned = cloneMarkerFcn != null && node._private.data.clonemarker;
 
-      
-        //This is where the multimer is drawn
+        if (node._private.data.class.startsWith('active ion channel') ||  node._private.data.class.startsWith('active hypothetical ion channel') )
+        {
+          plainDrawFcn = $$.sbgn.drawOpenIonChannel;
+        }
 
-        if ( canBeMultimer && $$.sbgn.isMultimer( node ) ) {
+        if (node._private.data.class.startsWith('ion channel') ||  node._private.data.class.startsWith('hypothetical ion channel') )
+        {
+          plainDrawFcn = $$.sbgn.drawIonChannel;
+        }
+
+    
+        //This is where the multimer is drawn
+       if ( canBeMultimer && $$.sbgn.isMultimer( node ) ) {
+
+        //If the node is also hypothetical
+        if ( canBeHypothetical && $$.sbgn.isHypothetical( node ) ) {
+
+
           //add multimer shape
           plainDrawFcn( context, centerX + multimerPadding,
-                  centerY + multimerPadding, width, height );
-          
-
-          $$.sbgn.drawBorder( { context, node } );
+            centerY + multimerPadding, width, height);
+    
+            borderStyle = 'dashed'
+            //context.setLineDash([3, 6]);
+            $$.sbgn.drawBorder( { context, node, borderStyle } );
+            context.beginPath();
 
           if ( extraDrawFcn ) {
-            extraDrawFcn( context, centerX + multimerPadding,
-                    centerY + multimerPadding, width, height );
+                extraDrawFcn( context, centerX + multimerPadding,
+                  centerY + multimerPadding, width, height);
+
+
+             $$.sbgn.drawBorder( { context, node } );
+          }
+  
+       }else{
+        //If the node is not hypothetical
+        plainDrawFcn( context, centerX + multimerPadding,
+          centerY + multimerPadding, width, height );
+  
+
+        $$.sbgn.drawBorder( { context, node } );
+
+        if ( extraDrawFcn ) {
+          extraDrawFcn( context, centerX + multimerPadding,
+            centerY + multimerPadding, width, height );
+
+
+          $$.sbgn.drawBorder( { context, node } );
+        }
+
+       }
+      
+        if ( isCloned ) {
+          cloneMarkerFcn(context,
+                  centerX + multimerPadding, centerY + multimerPadding,
+                  width - borderWidth, height - borderWidth, isCloned, true, bgOpacity);
+        }
+
+
+        //If the node is also active
+        console.log("node._private.data.class", node._private.data.class)
+        if( canBeActive && $$.sbgn.isActive( node ) && !node._private.data.class.startsWith('active ion channel') && !node._private.data.class.startsWith('active hypothetical ion channel')  ){
+            //add multimer shape
+            plainDrawFcn( context, centerX ,
+            centerY , width+ activePadding , height+ activePadding );
+
+            borderStyle = 'dashed'
+            context.setLineDash([3, 6]);
+            $$.sbgn.drawBorder( { context, node, borderStyle } );
+
+            if ( extraDrawFcn ) {
+                extraDrawFcn( context, centerX,
+                  centerY, width + activePadding, height + activePadding);
 
 
             $$.sbgn.drawBorder( { context, node } );
           }
 
-          if ( isCloned ) {
-            cloneMarkerFcn(context,
-                    centerX + multimerPadding, centerY + multimerPadding,
-                    width - borderWidth, height - borderWidth, isCloned, true, bgOpacity);
           }
-        }
+        
+      }
 
-        //This is where the active is drawn
-        if ( canBeActive && $$.sbgn.isActive( node ) ) {
-       
-           //add multimer shape
-           plainDrawFcn( context, centerX ,
+      //This is where the active is drawn
+      if ( canBeActive && $$.sbgn.isActive( node ) && !node._private.data.class.startsWith('active ion channel') && !node._private.data.class.startsWith('active hypothetical ion channel') ) {
+            //add multimer shape
+            plainDrawFcn( context, centerX ,
             centerY , width+ activePadding , height+ activePadding );
     
             borderStyle = 'dashed'
             context.setLineDash([3, 6]);
             $$.sbgn.drawBorder( { context, node, borderStyle } );
 
-          if ( extraDrawFcn ) {
+            if ( extraDrawFcn ) {
                 extraDrawFcn( context, centerX,
                   centerY, width + activePadding, height + activePadding);
 
 
-             $$.sbgn.drawBorder( { context, node } );
+            $$.sbgn.drawBorder( { context, node } );
           }
 
-          if ( isCloned ) {
-            cloneMarkerFcn(context,
-              centerX + multimerPadding, centerY + multimerPadding,
-              width - borderWidth, height - borderWidth, isCloned, true, bgOpacity);
-          }
-
-        }
+      }
 
         //This is where the active is drawn
         if ( canBeHypothetical && $$.sbgn.isHypothetical( node ) ) {
 
-          //Clear the canvas
-          console.log("context.canvas.width", context.canvas.width)
-          console.log("context.canvas.height", context.canvas.height)
-          context.fillRect(0, 0, 300, 150);
-          context.beginPath()
-          context.clearRect(0, 0, 1000, 1000);
 
-          /*
-          context.setLineDash([3, 6]);
-          borderStyle = 'dashed'
-          //add new shape
+          //add multimer shape
           plainDrawFcn( context, centerX ,
-           centerY , width , height );
-   
-           $$.sbgn.drawBorder( { context, node, borderStyle } );
+            centerY , width, height);
+    
+            borderStyle = 'dashed'
+            //context.setLineDash([3, 6]);
+            $$.sbgn.drawBorder( { context, node, borderStyle } );
+            context.beginPath();
 
-         if ( extraDrawFcn ) {
-               extraDrawFcn( context, centerX,
-                 centerY, width + activePadding, height + activePadding);
+          if ( extraDrawFcn ) {
+                extraDrawFcn( context, centerX,
+                  centerY, width, height);
 
 
-            $$.sbgn.drawBorder( { context, node } );
-         }
-         */
-
+             $$.sbgn.drawBorder( { context, node } );
+          }
+          return
        }
+
+       
         
-
         plainDrawFcn( context, centerX, centerY, width, height );
-
         $$.sbgn.drawBorder( { context, node } );
         $$.sbgn.drawImage( context, imgObj );
 
@@ -794,7 +845,7 @@ module.exports = function () {
 
         if ( canBeHypothetical && $$.sbgn.isHypothetical(node) ) {
           var hypotheticalIntersectionLines = plainIntersectLineFcn(
-                  centerX + activePadding, centerY + activePadding, width,
+                  centerX, centerY, width,
                   height, x, y, padding);
 
           intersections = intersections.concat( hypotheticalIntersectionLines );
@@ -842,8 +893,8 @@ module.exports = function () {
         var hypotheticalCheck = function() {
           return canBeHypothetical && $$.sbgn.isHypothetical(node)
                   && plainCheckPointFcn( x, y, padding, width, height,
-                                          centerX + multimerPadding,
-                                          centerY + multimerPadding );
+                                          centerX,
+                                          centerY );
         };
 
         return nodeCheck() || stateAndInfoCheck() || multimerCheck() || activeCheck() || hypotheticalCheck();
@@ -962,6 +1013,82 @@ module.exports = function () {
     context.closePath();
   };
 
+  $$.sbgn.drawIonChannel = function (context, x, y, width, height, radius) {
+
+    var halfWidth = width / 2;
+    var halfHeight = height / 2;
+    var cornerRadius = radius || cyMath.getRoundRectangleRadius( width, height );
+
+    if( context.beginPath ){ context.beginPath(); }
+
+    // Start at top middle
+    context.moveTo( x + halfWidth/4, y - halfHeight );
+    // Arc from middle top to right side
+    context.arcTo( x + halfWidth/2, y - halfHeight, x + halfWidth/2, y, cornerRadius );
+    // Arc from right side to bottom
+    context.arcTo( x + halfWidth/2, y + halfHeight, x/2 + halfWidth/4, y + halfHeight, cornerRadius );
+    // Arc from bottom to left side
+    context.arcTo( x - halfWidth, y + halfHeight, x - halfWidth, y, cornerRadius );
+    // Arc from left side to topBorder
+    context.arcTo( x - halfWidth, y - halfHeight, x + halfWidth/4, y - halfHeight, cornerRadius );
+    // Join line
+    context.lineTo( x + halfWidth/4, y - halfHeight );
+
+    // Start at top middle
+    context.moveTo( x + 3 *halfWidth/4, y - halfHeight );
+    // Arc from middle top to right side
+    context.arcTo( x + halfWidth, y - halfHeight, x + halfWidth, y, cornerRadius );
+    // Arc from right side to bottom
+    context.arcTo( x + halfWidth, y + halfHeight, x + 3 * halfWidth/4, y + halfHeight, cornerRadius );
+    // Arc from bottom to left side
+    context.arcTo( x + halfWidth/2, y + halfHeight, x +  halfWidth/2, y, cornerRadius );
+    // Arc from left side to topBorder
+    context.arcTo( x + halfWidth/2, y - halfHeight, x + 3 * halfWidth/4 , y - halfHeight, cornerRadius );
+    // Join line
+    //context.lineTo( x, y - halfHeight );
+
+
+    context.closePath();
+  }
+
+  $$.sbgn.drawOpenIonChannel = function (context, x, y, width, height, radius) {
+   
+    var halfWidth = width / 2;
+    var halfHeight = height / 2;
+    var cornerRadius = radius || cyMath.getRoundRectangleRadius( width, height );
+
+    if( context.beginPath ){ context.beginPath(); }
+
+    // Start at top middle
+    context.moveTo( x - halfWidth/2, y - halfHeight );
+    // Arc from middle top to right side
+    context.arcTo( x , y - halfHeight, x, y, cornerRadius );
+    // Arc from right side to bottom
+    context.arcTo( x, y + halfHeight, x- halfWidth/2, y + halfHeight, cornerRadius );
+    // Arc from bottom to left side
+    context.arcTo( x - halfWidth, y + halfHeight, x - halfWidth, y, cornerRadius );
+    // Arc from left side to topBorder
+    context.arcTo( x - halfWidth, y - halfHeight, x + halfWidth/2, y - halfHeight, cornerRadius );
+    // Join line
+    context.lineTo( x-halfWidth/2, y - halfHeight );
+
+    // Start at top middle
+    context.moveTo( x + 3 *halfWidth/4, y - halfHeight );
+    // Arc from middle top to right side
+    context.arcTo( x + halfWidth, y - halfHeight, x + halfWidth, y, cornerRadius );
+    // Arc from right side to bottom
+    context.arcTo( x + halfWidth, y + halfHeight, x + 3 * halfWidth/4, y + halfHeight, cornerRadius );
+    // Arc from bottom to left side
+    context.arcTo( x + halfWidth/2, y + halfHeight, x +  halfWidth/2, y, cornerRadius );
+    // Arc from left side to topBorder
+    context.arcTo( x + halfWidth/2, y - halfHeight, x + 3 * halfWidth/4 , y - halfHeight, cornerRadius );
+    // Join line
+    //context.lineTo( x, y - halfHeight );
+
+
+    context.closePath();
+  };
+
   $$.sbgn.drawComplex = function( context, x, y, width, height, cornerLength ) {
     cornerLength = cornerLength || $$.sbgn.getDefaultComplexCornerLength();
     var points = $$.sbgn.generateComplexShapePoints(cornerLength, width, height);
@@ -1017,7 +1144,7 @@ module.exports = function () {
 
   $$.sbgn.drawRoundRectangle = function( context, x, y, width, height ) {
     drawRoundRectanglePath( context, x, y, width, height );
-    context.fill();
+  
   };
 
   $$.sbgn.generateNucleicAcidPoints = function() {
