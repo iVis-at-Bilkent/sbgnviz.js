@@ -13,6 +13,7 @@ module.exports = function () {
 
   function graphUtilities (param) {
     optionUtilities = param.optionUtilities;
+    elementUtilities = param.elementUtilities;
     options = optionUtilities.getOptions();
     cy = param.sbgnCyInstance.getCy();    
   }
@@ -88,6 +89,31 @@ module.exports = function () {
       }
     });
 
+    // change parent of PNClass nodes based on neighbor majority if inferNestingOnLoad is enabled and node has no parent
+    if(options.inferNestingOnLoad) {
+      cy.nodes().forEach(function(node) {
+        if(elementUtilities.isPNClass(node) && node.parent().length == 0) {
+          var processParentMap = new Map();
+          node.neighborhood().nodes().forEach(function(neighbor) {
+            if(processParentMap.has(neighbor.parent().id()))
+              processParentMap.set(neighbor.parent().id(), processParentMap.get(neighbor.parent().id()) + 1);
+            else
+              processParentMap.set(neighbor.parent().id(), 1);
+          });
+          // find the max occurrence
+          var max_count = 0, result = null;
+          processParentMap.forEach((value, key) => {
+            if (max_count < value || (max_count == value && result == undefined)) {
+              result = key;
+              max_count = value;
+            }
+          });
+          node.move({
+            parent: result
+          })
+        }
+      });
+    }
 
     //this.refreshPaddings(); // Recalculates/refreshes the compound paddings
     cy.endBatch();
