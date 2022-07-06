@@ -26,8 +26,6 @@ module.exports = function () {
   */
   $$.sbgn.drawBorder = function({ context, node, borderWidth, borderColor, borderStyle, borderOpacity }) {
 
-   // console.log('context in draw border', context.canvas.id)
-
     borderWidth = borderWidth || ( node && parseFloat( node.css( 'border-width' ) ) );
 
     if( borderWidth > 0 ){
@@ -36,7 +34,6 @@ module.exports = function () {
       
       borderStyle = borderStyle || ( node && node.css( 'border-style' ) );
       borderColor = borderColor || ( node && node.css( 'border-color' ) );
-      console.log('borderStyle', borderStyle)
       borderOpacity = (
           borderOpacity || ( node && node.css( 'border-opacity' ) )
         ) * parentOpacity;
@@ -55,7 +52,6 @@ module.exports = function () {
 
       
       if( context.setLineDash ){ // for very outofdate browsers
-        console.log("ccontext.setLineDash", borderStyle)
         switch( borderStyle ){
           case 'dotted':
             context.setLineDash( [ 1, 1 ] );
@@ -99,9 +95,6 @@ module.exports = function () {
   // Taken from cytoscape.js and modified
   var drawRoundRectanglePath = $$.sbgn.drawRoundRectanglePath = function(
     context, x, y, width, height, radius ){
-
-      console.log("drainf round rectangel")
-
     var halfWidth = width / 2;
     var halfHeight = height / 2;
     var cornerRadius = radius || cyMath.getRoundRectangleRadius( width, height );
@@ -663,34 +656,20 @@ module.exports = function () {
         //This is where the multimer is drawn
        if ( canBeMultimer && $$.sbgn.isMultimer( node ) ) {
 
-        //If the node is also hypothetical
-        if ( canBeHypothetical && $$.sbgn.isHypothetical( node ) ) {
-
-
-          //add multimer shape
-          plainDrawFcn( context, centerX + multimerPadding,
-            centerY + multimerPadding, width, height);
-    
-            borderStyle = 'dashed'
-            //context.setLineDash([3, 6]);
-            $$.sbgn.drawBorder( { context, node, borderStyle } );
-            context.beginPath();
-
-          if ( extraDrawFcn ) {
-                extraDrawFcn( context, centerX + multimerPadding,
-                  centerY + multimerPadding, width, height);
-
-
-             $$.sbgn.drawBorder( { context, node } );
-          }
-  
-       }else{
-        //If the node is not hypothetical
         plainDrawFcn( context, centerX + multimerPadding,
           centerY + multimerPadding, width, height );
   
+        //If the node is also hypothetical
+        if (canBeHypothetical && $$.sbgn.isHypothetical( node ))
+        {
+            borderStyle = 'dashed'
+            $$.sbgn.drawBorder( { context, node, borderStyle } );
+            context.beginPath();
+        }
+        else{
+          $$.sbgn.drawBorder( { context, node } );
 
-        $$.sbgn.drawBorder( { context, node } );
+        }
 
         if ( extraDrawFcn ) {
           extraDrawFcn( context, centerX + multimerPadding,
@@ -699,8 +678,6 @@ module.exports = function () {
 
           $$.sbgn.drawBorder( { context, node } );
         }
-
-       }
       
         if ( isCloned ) {
           cloneMarkerFcn(context,
@@ -710,19 +687,18 @@ module.exports = function () {
 
 
         //If the node is also active
-        console.log("node._private.data.class", node._private.data.class)
         if( canBeActive && $$.sbgn.isActive( node ) && !node._private.data.class.startsWith('active ion channel') && !node._private.data.class.startsWith('active hypothetical ion channel')  ){
             //add multimer shape
-            plainDrawFcn( context, centerX ,
-            centerY , width+ activePadding , height+ activePadding );
+            plainDrawFcn( context, centerX + multimerPadding ,
+            centerY + multimerPadding, width+ activePadding , height+ activePadding );
 
             borderStyle = 'dashed'
             context.setLineDash([3, 6]);
             $$.sbgn.drawBorder( { context, node, borderStyle } );
 
             if ( extraDrawFcn ) {
-                extraDrawFcn( context, centerX,
-                  centerY, width + activePadding, height + activePadding);
+                extraDrawFcn( context, centerX + multimerPadding,
+                  centerY+ multimerPadding, width + activePadding, height + activePadding);
 
 
             $$.sbgn.drawBorder( { context, node } );
@@ -805,7 +781,6 @@ module.exports = function () {
       canHaveInfoBox, multimerPadding, activePadding } ) {
 
       return function( node, x, y ) {
-        console.log("generateIntersectLineFcn", node)
         var borderWidth = parseFloat(node.css('border-width'));
         var padding = borderWidth / 2;
         var width = node.outerWidth() - borderWidth;
@@ -924,7 +899,6 @@ module.exports = function () {
         canHaveInfoBox, multimerPadding, activePadding, extraDrawFcn
       } );
 
-      //console.log("totallyOverridenNodeShapes[ shapeName ]", shapeName, totallyOverridenNodeShapes[ shapeName ])
       var intersectLine = totallyOverridenNodeShapes[ shapeName ] ?
         generateIntersectLineFcn( { plainIntersectLineFcn, canBeMultimer, cloneMarkerFcn, canBeActive, canBeHypothetical,
           canHaveInfoBox, multimerPadding, activePadding
