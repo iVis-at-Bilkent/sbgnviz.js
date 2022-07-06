@@ -1903,7 +1903,12 @@ module.exports = function () {
           || _class == 'perturbing agent' || _class == 'tag'
           || _class == 'biological activity' || _class.startsWith('BA')
           || _class == 'submap' || _class == 'SIF macromolecule'
-          || _class == 'SIF simple chemical' || _class == 'protein') {
+          || _class == 'SIF simple chemical' || _class == 'protein'
+          || _class == 'receptor' || _class == 'truncated protein'
+          || _class == 'ion channel' || _class == 'complex sbml'
+          || _class == 'gene' || _class == 'rna' || _class == 'simple molecule'
+          || _class == 'unknown molecule' || _class == 'phenotype sbml'
+          || _class == 'drug' || _class == 'ion') {
           content = ele.data('label') ? ele.data('label') : "";
       }
       else if(_class == 'compartment'){
