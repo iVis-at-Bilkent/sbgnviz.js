@@ -235,7 +235,12 @@ module.exports = function () {
     'nucleic acid feature': true,
     'complex': true,
     'biological activity': true,
-    'compartment': true
+    'compartment': true,
+    'protein': true,
+    'receptor': true,
+    'truncated protein': true,
+    'ion channel': true,
+    'complex sbml': true
   };
 
   var canBeMultimerShapes = $$.sbgn.canBeMultimerShapes = {
@@ -656,104 +661,108 @@ module.exports = function () {
         //This is where the multimer is drawn
        if ( canBeMultimer && $$.sbgn.isMultimer( node ) ) {
 
-        plainDrawFcn( context, centerX + multimerPadding,
-          centerY + multimerPadding, width, height );
-  
-        //If the node is also hypothetical
-        if (canBeHypothetical && $$.sbgn.isHypothetical( node ))
-        {
-            borderStyle = 'dashed'
-            $$.sbgn.drawBorder( { context, node, borderStyle } );
-            context.beginPath();
-        }
-        else{
-          $$.sbgn.drawBorder( { context, node } );
-
-        }
-
-        if ( extraDrawFcn ) {
-          extraDrawFcn( context, centerX + multimerPadding,
+          plainDrawFcn( context, centerX + multimerPadding,
             centerY + multimerPadding, width, height );
+    
+          //If the node is also hypothetical
+          if (canBeHypothetical && $$.sbgn.isHypothetical( node ))
+          {
+              borderStyle = 'dashed'
+              $$.sbgn.drawBorder( { context, node, borderStyle } );
+              context.beginPath();
+          }
+          else{
+            $$.sbgn.drawBorder( { context, node } );
 
+          }
 
-          $$.sbgn.drawBorder( { context, node } );
-        }
-      
-        if ( isCloned ) {
-          cloneMarkerFcn(context,
-                  centerX + multimerPadding, centerY + multimerPadding,
-                  width - borderWidth, height - borderWidth, isCloned, true, bgOpacity);
-        }
-
-
-        //If the node is also active
-        if( canBeActive && $$.sbgn.isActive( node ) && !node._private.data.class.startsWith('active ion channel') && !node._private.data.class.startsWith('active hypothetical ion channel')  ){
-            //add multimer shape
-            plainDrawFcn( context, centerX + multimerPadding ,
-            centerY + multimerPadding, width+ activePadding , height+ activePadding );
-
-            borderStyle = 'dashed'
-            context.setLineDash([3, 6]);
-            $$.sbgn.drawBorder( { context, node, borderStyle } );
-
-            if ( extraDrawFcn ) {
-                extraDrawFcn( context, centerX + multimerPadding,
-                  centerY+ multimerPadding, width + activePadding, height + activePadding);
+          if ( extraDrawFcn ) {
+            extraDrawFcn( context, centerX + multimerPadding,
+              centerY + multimerPadding, width, height );
 
 
             $$.sbgn.drawBorder( { context, node } );
           }
+      
+          if ( isCloned ) {
+            cloneMarkerFcn(context,
+                    centerX + multimerPadding, centerY + multimerPadding,
+                    width - borderWidth, height - borderWidth, isCloned, true, bgOpacity);
+          }
+
+
+          //If the node is also active
+          console.log("canBeActive", canBeActive, node)
+          console.log("$$.sbgn.isActive( node )", $$.sbgn.isActive( node ), node)
+          if( canBeActive && $$.sbgn.isActive( node ) && !node._private.data.class.startsWith('active ion channel') && !node._private.data.class.startsWith('active hypothetical ion channel')  ){
+              //add multimer shape
+              plainDrawFcn( context, centerX + multimerPadding ,
+              centerY + multimerPadding, width+ activePadding , height+ activePadding );
+
+              borderStyle = 'dashed'
+              context.setLineDash([3, 6]);
+              $$.sbgn.drawBorder( { context, node, borderStyle } );
+
+              if ( extraDrawFcn ) {
+                  extraDrawFcn( context, centerX + multimerPadding,
+                    centerY+ multimerPadding, width + activePadding, height + activePadding);
+
+
+              $$.sbgn.drawBorder( { context, node } );
+            }
 
           }
         
-      }
-
-      //This is where the active is drawn
-      if ( canBeActive && $$.sbgn.isActive( node ) && !node._private.data.class.startsWith('active ion channel') && !node._private.data.class.startsWith('active hypothetical ion channel') ) {
-            //add multimer shape
-            plainDrawFcn( context, centerX ,
-            centerY , width+ activePadding , height+ activePadding );
-    
-            borderStyle = 'dashed'
-            context.setLineDash([3, 6]);
-            $$.sbgn.drawBorder( { context, node, borderStyle } );
-
-            if ( extraDrawFcn ) {
-                extraDrawFcn( context, centerX,
-                  centerY, width + activePadding, height + activePadding);
-
-
-            $$.sbgn.drawBorder( { context, node } );
-          }
-
-      }
+        }
 
         //This is where the active is drawn
+        if ( canBeActive && $$.sbgn.isActive( node ) && !node._private.data.class.startsWith('active ion channel') && !node._private.data.class.startsWith('active hypothetical ion channel') ) {
+              //add multimer shape
+              plainDrawFcn( context, centerX ,
+              centerY , width+ activePadding , height+ activePadding );
+      
+              borderStyle = 'dashed'
+              context.setLineDash([3, 6]);
+              $$.sbgn.drawBorder( { context, node, borderStyle } );
+
+              if ( extraDrawFcn ) {
+                  extraDrawFcn( context, centerX,
+                    centerY, width + activePadding, height + activePadding);
+
+
+              $$.sbgn.drawBorder( { context, node } );
+            }
+
+        }
+
+          //This is where the active is drawn
         if ( canBeHypothetical && $$.sbgn.isHypothetical( node ) ) {
 
 
-          //add multimer shape
-          plainDrawFcn( context, centerX ,
-            centerY , width, height);
-    
-            borderStyle = 'dashed'
-            //context.setLineDash([3, 6]);
-            $$.sbgn.drawBorder( { context, node, borderStyle } );
-            context.beginPath();
+            //add multimer shape
+            plainDrawFcn( context, centerX ,
+              centerY , width, height);
+      
+              borderStyle = 'dashed'
+              //context.setLineDash([3, 6]);
+              $$.sbgn.drawBorder( { context, node, borderStyle } );
+              context.beginPath();
 
-          if ( extraDrawFcn ) {
-                extraDrawFcn( context, centerX,
-                  centerY, width, height);
+            if ( extraDrawFcn ) {
+                  extraDrawFcn( context, centerX,
+                    centerY, width, height);
 
 
-             $$.sbgn.drawBorder( { context, node } );
-          }
-          return
-       }
+              $$.sbgn.drawBorder( { context, node } );
+            }
+            return
+        }
 
        
-        
-        plainDrawFcn( context, centerX, centerY, width, height );
+        if ( !(canBeHypothetical && $$.sbgn.isHypothetical( node )) )
+        {
+          plainDrawFcn( context, centerX, centerY, width, height );
+        }
         $$.sbgn.drawBorder( { context, node } );
         $$.sbgn.drawImage( context, imgObj );
 
