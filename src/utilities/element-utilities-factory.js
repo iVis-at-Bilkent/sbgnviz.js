@@ -1271,7 +1271,32 @@ module.exports = function () {
             || sbgnclass == 'macromolecule multimer' || sbgnclass == 'nucleic acid feature multimer'
             || sbgnclass == 'complex multimer' || (sbgnclass.startsWith('BA') && sbgnclass != "BA plain")
             || sbgnclass == 'compartment' || sbgnclass == 'SIF macromolecule' || sbgnclass == 'SIF simple chemical'
-            || sbgnclass == 'active protein' || sbgnclass == 'protein') {
+            || sbgnclass == 'protein' ||  sbgnclass == 'protein multimer' || sbgnclass == 'active protein' 
+            || sbgnclass == 'hypothetical protein' || sbgnclass == 'active protein multimer' || sbgnclass == 'hypothetical protein multimer' 
+            || sbgnclass == 'active hypothetical protein' || sbgnclass == 'active hypothetical protein multimer'
+            || sbgnclass == 'receptor' ||  sbgnclass == 'receptor multimer' || sbgnclass == 'active receptor' 
+            || sbgnclass == 'hypothetical receptor' || sbgnclass == 'active receptor multimer' || sbgnclass == 'hypothetical receptor multimer' 
+            || sbgnclass == 'active hypothetical receptor' || sbgnclass == 'active hypothetical receptor multimer'
+            || sbgnclass == 'ion channel' ||  sbgnclass == 'ion channel multimer' || sbgnclass == 'active ion channel' 
+            || sbgnclass == 'hypothetical ion channel' || sbgnclass == 'active ion channel multimer' || sbgnclass == 'hypothetical ion channel multimer' 
+            || sbgnclass == 'active hypothetical ion channel' || sbgnclass == 'active hypothetical ion channel multimer'
+            || sbgnclass == 'truncated protein' ||  sbgnclass == 'truncated protein multimer' || sbgnclass == 'active truncated protein' 
+            || sbgnclass == 'hypothetical truncated protein' || sbgnclass == 'active truncated protein multimer' || sbgnclass == 'hypothetical truncated protein multimer' 
+            || sbgnclass == 'active hypothetical truncated protein' || sbgnclass == 'active hypothetical truncated protein multimer'
+            || sbgnclass == 'complex sbml' ||  sbgnclass == 'complex sbml multimer' || sbgnclass == 'active complex sbml' 
+            || sbgnclass == 'hypothetical complex sbml' || sbgnclass == 'active complex sbml multimer' || sbgnclass == 'hypothetical complex sbml multimer' 
+            || sbgnclass == 'active hypothetical complex sbml' || sbgnclass == 'active hypothetical complex sbml multimer' 
+            || sbgnclass == 'gene' ||  sbgnclass == 'gene multimer' || sbgnclass == 'hypothetical gene' || sbgnclass == 'hypothetical gene multimer' 
+            || sbgnclass == 'rna' ||  sbgnclass == 'rna multimer' 
+            || sbgnclass == 'hypothetical rna' || sbgnclass == 'hypothetical rna multimer' 
+            || sbgnclass == 'simple molecule' ||  sbgnclass == 'simple molecule multimer' 
+            || sbgnclass == 'hypothetical simple molecule'  || sbgnclass == 'hypothetical simple molecule multimer' 
+            || sbgnclass == 'unknown molecule' ||  sbgnclass == 'unknown molecule multimer' 
+            || sbgnclass == 'hypothetical unknown molecule' ||  sbgnclass == 'hypothetical unknown molecule multimer' 
+            || sbgnclass == 'phenotype sbml' ||  sbgnclass == 'phenotype sbml multimer'
+            || sbgnclass == 'drug' ||  sbgnclass == 'drug multimer'  || sbgnclass == 'hypothetical drug'  || sbgnclass == 'hypothetical drug multimer' 
+            || sbgnclass == 'ion' ||  sbgnclass == 'ion multimer' || sbgnclass == 'hypothetical ion' || sbgnclass == 'hypothetical ion multimer'
+            ) {
       return true;
     }
     return false;
@@ -1306,7 +1331,9 @@ module.exports = function () {
             || sbgnclass == 'active hypothetical truncated protein' || sbgnclass == 'active hypothetical truncated protein multimer'
             || sbgnclass == 'complex sbml' ||  sbgnclass == 'complex sbml multimer' || sbgnclass == 'active complex sbml' 
             || sbgnclass == 'hypothetical complex sbml' || sbgnclass == 'active complex sbml multimer' || sbgnclass == 'hypothetical complex sbml multimer' 
-            || sbgnclass == 'active hypothetical complex sbml' || sbgnclass == 'active hypothetical complex sbml multimer' ) {
+            || sbgnclass == 'active hypothetical complex sbml' || sbgnclass == 'active hypothetical complex sbml multimer' 
+ 
+            ) {
       return true;
     }
     return false;
