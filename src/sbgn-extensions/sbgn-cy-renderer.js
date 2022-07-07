@@ -240,12 +240,7 @@ module.exports = function () {
     'receptor': true,
     'truncated protein': true,
     'ion channel': true,
-    'complex sbml': true,
-    'gene': true,
-    'rna': true,
-    'simple molecule': true,
-    'unknown molecule': true,
-    'phenotype sbml': true
+    'complex sbml': true
   };
 
   var canBeMultimerShapes = $$.sbgn.canBeMultimerShapes = {
@@ -643,65 +638,6 @@ module.exports = function () {
     function generateDrawFcn( { plainDrawFcn, extraDrawFcn, canBeMultimer, cloneMarkerFcn, canBeActive, canBeHypothetical,
       canHaveInfoBox, multimerPadding, activePadding} ) {
 
-
-        /*
-        return function( context, node, imgObj ) {
-
-          var borderWidth = parseFloat(node.css('border-width'));
-          var width = node.outerWidth() - borderWidth;
-          var height = node.outerHeight() - borderWidth;
-          var centerX = node._private.position.x;
-          var centerY = node._private.position.y;
-          var bgOpacity = node.css('background-opacity');
-          var isCloned = cloneMarkerFcn != null && node._private.data.clonemarker;
-  
-          if ( canBeMultimer && $$.sbgn.isMultimer( node ) ) {
-            //add multimer shape
-            plainDrawFcn( context, centerX + multimerPadding,
-                    centerY + multimerPadding, width, height );
-  
-            $$.sbgn.drawBorder( { context, node } );
-  
-            if ( extraDrawFcn ) {
-              extraDrawFcn( context, centerX + multimerPadding,
-                      centerY + multimerPadding, width, height );
-  
-  
-              $$.sbgn.drawBorder( { context, node } );
-            }
-  
-            if ( isCloned ) {
-              cloneMarkerFcn(context,
-                      centerX + multimerPadding, centerY + multimerPadding,
-                      width - borderWidth, height - borderWidth, isCloned, true, bgOpacity);
-            }
-          }
-  
-          plainDrawFcn( context, centerX, centerY, width, height );
-  
-          $$.sbgn.drawBorder( { context, node } );
-          $$.sbgn.drawImage( context, imgObj );
-  
-          if ( extraDrawFcn ) {
-              extraDrawFcn( context, centerX, centerY, width, height );
-  
-              $$.sbgn.drawBorder( { context, node } );
-          }
-  
-          if ( isCloned ) {
-            cloneMarkerFcn(context, centerX, centerY, width - borderWidth,
-                      height - borderWidth, isCloned, false, bgOpacity);
-          }
-  
-          if ( canHaveInfoBox ) {
-            var oldStyle = context.fillStyle;
-            $$.sbgn.forceOpacityToOne(node, context);
-            $$.sbgn.drawStateAndInfos(node, context, centerX, centerY);
-            context.fillStyle = oldStyle;
-          }
-        };
-*/
-        
       return function( context, node, imgObj ) {
         var borderWidth = parseFloat(node.css('border-width'));
         var width = node.outerWidth() - borderWidth;
@@ -848,7 +784,6 @@ module.exports = function () {
           context.fillStyle = oldStyle;
         }
       };
-      
     }
 
     function generateIntersectLineFcn( { plainIntersectLineFcn, canBeMultimer, cloneMarkerFcn, canBeActive, canBeHypothetical,
