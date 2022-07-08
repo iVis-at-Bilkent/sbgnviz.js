@@ -240,7 +240,15 @@ module.exports = function () {
     'receptor': true,
     'truncated protein': true,
     'ion channel': true,
-    'complex sbml': true
+    'complex sbml': true,
+    'gene': true,
+    'rna': true,
+    'simple molecule': true,
+    'unknown molecule': true,
+    'phenotype sbml': true,
+    'drug': true,
+    'ion': true,
+    'empty set': true
   };
 
   var canBeMultimerShapes = $$.sbgn.canBeMultimerShapes = {
@@ -279,12 +287,11 @@ module.exports = function () {
     'truncated protein': true,
     'gene': true,
     'rna': true,
-    'phenotype': true,
+    'phenotype sbml': true,
     'ion': true,
     'simple molecule': true,
     'unknown molecule': true,
     'drug': true,
-    'complex': true,
     'degradation': true
 };
 
@@ -501,6 +508,7 @@ module.exports = function () {
 
   $$.sbgn.drawEllipsePath = function (context, x, y, width, height) {
     cyBaseNodeShapes['ellipse'].drawPath(context, x, y, width, height);
+
   };
 
 
@@ -755,7 +763,7 @@ module.exports = function () {
 
               $$.sbgn.drawBorder( { context, node } );
             }
-            return
+      
         }
 
        
@@ -784,6 +792,7 @@ module.exports = function () {
           context.fillStyle = oldStyle;
         }
       };
+      
     }
 
     function generateIntersectLineFcn( { plainIntersectLineFcn, canBeMultimer, cloneMarkerFcn, canBeActive, canBeHypothetical,
@@ -927,6 +936,7 @@ module.exports = function () {
     //$$.sbgn.drawEllipsePath(context, x, y, width, height);
     //context.fill();
     cyBaseNodeShapes['ellipse'].draw(context, x, y, width, height);
+    context.fill();
   };
 
   $$.sbgn.drawIonChannel = function (context, x, y, width, height, radius) {
@@ -994,6 +1004,7 @@ module.exports = function () {
 
 
     context.closePath();
+    context.fill();
   };
 
   $$.sbgn.drawIonChannel = function (context, x, y, width, height, radius) {
@@ -1032,6 +1043,7 @@ module.exports = function () {
 
 
     context.closePath();
+    context.fill();
   }
 
   $$.sbgn.drawOpenIonChannel = function (context, x, y, width, height, radius) {
@@ -1070,6 +1082,7 @@ module.exports = function () {
 
 
     context.closePath();
+    context.fill();
   };
 
   $$.sbgn.drawComplex = function( context, x, y, width, height, cornerLength ) {
@@ -1083,6 +1096,7 @@ module.exports = function () {
 
   $$.sbgn.drawGene = function( context, x, y, width, height ) {
     cyBaseNodeShapes['rectangle'].draw(context, x, y, width, height);
+    context.fill();
 
   };
 
@@ -1096,6 +1110,7 @@ module.exports = function () {
 
   $$.sbgn.drawPhenotype = function( context, x, y, width, height ) {
     cyBaseNodeShapes['hexagon'].draw(context, x, y, width, height);
+    context.fill();
 
   };
   $$.sbgn.drawReceptor= function( context, x, y, width, height ) {
@@ -1127,6 +1142,7 @@ module.exports = function () {
 
   $$.sbgn.drawRoundRectangle = function( context, x, y, width, height ) {
     drawRoundRectanglePath( context, x, y, width, height );
+    context.fill();
   
   };
 
