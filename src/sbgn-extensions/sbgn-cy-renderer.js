@@ -700,7 +700,6 @@ module.exports = function () {
 
 
           //If the node is also active
-          console.log("canBeActive", canBeActive, node)
           console.log("$$.sbgn.isActive( node )", $$.sbgn.isActive( node ), node)
           if( canBeActive && $$.sbgn.isActive( node ) && !node._private.data.class.startsWith('active ion channel') && !node._private.data.class.startsWith('active hypothetical ion channel')  ){
               //add multimer shape
