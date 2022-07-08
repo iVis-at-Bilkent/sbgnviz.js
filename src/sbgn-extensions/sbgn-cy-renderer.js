@@ -939,45 +939,7 @@ module.exports = function () {
     context.fill();
   };
 
-  $$.sbgn.drawIonChannel = function (context, x, y, width, height, radius) {
-
-    var halfWidth = width / 2;
-    var halfHeight = height / 2;
-    var cornerRadius = radius || cyMath.getRoundRectangleRadius( width, height );
-
-    if( context.beginPath ){ context.beginPath(); }
-
-    // Start at top middle
-    context.moveTo( x + halfWidth/4, y - halfHeight );
-    // Arc from middle top to right side
-    context.arcTo( x + halfWidth/2, y - halfHeight, x + halfWidth/2, y, cornerRadius );
-    // Arc from right side to bottom
-    context.arcTo( x + halfWidth/2, y + halfHeight, x/2 + halfWidth/4, y + halfHeight, cornerRadius );
-    // Arc from bottom to left side
-    context.arcTo( x - halfWidth, y + halfHeight, x - halfWidth, y, cornerRadius );
-    // Arc from left side to topBorder
-    context.arcTo( x - halfWidth, y - halfHeight, x + halfWidth/4, y - halfHeight, cornerRadius );
-    // Join line
-    context.lineTo( x + halfWidth/4, y - halfHeight );
-
-    // Start at top middle
-    context.moveTo( x + 3 *halfWidth/4, y - halfHeight );
-    // Arc from middle top to right side
-    context.arcTo( x + halfWidth, y - halfHeight, x + halfWidth, y, cornerRadius );
-    // Arc from right side to bottom
-    context.arcTo( x + halfWidth, y + halfHeight, x + 3 * halfWidth/4, y + halfHeight, cornerRadius );
-    // Arc from bottom to left side
-    context.arcTo( x + halfWidth/2, y + halfHeight, x +  halfWidth/2, y, cornerRadius );
-    // Arc from left side to topBorder
-    context.arcTo( x + halfWidth/2, y - halfHeight, x + 3 * halfWidth/4 , y - halfHeight, cornerRadius );
-    // Join line
-    //context.lineTo( x, y - halfHeight );
-
-
-    context.closePath();
-  }
-
-  $$.sbgn.drawTruncatedProtein = function (context, x, y, width, height, radius) {
+    $$.sbgn.drawTruncatedProtein = function (context, x, y, width, height, radius) {
    
     var halfWidth = width / 2;
     var halfHeight = height / 2;
