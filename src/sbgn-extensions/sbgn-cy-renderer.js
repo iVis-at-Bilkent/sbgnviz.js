@@ -655,6 +655,7 @@ module.exports = function () {
         var bgOpacity = node.css('background-opacity');
         var isCloned = cloneMarkerFcn != null && node._private.data.clonemarker;
 
+        //Ion channel is dran differently when it is active
         if (node._private.data.class.startsWith('active ion channel') ||  node._private.data.class.startsWith('active hypothetical ion channel') )
         {
           plainDrawFcn = $$.sbgn.drawOpenIonChannel;
@@ -704,7 +705,7 @@ module.exports = function () {
           if( canBeActive && $$.sbgn.isActive( node ) && !node._private.data.class.startsWith('active ion channel') && !node._private.data.class.startsWith('active hypothetical ion channel')  ){
               //add multimer shape
               plainDrawFcn( context, centerX + multimerPadding ,
-              centerY + multimerPadding, width+ activePadding , height+ activePadding );
+              centerY + multimerPadding, width+ activePadding , height+ activePadding, true);
 
               borderStyle = 'dashed'
               context.setLineDash([3, 6]);
@@ -726,7 +727,7 @@ module.exports = function () {
         if ( canBeActive && $$.sbgn.isActive( node ) && !node._private.data.class.startsWith('active ion channel') && !node._private.data.class.startsWith('active hypothetical ion channel') ) {
               //add multimer shape
               plainDrawFcn( context, centerX ,
-              centerY , width+ activePadding , height+ activePadding );
+              centerY , width+ activePadding , height+ activePadding,true );
       
               borderStyle = 'dashed'
               context.setLineDash([3, 6]);
@@ -940,7 +941,7 @@ module.exports = function () {
     context.fill();
   };
 
-    $$.sbgn.drawTruncatedProtein = function (context, x, y, width, height, radius) {
+    $$.sbgn.drawTruncatedProtein = function (context, x, y, width, height, isActive, radius) {
    
     var halfWidth = width / 2;
     var halfHeight = height / 2;
@@ -965,9 +966,12 @@ module.exports = function () {
     // Arc from left side to topBorder
     context.arcTo( x - halfWidth, y - halfHeight, x, y - halfHeight, cornerRadius );
 
-
     context.closePath();
-    context.fill();
+    console.log("activeOrNote", isActive);
+    if(!isActive)
+    {
+      context.fill();
+    }
   };
 
   $$.sbgn.drawIonChannel = function (context, x, y, width, height, radius) {
@@ -1048,19 +1052,24 @@ module.exports = function () {
     context.fill();
   };
 
-  $$.sbgn.drawComplex = function( context, x, y, width, height, cornerLength ) {
+  $$.sbgn.drawComplex = function( context, x, y, width, height, isActive, cornerLength ) {
     cornerLength = cornerLength || $$.sbgn.getDefaultComplexCornerLength();
     var points = $$.sbgn.generateComplexShapePoints(cornerLength, width, height);
 
     drawPolygonPath(context, x, y, width, height, points);
 
-    context.fill();
+    if(!isActive)
+    {
+      context.fill();
+    }
   };
 
-  $$.sbgn.drawGene = function( context, x, y, width, height ) {
+  $$.sbgn.drawGene = function( context, x, y, width, height, isActive ) {
     cyBaseNodeShapes['rectangle'].draw(context, x, y, width, height);
-    context.fill();
-
+    if (!isActive)
+    {
+      context.fill();
+    }
   };
 
   $$.sbgn.drawRNA = function( context, x, y, width, height ) {
@@ -1076,12 +1085,14 @@ module.exports = function () {
     context.fill();
 
   };
-  $$.sbgn.drawReceptor= function( context, x, y, width, height ) {
+  $$.sbgn.drawReceptor= function( context, x, y, width, height, isActive ) {
     var points = $$.sbgn.generateReceptorShapePoints( width, height);
 
     drawPolygonPath(context, x, y, width, height, points);
-
-    context.fill();
+    if(!isActive)
+    {
+      context.fill();
+    }
 
   };
 
@@ -1103,9 +1114,12 @@ module.exports = function () {
     context.fill();
   };
 
-  $$.sbgn.drawRoundRectangle = function( context, x, y, width, height ) {
+  $$.sbgn.drawRoundRectangle = function( context, x, y, width, height, isActive ) {
     drawRoundRectanglePath( context, x, y, width, height );
-    context.fill();
+    if(!isActive)
+    {
+      context.fill();
+    }
   
   };
   $$.sbgn.drawRoundedDrug = function( context, x, y, width, height ) {
