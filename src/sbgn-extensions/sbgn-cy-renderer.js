@@ -122,7 +122,7 @@ module.exports = function () {
 
   };
 
-  var drawRoundDrugPath= $$.sbgn.drawRoundDrug = function(
+  var drawRoundedDrugPath= $$.sbgn.drawRoundedDrug = function(
     context, x, y, width, height, radius )
     {
 
@@ -145,6 +145,7 @@ module.exports = function () {
     // Join line
     context.lineTo( x, y - halfHeight );
 
+    
 
     var halfWidthInner = width / 2 - 5;
     var halfHeightInner = height / 2 - 5;
@@ -163,7 +164,6 @@ module.exports = function () {
     context.arcTo( x - halfWidthInner, y - halfHeightInner, x, y - halfHeightInner, cornerRadius );
     // Join line
     context.lineTo( x, y - halfHeightInner );
-
 
     context.closePath();
   };
@@ -1106,6 +1106,11 @@ module.exports = function () {
     context.fill();
   
   };
+  $$.sbgn.drawRoundedDrug = function( context, x, y, width, height ) {
+    drawRoundedDrugPath( context, x, y, width, height );
+    context.fill();
+  
+  };
 
   $$.sbgn.generateNucleicAcidPoints = function() {
     return cyMath.generateUnitNgonPointsFitToSquare(4, 0);
@@ -1132,7 +1137,7 @@ module.exports = function () {
     "rna": $$.sbgn.drawRNA,
     "simple molecule": $$.sbgn.drawEllipse,
     "unknown molecule": $$.sbgn.drawEllipse,
-    "drug": $$.sbgn.drawRoundDrug,
+    "drug": $$.sbgn.drawRoundedDrug,
     "ion": $$.sbgn.drawEllipse,
     "truncated protein": $$.sbgn.drawTruncatedProtein,
     "ion channel" : $$.sbgn.drawIonChannel,
