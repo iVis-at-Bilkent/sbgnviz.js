@@ -770,8 +770,10 @@ module.exports = function () {
         {
           plainDrawFcn( context, centerX, centerY, width, height );
         }
-        $$.sbgn.drawBorder( { context, node } );
+
         $$.sbgn.drawImage( context, imgObj );
+        $$.sbgn.drawBorder( { context, node } );
+        
 
         if ( extraDrawFcn ) {
             extraDrawFcn( context, centerX, centerY, width, height );
