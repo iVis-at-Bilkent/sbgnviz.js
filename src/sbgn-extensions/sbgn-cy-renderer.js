@@ -676,9 +676,11 @@ module.exports = function () {
           //If the node is also hypothetical
           if (canBeHypothetical && $$.sbgn.isHypothetical( node ))
           {
+              $$.sbgn.drawImage( context, imgObj );
               borderStyle = 'dashed'
               $$.sbgn.drawBorder( { context, node, borderStyle } );
               context.beginPath();
+
           }
           else{
             $$.sbgn.drawBorder( { context, node } );
@@ -751,8 +753,8 @@ module.exports = function () {
             plainDrawFcn( context, centerX ,
               centerY , width, height);
       
+              $$.sbgn.drawImage( context, imgObj );
               borderStyle = 'dashed'
-              //context.setLineDash([3, 6]);
               $$.sbgn.drawBorder( { context, node, borderStyle } );
               context.beginPath();
 
@@ -770,9 +772,10 @@ module.exports = function () {
         if ( !(canBeHypothetical && $$.sbgn.isHypothetical( node )) )
         {
           plainDrawFcn( context, centerX, centerY, width, height );
-        }
+          $$.sbgn.drawImage( context, imgObj );
 
-        $$.sbgn.drawImage( context, imgObj );
+        }
+       
         $$.sbgn.drawBorder( { context, node } );
         
 
