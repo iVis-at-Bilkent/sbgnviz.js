@@ -122,6 +122,58 @@ module.exports = function () {
 
   };
 
+
+  var drawProteinPath = $$.sbgn.drawProtein = function(
+    context, x, y, width, height, activePadding1  ){
+    var halfWidth = (width+ activePadding1) / 2;
+    var halfHeight = (height + activePadding1) / 2;
+    var cornerRadius =  cyMath.getRoundRectangleRadius( width, height );
+
+    if( context.beginPath ){ context.beginPath(); }
+
+    // Start at top middle
+    context.moveTo( x, y - halfHeight );
+    // Arc from middle top to right side
+    context.arcTo( x + halfWidth, y - halfHeight, x + halfWidth, y, cornerRadius );
+    // Arc from right side to bottom
+    context.arcTo( x + halfWidth, y + halfHeight, x, y + halfHeight, cornerRadius );
+    // Arc from bottom to left side
+    context.arcTo( x - halfWidth, y + halfHeight, x - halfWidth, y, cornerRadius );
+    // Arc from left side to topBorder
+    context.arcTo( x - halfWidth, y - halfHeight, x, y - halfHeight, cornerRadius );
+    // Join line
+    context.lineTo( x, y - halfHeight );
+
+    context.closePath();
+
+
+    //context.clearRect(0, 0, width, height);
+    //context.beginPath()
+
+  };
+
+
+  var drawReceptorPath = $$.sbgn.drawReceptor = function(
+    context, x, y, width, height, activePadding1  ){
+    var halfPadding  = activePadding1? activePadding1/2: 0;
+    //var points= [-1, -1,   0, -0.5,   1, -1,   1, 0.5,   0, 1,   -1,  0.5 ];
+    var halfW = width / 2;
+    var halfH = height / 2;
+    
+
+    if( context.beginPath ){ context.beginPath(); }
+
+    context.moveTo( x + halfW * (-1) - halfPadding, y + halfH * (-1) - 3*halfPadding/2)
+    context.lineTo( x + halfW * (0), y + halfH * (-0.5) - 3*halfPadding/2)
+    context.lineTo( x + halfW * (1) + halfPadding, y + halfH * (-1) - 3*halfPadding/2)
+    context.lineTo( x + halfW * (1) + halfPadding, y + halfH * (0.5) + halfPadding)
+    context.lineTo( x + halfW * (0), y + halfH * (1) + 3*halfPadding/2)
+    context.lineTo( x + halfW * (-1) - halfPadding, y + halfH * (0.5) + halfPadding)
+
+    context.closePath();
+
+  };
+
   var drawRoundedDrugPath= $$.sbgn.drawRoundedDrug = function(
     context, x, y, width, height, radius )
     {
@@ -708,7 +760,7 @@ module.exports = function () {
           if( canBeActive && $$.sbgn.isActive( node ) && !node._private.data.class.startsWith('active ion channel') && !node._private.data.class.startsWith('active hypothetical ion channel')  ){
               //add multimer shape
               plainDrawFcn( context, centerX + multimerPadding ,
-              centerY + multimerPadding, width+ activePadding , height+ activePadding, true);
+              centerY + multimerPadding, width , height, true, activePadding);
 
               borderStyle = 'dashed'
               context.setLineDash([3, 6]);
@@ -730,7 +782,7 @@ module.exports = function () {
         if ( canBeActive && $$.sbgn.isActive( node ) && !node._private.data.class.startsWith('active ion channel') && !node._private.data.class.startsWith('active hypothetical ion channel') ) {
               //add multimer shape
               plainDrawFcn( context, centerX ,
-              centerY , width+ activePadding , height+ activePadding,true );
+              centerY , width, height,true , activePadding);
       
               borderStyle = 'dashed'
               context.setLineDash([3, 6]);
@@ -945,33 +997,33 @@ module.exports = function () {
     context.fill();
   };
 
-    $$.sbgn.drawTruncatedProtein = function (context, x, y, width, height, isActive, radius) {
+    $$.sbgn.drawTruncatedProtein = function (context, x, y, width, height, isActive, activePadding ) {
    
     var halfWidth = width / 2;
     var halfHeight = height / 2;
-    var cornerRadius = radius || cyMath.getRoundRectangleRadius( width, height );
+    var cornerRadius = cyMath.getRoundRectangleRadius( width, height );
+    var halfPadding = activePadding? activePadding /2: 0;
 
     if( context.beginPath ){ context.beginPath(); }
 
     // Start at top middle
-    context.moveTo( x, y - halfHeight );
+    context.moveTo( x, y - halfHeight - halfPadding );
     //Draw a line till right top
-    context.lineTo( x + halfWidth, y - halfHeight );
+    context.lineTo( x + halfWidth + halfPadding, y - halfHeight - halfPadding);
     //Draw a line to middle right
-    context.lineTo( x + halfWidth, y + halfHeight/2);
+    context.lineTo( x + halfWidth + halfPadding, y + 2*halfHeight/3 + 2*halfPadding);
     //Draw a line inner
-    context.lineTo( x + halfWidth/2, y );
+    context.lineTo( x + 2*halfWidth/3 + halfPadding, y + halfHeight/3 + 2*halfPadding );
     //Draw a line to bottom right
-    context.lineTo( x + halfWidth/2, y + halfHeight );
+    context.lineTo( x + 2*halfWidth/3 + halfPadding, y + halfHeight + halfPadding );
     //Draw a line to bottom middle
-    context.lineTo( x, y + halfHeight );
+    context.lineTo( x, y + halfHeight + halfPadding );
     // Arc from bottom to left side
-    context.arcTo( x - halfWidth, y + halfHeight, x - halfWidth, y, cornerRadius );
+    context.arcTo( x - halfWidth -halfPadding, y + halfHeight+ halfPadding, x - halfWidth -halfPadding , y, cornerRadius );
     // Arc from left side to topBorder
-    context.arcTo( x - halfWidth, y - halfHeight, x, y - halfHeight, cornerRadius );
+    context.arcTo( x - halfWidth - halfPadding, y - halfHeight - halfPadding, x, y - halfHeight -halfPadding, cornerRadius );
 
     context.closePath();
-    console.log("activeOrNote", isActive);
     if(!isActive)
     {
       context.fill();
@@ -1089,10 +1141,8 @@ module.exports = function () {
     context.fill();
 
   };
-  $$.sbgn.drawReceptor= function( context, x, y, width, height, isActive ) {
-    var points = $$.sbgn.generateReceptorShapePoints( width, height);
-
-    drawPolygonPath(context, x, y, width, height, points);
+  $$.sbgn.drawReceptor= function( context, x, y, width, height, isActive, activePadding ) {
+     drawReceptorPath(context, x, y, width, height,activePadding)
     if(!isActive)
     {
       context.fill();
@@ -1120,6 +1170,16 @@ module.exports = function () {
 
   $$.sbgn.drawRoundRectangle = function( context, x, y, width, height, isActive ) {
     drawRoundRectanglePath( context, x, y, width, height );
+    if(!isActive)
+    {
+      context.fill();
+    }
+  
+  };
+
+  $$.sbgn.drawProtein = function( context, x, y, width, height, isActive, activePadding ) {
+    let activePadding1 = activePadding || 0;
+    drawProteinPath( context, x, y, width, height, activePadding1 );
     if(!isActive)
     {
       context.fill();
@@ -1164,7 +1224,7 @@ module.exports = function () {
     "phenotype sbml": $$.sbgn.drawPhenotype,
     "receptor": $$.sbgn.drawReceptor,
     "complex sbml": $$.sbgn.drawComplex,
-    "protein": $$.sbgn.drawRoundRectangle
+    "protein": $$.sbgn.drawProtein
   };
 
   // To define an extra drawing for the node that is rendered at the very end,
