@@ -676,9 +676,10 @@ module.exports = function () {
           //If the node is also hypothetical
           if (canBeHypothetical && $$.sbgn.isHypothetical( node ))
           {
-              $$.sbgn.drawImage( context, imgObj );
+             // $$.sbgn.drawImage( context, imgObj );
               borderStyle = 'dashed'
               $$.sbgn.drawBorder( { context, node, borderStyle } );
+              //$$.sbgn.drawImage( context, imgObj );
               context.beginPath();
 
           }
@@ -752,10 +753,10 @@ module.exports = function () {
             //add multimer shape
             plainDrawFcn( context, centerX ,
               centerY , width, height);
-      
-              $$.sbgn.drawImage( context, imgObj );
+    
               borderStyle = 'dashed'
               $$.sbgn.drawBorder( { context, node, borderStyle } );
+             // $$.sbgn.drawImage( context, imgObj );
               context.beginPath();
 
             if ( extraDrawFcn ) {
