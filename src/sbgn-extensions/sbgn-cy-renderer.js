@@ -606,7 +606,7 @@ module.exports = function () {
 
   $$.sbgn.generateRNAShapePoints = function (width, height) {
 
-    return [-1, 1,   0, 1 ,   0.5, 0,   -0.5 , 0 ];
+    return [-1, 0.8,   0.5, 0.8 ,   1, -0.8,   -0.5 , -0.8 ];
   };
 
   $$.sbgn.generateReceptorShapePoints = function (width, height) {
