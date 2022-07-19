@@ -1304,8 +1304,32 @@ module.exports = function () {
   // Returns whether the given element can have more than one units of information
   elementUtilities.canHaveMultipleUnitOfInformation = function (ele) {
     var sbgnclass = elementUtilities.getPureSbgnClass( ele );
+    if (sbgnclass == 'gene' || sbgnclass == 'rna' || sbgnclass == 'simple molecule' || sbgnclass == 'unknown molecule'
+    || sbgnclass == 'phenotype sbml' || sbgnclass == 'drug' || sbgnclass == 'protein' || sbgnclass == 'truncated protein'
+    || sbgnclass == 'ion channel' || sbgnclass == 'receptor' || sbgnclass == 'ion' || sbgnclass == 'empty set' 
+    || sbgnclass == 'complex sbml')
+    {
+      return false;
+    }
     return !sbgnclass.startsWith('BA');
   };
+
+
+  // Returns whether the given element can have more than one units of information
+  elementUtilities.canHaveOneUnitOfInformation = function (ele) {
+    var sbgnclass = elementUtilities.getPureSbgnClass( ele );
+    if (sbgnclass == 'gene' || sbgnclass == 'rna' || sbgnclass == 'simple molecule' || sbgnclass == 'unknown molecule'
+    || sbgnclass == 'phenotype sbml' || sbgnclass == 'drug' || sbgnclass == 'protein' || sbgnclass == 'truncated protein'
+    || sbgnclass == 'ion channel' || sbgnclass == 'receptor' || sbgnclass == 'ion' || sbgnclass == 'empty set' 
+    || sbgnclass == 'complex sbml')
+    {
+      return true;
+    }
+    return false;
+  };
+
+
+  
 
 
   // Returns whether the give element have state variable
