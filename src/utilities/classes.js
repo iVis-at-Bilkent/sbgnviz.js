@@ -570,7 +570,6 @@ ns.StateVariable = StateVariable;
    var obj = AuxiliaryUnit.construct(parent);
    obj.id = id || elementUtilities.generateStateVarId();
    obj.residue = {};
-   obj.residue.value = value;
    obj.residue.variable = null;
    obj.residueVariableDefinition = residueVariableDefinition;
    obj.clazz = "residue variable";
@@ -579,14 +578,13 @@ ns.StateVariable = StateVariable;
  };
  
  ResidueVariable.getText = function(mainObj) {
-   var residueValue = mainObj.residue.value || '';
-   var residueVariable = mainObj.residue.variable ? "@" + mainObj.residue.variable : "";
+   var residueVariable = mainObj.residue.variable || '';
  
-   return residueValue + residueVariable;
+   return residueVariable;
  };
  
  ResidueVariable.hasText = function(mainObj) {
-   return (mainObj.residue.value && mainObj.residue.value != "") || (mainObj.residue.variable && mainObj.residue.variable != "");
+   return  (mainObj.residue.variable && mainObj.residue.variable != "");
  };
  
  /*this function is called upon creation of residue variable and it returns the location information of the added residue variable
@@ -596,7 +594,6 @@ ns.StateVariable = StateVariable;
    var residueVar = ResidueVariable.construct();
    ResidueVariable.setParentRef(residueVar, parentNode);
  
-   residueVar.value = value;
    residueVar.variable = variable;
    residueVar.residue = {value: value, variable: variable};
    residueVar.bbox = bbox;
@@ -621,7 +618,6 @@ ns.StateVariable = StateVariable;
    return {
      clazz: "residue variable",
      residue: {
-       value: mainObj.residue.value,
        variable: mainObj.residue.variable
      },
      bbox: {
