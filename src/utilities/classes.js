@@ -31,7 +31,19 @@ var getAuxUnitClass = function(unit) {
   // Unit parameter may pass the unit itself or the type of the unit check it
   var unitType = typeof unit === 'string' ? unit : unit.clazz;
   // Retrieve and return unit class according to the unit type
-  var className = unitType === 'state variable' ? 'StateVariable' : ('residue variable'? "ResidueVariable":'UnitOfInformation');
+  var className = ''
+  switch (unitType) {
+    case "state variable":
+      className = "StateVariable";
+      break;
+    case "residue variable":
+      className = "ResidueVariable";
+      break;
+    case "unit of information":
+      className = "UnitOfInformation";
+      break;
+  }
+  //var className = unitType === 'state variable' ? 'StateVariable' : 'residue variable'? "ResidueVariable":'UnitOfInformation';
   return ns[className];
 };
 
