@@ -1339,8 +1339,16 @@ module.exports = function () {
     if (sbgnclass == 'macromolecule' || sbgnclass == 'nucleic acid feature'
             || sbgnclass == 'complex'
             || sbgnclass == 'macromolecule multimer' || sbgnclass == 'nucleic acid feature multimer'
-            || sbgnclass == 'complex multimer' 
-            || sbgnclass == 'protein' ||  sbgnclass == 'protein multimer' || sbgnclass == 'active protein' 
+            || sbgnclass == 'complex multimer' ) {
+      return true;
+    }
+    return false;
+  };
+
+  elementUtilities.canHaveResidueVariable = function (ele) {
+    var sbgnclass = elementUtilities.getPureSbgnClass( ele );
+
+    if (    sbgnclass == 'protein' ||  sbgnclass == 'protein multimer' || sbgnclass == 'active protein' 
             || sbgnclass == 'hypothetical protein' || sbgnclass == 'active protein multimer' || sbgnclass == 'hypothetical protein multimer' 
             || sbgnclass == 'active hypothetical protein' || sbgnclass == 'active hypothetical protein multimer'
             || sbgnclass == 'receptor' ||  sbgnclass == 'receptor multimer' || sbgnclass == 'active receptor' 
@@ -2066,6 +2074,15 @@ module.exports = function () {
     return ['stadium'];
   };
 
+  elementUtilities.getResidueShapeOptions = function(ele) {
+    if ( !elementUtilities.canHaveResidueVariable( ele ) ) {
+      return null;
+    }
+
+    return ['stadium'];
+  };
+
+  
   elementUtilities.getUnitOfInfoShapeOptions = function(ele) {
     var type = elementUtilities.getPureSbgnClass(ele);
 
@@ -2186,6 +2203,16 @@ module.exports = function () {
           stateLabel = "";
         }
         contentHtml += "<div style='text-align:center;font-size:14px;'>" + stateLabel + "</div>";
+      }
+      else if (sbgnstateandinfo.clazz == "residue variable") {
+        var value = sbgnstateandinfo.residue.value;
+        var variable = sbgnstateandinfo.residue.variable;
+        var residueLabel = (variable == null /*|| typeof residueVariable === undefined */) ? value :
+                value + "@" + variable;
+        if (residueLabel == null) {
+          residueLabel = "";
+        }
+        contentHtml += "<div style='text-align:center;font-size:14px;'>" + residueLabel + "</div>";
       }
     }
     return contentHtml;
@@ -3321,7 +3348,7 @@ module.exports = function () {
   };
 
   var getDefaultInfoboxShapeName = function( nodeClass, infoboxType ) {
-    if ( infoboxType === 'state variable' ) {
+    if ( infoboxType === 'state variable' || infoboxType === 'residue variable') {
       return 'stadium';
     }
 
@@ -3345,10 +3372,15 @@ module.exports = function () {
       var props = getDefaultInfoboxProperties( type, 'state variable' );
       defaultProperties[ type ][ 'state variable' ] = props;
     }
+    if (elementUtilities.canHaveResidueVariable( type )) {
+      var props = getDefaultInfoboxProperties( type, 'residue variable' );
+      defaultProperties[ type ][ 'residue variable' ] = props;
+    }
     if (elementUtilities.canHaveUnitOfInformation( type )) {
       var props = getDefaultInfoboxProperties( type, 'unit of information' );
       defaultProperties[ type ][ 'unit of information' ] = props;
     }
+
   } );
 
   elementUtilities.compoundNodeTypes.forEach( function( type ) {
@@ -3423,6 +3455,7 @@ module.exports = function () {
       'width': true,
       'height': true,
       'state variable': true,
+      'residue variable': true,
       'unit of information': true,
       'multimer': true,
       'clonemarker': true,

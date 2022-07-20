@@ -1952,6 +1952,11 @@ module.exports = function () {
         currIntersections = $$.sbgn.intersectLineEllipse(x, y, centerX, centerY,
                 coord.x, coord.y, infoBoxWidth, infoBoxHeight, padding);
       }
+      if ( state.clazz == "residue variable" ) {
+        var coord = classes.ResidueVariable.getAbsoluteCoord(state, node.cy());
+        currIntersections = $$.sbgn.intersectLineEllipse(x, y, centerX, centerY,
+                coord.x, coord.y, infoBoxWidth, infoBoxHeight, padding);
+      }
       else if ( state.clazz == "unit of information" ) {
         var coord = classes.UnitOfInformation.getAbsoluteCoord(state, node.cy());
         if (node.data("class") == "BA macromolecule" || node.data("class") == "BA nucleic acid feature"

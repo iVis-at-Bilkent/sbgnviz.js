@@ -31,7 +31,7 @@ var getAuxUnitClass = function(unit) {
   // Unit parameter may pass the unit itself or the type of the unit check it
   var unitType = typeof unit === 'string' ? unit : unit.clazz;
   // Retrieve and return unit class according to the unit type
-  var className = unitType === 'state variable' ? 'StateVariable' : 'UnitOfInformation';
+  var className = unitType === 'state variable' ? 'StateVariable' : ('residue variable'? "ResidueVariable":'UnitOfInformation');
   return ns[className];
 };
 
@@ -100,7 +100,9 @@ AuxiliaryUnit.checkPoint = function(x, y, node, threshold) {
     } else if (state.clazz == "unit of information") {
       checkPoint = cyBaseNodeShapes["roundrectangle"].checkPoint(
               x, y, padding, stateWidth, stateHeight, stateCenterX, stateCenterY);
-    }
+    }else if( state.clazz == "residue variable") {
+      checkPoint = cyBaseNodeShapes["ellipse"].checkPoint(
+              x, y, padding, stateWidth, stateHeight, stateCenterX, stateCenterY);}
 
     if (checkPoint == true) {
       return state;
@@ -549,6 +551,101 @@ StateVariable.copy = function(mainObj, cy, newParent, newId) {
 
 ns.StateVariable = StateVariable;
 // -------------- END StateVariable -------------- //
+
+
+// -------------- ResidueVariable -------------- //
+/**
+ * This is for CellDesigner palette
+ */
+
+ var ResidueVariable = {};
+
+ // ResidueVariable extends AuxiliaryUnit by inheriting each static property of it
+ for (var prop in AuxiliaryUnit) {
+  ResidueVariable[prop] = AuxiliaryUnit[prop];
+ }
+ 
+ // Construct a residue variable object by extending default behaviours of a AuxiliaryUnit object and returns that object
+ ResidueVariable.construct = function(value, residueVariableDefinition, parent, id) {
+   var obj = AuxiliaryUnit.construct(parent);
+   obj.id = id || elementUtilities.generateStateVarId();
+   obj.residue = {};
+   obj.residue.value = value;
+   obj.residue.variable = null;
+   obj.residueVariableDefinition = residueVariableDefinition;
+   obj.clazz = "residue variable";
+ 
+   return obj;
+ };
+ 
+ ResidueVariable.getText = function(mainObj) {
+   var residueValue = mainObj.residue.value || '';
+   var residueVariable = mainObj.residue.variable ? "@" + mainObj.residue.variable : "";
+ 
+   return residueValue + residueVariable;
+ };
+ 
+ ResidueVariable.hasText = function(mainObj) {
+   return (mainObj.residue.value && mainObj.residue.value != "") || (mainObj.residue.variable && mainObj.residue.variable != "");
+ };
+ 
+ /*this function is called upon creation of residue variable and it returns the location information of the added residue variable
+ */
+ ResidueVariable.create = function(parentNode, cy, value, variable, bbox, location, position, style, index, id) {
+   // create the new residue var of info
+   var residueVar = ResidueVariable.construct();
+   ResidueVariable.setParentRef(residueVar, parentNode);
+ 
+   residueVar.value = value;
+   residueVar.variable = variable;
+   residueVar.residue = {value: value, variable: variable};
+   residueVar.bbox = bbox;
+   residueVar.style = style;
+   if ( id ) {
+    residueVar.id = id;
+   }
+   // link to layout
+   position = ResidueVariable.addToParent(residueVar, cy, parentNode, location, position, index);
+   return {
+     index: ResidueVariable.getParent(residueVar, cy).data('statesandinfos').indexOf(residueVar),
+     location: residueVar.anchorSide,
+     position: position
+   }
+ 
+ };
+ 
+ ResidueVariable.remove = function (mainObj, cy) {
+   var position = ResidueVariable.getPositionIndex(mainObj, cy);
+   var index = ResidueVariable.getParent(mainObj, cy).data('statesandinfos').indexOf(mainObj);
+   ResidueVariable.removeFromParent(mainObj, cy);
+   return {
+     clazz: "residue variable",
+     residue: {
+       value: mainObj.residue.value,
+       variable: mainObj.residue.variable
+     },
+     bbox: {
+       w: mainObj.bbox.w,
+       h: mainObj.bbox.h
+     },
+     location: mainObj.anchorSide,
+     position: position,
+     index: index,
+     style : mainObj.style
+   };
+ };
+ 
+ ResidueVariable.copy = function(mainObj, cy, newParent, newId) {
+   var newResidueVar = AuxiliaryUnit.copy(mainObj, cy, ResidueVariable.construct(), newParent, newId);
+   newResidueVar.residue = jQuery.extend(true, {}, mainObj.residue);
+   newResidueVar.ResidueVariableDefinition = mainObj.ResidueVariableDefinition;
+   newStanewResidueVarteVar.clazz = mainObj.clazz;
+   return newResidueVar;
+ };
+ 
+ ns.ResidueVariable = ResidueVariable;
+ // -------------- END ResidueVariable -------------- //
+ 
 
 // -------------- UnitOfInformation -------------- //
 /**
