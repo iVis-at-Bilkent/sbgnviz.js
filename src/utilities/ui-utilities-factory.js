@@ -43,13 +43,13 @@ module.exports = function () {
   if (!className) {
     className = 'default-class';
   }
-
   if ($('.' + className).length === 0) {
     var containerWidth = $(options.networkContainerSelector).width();
     var containerHeight = $(options.networkContainerSelector).height();
-    setTimeout(()=>{
-      $(options.networkContainerSelector + ':parent').prepend('<i style="position: absolute; z-index: 9999999; left: ' + 4*containerWidth / 9 + 'px; top: ' +  4* containerHeight/7 + 'px;" class="' + className + '">This might take a while. Please wait...</i>');
-    },30000)
+    $(options.networkContainerSelector + ':parent').append('<i style=" position: absolute; z-index: 9999999; left: ' + 4*containerWidth / 9 + 'px; top: ' +  4* containerHeight/7 + 'px;" class="' + className + '">Take a sip of your coffee while you wait</i>');
+    $("."+className).hide(0)
+    $("."+className).delay(10000).show(0)
+ 
   }
 };
 uiUtilities.removeSpinnerText = function (className) {
