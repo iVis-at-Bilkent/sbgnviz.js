@@ -24,7 +24,12 @@ module.exports = function () {
    if ($('.' + className).length === 0) {
      var containerWidth = $(options.networkContainerSelector).width();
      var containerHeight = $(options.networkContainerSelector).height();
-     $(options.networkContainerSelector + ':parent').prepend('<i style="position: absolute; z-index: 9999999; left: ' + containerWidth / 2 + 'px; top: ' + containerHeight / 2 + 'px;" class="fa fa-spinner fa-spin fa-3x fa-fw ' + className + '"></i>');
+     $(options.networkContainerSelector + ':parent').prepend('<div style="position: absolute; z-index: 9999999; left: 45%; top: ' + containerHeight / 2 + 'px;" class="'+className+'-wrapper">'+
+     '<div style="margin: 0 auto; margin-bottom: 5px; width:50px"><i class="fa fa-spinner fa-spin fa-3x fa-fw ' + className + '"></i></div>'+
+     '<div style="width: 220px; height 20%"><i class="' + className + '-text">Take a sip of your coffee while you wait</i></div>'+
+     '</div>');
+     $("."+className+'-text').fadeOut(0)
+    $("."+className+'-text').delay(1000).fadeIn(0)
    }
  };
 
@@ -33,33 +38,10 @@ module.exports = function () {
      className = 'default-class';
    }
 
-   if ($('.' + className).length > 0) {
-     $('.' + className).remove();
+   if ($('.' + className + '-wrapper').length > 0) {
+     $('.' + className + '-wrapper').remove();
    }
  };
 
-
- uiUtilities.showSpinnerText = function (className) {
-  if (!className) {
-    className = 'default-class';
-  }
-  if ($('.' + className).length === 0) {
-    var containerWidth = $(options.networkContainerSelector).width();
-    var containerHeight = $(options.networkContainerSelector).height();
-    $(options.networkContainerSelector + ':parent').append('<i style=" position: absolute; z-index: 9999999; left: ' + 4*containerWidth / 9 + 'px; top: ' +  4* containerHeight/7 + 'px;" class="' + className + '">Take a sip of your coffee while you wait</i>');
-    $("."+className).hide(0)
-    $("."+className).delay(10000).show(0)
- 
-  }
-};
-uiUtilities.removeSpinnerText = function (className) {
-  if (!className) {
-    className = 'default-class';
-  }
-console.log('className removeSpinnerText', className)
-  if ($('.' + className).length > 0) {
-    $('.' + className).remove();
-  }
-};
  return uiUtilities;
 };
