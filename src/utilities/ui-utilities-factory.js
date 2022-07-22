@@ -29,10 +29,12 @@ module.exports = function () {
      '<div style="width: 220px; height 20%"><i class="' + className + '-text">Take a sip of your coffee while you wait</i></div>'+
      '</div>');
      $("."+className+'-text').fadeOut(0)
-    $("."+className+'-text').delay(1000).fadeIn(0)
    }
  };
-
+ uiUtilities.showSpinnerText = function(className)
+ {
+   $("."+className+'-text').fadeIn(0)
+ }
  uiUtilities.endSpinner = function (className) {
    if (!className) {
      className = 'default-class';
@@ -42,6 +44,7 @@ module.exports = function () {
      $('.' + className + '-wrapper').remove();
    }
  };
+
 
  return uiUtilities;
 };
