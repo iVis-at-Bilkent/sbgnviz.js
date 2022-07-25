@@ -1204,6 +1204,7 @@ module.exports = function () {
   // The default value for it is data. If propertyName parameter is given as a function instead of a string representing the
   // property name then use what that function returns.
   elementUtilities.getCommonProperty = function (elements, propertyName, dataOrCss) {
+    console.log("in getCommonProperty",propertyName)
     if (elements.length == 0) {
       return null;
     }
@@ -1220,7 +1221,9 @@ module.exports = function () {
     }
 
     var getVal = function( index ) {
+        //console.log("elements[index][dataOrCss](propertyName)",elements[index] )
         var val = isFunction ? propertyName(elements[index]) : elements[index][dataOrCss](propertyName);
+        console.log("val",val )
         return val;
     }
 
@@ -1360,12 +1363,28 @@ module.exports = function () {
             || sbgnclass == 'truncated protein' ||  sbgnclass == 'truncated protein multimer' || sbgnclass == 'active truncated protein' 
             || sbgnclass == 'hypothetical truncated protein' || sbgnclass == 'active truncated protein multimer' || sbgnclass == 'hypothetical truncated protein multimer' 
             || sbgnclass == 'active hypothetical truncated protein' || sbgnclass == 'active hypothetical truncated protein multimer'
-            || sbgnclass == 'complex sbml' ||  sbgnclass == 'complex sbml multimer' || sbgnclass == 'active complex sbml' 
-            || sbgnclass == 'hypothetical complex sbml' || sbgnclass == 'active complex sbml multimer' || sbgnclass == 'hypothetical complex sbml multimer' 
-            || sbgnclass == 'active hypothetical complex sbml' || sbgnclass == 'active hypothetical complex sbml multimer' 
-            || sbgnclass == 'gene' ||  sbgnclass == 'gene multimer' || sbgnclass == 'hypothetical gene' || sbgnclass == 'hypothetical gene multimer' 
-            || sbgnclass == 'rna' ||  sbgnclass == 'rna multimer' || sbgnclass == 'hypothetical rna' || sbgnclass == 'hypothetical rna multimer' 
             ) {
+      return true;
+    }
+    return false;
+  };
+
+  elementUtilities.canHaveBindingRegion = function (ele) {
+    var sbgnclass = elementUtilities.getPureSbgnClass( ele );
+
+    if (    sbgnclass == 'protein' ||  sbgnclass == 'protein multimer' || sbgnclass == 'active protein' 
+            || sbgnclass == 'hypothetical protein' || sbgnclass == 'active protein multimer' || sbgnclass == 'hypothetical protein multimer' 
+            || sbgnclass == 'active hypothetical protein' || sbgnclass == 'active hypothetical protein multimer'
+            || sbgnclass == 'receptor' ||  sbgnclass == 'receptor multimer' || sbgnclass == 'active receptor' 
+            || sbgnclass == 'hypothetical receptor' || sbgnclass == 'active receptor multimer' || sbgnclass == 'hypothetical receptor multimer' 
+            || sbgnclass == 'active hypothetical receptor' || sbgnclass == 'active hypothetical receptor multimer'
+            || sbgnclass == 'ion channel' ||  sbgnclass == 'ion channel multimer' || sbgnclass == 'active ion channel' 
+            || sbgnclass == 'hypothetical ion channel' || sbgnclass == 'active ion channel multimer' || sbgnclass == 'hypothetical ion channel multimer' 
+            || sbgnclass == 'active hypothetical ion channel' || sbgnclass == 'active hypothetical ion channel multimer'
+            || sbgnclass == 'truncated protein' ||  sbgnclass == 'truncated protein multimer' || sbgnclass == 'active truncated protein' 
+            || sbgnclass == 'hypothetical truncated protein' || sbgnclass == 'active truncated protein multimer' || sbgnclass == 'hypothetical truncated protein multimer' 
+            || sbgnclass == 'active hypothetical truncated protein' || sbgnclass == 'active hypothetical truncated protein multimer'
+             ) {
       return true;
     }
     return false;
@@ -2081,6 +2100,13 @@ module.exports = function () {
 
     return ['stadium'];
   };
+  elementUtilities.getBindingRegionShapeOptions = function(ele) {
+    if ( !elementUtilities.canHaveBindingRegion( ele ) ) {
+      return null;
+    }
+
+    return ['rectangle'];
+  };
 
   
   elementUtilities.getUnitOfInfoShapeOptions = function(ele) {
@@ -2205,14 +2231,20 @@ module.exports = function () {
         contentHtml += "<div style='text-align:center;font-size:14px;'>" + stateLabel + "</div>";
       }
       else if (sbgnstateandinfo.clazz == "residue variable") {
-        var value = sbgnstateandinfo.residue.value;
         var variable = sbgnstateandinfo.residue.variable;
-        var residueLabel = (variable == null /*|| typeof residueVariable === undefined */) ? value :
-                value + "@" + variable;
+        var residueLabel = variable
         if (residueLabel == null) {
           residueLabel = "";
         }
         contentHtml += "<div style='text-align:center;font-size:14px;'>" + residueLabel + "</div>";
+      }
+      else if (sbgnstateandinfo.clazz == "binding region") {
+        var variable = sbgnstateandinfo.region.variable;
+        var regionLabel = variable
+        if (regionLabel == null) {
+          regionLabel = "";
+        }
+        contentHtml += "<div style='text-align:center;font-size:14px;'>" + regionLabel + "</div>";
       }
     }
     return contentHtml;
@@ -3353,7 +3385,7 @@ module.exports = function () {
     }
 
     if ( elementUtilities.isSIFNode( nodeClass ) ) {
-      if ( infoboxType === 'unit of information' ) {
+      if ( infoboxType === 'unit of information' || infoboxType === 'binding region') {
         if ( nodeClass == 'SIF macromolecule' ) {
           return 'stadium';
         }
@@ -3375,6 +3407,10 @@ module.exports = function () {
     if (elementUtilities.canHaveResidueVariable( type )) {
       var props = getDefaultInfoboxProperties( type, 'residue variable' );
       defaultProperties[ type ][ 'residue variable' ] = props;
+    }
+    if (elementUtilities.canHaveBindingRegion( type )) {
+      var props = getDefaultInfoboxProperties( type, 'binding region' );
+      defaultProperties[ type ][ 'binding region' ] = props;
     }
     if (elementUtilities.canHaveUnitOfInformation( type )) {
       var props = getDefaultInfoboxProperties( type, 'unit of information' );
@@ -3456,6 +3492,7 @@ module.exports = function () {
       'height': true,
       'state variable': true,
       'residue variable': true,
+      'binding region': true,
       'unit of information': true,
       'multimer': true,
       'clonemarker': true,

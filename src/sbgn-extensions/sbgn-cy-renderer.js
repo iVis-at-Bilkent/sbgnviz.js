@@ -370,6 +370,7 @@ module.exports = function () {
 
     for (var side in layouts) {
       var layout = layouts[side];
+      console.log("layout",layout)
       classes.AuxUnitLayout.draw(layout, node.cy(), context);
     }
     context.beginPath();
@@ -756,7 +757,6 @@ module.exports = function () {
 
 
           //If the node is also active
-          console.log("$$.sbgn.isActive( node )", $$.sbgn.isActive( node ), node)
           if( canBeActive && $$.sbgn.isActive( node ) && !node._private.data.class.startsWith('active ion channel') && !node._private.data.class.startsWith('active hypothetical ion channel')  ){
               //add multimer shape
               plainDrawFcn( context, centerX + multimerPadding ,
@@ -846,6 +846,7 @@ module.exports = function () {
         if ( canHaveInfoBox ) {
           var oldStyle = context.fillStyle;
           $$.sbgn.forceOpacityToOne(node, context);
+          console.log("node", node)
           $$.sbgn.drawStateAndInfos(node, context, centerX, centerY);
           context.fillStyle = oldStyle;
         }
@@ -1946,14 +1947,19 @@ module.exports = function () {
       var infoBoxHeight = state.bbox.h;
 
       var currIntersections = null;
-
+      console.log("in intersectLineStateAndInfoBoxes")
       if ( state.clazz == "state variable" ) {
         var coord = classes.StateVariable.getAbsoluteCoord(state, node.cy());
         currIntersections = $$.sbgn.intersectLineEllipse(x, y, centerX, centerY,
                 coord.x, coord.y, infoBoxWidth, infoBoxHeight, padding);
       }
-      if ( state.clazz == "residue variable" ) {
+      else if ( state.clazz == "residue variable" ) {
         var coord = classes.ResidueVariable.getAbsoluteCoord(state, node.cy());
+        currIntersections = $$.sbgn.intersectLineEllipse(x, y, centerX, centerY,
+                coord.x, coord.y, infoBoxWidth, infoBoxHeight, padding);
+      }
+      else if ( state.clazz == "binding region" ) {
+        var coord = classes.BindingRegion.getAbsoluteCoord(state, node.cy());
         currIntersections = $$.sbgn.intersectLineEllipse(x, y, centerX, centerY,
                 coord.x, coord.y, infoBoxWidth, infoBoxHeight, padding);
       }
