@@ -442,6 +442,10 @@ AuxiliaryUnit.addToParent = function (mainObj, cy, parentNode, location, positio
   }
   if(!location) { // location not provided, need to define it automatically
     location = AuxUnitLayout.selectNextAvailable(parentNode, cy);
+  }else if(location === 'left' || location === 'right')
+  {
+    console.log("in left and ritght")
+    location = AuxUnitLayout.selectNextAvailableLeftRight(parentNode, cy);
   }
   // here we are sure to have a location even if it was not provided as argument
   // get or create the necessary layout
@@ -1647,7 +1651,7 @@ AuxUnitLayout.selectNextAvailableLeftRight = function(node) {
   var left = node.data('auxunitlayouts').left;
   var right = node.data('auxunitlayouts').right;
   var resultLocation = "left";
-  // start by adding on top if free
+  // start by adding on left if free
   if(!left || AuxUnitLayout.isEmpty(left)) {
     resultLocation = "left";
   }
@@ -1655,7 +1659,7 @@ AuxUnitLayout.selectNextAvailableLeftRight = function(node) {
     resultLocation = "right";
   }
   else {
-    // choose the side (top or bottom) that has the most space available to the right of the rightmost infobox
+    // choose the side (left or right) that has the most space available to the right of the rightmost infobox
     if(AuxUnitLayout.unitLength(left) <= AuxUnitLayout.unitLength(left)) {
       resultLocation = "left";
     }
