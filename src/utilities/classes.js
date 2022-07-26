@@ -61,14 +61,12 @@ AuxiliaryUnit.construct = function(parent) {
   var obj = {};
 
   AuxiliaryUnit.setParentRef(obj, parent);
-  console.log("obj in AuxiliaryUnit.construct", obj)
 
   obj.id = null;
   obj.bbox = null;  
   obj.anchorSide = null;
   obj.isDisplayed = false;
   obj.style = null;
-  console.log("obj in AuxiliaryUnit.construct after added", obj.id)
   return obj;
 };
 
@@ -85,7 +83,6 @@ AuxiliaryUnit.getParent = function(mainObj, cy) {
 AuxiliaryUnit.setParentRef = function(mainObj, newParent) {
   if (mainObj && newParent) {
     // Reference to id instead of the node itself to avaoid circular reference
-    console.log("newParent",newParent)
     mainObj.parent = typeof newParent === 'string' ? newParent : newParent.id();
   }
 }
@@ -107,7 +104,6 @@ AuxiliaryUnit.checkPoint = function(x, y, node, threshold) {
 
     var stateWidth = parseFloat(state.bbox.w) + threshold;
     var stateHeight = parseFloat(state.bbox.h) + threshold;
-    console.log('in checkpoiunt')
     var coord = AuxiliaryUnit.getAbsoluteCoord(state, node.cy());
     var stateCenterX = coord.x;
     var stateCenterY = coord.y;
@@ -155,10 +151,8 @@ AuxiliaryUnit.copy = function (mainObj, cy, existingInstance, newParent, newId) 
 
 // draw the auxiliary unit at its position
 AuxiliaryUnit.draw = function(mainObj, cy, context) {
-  console.log('mainObj in draw', mainObj);
   var unitClass = getAuxUnitClass(mainObj);
   var coords = unitClass.getAbsoluteCoord(mainObj, cy);
-  console.log('coords', coords);
 
   unitClass.drawShape(mainObj, cy, context, coords.x, coords.y);
   if (unitClass.hasText(mainObj, cy)) {
@@ -281,10 +275,10 @@ AuxiliaryUnit.getAbsoluteCoord = function(mainObj, cy) {
       
     }
 
-  console.log('mainObj', mainObj)
-  console.log('mainObj.bbox.y',mainObj.bbox.y)
-  console.log("parent.outerHeight()", parent.outerHeight())
-  console.log("position.y",position.y)
+  //console.log('mainObj', mainObj)
+  //console.log('mainObj.bbox.y',mainObj.bbox.y)
+  //console.log("parent.outerHeight()", parent.outerHeight())
+  //console.log("position.y",position.y)
   // due to corner of barrel shaped compartment shift absX to right
  /*  if (parent.data("class") == "compartment"){
       absX += parent.outerWidth() * 0.1;
@@ -379,7 +373,6 @@ AuxiliaryUnit.convertToRelativeCoord = function(mainObj, absX, absY, cy, parentN
 
 AuxiliaryUnit.setAnchorSide = function(mainObj, node) {
 
-  console.log("setAnchorSide",mainObj)
   var thisX = mainObj.bbox.x;
   var thisY = mainObj.bbox.y;
   var thisH = mainObj.bbox.h;
@@ -441,7 +434,6 @@ AuxiliaryUnit.addToParent = function (mainObj, cy, parentNode, location, positio
     parentNode.data('statesandinfos').splice(index, 0, mainObj);
   }
   else {
-    console.log("adding to parent and pushing", mainObj)
     parentNode.data('statesandinfos').push(mainObj);
   }
 
@@ -466,7 +458,7 @@ AuxiliaryUnit.addToParent = function (mainObj, cy, parentNode, location, positio
     case "right": mainObj.bbox.x = 100; break;
   }
   // add stateVar to layout, precomputing of relative coords will be triggered accordingly
-  console.log("mainObj.bbox.x in addParent",mainObj)
+  //console.log("mainObj.bbox.x in addParent",mainObj)
   var insertedPosition = AuxUnitLayout.addAuxUnit(layout, cy, mainObj, position);
   return insertedPosition;
 }
@@ -689,7 +681,6 @@ ns.StateVariable = StateVariable;
  // Construct a binding region object by extending default behaviours of a AuxiliaryUnit object and returns that object
  BindingRegion.construct = function( bindingRegionDefinition, parent, id) {
    var obj = AuxiliaryUnit.construct(parent);
-   console.log("Constructed AuxiliaryUnit", obj)
    obj.id = id || elementUtilities.generateStateVarId();
    obj.region = {};
    obj.region.variable = null;
@@ -714,7 +705,6 @@ ns.StateVariable = StateVariable;
  BindingRegion.create = function(parentNode, cy, value, variable, bbox, location, position, style, index, id) {
    // create the new binding region of info
    var bindingRegion = BindingRegion.construct();
-   console.log("constructed bidingregion",bindingRegion)
    BindingRegion.setParentRef(bindingRegion, parentNode);
  
    bindingRegion.variable = variable;
@@ -726,7 +716,6 @@ ns.StateVariable = StateVariable;
    }
    // link to layout
    //console.log('bindingRegion.anchorSide',  bindingRegion.anchorSide).
-   console.log("creating a binding region",bindingRegion)
    position = BindingRegion.addToParent(bindingRegion, cy, parentNode, "left", position, index);
    return {
      index: BindingRegion.getParent(bindingRegion, cy).data('statesandinfos').indexOf(bindingRegion),
@@ -1092,7 +1081,37 @@ AuxUnitLayout.computeCoords = function(mainObj, cy, unit){
      // unit.bbox.x = mainObj.units[lastUnit].bbox.x +  mainObj.units[lastUnit].bbox.w/2 + unit.bbox.w/2 + AuxUnitLayout.getCurrentGap(location);
     }
     unit.bbox.y = (location === "top") ? 0 : 100;
-  }//We don't have the right or left addition cases yet
+  }//We don't have the right or left addition cases yet -- Now we have it
+  else
+  {
+    var position = node.position();
+    var parentWidth = node.data('bbox').w;
+    var padding = node.padding();
+    var parentWidth = node.width();
+    var parentHeight = node.height();
+    var parentX1 = position.x - parentWidth/2 - padding;
+    var parentX2 = position.x + parentWidth/2 + padding;
+    var parentY1 = position.y - parentHeight/2 - padding;
+    var parentY2 = position.y + parentHeight/2 + padding;
+
+    if (mainObj.units.length === 1) {
+      console.log('one')
+      var relativeCoords = AuxiliaryUnit.convertToRelativeCoord(unit, unit.bbox.w/2 + (parentX1) + AuxUnitLayout.getCurrentGap(location), (parentY1) + AuxUnitLayout.getCurrentGap(location), cy);
+      unit.bbox.x = relativeCoords.x ;
+      unit.bbox.y = relativeCoords.y;
+    }
+    else {
+      console.log('more than one')
+      var lastUnit = mainObj.units[mainObj.units.length - 2];//Get the position of the last unit
+      var lastUnitAbsCord = AuxiliaryUnit.convertToAbsoluteCoord(lastUnit, lastUnit.bbox.x, lastUnit.bbox.y, cy);
+      var relativeCoords = AuxiliaryUnit.convertToRelativeCoord(unit, unit.bbox.w/2+ lastUnitAbsCord.x + lastUnit.bbox.w/2 + AuxUnitLayout.getCurrentGap(location), (parentY1) + AuxUnitLayout.getCurrentGap(location), cy);
+      unit.bbox.x = relativeCoords.x ;
+      unit.bbox.y = relativeCoords.y;
+     // unit.bbox.x = mainObj.units[lastUnit].bbox.x +  mainObj.units[lastUnit].bbox.w/2 + unit.bbox.w/2 + AuxUnitLayout.getCurrentGap(location);
+    }
+    unit.bbox.y = (location === "top") ? 0 : 100;
+  }
+
 };
 
 AuxUnitLayout.removeAuxUnit = function(mainObj, cy, unit) {
@@ -1515,7 +1534,6 @@ AuxUnitLayout.precomputeCoords = function (mainObj, cy, doForceUpdate) {
 AuxUnitLayout.draw = function (mainObj, cy, context) {
   for(var i=0; i < mainObj.units.length; i++) {
     var auxUnit = mainObj.units[i];
-    console.log("auxUnit",auxUnit)
       getAuxUnitClass(auxUnit).draw(auxUnit, cy, context);
   }
 };

@@ -1204,7 +1204,6 @@ module.exports = function () {
   // The default value for it is data. If propertyName parameter is given as a function instead of a string representing the
   // property name then use what that function returns.
   elementUtilities.getCommonProperty = function (elements, propertyName, dataOrCss) {
-    console.log("in getCommonProperty",propertyName)
     if (elements.length == 0) {
       return null;
     }
@@ -1223,7 +1222,6 @@ module.exports = function () {
     var getVal = function( index ) {
         //console.log("elements[index][dataOrCss](propertyName)",elements[index] )
         var val = isFunction ? propertyName(elements[index]) : elements[index][dataOrCss](propertyName);
-        console.log("val",val )
         return val;
     }
 

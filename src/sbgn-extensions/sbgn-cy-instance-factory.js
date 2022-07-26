@@ -485,7 +485,6 @@ module.exports = function () {
 								node.data('auxunitlayouts')[location] = classes.AuxUnitLayout.construct(node, location);
 							}
 							var layout = node.data('auxunitlayouts')[location];
-							console.log("statesandinfos.anchorSide = location;",location)
 							statesandinfos.anchorSide = location;
 							switch(location) {
 								case "top": statesandinfos.bbox.y = 0; break;

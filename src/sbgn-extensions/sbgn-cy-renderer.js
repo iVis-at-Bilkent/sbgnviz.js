@@ -370,7 +370,6 @@ module.exports = function () {
 
     for (var side in layouts) {
       var layout = layouts[side];
-      console.log("layout",layout)
       classes.AuxUnitLayout.draw(layout, node.cy(), context);
     }
     context.beginPath();
@@ -846,7 +845,6 @@ module.exports = function () {
         if ( canHaveInfoBox ) {
           var oldStyle = context.fillStyle;
           $$.sbgn.forceOpacityToOne(node, context);
-          console.log("node", node)
           $$.sbgn.drawStateAndInfos(node, context, centerX, centerY);
           context.fillStyle = oldStyle;
         }
@@ -1947,7 +1945,6 @@ module.exports = function () {
       var infoBoxHeight = state.bbox.h;
 
       var currIntersections = null;
-      console.log("in intersectLineStateAndInfoBoxes")
       if ( state.clazz == "state variable" ) {
         var coord = classes.StateVariable.getAbsoluteCoord(state, node.cy());
         currIntersections = $$.sbgn.intersectLineEllipse(x, y, centerX, centerY,
