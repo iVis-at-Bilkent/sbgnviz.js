@@ -444,7 +444,6 @@ AuxiliaryUnit.addToParent = function (mainObj, cy, parentNode, location, positio
     location = AuxUnitLayout.selectNextAvailable(parentNode, cy);
   }else if(location === 'left' || location === 'right')
   {
-    console.log("in left and ritght")
     location = AuxUnitLayout.selectNextAvailableLeftRight(parentNode, cy);
   }
   // here we are sure to have a location even if it was not provided as argument
@@ -1099,13 +1098,11 @@ AuxUnitLayout.computeCoords = function(mainObj, cy, unit){
     var parentY2 = position.y + parentHeight/2 + padding;
 
     if (mainObj.units.length === 1) {
-      console.log('one')
       var relativeCoords = AuxiliaryUnit.convertToRelativeCoord(unit, unit.bbox.w/2 + (parentX1) + AuxUnitLayout.getCurrentGap(location), (parentY1) + AuxUnitLayout.getCurrentGap(location), cy);
       unit.bbox.x = relativeCoords.x ;
       unit.bbox.y = relativeCoords.y;
     }
     else {
-      console.log('more than one')
       var lastUnit = mainObj.units[mainObj.units.length - 2];//Get the position of the last unit
       var lastUnitAbsCord = AuxiliaryUnit.convertToAbsoluteCoord(lastUnit, lastUnit.bbox.x, lastUnit.bbox.y, cy);
       var relativeCoords = AuxiliaryUnit.convertToRelativeCoord(unit, unit.bbox.w/2+ lastUnitAbsCord.x + lastUnit.bbox.w/2 + AuxUnitLayout.getCurrentGap(location), (parentY1) + AuxUnitLayout.getCurrentGap(location), cy);
