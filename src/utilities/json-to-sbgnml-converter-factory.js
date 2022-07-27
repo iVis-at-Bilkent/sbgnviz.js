@@ -393,6 +393,12 @@ module.exports = function () {
        else if(boxGlyph.clazz === "unit of information"){
            glyph.addGlyphMember(this.addInfoBoxGlyph(boxGlyph, statesandinfosId, node));
        }
+       else if(boxGlyph.clazz === "residue variable"){
+        glyph.addGlyphMember(this.addResidueBoxGlyph(boxGlyph, statesandinfosId, node));
+      }
+      else if(boxGlyph.clazz === "binding region"){
+        glyph.addGlyphMember(this.addBindingBoxGlyph(boxGlyph, statesandinfosId, node));
+    }
     }
     // check for annotations
     if (version !== "plain" && node.data('annotations') && !$.isEmptyObject(node.data('annotations'))) {
@@ -614,6 +620,29 @@ module.exports = function () {
 
       return glyph;
   };
+  jsonToSbgnml.addBindingBoxGlyph = function(node, id, mainGlyph){
+
+    var glyph = new libsbgnjs.Glyph({id: id, class_: 'binding region'});
+    var region = new libsbgnjs.StateType();
+ 
+    if(typeof node.region.variable != 'undefined')
+      region.variable = node.region.variable;
+    glyph.setState(region);
+    glyph.setBbox(this.addStateAndInfoBbox(mainGlyph, node));
+
+    return glyph;
+};
+  jsonToSbgnml.addResidueBoxGlyph = function(node, id, mainGlyph){
+
+    var glyph = new libsbgnjs.Glyph({id: id, class_: 'residue variable'});
+    var residue = new libsbgnjs.StateType();
+    if(typeof node.residue.variable != 'undefined')
+        residue.variable = node.residue.variable;
+    glyph.setState(residue);
+    glyph.setBbox(this.addStateAndInfoBbox(mainGlyph, node));
+
+    return glyph;
+};
 
   jsonToSbgnml.addInfoBoxGlyph = function (node, id, mainGlyph) {
       var glyph = new libsbgnjs.Glyph({id: id, class_: 'unit of information'});
