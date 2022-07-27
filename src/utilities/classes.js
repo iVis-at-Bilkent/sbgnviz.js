@@ -1603,6 +1603,18 @@ AuxUnitLayout.unitLength = function(mainObj) {
   return rightMostPoint;
 };
 
+AuxUnitLayout.unitLengthRightLeft = function(mainObj) {
+  var units = mainObj.units;
+  var topMostPoint = 0;
+  for (var i = 0; i < units.length; i++) {
+    var box = units[i].bbox;
+    if (box.y + box.h / 2 > topMostPoint){
+      topMostPoint = box.y+ box.h / 2;
+    }
+  }
+  return topMostPoint;
+};
+
 //Get Unit Gaps
 AuxUnitLayout.getCurrentTopGap = function(){
   return AuxUnitLayout.currentTopUnitGap;
@@ -1660,7 +1672,7 @@ AuxUnitLayout.selectNextAvailableLeftRight = function(node) {
   }
   else {
     // choose the side (left or right) that has the most space available to the right of the rightmost infobox
-    if(AuxUnitLayout.unitLength(left) <= AuxUnitLayout.unitLength(left)) {
+    if(AuxUnitLayout.unitLengthRightLeft(left) <= AuxUnitLayout.unitLengthRightLeft(right)) {
       resultLocation = "left";
     }
     else {
