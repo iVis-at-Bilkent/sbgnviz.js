@@ -1101,7 +1101,19 @@ module.exports = function () {
   elementUtilities.sbmlTypeMultimer = ['gene multimer', 'rna multimer', 'ion channel multimer', 'receptor multimer', 'truncated protein multimer', 'phenotype multimer',
     'ion multimer', 'simple molecule multimer', 'unknown molecule multimer', 'drug multimer', 'complex multimer', 'phenotype sbml multimer', 'receptor multimer',
   'complex sbml multimer', 'protein multimer']
-  elementUtilities.sbmlTypeActive = ['active protein', 'active receptor', 'active truncated protein', 'active complex']
+  elementUtilities.sbmlTypeActive = ['active protein', 'active receptor', 'active ion channel','active truncated protein', 'active complex sbml']
+  elementUtilities.sbmlTypeHypothetical = ['hypothetical protein', 'hypothetical receptor', 'hypothetical truncated protein', 'hypothetical ion channel', 
+  'hypothetical gene', 'hypothetical rna', 'hypothetical phenotype sbml', 'hypothetical ion', 'hypothetical uknown molecule', 'hypothetical drug',
+  'hypothetical complex sbml', 'hypothetical degradation']
+  elementUtilities.sbmlTypeActiveHypothetical = ['active hypothetical protein', 'active hypothetical receptor', 'active hypothetical truncated protein', 'hypothetical ion channel', 
+  'active hypothetical complex sbml']
+  elementUtilities.sbmlTypeActiveMultimer =  ['active protein multimer', 'active receptor multimer', 'active ion channel multimer','active truncated protein multimer', 'active complex multimer']
+  elementUtilities.sbmlTypeHypotheticalMultimer = ['hypothetical protein multimer', 'hypothetical receptor multimer', 'hypothetical truncated protein multimer', 'hypothetical ion channel multimer', 
+  'hypothetical gene multimer', 'hypothetical rna multimer', 'hypothetical phenotype sbml multimer', 'hypothetical ion multimer', 'hypothetical uknown molecule multimer', 'hypothetical drug multimer',
+  'hypothetical complex sbml  multimer', 'hypothetical degradation  multimer']
+  elementUtilities.sbmlTypeActiveHypotheticalMultimer =  ['active hypothetical protein multimer', 'active hypothetical receptor multimer', 'active hypothetical ion channel multimer','active hypothetical truncated protein multimer', 'active hypothetical complex multimer']
+
+
   //elementUtilities.sbmlTypeHypothetical = [''] //Do I need this?
   elementUtilities.nodeTypes = elementUtilities.epnTypes
     .concat( elementUtilities.logicalOperatorTypes )
@@ -1110,7 +1122,13 @@ module.exports = function () {
     .concat( elementUtilities.sifTypes )
     .concat( elementUtilities.otherNodeTypes )
     .concat( elementUtilities.sbmlType)
-    .concat( elementUtilities.sbmlTypeActive);
+    .concat( elementUtilities.sbmlTypeMultimer)
+    .concat( elementUtilities.sbmlTypeActive)
+    .concat( elementUtilities.sbmlTypeHypothetical)
+    .concat( elementUtilities.sbmlTypeActiveHypothetical)
+    .concat( elementUtilities.sbmlTypeActiveMultimer)
+    .concat( elementUtilities.sbmlTypeHypotheticalMultimer)
+    .concat( elementUtilities.sbmlTypeActiveHypotheticalMultimer);
 
   elementUtilities.compoundNodeTypes = ['complex', 'compartment', 'submap'];
 
