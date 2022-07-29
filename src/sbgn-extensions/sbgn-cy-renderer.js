@@ -257,7 +257,8 @@ module.exports = function () {
     'ion': true,
     'phenotype sbml': true,
     'complex sbml': true,
-    'protein': true
+    'protein': true,
+    'degradation': true
   };
 
   var totallyOverridenNodeShapes = $$.sbgn.totallyOverridenNodeShapes = {
@@ -300,7 +301,7 @@ module.exports = function () {
     'phenotype sbml': true,
     'drug': true,
     'ion': true,
-    'empty set': true
+    'degradation': true
   };
 
   var canBeMultimerShapes = $$.sbgn.canBeMultimerShapes = {
@@ -690,7 +691,7 @@ module.exports = function () {
   cyStyleProperties.types.nodeShape.enums.push(
     'empty set', 'nucleic acid feature', 'complex', 'macromolecule',
     'simple chemical', 'biological activity', 'compartment', 'gene', 'simple molecule', 'unknown molecule', 'drug', 
-    'truncated protein', 'ion', 'ion channel', 'rna', 'phenotype sbml', 'receptor', 'complex sbml', 'protein'
+    'truncated protein', 'ion', 'ion channel', 'rna', 'phenotype sbml', 'receptor', 'complex sbml', 'protein', 'degradation'
   );
 
   $$.sbgn.registerSbgnNodeShapes = function () {
@@ -954,7 +955,7 @@ module.exports = function () {
     var shapeNames = [ "simple chemical", "macromolecule", "complex",
       "nucleic acid feature", "empty set", "biological activity",
       "compartment", "oldCompartment", "gene", "simple molecule", 'receptor', 'complex sbml',
-      "unknown molecule", "drug", "ion", "truncated protein", "ion channel", "rna", "phenotype sbml", "protein"
+      "unknown molecule", "drug", "ion", "truncated protein", "ion channel", "rna", "phenotype sbml", "protein", "degradation"
     ];
 
     shapeNames.forEach( function( shapeName ) {
@@ -1223,14 +1224,16 @@ module.exports = function () {
     "phenotype sbml": $$.sbgn.drawPhenotype,
     "receptor": $$.sbgn.drawReceptor,
     "complex sbml": $$.sbgn.drawComplex,
-    "protein": $$.sbgn.drawProtein
+    "protein": $$.sbgn.drawProtein,
+    "degradation": $$.sbgn.drawEllipse,
   };
 
   // To define an extra drawing for the node that is rendered at the very end,
   // even after the node background image is drawn.
   // E.g. cross lines of "empty set" nodes.
   $$.sbgn.extraDraw = {
-    "empty set": $$.sbgn.drawCrossLine
+    "empty set": $$.sbgn.drawCrossLine,
+    "degradation": $$.sbgn.drawCrossLine
   };
 
   $$.sbgn.plainIntersectLine = {
@@ -1253,6 +1256,9 @@ module.exports = function () {
       return cyBaseNodeShapes["bottomroundrectangle"].intersectLine( centerX, centerY, width, height, x, y, padding );
     },
     "empty set": function( centerX, centerY, width, height, x, y, padding ) {
+      return cyBaseNodeShapes["ellipse"].intersectLine( centerX, centerY, width, height, x, y, padding );
+    },
+    "degradation": function( centerX, centerY, width, height, x, y, padding ) {
       return cyBaseNodeShapes["ellipse"].intersectLine( centerX, centerY, width, height, x, y, padding );
     },
     "biological activity": function( centerX, centerY, width, height, x, y, padding ) {
@@ -1415,6 +1421,9 @@ module.exports = function () {
       return cyBaseNodeShapes["bottomroundrectangle"].checkPoint( x, y, padding, width, height, centerX, centerY );
     },
     "empty set": function( x, y, padding, width, height, centerX, centerY ) {
+      return cyBaseNodeShapes["ellipse"].checkPoint( x, y, padding, width, height, centerX, centerY );
+    },
+    "degradation": function( x, y, padding, width, height, centerX, centerY ) {
       return cyBaseNodeShapes["ellipse"].checkPoint( x, y, padding, width, height, centerX, centerY );
     },
     "biological activity": function( x, y, padding, width, height, centerX, centerY ) {

@@ -467,7 +467,7 @@ module.exports = function () {
       "gene":                 {asSource: {isAllowed: true},    asTarget: {}},
       "compartment":          {asSource: {},   asTarget: {}},
       "rna":                  {asSource: {isAllowed: true},   asTarget: {}},
-      "empty set":            {asSource: {isAllowed: true},    asTarget: {}},
+      "degradation":            {asSource: {isAllowed: true},    asTarget: {}},
       "drug":                 {asSource: {isAllowed: true},   asTarget: {}},
       "truncated protein":    {asSource: {isAllowed: true},   asTarget: {}},
       "ion channel":          {asSource: {isAllowed: true},   asTarget: {}},
@@ -493,7 +493,7 @@ module.exports = function () {
       "gene":                 {asSource: {},    asTarget: {isAllowed: true}},
       "compartment":          {asSource: {},   asTarget: {}},
       "rna":                  {asSource: {},   asTarget: {isAllowed: true}},
-      "empty set":            {asSource: {},    asTarget: {isAllowed: true}},
+      "degradation":            {asSource: {},    asTarget: {isAllowed: true}},
       "drug":                 {asSource: {},   asTarget: {isAllowed: true}},
       "truncated protein":    {asSource: {},   asTarget: {isAllowed: true}},
       "ion channel":          {asSource: {},   asTarget: {isAllowed: true}},
@@ -519,7 +519,7 @@ module.exports = function () {
       "gene":                 {asSource: {isAllowed: true},   asTarget: {}},
       "compartment":          {asSource: {},   asTarget: {}},
       "rna":                  {asSource: {isAllowed: true},   asTarget: {}},
-      "empty set":            {asSource: {isAllowed: true},   asTarget: {}},
+      "degradation":            {asSource: {isAllowed: true},   asTarget: {}},
       "drug":                 {asSource: {isAllowed: true},   asTarget: {}},
       "truncated protein":    {asSource: {isAllowed: true},   asTarget: {}},
       "ion channel":          {asSource: {isAllowed: true},   asTarget: {}},
@@ -545,7 +545,7 @@ module.exports = function () {
       "gene":                 {asSource: {isAllowed: true},   asTarget: {}},
       "compartment":          {asSource: {},   asTarget: {}},
       "rna":                  {asSource: {isAllowed: true},   asTarget: {}},
-      "empty set":            {asSource: {isAllowed: true},   asTarget: {}},
+      "degradation":            {asSource: {isAllowed: true},   asTarget: {}},
       "drug":                 {asSource: {isAllowed: true},   asTarget: {}},
       "truncated protein":    {asSource: {isAllowed: true},   asTarget: {}},
       "ion channel":          {asSource: {isAllowed: true},   asTarget: {}},
@@ -571,7 +571,7 @@ module.exports = function () {
       "gene":                 {asSource: {isAllowed: true},   asTarget: {}},
       "compartment":          {asSource: {},   asTarget: {}},
       "rna":                  {asSource: {isAllowed: true},   asTarget: {}},
-      "empty set":            {asSource: {isAllowed: true},   asTarget: {}},
+      "degradation":            {asSource: {isAllowed: true},   asTarget: {}},
       "drug":                 {asSource: {isAllowed: true},   asTarget: {}},
       "truncated protein":    {asSource: {isAllowed: true},   asTarget: {}},
       "ion channel":          {asSource: {isAllowed: true},   asTarget: {}},
@@ -597,7 +597,7 @@ module.exports = function () {
       "gene":                 {asSource: {isAllowed: true},   asTarget: {}},
       "compartment":          {asSource: {},   asTarget: {}},
       "rna":                  {asSource: {isAllowed: true},   asTarget: {}},
-      "empty set":            {asSource: {isAllowed: true},   asTarget: {}},
+      "degradation":            {asSource: {isAllowed: true},   asTarget: {}},
       "drug":                 {asSource: {isAllowed: true},   asTarget: {}},
       "truncated protein":    {asSource: {isAllowed: true},   asTarget: {}},
       "ion channel":          {asSource: {isAllowed: true},   asTarget: {}},
@@ -623,7 +623,7 @@ module.exports = function () {
       "gene":                 {asSource: {isAllowed: true},   asTarget: {}},
       "compartment":          {asSource: {},   asTarget: {}},
       "rna":                  {asSource: {isAllowed: true},   asTarget: {}},
-      "empty set":            {asSource: {isAllowed: true},   asTarget: {}},
+      "degradation":            {asSource: {isAllowed: true},   asTarget: {}},
       "drug":                 {asSource: {isAllowed: true},   asTarget: {}},
       "truncated protein":    {asSource: {isAllowed: true},   asTarget: {}},
       "ion channel":          {asSource: {isAllowed: true},   asTarget: {}},
@@ -649,7 +649,7 @@ module.exports = function () {
       "gene":                 {asSource: {},   asTarget: {isAllowed: true}},
       "compartment":          {asSource: {},   asTarget: {}},
       "rna":                  {asSource: {},   asTarget: {isAllowed: true}},
-      "empty set":            {asSource: {},   asTarget: {isAllowed: true}},
+      "degradation":            {asSource: {},   asTarget: {isAllowed: true}},
       "drug":                 {asSource: {},   asTarget: {isAllowed: true}},
       "truncated protein":    {asSource: {},   asTarget: {isAllowed: true}},
       "ion channel":          {asSource: {},   asTarget: {isAllowed: true}},
@@ -675,7 +675,7 @@ module.exports = function () {
       "gene":                 {asSource: {isAllowed: true},   asTarget: {}},
       "compartment":          {asSource: {},   asTarget: {}},
       "rna":                  {asSource: {isAllowed: true},   asTarget: {}},
-      "empty set":            {asSource: {isAllowed: true},   asTarget: {}},
+      "degradation":            {asSource: {isAllowed: true},   asTarget: {}},
       "drug":                 {asSource: {isAllowed: true},   asTarget: {}},
       "truncated protein":    {asSource: {isAllowed: true},   asTarget: {}},
       "ion channel":          {asSource: {isAllowed: true},   asTarget: {}},
@@ -701,7 +701,7 @@ module.exports = function () {
       "gene":                 {asSource: {isAllowed: true},   asTarget: {}},
       "compartment":          {asSource: {},   asTarget: {}},
       "rna":                  {asSource: {isAllowed: true},   asTarget: {}},
-      "empty set":            {asSource: {isAllowed: true},   asTarget: {}},
+      "degradation":            {asSource: {isAllowed: true},   asTarget: {}},
       "drug":                 {asSource: {isAllowed: true},   asTarget: {}},
       "truncated protein":    {asSource: {isAllowed: true},   asTarget: {}},
       "ion channel":          {asSource: {isAllowed: true},   asTarget: {}},
@@ -727,7 +727,7 @@ module.exports = function () {
       "gene":                 {asSource: {isAllowed: true},   asTarget: {}},
       "compartment":          {asSource: {},   asTarget: {}},
       "rna":                  {asSource: {isAllowed: true},   asTarget: {}},
-      "empty set":            {asSource: {isAllowed: true},   asTarget: {}},
+      "degradation":            {asSource: {isAllowed: true},   asTarget: {}},
       "drug":                 {asSource: {isAllowed: true},   asTarget: {}},
       "truncated protein":    {asSource: {isAllowed: true},   asTarget: {}},
       "ion channel":          {asSource: {isAllowed: true},   asTarget: {}},
@@ -753,7 +753,7 @@ module.exports = function () {
       "gene":                 {asSource: {},   asTarget: {isAllowed: true}},
       "compartment":          {asSource: {},   asTarget: {}},
       "rna":                  {asSource: {},   asTarget: {isAllowed: true}},
-      "empty set":            {asSource: {},   asTarget: {isAllowed: true}},
+      "degradation":            {asSource: {},   asTarget: {isAllowed: true}},
       "drug":                 {asSource: {},   asTarget: {isAllowed: true}},
       "truncated protein":    {asSource: {},   asTarget: {isAllowed: true}},
       "ion channel":          {asSource: {},   asTarget: {isAllowed: true}},
@@ -779,7 +779,7 @@ module.exports = function () {
       "gene":                 {asSource: {isAllowed: true},   asTarget: {}},
       "compartment":          {asSource: {},   asTarget: {}},
       "rna":                  {asSource: {isAllowed: true},   asTarget: {}},
-      "empty set":            {asSource: {isAllowed: true},   asTarget: {}},
+      "degradation":            {asSource: {isAllowed: true},   asTarget: {}},
       "drug":                 {asSource: {isAllowed: true},   asTarget: {}},
       "truncated protein":    {asSource: {isAllowed: true},   asTarget: {}},
       "ion channel":          {asSource: {isAllowed: true},   asTarget: {}},
@@ -805,7 +805,7 @@ module.exports = function () {
       "gene":                 {asSource: {},   asTarget: {isAllowed: true}},
       "compartment":          {asSource: {},   asTarget: {}},
       "rna":                  {asSource: {},   asTarget: {isAllowed: true}},
-      "empty set":            {asSource: {},   asTarget: {isAllowed: true}},
+      "degradation":            {asSource: {},   asTarget: {isAllowed: true}},
       "drug":                 {asSource: {},   asTarget: {isAllowed: true}},
       "truncated protein":    {asSource: {},   asTarget: {isAllowed: true}},
       "ion channel":          {asSource: {},   asTarget: {isAllowed: true}},
@@ -831,7 +831,7 @@ module.exports = function () {
       "gene":                 {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
       "compartment":          {asSource: {},   asTarget: {}},
       "rna":                  {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
-      "empty set":            {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "degradation":            {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
       "drug":                 {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
       "truncated protein":    {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
       "ion channel":          {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
@@ -857,7 +857,7 @@ module.exports = function () {
       "gene":                 {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
       "compartment":          {asSource: {},   asTarget: {}},
       "rna":                  {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
-      "empty set":            {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "degradation":            {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
       "drug":                 {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
       "truncated protein":    {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
       "ion channel":          {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
@@ -883,7 +883,7 @@ module.exports = function () {
       "gene":                 {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
       "compartment":          {asSource: {},   asTarget: {}},
       "rna":                  {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
-      "empty set":            {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "degradation":            {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
       "drug":                 {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
       "truncated protein":    {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
       "ion channel":          {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
@@ -909,7 +909,7 @@ module.exports = function () {
       "gene":                 {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
       "compartment":          {asSource: {},   asTarget: {}},
       "rna":                  {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
-      "empty set":            {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "degradation":            {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
       "drug":                 {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
       "truncated protein":    {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
       "ion channel":          {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
@@ -935,7 +935,7 @@ module.exports = function () {
       "gene":                 {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
       "compartment":          {asSource: {},   asTarget: {}},
       "rna":                  {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
-      "empty set":            {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "degradation":            {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
       "drug":                 {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
       "truncated protein":    {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
       "ion channel":          {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
@@ -961,7 +961,7 @@ module.exports = function () {
       "gene":                 {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
       "compartment":          {asSource: {},   asTarget: {}},
       "rna":                  {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
-      "empty set":            {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "degradation":            {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
       "drug":                 {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
       "truncated protein":    {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
       "ion channel":          {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
@@ -987,7 +987,7 @@ module.exports = function () {
       "gene":                 {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
       "compartment":          {asSource: {},   asTarget: {}},
       "rna":                  {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
-      "empty set":            {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "degradation":            {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
       "drug":                 {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
       "truncated protein":    {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
       "ion channel":          {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
@@ -1013,7 +1013,7 @@ module.exports = function () {
       "gene":                 {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
       "compartment":          {asSource: {},   asTarget: {}},
       "rna":                  {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
-      "empty set":            {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "degradation":            {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
       "drug":                 {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
       "truncated protein":    {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
       "ion channel":          {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
@@ -1039,7 +1039,7 @@ module.exports = function () {
       "gene":                 {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
       "compartment":          {asSource: {},   asTarget: {}},
       "rna":                  {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
-      "empty set":            {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "degradation":            {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
       "drug":                 {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
       "truncated protein":    {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
       "ion channel":          {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
@@ -1065,7 +1065,7 @@ module.exports = function () {
       "gene":                 {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
       "compartment":          {asSource: {},   asTarget: {}},
       "rna":                  {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
-      "empty set":            {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "degradation":            {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
       "drug":                 {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
       "truncated protein":    {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
       "ion channel":          {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
@@ -1097,7 +1097,7 @@ module.exports = function () {
   elementUtilities.sifTypes = ['SIF macromolecule', 'SIF simple chemical'];
   elementUtilities.otherNodeTypes = ['compartment', 'tag', 'submap', 'topology group'];
   elementUtilities.sbmlType = ['gene', 'rna', 'simple molecule', 'unknown molecule', 'phenotype', 'drug', 'ion', 'protein', 'truncated protein', 
-  'ion channel', 'receptor', 'phenotype sbml', 'receptor', 'complex sbml', 'protein'];
+  'ion channel', 'receptor', 'phenotype sbml', 'receptor', 'complex sbml', 'protein', 'degradation'];
   elementUtilities.sbmlTypeMultimer = ['gene multimer', 'rna multimer', 'ion channel multimer', 'receptor multimer', 'truncated protein multimer', 'phenotype multimer',
     'ion multimer', 'simple molecule multimer', 'unknown molecule multimer', 'drug multimer', 'complex multimer', 'phenotype sbml multimer', 'receptor multimer',
   'complex sbml multimer', 'protein multimer']
@@ -1312,7 +1312,7 @@ module.exports = function () {
             || sbgnclass == 'simple molecule' ||  sbgnclass == 'simple molecule multimer' || sbgnclass == 'hypothetical simple molecule' || sbgnclass == 'hypothetical simple molecule multimer' 
             || sbgnclass == 'unknown molecule' ||  sbgnclass == 'unknown molecule multimer' || sbgnclass == 'hypothetical unknown molecule' || sbgnclass == 'hypothetical unknown molecule multimer' 
             || sbgnclass == 'drug' ||  sbgnclass == 'drug multimer' || sbgnclass == 'hypothetical drug' || sbgnclass == 'hypothetical drug multimer' 
-            || sbgnclass == 'empty set' ||  sbgnclass == 'empty set multimer' || sbgnclass == 'hypothetical empty set' || sbgnclass == 'hypothetical empty set multimer' 
+            || sbgnclass == 'degradation' ||  sbgnclass == 'degradation multimer' || sbgnclass == 'hypothetical degradation' || sbgnclass == 'hypothetical degradation multimer' 
 
              ) {
       return true;
@@ -1339,7 +1339,7 @@ module.exports = function () {
     var sbgnclass = elementUtilities.getPureSbgnClass( ele );
     if (sbgnclass == 'gene' || sbgnclass == 'rna' || sbgnclass == 'simple molecule' || sbgnclass == 'unknown molecule'
     || sbgnclass == 'phenotype sbml' || sbgnclass == 'drug' || sbgnclass == 'protein' || sbgnclass == 'truncated protein'
-    || sbgnclass == 'ion channel' || sbgnclass == 'receptor' || sbgnclass == 'ion' || sbgnclass == 'empty set' 
+    || sbgnclass == 'ion channel' || sbgnclass == 'receptor' || sbgnclass == 'ion' || sbgnclass == 'degradation' 
     || sbgnclass == 'complex sbml')
     {
       return true;
@@ -1904,7 +1904,8 @@ module.exports = function () {
       if (_class == 'empty set' || _class == 'nucleic acid feature' || _class == 'macromolecule'
               || _class == 'simple chemical' || _class == 'complex' || _class == 'biological activity' || _class == 'cule' || _class == 'gene'
               || _class == 'unknown molecule' || _class == 'drug' || _class == 'ion' || _class == 'truncated protein' || _class == 'ion channel'
-              || _class == 'rna'   || _class == 'simple molecule' || _class == 'phenotype sbml'|| _class == 'receptor' || _class == 'complex sbml' || _class == 'protein') {
+              || _class == 'rna'   || _class == 'simple molecule' || _class == 'phenotype sbml'|| _class == 'receptor' || _class == 'complex sbml' || _class == 'protein'
+              || _class == 'degradation') {
           return _class;
       }
 
@@ -3226,6 +3227,10 @@ module.exports = function () {
       height: 30
     },
     'empty set': {
+      width: 22,
+      height: 22
+    },
+    'degradation': {
       width: 22,
       height: 22
     },
