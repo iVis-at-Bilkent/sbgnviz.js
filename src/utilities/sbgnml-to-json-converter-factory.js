@@ -76,8 +76,8 @@ module.exports = function () {
     ele.bboxCalculated = true;
     var childNodes = ele.glyphMembers;
     //exclude state variables and units of information from child members
-    childNodes = childNodes.filter(function(child){ return child.class_ != "state variable" && child.class_ != "unit of information"} );
-   // && child.class_ != "binding region" && child.class_ != "residue variable");
+    childNodes = childNodes.filter(function(child){ return child.class_ != "state variable" && child.class_ != "unit of information"
+    && child.class_ != "binding region" && child.class_ != "residue variable"} );
     var bbox = {};
     bbox.x = ele.bbox.x;
     bbox.y = ele.bbox.y;
@@ -151,8 +151,8 @@ module.exports = function () {
         var right = childNodeBbox.x + childNodeBbox.w/2 + childPadding;
         var top = childNodeBbox.y  - childNodeBbox.h/2 - childPadding;
         var bottom = childNodeBbox.y + childNodeBbox.h/2 + childPadding;
-        var stateAndInfos = childNode.glyphMembers.filter(function(child){ return child.class_ == "state variable" || child.class_ == "unit of information"});
-        //|| child.class_ == "binding region" || child.class_ == "residue variable"});
+        var stateAndInfos = childNode.glyphMembers.filter(function(child){ return child.class_ == "state variable" || child.class_ == "unit of information"
+        || child.class_ == "binding region" || child.class_ == "residue variable" } );
         if(stateAndInfos.length > 0){
             for(var k = 0 ; k<stateAndInfos.length; k++){
                 var stateBbox = stateAndInfos[k].bbox;
@@ -283,8 +283,8 @@ module.exports = function () {
      
       var childNodes = ele.glyphMembers;
     //exclude state variables and units of information from child members
-      childNodes = childNodes.filter(function(child){ return child.class_ != "state variable" && child.class_ != "unit of information"});
-      //&& child.class_ != "binding region" && child.class_ != "residue variable"});
+      childNodes = childNodes.filter(function(child){ return child.class_ != "state variable" && child.class_ != "unit of information"
+      && child.class_ != "binding region" && child.class_ != "residue variable"});
       if(childNodes.length <= 0 ) return 0;
       var compoundPadding = typeof options.compoundPadding === 'function' ? options.compoundPadding.call() : options.compoundPadding;
      // } 
@@ -293,8 +293,8 @@ module.exports = function () {
         var extraComplexPadding = typeof options.extraComplexPadding === 'function' ? options.extraComplexPadding.call() : options.extraComplexPadding;
         complexPadding = compoundPadding < 5 ? 5 : compoundPadding;       
 
-        var stateAndInfos = ele.glyphMembers.filter(function(child){ return child.class_ == "state variable" || child.class_ == "unit of information"});
-        //|| child.class_ == "binding region" || child.class_ == "residue variable"});
+        var stateAndInfos = ele.glyphMembers.filter(function(child){ return child.class_ == "state variable" || child.class_ == "unit of information"
+        || child.class_ == "binding region" || child.class_ == "residue variable"});
             
         if(ele.label != undefined && ele.label.text != undefined && ele.label.text.length > 0){ 
          
@@ -356,8 +356,8 @@ module.exports = function () {
     for (var i = 0; i < childGlyphs.length; i++) {
       var glyph = childGlyphs[i];
 
-      if (glyph.class_ !== 'unit of information' && glyph.class_ !== 'state variable' ) {
-      //&& glyph.class_ !== 'residue variable' && glyph.class_ !== 'binding region') {
+      if (glyph.class_ !== 'unit of information' && glyph.class_ !== 'state variable'
+      && glyph.class_ !== 'residue variable' && glyph.class_ !== 'binding region') {
         continue;
       }
 
@@ -388,20 +388,17 @@ module.exports = function () {
         infobox.state.value = (state && state.value) || undefined;
         infobox.state.variable = (state && state.variable) || undefined;
       }
-      /*
+      
       else if (glyph.class_ === 'residue variable') {
-      infobox = classes.ResidueVariable.construct(undefined, undefined, undefined, infoboxId);
-
-      var residue = glyph.residue;
-      infobox.residue.variable = (residue && residue.variable) || undefined;
+        infobox = classes.ResidueVariable.construct(undefined, undefined, infoboxId);
+        infobox.residue.variable =  (glyph.label && glyph.label.text) || undefined
+      
     }
     else if (glyph.class_ === 'binding region') {
-      infobox = classes.BindingRegion.construct(undefined, undefined, undefined, infoboxId);
-
-      var region = glyph.region;
-      infobox.region.variable = (region && region.variable) || undefined;
+      infobox = classes.BindingRegion.construct(undefined, undefined, infoboxId);
+      infobox.region.variable =  (glyph.label && glyph.label.text) || undefined
     }
-    */
+    
       //var bboxAndAnchorResult = getAuxUnitClass(infobox).setAnchorSideAndBbox();
 
       infobox.bbox = self.stateAndInfoBboxProp(glyph, parentBbox);
@@ -500,7 +497,7 @@ module.exports = function () {
 
     // add language info, this will always be the mapType if not hybrid
     var mapType = elementUtilities.mapType;
-    if(mapType == 'PD' || mapType == 'AF' || mapType == 'SIF'){
+    if(mapType == 'PD' || mapType == 'AF' || mapType == 'SIF' || mapType == 'SBML'){
       nodeObj.language = elementUtilities.mapType;
     }else if(mapType == 'HybridSbgn'){
       if(nodeObj.class == 'delay' || nodeObj.class.startsWith("BA")){
@@ -514,7 +511,7 @@ module.exports = function () {
       }else if(nodeObj.class == 'delay' || nodeObj.class.startsWith("BA")){
         nodeObj.language = 'AF';
       }else{
-        nodeObj.language = 'PD';
+        nodeObj.language = 'PD'; //Need to add SBML here
       }
     }
    
@@ -698,8 +695,8 @@ module.exports = function () {
       for (var i = 0; i < childGlyphs.length; i++) {
         var glyph = childGlyphs[i];
         var glyphClass = glyph.class_;
-        if (glyphClass !== 'state variable' && glyphClass !== 'unit of information') {
-        //&& glyphClass !== 'residue variable' && glyphClass !== 'binding region') {
+        if (glyphClass !== 'state variable' && glyphClass !== 'unit of information'
+        && glyphClass !== 'residue variable' && glyphClass !== 'binding region') {
           if (glyph.compartmentRef && glyph.compartmentRef != elId && eleClass == 'submap') {
             self.traverseNodes(glyph, jsonArray, glyph.compartmentRef, compartments);
           }
@@ -879,7 +876,7 @@ module.exports = function () {
     var PdEdges = ["consumption","production","modulation","stimulation","catalysis","inhibition","necessary stimulation","logic arc","equivalence arc"];
     var AfEdges = ["positive influence","negative influence","unknown influence"];  
     var mapType = elementUtilities.mapType;
-    if(mapType == 'PD' || mapType == 'AF' || mapType == 'SIF'){
+    if(mapType == 'PD' || mapType == 'AF' || mapType == 'SIF' || mapType == 'SBML'){
       edgeObj.language = elementUtilities.mapType;
     }else if(mapType == 'HybridSbgn'){
       if(PdEdges.indexOf(edgeObj.class) > -1){
@@ -893,7 +890,7 @@ module.exports = function () {
       }else if(AfEdges.indexOf(edgeObj.class) > -1){
         edgeObj.language = 'AF';
       }else{
-        edgeObj.language = 'SIF';
+        edgeObj.language = 'SIF'; // Need to add SBML
       }
     }
 
@@ -1201,8 +1198,8 @@ module.exports = function () {
       for (var i = 0; i < glyphs.length; i++) {
         var glyph = glyphs[i];
 
-        childNodes = glyph.glyphMembers.filter(function(child){ return child.class_ != "state variable" && child.class_ != "unit of information"});
-       // && child.class_ != "residue variable" && child.class_ != "binding region"});
+        childNodes = glyph.glyphMembers.filter(function(child){ return child.class_ != "state variable" && child.class_ != "unit of information"
+        && child.class_ != "residue variable" && child.class_ != "binding region"});
         if(childNodes.length > 0){ // compound node
           var hasMin = false;
           for (var j = 0; j < childNodes.length; j++) {           
@@ -1212,8 +1209,8 @@ module.exports = function () {
               childClass = "empty set";
             }
             var borderWidth = elementUtilities.getDefaultProperties(childClass)["border-width"];
-            var stateAndInfos = childNode.glyphMembers.filter(function(child){ return child.class_ == "state variable" || child.class_ == "unit of information"});
-            //|| child.class_ == "residue variable" || child.class_ == "binding region"});
+            var stateAndInfos = childNode.glyphMembers.filter(function(child){ return child.class_ == "state variable" || child.class_ == "unit of information"
+            || child.class_ == "residue variable" || child.class_ == "binding region"});
             if(stateAndInfos.length > 0){
               for(var k = 0 ; k<stateAndInfos.length; k++){
                 var stateBbox = stateAndInfos[k].bbox;
@@ -1264,8 +1261,8 @@ module.exports = function () {
 
           if(hasMin){
             if(glyph.class_ == "complex"){
-              var stateAndInfos = glyph.glyphMembers.filter(function(child){ return child.class_ == "state variable" || child.class_ == "unit of information"});
-              //|| child.class_ == "residue variable" || child.class_ == "binding region"});
+              var stateAndInfos = glyph.glyphMembers.filter(function(child){ return child.class_ == "state variable" || child.class_ == "unit of information"
+              || child.class_ == "residue variable" || child.class_ == "binding region"});
               var extraComplexPadding = typeof options.extraComplexPadding === 'function' ? options.extraComplexPadding.call() : options.extraComplexPadding;
               if(glyph.label != undefined && glyph.label.text != undefined && glyph.label.text.length > 0){
                

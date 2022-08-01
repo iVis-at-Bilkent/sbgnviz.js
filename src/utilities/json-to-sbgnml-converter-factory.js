@@ -623,25 +623,24 @@ module.exports = function () {
   jsonToSbgnml.addBindingBoxGlyph = function(node, id, mainGlyph){
 
     var glyph = new libsbgnjs.Glyph({id: id, class_: 'binding region'});
-    var region = new libsbgnjs.StateType();
- 
+    var label = new libsbgnjs.Label();
     if(typeof node.region.variable != 'undefined')
-      region.variable = node.region.variable;
-    glyph.setState(region);
+        label.text = node.region.variable;
+    glyph.setLabel(label);
     glyph.setBbox(this.addStateAndInfoBbox(mainGlyph, node));
 
     return glyph;
-};
+  };
   jsonToSbgnml.addResidueBoxGlyph = function(node, id, mainGlyph){
 
-    var glyph = new libsbgnjs.Glyph({id: id, class_: 'residue variable'});
-    var residue = new libsbgnjs.StateType();
-    if(typeof node.residue.variable != 'undefined')
-        residue.variable = node.residue.variable;
-    glyph.setState(residue);
-    glyph.setBbox(this.addStateAndInfoBbox(mainGlyph, node));
+      var glyph = new libsbgnjs.Glyph({id: id, class_: 'residue variable'});
+      var label = new libsbgnjs.Label();
+      if(typeof node.residue.variable != 'undefined')
+          label.text = node.residue.variable;
+      glyph.setLabel(label);
+      glyph.setBbox(this.addStateAndInfoBbox(mainGlyph, node));
 
-    return glyph;
+      return glyph;
 };
 
   jsonToSbgnml.addInfoBoxGlyph = function (node, id, mainGlyph) {
