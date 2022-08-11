@@ -1,10 +1,8 @@
-var webpack = require('webpack');
 const path = require('path');
 const pkg = require('./package.json');
 const SRC_DIR = './src';
 const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
 const NodeExternals = require('webpack-node-externals');
-const CopyPlugin = require("copy-webpack-plugin");
 
 let config = {
   devtool: 'eval-source-map',
@@ -17,7 +15,6 @@ let config = {
   // this mode is used in 'build' script
   mode: 'development',
   output: {
-    publicPath: '/',
     path: path.join( __dirname ),
     filename: pkg.name + '.js',
     library: pkg.name,
@@ -39,22 +36,11 @@ let config = {
     minimize: false
   },
   plugins: [
-    new webpack.IgnorePlugin({resourceRegExp: /^fs$/ }),
     new NodePolyfillPlugin(),
-    new CopyPlugin({
-      patterns: [
-      {from: '**/*.wasm', to: path.resolve('./',  '[name][ext]'),} ],
-      }),
   ],
 
   externals: [NodeExternals()],
-  
-  devServer: {
-    contentBase: [
-      path.join(__dirname,'src'),
-      path.join(__dirname,'node_modules','libsbmljs_stable')
-    ]
-  },
+
   
 };
 
