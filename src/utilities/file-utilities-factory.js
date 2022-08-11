@@ -75,13 +75,14 @@ module.exports = function () {
  }
  // Helper functions End
 
- var sbgnmlToJson, jsonToSbgnml, jsonToNwt, uiUtilities, tdToJson,
+ var sbgnmlToJson, sbmlToJson, jsonToSbgnml, jsonToNwt, uiUtilities, tdToJson,
      sifToJson, graphUtilities, layoutToText, nwtToJson, jsonToSif,sbgnmlToCd,cdToSbgnml,sbgnmlToSbml,sbmlToSbgnml;
  var updateGraph;
  var options, cy;
 
  function fileUtilities (param) {
    sbgnmlToJson = param.sbgnmlToJsonConverter;
+   sbmlToJson = param.sbmlToJsonConverter;
    nwtToJson = param.nwtToJsonConverter;
    jsonToSbgnml = param.jsonToSbgnmlConverter;
    jsonToNwt = param.jsonToNwtConverter;
@@ -281,9 +282,11 @@ module.exports = function () {
    var textType = /text.*/;
 
    var reader = new FileReader();
+   console.log("loading file")
 
    reader.onload = function (e) {
      var text = this.result;
+     console.log("text", text)
     var matchResult = text.match("<renderInformation[^]*</renderInformation>");
     if(matchResult != null){
     var imagesElementMatch = text.match("<listOfBackgroundImages[^]*</listOfBackgroundImages>");
@@ -353,6 +356,13 @@ module.exports = function () {
 
  };
 
+ fileUtilities.loadSBMLText = async function(textData, tileInfoBoxes, filename, cy, urlParams){
+  await updateGraph(sbmlToJson.convert(textToXmlObject(textData), urlParams), undefined, undefined, tileInfoBoxes);
+   await $(document).trigger("sbgnvizLoadFileEnd",  [filename, cy]);
+   uiUtilities.endSpinner("load-file-spinner");
+
+};
+
  // supported versions are either 0.2 or 0.3
  fileUtilities.saveAsSbgnml = function(filename, version, renderInfo, mapProperties, nodes, edges) {
    var sbgnmlText = jsonToSbgnml.createSbgnml(filename, version, renderInfo, mapProperties, nodes, edges);
@@ -364,7 +374,7 @@ module.exports = function () {
 
  // supported versions are either 0.2 or 0.3
  fileUtilities.saveAsNwt = function(filename, version, renderInfo, mapProperties, nodes, edges) {
-   console.log("Save as newt")
+   console.log("Save as newt", renderInfo)
    var sbgnmlText = jsonToNwt.createNwt(filename, version, renderInfo, mapProperties, nodes, edges);
    var blob = new Blob([sbgnmlText], {
      type: "text/plain;charset=utf-8;",
@@ -434,7 +444,8 @@ module.exports = function () {
 
  }
 
- fileUtilities.loadSbml = function(file, successCallback, errorCallback){
+ fileUtilities.loadSbml = function(file, callback1, callback2){
+   /*
   var reader = new FileReader();
   reader.onload = function (e) { 
     
@@ -455,6 +466,13 @@ module.exports = function () {
   var sbgnmlText = jsonToSbgnml.createSbgnml(filename, "plain", renderInfo, mapProperties, nodes, edges, hidden);
  
   return sbgnmlText;
+  */
+  var convert = function( text ) {
+    return sbmlToJson.convert(text);
+  };
+
+  fileUtilities.loadFile( file, convert, callback1, callback2, fileUtilities.collapseMarkedNodes );
+ 
 };
 
  fileUtilities.exportLayoutData = function(filename, byName) {
@@ -478,6 +496,9 @@ module.exports = function () {
  fileUtilities.convertSbgnmlTextToJson = function(sbgnmlText){
      return sbgnmlToJson.convert(textToXmlObject(sbgnmlText));
  };
+ fileUtilities.convertSbmlTextToJson = function(sbgnmlText){
+  return sbmlToJson.convert(textToXmlObject(sbgnmlText));
+};
 
  fileUtilities.convertSifTextToJson = function(sifText){
         return sifToJson.convert(sifText);
@@ -488,6 +509,12 @@ fileUtilities.createJsonFromSBGN = function(){
 
     var sbgnmlText = jsonToSbgnml.createSbgnml();
     return sbgnmlToJson.convert(textToXmlObject(sbgnmlText));
+};
+
+fileUtilities.createJsonFromSBML = function(){
+
+  var sbgnmlText = jsonToSbgnml.createSbgnml(); //SBML
+  return sbmlToJson.convert(textToXmlObject(sbgnmlText));
 };
 
 fileUtilities.createJsonFromSif = function(){

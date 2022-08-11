@@ -23,6 +23,7 @@
     var jsonToSbgnmlConverter = require('./utilities/json-to-sbgnml-converter-factory')();
     var jsonToNwtConverter = require('./utilities/json-to-nwt-converter-factory')();
     var sbgnmlToJsonConverter = require('./utilities/sbgnml-to-json-converter-factory')();
+    var sbmlToJsonConverter = require('./utilities/sbml-to-json-converter-factory')();
     var nwtToJsonConverter = require('./utilities/nwt-to-json-converter-factory')();
     var tdToJsonConverter = require('./utilities/tab-delimited-to-json-converter-factory')();
     var sifToJsonConverter = require('./utilities/sif-to-json-converter-factory')();
@@ -49,6 +50,7 @@
     param.jsonToSbgnmlConverter = jsonToSbgnmlConverter;
     param.jsonToNwtConverter = jsonToNwtConverter;
     param.sbgnmlToJsonConverter = sbgnmlToJsonConverter;
+    param.sbmlToJsonConverter = sbmlToJsonConverter;
     param.nwtToJsonConverter = nwtToJsonConverter;
     param.tdToJsonConverter = tdToJsonConverter;
     param.sifToJsonConverter = sifToJsonConverter;
@@ -76,6 +78,7 @@
     jsonToSbgnmlConverter(param);
     jsonToNwtConverter(param);
     sbgnmlToJsonConverter(param);
+    sbmlToJsonConverter(param);
     nwtToJsonConverter(param);
     tdToJsonConverter(param);
     sifToJsonConverter(param);

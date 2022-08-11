@@ -1,14 +1,15 @@
-var libsbgnjs = require('libsbgn.js');
-var parseString = require('xml2js').parseString;
-var libUtilities = require('./lib-utilities');
+const libsbml = require('libsbmljs_stable');
+const libsbmlInstance = libsbml();
+var parseString = require("xml2js").parseString;
+var libUtilities = require("./lib-utilities");
 var libs = libUtilities.getLibs();
-var jQuery = $ = libs.jQuery;
-var classes = require('./classes');
+var jQuery = ($ = libs.jQuery);
+var classes = require("./classes");
 
 module.exports = function () {
-  var elementUtilities, graphUtilities, handledElements,mainUtilities;
+  var elementUtilities, graphUtilities, handledElements, mainUtilities;
 
-  function sbgnmlToJson (param) {
+  function sbmlToJson(param) {
     optionUtilities = param.optionUtilities;
     options = optionUtilities.getOptions();
     elementUtilities = param.elementUtilities;
@@ -17,33 +18,32 @@ module.exports = function () {
 
     handledElements = {};
 
-    elementUtilities.elementTypes.forEach( function( type ) {
-      handledElements[ type ] = true;
-    } );
+    elementUtilities.elementTypes.forEach(function (type) {
+      handledElements[type] = true;
+    });
   }
 
-  sbgnmlToJson.insertedNodes = {};
+  sbmlToJson.insertedNodes = {};
 
-  sbgnmlToJson.map = undefined;
-  sbgnmlToJson.calculatedCompoundPadding = undefined;
+  sbmlToJson.map = undefined;
+  sbmlToJson.calculatedCompoundPadding = undefined;
 
-  sbgnmlToJson.getAllCompartments = function (glyphList) {
+  sbmlToJson.getAllCompartments = function (glyphList) {
     var compartments = [];
 
     for (var i = 0; i < glyphList.length; i++) {
-      if (glyphList[i].class_ == 'compartment') {
+      if (glyphList[i].class_ == "compartment") {
         var compartment = glyphList[i];
         var bbox = compartment.bbox;
         compartments.push({
-          'x': parseFloat(bbox.x),
-          'y': parseFloat(bbox.y),
-          'w': parseFloat(bbox.w),
-          'h': parseFloat(bbox.h),
-          'id': compartment.id
+          x: parseFloat(bbox.x),
+          y: parseFloat(bbox.y),
+          w: parseFloat(bbox.w),
+          h: parseFloat(bbox.h),
+          id: compartment.id,
         });
       }
     }
-
     compartments.sort(function (c1, c2) {
       if (c1.h * c1.w < c2.h * c2.w) {
         return -1;
@@ -57,63 +57,68 @@ module.exports = function () {
     return compartments;
   };
 
-  sbgnmlToJson.isInBoundingBox = function (bbox1, bbox2) {
-    if (bbox1.x > bbox2.x &&
-        bbox1.y > bbox2.y &&
-        bbox1.x + bbox1.w < bbox2.x + bbox2.w &&
-        bbox1.y + bbox1.h < bbox2.y + bbox2.h) {
+  sbmlToJson.isInBoundingBox = function (bbox1, bbox2) {
+    if (
+      bbox1.x > bbox2.x &&
+      bbox1.y > bbox2.y &&
+      bbox1.x + bbox1.w < bbox2.x + bbox2.w &&
+      bbox1.y + bbox1.h < bbox2.y + bbox2.h
+    ) {
       return true;
     }
     return false;
   };
 
-  sbgnmlToJson.bboxProp = function (ele) {
-
-    if(ele.bboxCalculated){
+  sbmlToJson.bboxProp = function (ele) {
+    if (ele.bboxCalculated) {
       return ele.bbox;
     }
 
     ele.bboxCalculated = true;
     var childNodes = ele.glyphMembers;
     //exclude state variables and units of information from child members
-    childNodes = childNodes.filter(function(child){ return child.class_ != "state variable" && child.class_ != "unit of information"
-    && child.class_ != "binding region" && child.class_ != "residue variable"} );
+    childNodes = childNodes.filter(function (child) {
+      return (
+        child.class_ != "state variable" &&
+        child.class_ != "unit of information" &&
+        child.class_ != "binding region" &&
+        child.class_ != "residue variable"
+      );
+    });
     var bbox = {};
     bbox.x = ele.bbox.x;
     bbox.y = ele.bbox.y;
     bbox.w = ele.bbox.w;
     bbox.h = ele.bbox.h;
     //if it is simple node return bbox
-    if(childNodes.length <= 0){
+    if (childNodes.length <= 0) {
       bbox.x = parseFloat(bbox.x) + parseFloat(bbox.w) / 2;
       bbox.y = parseFloat(bbox.y) + parseFloat(bbox.h) / 2;
-     
+
       return bbox;
-    }else if (ele.extension && ele.extension.has('extraInfo')) {// if newt file then extrainfo on the compound node exists
-        var xml = ele.extension.get('extraInfo');
-        var extraInfo;
-        parseString(xml, function (err, result) {
-           extraInfo = result.extraInfo;
-        });
-        ele.originalW= bbox.w;
-        ele.originalH = bbox.h;
-        bbox.x = parseFloat(bbox.x) + parseFloat(bbox.w) / 2;
-        bbox.y = parseFloat(bbox.y) + parseFloat(bbox.h) / 2;
-        bbox.w = parseFloat(extraInfo.w);
-        bbox.h = parseFloat(extraInfo.h);       
-        ele.minWidth = parseFloat(extraInfo.minW);
-        ele.minHeight = parseFloat(extraInfo.minH);
-        ele.minWidthBiasLeft = parseFloat(extraInfo.WLBias);
-        ele.minWidthBiasRight = parseFloat(extraInfo.WRBias);
-        ele.minHeightBiasBottom = parseFloat(extraInfo.HBBias);
-        ele.minHeightBiasTop = parseFloat(extraInfo.HTBias);
-        
-        return bbox;
+    } else if (ele.extension && ele.extension.has("extraInfo")) {
+      // if newt file then extrainfo on the compound node exists
+      var xml = ele.extension.get("extraInfo");
+      var extraInfo;
+      parseString(xml, function (err, result) {
+        extraInfo = result.extraInfo;
+      });
+      ele.originalW = bbox.w;
+      ele.originalH = bbox.h;
+      bbox.x = parseFloat(bbox.x) + parseFloat(bbox.w) / 2;
+      bbox.y = parseFloat(bbox.y) + parseFloat(bbox.h) / 2;
+      bbox.w = parseFloat(extraInfo.w);
+      bbox.h = parseFloat(extraInfo.h);
+      ele.minWidth = parseFloat(extraInfo.minW);
+      ele.minHeight = parseFloat(extraInfo.minH);
+      ele.minWidthBiasLeft = parseFloat(extraInfo.WLBias);
+      ele.minWidthBiasRight = parseFloat(extraInfo.WRBias);
+      ele.minHeightBiasBottom = parseFloat(extraInfo.HBBias);
+      ele.minHeightBiasTop = parseFloat(extraInfo.HTBias);
 
-        
-     }else{
-
-     /*  var styles;
+      return bbox;
+    } else {
+      /*  var styles;
       if (this.map.extension && this.map.extension.has('renderInformation')) { // render extension was found
         styles = this.map.extension.get('renderInformation').listOfStyles;
         if(styles  !== undefined){
@@ -121,67 +126,87 @@ module.exports = function () {
         }
       }
  */
-     /*  var compoundPadding = parseFloat(mapProperties.compoundPadding);
+      /*  var compoundPadding = parseFloat(mapProperties.compoundPadding);
       var extraCompartmentPadding = parseFloat(mapProperties.extraCompartmentPadding); */
-      
-     
+
       var padding = this.calculateElementPadding(ele);
-      if(ele.class_ == "complex"){
+      if (ele.class_ == "complex") {
         ele.complexCalculatedPadding = padding;
       }
-      
-      var minLeft, maxRight, minTop, maxBottom, childrenBboxW, childrenBboxH,minLeftBorder,maxRightBorder,minTopBorder,maxBottomBorder; 
+
+      var minLeft,
+        maxRight,
+        minTop,
+        maxBottom,
+        childrenBboxW,
+        childrenBboxH,
+        minLeftBorder,
+        maxRightBorder,
+        minTopBorder,
+        maxBottomBorder;
       var fromInfoBox = false;
       // Traverse the other children and update the extreme values
       for (var i = 0; i < childNodes.length; i++) {
         var childNode = childNodes[i];
-      
+
         var childNodeBbox = this.bboxProp(childNode);
-       
+
         childNode.bbox = childNodeBbox;
-        var borderWidth = elementUtilities.getDefaultProperties(childNode.class_)["border-width"]; 
+        var borderWidth = elementUtilities.getDefaultProperties(
+          childNode.class_
+        )["border-width"];
         var childPadding = this.calculateElementPadding(childNode);
         //var childStyle = styles.filter(style =>{ return style.idList == childNode.id});
-       
-       /*  if(childStyle.length > 0 && childStyle[0].renderGroup !== undefined){
+
+        /*  if(childStyle.length > 0 && childStyle[0].renderGroup !== undefined){
           borderWidth = childStyle[0].renderGroup.strokeWidth;
         } */
 
-        var left = childNodeBbox.x - childNodeBbox.w/2 - childPadding ;
-        var right = childNodeBbox.x + childNodeBbox.w/2 + childPadding;
-        var top = childNodeBbox.y  - childNodeBbox.h/2 - childPadding;
-        var bottom = childNodeBbox.y + childNodeBbox.h/2 + childPadding;
-        var stateAndInfos = childNode.glyphMembers.filter(function(child){ return child.class_ == "state variable" || child.class_ == "unit of information"
-        || child.class_ == "binding region" || child.class_ == "residue variable" } );
-        if(stateAndInfos.length > 0){
-            for(var k = 0 ; k<stateAndInfos.length; k++){
-                var stateBbox = stateAndInfos[k].bbox;
-                if(minLeft === undefined || stateBbox.x < minLeft){
-                  minLeft = stateBbox.x;
-                  fromInfoBox = true;
-                  minLeftBorder = 0;
-                }
-
-                if(maxRight === undefined || stateBbox.x + stateBbox.w > maxRight){
-                  maxRight = stateBbox.x + stateBbox.w;
-                  fromInfoBox = true;
-                  maxRightBorder = 0;
-                }
-
-                if(minTop === undefined || stateBbox.y < minTop){
-                  minTop = stateBbox.y;
-                  fromInfoBox = true;
-                  minTopBorder = 0;
-                }
-
-                if(maxBottom === undefined || stateBbox.y + stateBbox.h > maxBottom){
-                  maxBottom = stateBbox.y + stateBbox.h;
-                  fromInfoBox = true;
-                  maxBottomBorder = 0;
-                }
-
-
+        var left = childNodeBbox.x - childNodeBbox.w / 2 - childPadding;
+        var right = childNodeBbox.x + childNodeBbox.w / 2 + childPadding;
+        var top = childNodeBbox.y - childNodeBbox.h / 2 - childPadding;
+        var bottom = childNodeBbox.y + childNodeBbox.h / 2 + childPadding;
+        var stateAndInfos = childNode.glyphMembers.filter(function (child) {
+          return (
+            child.class_ == "state variable" ||
+            child.class_ == "unit of information" ||
+            child.class_ == "binding region" ||
+            child.class_ == "residue variable"
+          );
+        });
+        if (stateAndInfos.length > 0) {
+          for (var k = 0; k < stateAndInfos.length; k++) {
+            var stateBbox = stateAndInfos[k].bbox;
+            if (minLeft === undefined || stateBbox.x < minLeft) {
+              minLeft = stateBbox.x;
+              fromInfoBox = true;
+              minLeftBorder = 0;
             }
+
+            if (
+              maxRight === undefined ||
+              stateBbox.x + stateBbox.w > maxRight
+            ) {
+              maxRight = stateBbox.x + stateBbox.w;
+              fromInfoBox = true;
+              maxRightBorder = 0;
+            }
+
+            if (minTop === undefined || stateBbox.y < minTop) {
+              minTop = stateBbox.y;
+              fromInfoBox = true;
+              minTopBorder = 0;
+            }
+
+            if (
+              maxBottom === undefined ||
+              stateBbox.y + stateBbox.h > maxBottom
+            ) {
+              maxBottom = stateBbox.y + stateBbox.h;
+              fromInfoBox = true;
+              maxBottomBorder = 0;
+            }
+          }
         }
 
         if (minLeft === undefined || left < minLeft) {
@@ -209,122 +234,180 @@ module.exports = function () {
         }
       }
 
-      var averageBorderWidthW =  (minLeftBorder + maxRightBorder)/2;
-      var averageBorderWidthH = (minTopBorder + maxBottomBorder)/2;
+      var averageBorderWidthW = (minLeftBorder + maxRightBorder) / 2;
+      var averageBorderWidthH = (minTopBorder + maxBottomBorder) / 2;
       // The sizes of children bbox are determined by the difference between the extreme coordinates
       childrenBboxW = maxRight - minLeft + 2; // 2 is from cytoscape internal implementation of infoboxes
       childrenBboxH = maxBottom - minTop + 2;
-     
-     
-    
+
       // If children bbox width is less than node bbox width + paddings set minWidth, and horizontal biases
-      if (Number((childrenBboxW + 2 * padding + averageBorderWidthW + (fromInfoBox ?  2 * borderWidth : 0)).toFixed(2)) < Number(bbox.w.toFixed(2))) {
-
+      if (
+        Number(
+          (
+            childrenBboxW +
+            2 * padding +
+            averageBorderWidthW +
+            (fromInfoBox ? 2 * borderWidth : 0)
+          ).toFixed(2)
+        ) < Number(bbox.w.toFixed(2))
+      ) {
         //ele.minWidth = bbox.w - 2 padding  calculate badding first
-        ele.minWidth =  bbox.w - 2 * padding;
-        var extraLeft =  Number((minLeft - bbox.x  - padding - minLeftBorder/2 -1).toFixed(2)) ;
-        var extraRight = Number(((bbox.x + bbox.w) - maxRight  - padding - maxRightBorder/2 - 1).toFixed(2)) ;
+        ele.minWidth = bbox.w - 2 * padding;
+        var extraLeft = Number(
+          (minLeft - bbox.x - padding - minLeftBorder / 2 - 1).toFixed(2)
+        );
+        var extraRight = Number(
+          (
+            bbox.x +
+            bbox.w -
+            maxRight -
+            padding -
+            maxRightBorder / 2 -
+            1
+          ).toFixed(2)
+        );
 
-       
-        ele.minWidthBiasLeft = extraLeft / (extraLeft + extraRight) * 100;
+        ele.minWidthBiasLeft = (extraLeft / (extraLeft + extraRight)) * 100;
         ele.minWidthBiasRight = 100 - ele.minWidthBiasLeft;
       }
 
       // If children bbox height is bigger than node bbox height set minHeight, and vertical biases
-      if (Number((childrenBboxH + 2 * padding + averageBorderWidthH + (fromInfoBox ?  2 * borderWidth : 0)).toFixed(2)) < Number(bbox.h.toFixed(2))) {
+      if (
+        Number(
+          (
+            childrenBboxH +
+            2 * padding +
+            averageBorderWidthH +
+            (fromInfoBox ? 2 * borderWidth : 0)
+          ).toFixed(2)
+        ) < Number(bbox.h.toFixed(2))
+      ) {
         ele.minHeight = bbox.h - 2 * padding;
-        var extraTop = Number((minTop - bbox.y - padding - minTopBorder/2 - 1).toFixed(2));
-        var extraBottom = Number(((bbox.y + bbox.h) - maxBottom - padding - maxBottomBorder/2 - 1).toFixed(2));        
+        var extraTop = Number(
+          (minTop - bbox.y - padding - minTopBorder / 2 - 1).toFixed(2)
+        );
+        var extraBottom = Number(
+          (
+            bbox.y +
+            bbox.h -
+            maxBottom -
+            padding -
+            maxBottomBorder / 2 -
+            1
+          ).toFixed(2)
+        );
 
-        ele.minHeightBiasTop = extraTop / (extraTop + extraBottom) * 100;
+        ele.minHeightBiasTop = (extraTop / (extraTop + extraBottom)) * 100;
         ele.minHeightBiasBottom = 100 - ele.minHeightBiasTop;
       }
-      
 
       // set positions as center
 
       bbox.x = parseFloat(bbox.x) + parseFloat(bbox.w) / 2;
       bbox.y = parseFloat(bbox.y) + parseFloat(bbox.h) / 2;
-       //bbox.x = (minLeft + maxRight) /2;
-     // bbox.y = (minTop + maxBottom) / 2;
+      //bbox.x = (minLeft + maxRight) /2;
+      // bbox.y = (minTop + maxBottom) / 2;
       bbox.w = bbox.w - 2 * padding - averageBorderWidthW;
       bbox.h = bbox.h - 2 * padding - averageBorderWidthH;
       bbox.w = bbox.w < 0 ? 0 : bbox.w;
       bbox.h = bbox.h < 0 ? 0 : bbox.h;
 
       return bbox;
-     }
-    
+    }
   };
 
-  sbgnmlToJson.stateAndInfoBboxProp = function (ele, parentBbox) {
+  sbmlToJson.stateAndInfoBboxProp = function (ele, parentBbox) {
     // don't copy directly ele.box because it contains other things than x y w h
     var bbox = {};
 
-    if(ele.bbox != null){
-      bbox.x = ele.bbox.x ;
+    if (ele.bbox != null) {
+      bbox.x = ele.bbox.x;
       bbox.y = ele.bbox.y;
       bbox.w = ele.bbox.w;
       bbox.h = ele.bbox.h;
-    }else{
-      bbox.x = 0 ;
+    } else {
+      bbox.x = 0;
       bbox.y = 0;
       bbox.w = 12;
       bbox.h = 12;
     }
-   
-   
-
 
     return bbox;
   };
-  sbgnmlToJson.calculateElementPadding = function(ele){
-      var padding = 0 ;
-     
-      var childNodes = ele.glyphMembers;
+
+  sbmlToJson.calculateElementPadding = function (ele) {
+    var padding = 0;
+
+    var childNodes = ele.glyphMembers;
     //exclude state variables and units of information from child members
-      childNodes = childNodes.filter(function(child){ return child.class_ != "state variable" && child.class_ != "unit of information"
-      && child.class_ != "binding region" && child.class_ != "residue variable"});
-      if(childNodes.length <= 0 ) return 0;
-      var compoundPadding = typeof options.compoundPadding === 'function' ? options.compoundPadding.call() : options.compoundPadding;
-     // } 
-      if(ele.class_ == "complex"){
-        var complexPadding = 0;
-        var extraComplexPadding = typeof options.extraComplexPadding === 'function' ? options.extraComplexPadding.call() : options.extraComplexPadding;
-        complexPadding = compoundPadding < 5 ? 5 : compoundPadding;       
+    childNodes = childNodes.filter(function (child) {
+      return (
+        child.class_ != "state variable" &&
+        child.class_ != "unit of information" &&
+        child.class_ != "binding region" &&
+        child.class_ != "residue variable"
+      );
+    });
+    if (childNodes.length <= 0) return 0;
+    var compoundPadding =
+      typeof options.compoundPadding === "function"
+        ? options.compoundPadding.call()
+        : options.compoundPadding;
+    // }
+    if (ele.class_ == "complex") {
+      var complexPadding = 0;
+      var extraComplexPadding =
+        typeof options.extraComplexPadding === "function"
+          ? options.extraComplexPadding.call()
+          : options.extraComplexPadding;
+      complexPadding = compoundPadding < 5 ? 5 : compoundPadding;
 
-        var stateAndInfos = ele.glyphMembers.filter(function(child){ return child.class_ == "state variable" || child.class_ == "unit of information"
-        || child.class_ == "binding region" || child.class_ == "residue variable"});
-            
-        if(ele.label != undefined && ele.label.text != undefined && ele.label.text.length > 0){ 
-         
-              complexPadding = complexPadding + 0.5 * extraComplexPadding;
-              var hasTopBottomInfo = false;
-              stateAndInfos.forEach(function(stateAndInfo){
-                if(Number((stateAndInfo.bbox.y + stateAndInfo.bbox.h/2).toFixed(2)) == Number((ele.bbox.y + ele.bbox.h).toFixed(2))){
-                  hasTopBottomInfo = true;
-                }
-              });
-  
-              if(hasTopBottomInfo){
-                complexPadding = complexPadding + 0.5 * extraComplexPadding;
-              }
-          
-        }else if(stateAndInfos.length > 0){
-          complexPadding += 2;
+      var stateAndInfos = ele.glyphMembers.filter(function (child) {
+        return (
+          child.class_ == "state variable" ||
+          child.class_ == "unit of information" ||
+          child.class_ == "binding region" ||
+          child.class_ == "residue variable"
+        );
+      });
+
+      if (
+        ele.label != undefined &&
+        ele.label.text != undefined &&
+        ele.label.text.length > 0
+      ) {
+        complexPadding = complexPadding + 0.5 * extraComplexPadding;
+        var hasTopBottomInfo = false;
+        stateAndInfos.forEach(function (stateAndInfo) {
+          if (
+            Number(
+              (stateAndInfo.bbox.y + stateAndInfo.bbox.h / 2).toFixed(2)
+            ) == Number((ele.bbox.y + ele.bbox.h).toFixed(2))
+          ) {
+            hasTopBottomInfo = true;
+          }
+        });
+
+        if (hasTopBottomInfo) {
+          complexPadding = complexPadding + 0.5 * extraComplexPadding;
         }
-
-        padding = complexPadding;
-
-      }else{
-        var extraCompartmentPadding = typeof options.extraCompartmentPadding === 'function' ? options.extraCompartmentPadding.call() : options.extraCompartmentPadding;
-        padding = extraCompartmentPadding +  compoundPadding;
+      } else if (stateAndInfos.length > 0) {
+        complexPadding += 2;
       }
 
-      return padding;
-      
+      padding = complexPadding;
+    } else {
+      var extraCompartmentPadding =
+        typeof options.extraCompartmentPadding === "function"
+          ? options.extraCompartmentPadding.call()
+          : options.extraCompartmentPadding;
+      padding = extraCompartmentPadding + compoundPadding;
+    }
+
+    return padding;
   };
-  sbgnmlToJson.findChildNodes = function (ele, childTagName) {
+
+  sbmlToJson.findChildNodes = function (ele, childTagName) {
     // find child nodes at depth level of 1 relative to the element
     var children = [];
     for (var i = 0; i < ele.childNodes.length; i++) {
@@ -336,12 +419,12 @@ module.exports = function () {
     return children;
   };
 
-  sbgnmlToJson.findChildNode = function (ele, childTagName) {
+  sbmlToJson.findChildNode = function (ele, childTagName) {
     var nodes = this.findChildNodes(ele, childTagName);
     return nodes.length > 0 ? nodes[0] : undefined;
   };
 
-  sbgnmlToJson.stateAndInfoProp = function (ele, parent) {
+  sbmlToJson.stateAndInfoProp = function (ele, parent) {
     var self = this;
     var parentBbox = parent.bbox;
     var stateAndInfoArray = [];
@@ -349,15 +432,19 @@ module.exports = function () {
     var childGlyphs = ele.glyphMembers; // this.findChildNodes(ele, 'glyph');
 
     // if a biological activity node has no unit of info, it must be a BA plain
-    if(parent.class == "biological activity" && childGlyphs.length == 0) {
+    if (parent.class == "biological activity" && childGlyphs.length == 0) {
       parent.class = "BA plain";
     }
 
     for (var i = 0; i < childGlyphs.length; i++) {
       var glyph = childGlyphs[i];
 
-      if (glyph.class_ !== 'unit of information' && glyph.class_ !== 'state variable'
-      && glyph.class_ !== 'residue variable' && glyph.class_ !== 'binding region') {
+      if (
+        glyph.class_ !== "unit of information" &&
+        glyph.class_ !== "state variable" &&
+        glyph.class_ !== "residue variable" &&
+        glyph.class_ !== "binding region"
+      ) {
         continue;
       }
 
@@ -365,40 +452,69 @@ module.exports = function () {
       var infobox;
       var infoboxId = glyph.id;
 
-      if (glyph.class_ === 'unit of information') {
-        infobox = classes.UnitOfInformation.construct(undefined, undefined, infoboxId);
-        if(glyph.entity) {
+      if (glyph.class_ === "unit of information") {
+        infobox = classes.UnitOfInformation.construct(
+          undefined,
+          undefined,
+          infoboxId
+        );
+        /*
+        if (glyph.entity) {
           // change the parent class according to its true class of biological activity
-          switch(glyph.entity.name) {
-            case 'unspecified entity':    parent.class = "BA unspecified entity"; break;
-            case 'simple chemical':       parent.class = "BA simple chemical"; break;
-            case 'macromolecule':         parent.class = "BA macromolecule"; break;
-            case 'nucleic acid feature':  parent.class = "BA nucleic acid feature"; break;
-            case 'perturbation':          parent.class = "BA perturbing agent"; break;
-            case 'complex':               parent.class = "BA complex"; break;
+          switch (glyph.entity.name) {
+            case "unspecified entity":
+              parent.class = "BA unspecified entity";
+              break;
+            case "simple chemical":
+              parent.class = "BA simple chemical";
+              break;
+            case "macromolecule":
+              parent.class = "BA macromolecule";
+              break;
+            case "nucleic acid feature":
+              parent.class = "BA nucleic acid feature";
+              break;
+            case "perturbation":
+              parent.class = "BA perturbing agent";
+              break;
+            case "complex":
+              parent.class = "BA complex";
+              break;
           }
         }
+        */
         infobox.label = {
-          'text': (glyph.label && glyph.label.text) || undefined
+          text: (glyph.label && glyph.label.text) || undefined,
         };
-      } else if (glyph.class_ === 'state variable') {
-        infobox = classes.StateVariable.construct(undefined, undefined, undefined, infoboxId);
+      } else if (glyph.class_ === "state variable") {
+        infobox = classes.StateVariable.construct(
+          undefined,
+          undefined,
+          undefined,
+          infoboxId
+        );
 
         var state = glyph.state;
         infobox.state.value = (state && state.value) || undefined;
         infobox.state.variable = (state && state.variable) || undefined;
+      } else if (glyph.class_ === "residue variable") {
+        infobox = classes.ResidueVariable.construct(
+          undefined,
+          undefined,
+          infoboxId
+        );
+        infobox.residue.variable =
+          (glyph.label && glyph.label.text) || undefined;
+      } else if (glyph.class_ === "binding region") {
+        infobox = classes.BindingRegion.construct(
+          undefined,
+          undefined,
+          infoboxId
+        );
+        infobox.region.variable =
+          (glyph.label && glyph.label.text) || undefined;
       }
-      
-      else if (glyph.class_ === 'residue variable') {
-        infobox = classes.ResidueVariable.construct(undefined, undefined, infoboxId);
-        infobox.residue.variable =  (glyph.label && glyph.label.text) || undefined
-      
-    }
-    else if (glyph.class_ === 'binding region') {
-      infobox = classes.BindingRegion.construct(undefined, undefined, infoboxId);
-      infobox.region.variable =  (glyph.label && glyph.label.text) || undefined
-    }
-    
+
       //var bboxAndAnchorResult = getAuxUnitClass(infobox).setAnchorSideAndBbox();
 
       infobox.bbox = self.stateAndInfoBboxProp(glyph, parentBbox);
@@ -410,32 +526,40 @@ module.exports = function () {
     return stateAndInfoArray;
   };
 
-  sbgnmlToJson.getDefaultStateAndInfoStyle = function(gylph, parentClass) {
-    return elementUtilities.getDefaultInfoboxStyle( parentClass, gylph.class_ );
+  sbmlToJson.getDefaultStateAndInfoStyle = function (gylph, parentClass) {
+    return elementUtilities.getDefaultInfoboxStyle(parentClass, gylph.class_);
   };
 
-  sbgnmlToJson.addParentInfoToNode = function (ele, nodeObj, parent, compartments) {
+  sbmlToJson.addParentInfoToNode = function (
+    ele,
+    nodeObj,
+    parent,
+    compartments
+  ) {
     var self = this;
     var compartmentRef = ele.compartmentRef;
 
     var inferNestingOnLoad = options.inferNestingOnLoad;
-    inferNestingOnLoad = typeof inferNestingOnLoad === 'function' ? inferNestingOnLoad.call() : inferNestingOnLoad;
+    inferNestingOnLoad =
+      typeof inferNestingOnLoad === "function"
+        ? inferNestingOnLoad.call()
+        : inferNestingOnLoad;
 
     if (parent) {
       nodeObj.parent = parent;
     } else if (compartmentRef) {
       nodeObj.parent = compartmentRef;
-    } else if(inferNestingOnLoad) {
-      nodeObj.parent = '';
+    } else if (inferNestingOnLoad) {
+      nodeObj.parent = "";
 
       // add compartment according to geometry
       for (var i = 0; i < compartments.length; i++) {
         var bbox = {
-          'x': parseFloat(ele.bbox.x),
-          'y': parseFloat(ele.bbox.y),
-          'w': parseFloat(ele.bbox.w),
-          'h': parseFloat(ele.bbox.h),
-          'id': ele.id
+          x: parseFloat(ele.bbox.x),
+          y: parseFloat(ele.bbox.y),
+          w: parseFloat(ele.bbox.w),
+          h: parseFloat(ele.bbox.h),
+          id: ele.id,
         };
         if (self.isInBoundingBox(bbox, compartments[i])) {
           nodeObj.parent = compartments[i].id;
@@ -444,8 +568,7 @@ module.exports = function () {
       }
     }
   };
-
-  sbgnmlToJson.addCytoscapeJsNode = function (ele, jsonArray, parent, compartments) {
+  sbmlToJson.addCytoscapeJsNode = function (ele, jsonArray, parent, compartments) {
     var self = this;
     var nodeObj = {};
     var styleObj = {};
@@ -624,7 +747,7 @@ module.exports = function () {
   /**
   * given a future cy object, and the corresponding element's libsbgnjs' extension, populates the annotations field
   */
-  sbgnmlToJson.handleAnnotations = function(cyObject, rdfElement) {
+  sbmlToJson.handleAnnotations = function(cyObject, rdfElement) {
     // local utility function
     function dbFromUrl(url) {
       var regexp = /^http:\/\/identifiers.org\/(.+?)\/.+$/;
@@ -656,7 +779,7 @@ module.exports = function () {
     var globalAnnotIndex = 0;
     // handle controlled properties
     for (var fullQualifier in resources) {
-      var relation = libsbgnjs.annot.Util.reducePrefix(fullQualifier);
+      var relation = libsbml.annot.Util.reducePrefix(fullQualifier);
       for(var i=0; i<resources[fullQualifier].length; i++) {
         var value = resources[fullQualifier][i];
         var selectedDB = dbFromUrl(value);
@@ -674,7 +797,7 @@ module.exports = function () {
     return cyObject;
   };
 
-  sbgnmlToJson.traverseNodes = function (ele, jsonArray, parent, compartments) {
+  sbmlToJson.traverseNodes = function (ele, jsonArray, parent, compartments) {
     var elId = ele.id; 
 
     // Workaround: In application we use class 'empty set' but on read write we use 'source and sink'
@@ -710,11 +833,11 @@ module.exports = function () {
     }
   };
 
-  sbgnmlToJson.getPorts = function (xmlObject) {
+  sbmlToJson.getPorts = function (xmlObject) {
     return ( xmlObject._cachedPorts = xmlObject._cachedPorts || xmlObject.querySelectorAll('port'));
   };
 
-  sbgnmlToJson.getGlyphs = function (xmlObject) {
+  sbmlToJson.getGlyphs = function (xmlObject) {
     var glyphs = xmlObject._cachedGlyphs;
 
     if (!glyphs) {
@@ -733,7 +856,7 @@ module.exports = function () {
     return glyphs;
   };
 
-  sbgnmlToJson.getArcs = function (xmlObject) {
+  sbmlToJson.getArcs = function (xmlObject) {
     var arcs = xmlObject._cachedArcs;
 
     if (!arcs) {
@@ -752,19 +875,19 @@ module.exports = function () {
     return arcs;
   };
 
-  sbgnmlToJson.getGlyphById = function (xmlObject, id) {
+  sbmlToJson.getGlyphById = function (xmlObject, id) {
     this.getGlyphs(xmlObject); // make sure cache is built
 
     return xmlObject._id2glyph[id];
   };
 
-  sbgnmlToJson.getArcById = function (xmlObject, id) {
+  sbmlToJson.getArcById = function (xmlObject, id) {
     this.getArcs(xmlObject); // make sure cache is built
 
     return xmlObject._id2arc[id];
   };
 
-  sbgnmlToJson.getArcSourceAndTarget = function (arc, xmlObject) {
+  sbmlToJson.getArcSourceAndTarget = function (arc, xmlObject) {
     // source and target can be inside of a port
     var source = arc.source;
     var target = arc.target;
@@ -807,7 +930,7 @@ module.exports = function () {
     return {'source': sourceNodeId, 'target': targetNodeId};
   };
 
-  sbgnmlToJson.getArcAnchorPointPositions = function (ele) {
+  sbmlToJson.getArcAnchorPointPositions = function (ele) {
     var anchorPointPositions = [];
 
     var children = ele.nexts;
@@ -825,7 +948,7 @@ module.exports = function () {
     return anchorPointPositions;
   };
 
-  sbgnmlToJson.addCytoscapeJsEdge = function (ele, jsonArray, xmlObject) {
+  sbmlToJson.addCytoscapeJsEdge = function (ele, jsonArray, xmlObject) {
     if (!handledElements[ele.class_]) {
       return;
     }
@@ -929,7 +1052,7 @@ module.exports = function () {
     jsonArray.push(cytoscapeJsEdge);
   };
 
-  sbgnmlToJson.applyStyle = function (renderInformation, nodes, edges) {
+  sbmlToJson.applyStyle = function (renderInformation, nodes, edges) {
     // get all color id references to their value
     if (renderInformation.listOfColorDefinitions) {
       var colorList = renderInformation.listOfColorDefinitions.colorDefinitions;
@@ -1116,7 +1239,7 @@ module.exports = function () {
     overrideStyleProperties( edges, edgePropMap, edgePropDetails, getElementId, setElementStyleProp );
   };
 
-  sbgnmlToJson.mapPropertiesToObj = function() {
+  sbmlToJson.mapPropertiesToObj = function() {
     if (this.map.extension && this.map.extension.has('mapProperties')) { // render extension was found
        var xml = this.map.extension.get('mapProperties');
        var obj;
@@ -1133,24 +1256,33 @@ module.exports = function () {
     
   };
 
-  sbgnmlToJson.convert = function (xmlObject, urlParams) {
+  sbmlToJson.convert = function (xmlString, urlParams) {
+    console.log("converting to json")
+    
     var self = this;
     var cytoscapeJsNodes = [];
     var cytoscapeJsEdges = [];
     var compartmentChildrenMap = {}; // Map compartments children temporarily
-    elementUtilities.fileFormat = 'sbgnml';
+    elementUtilities.fileFormat = 'sbml';
 
     var sbgn;
     try {
-      var xmlString = new XMLSerializer().serializeToString(xmlObject);
-      console.log("xmlStringl",xmlString)
-      sbgn = libsbgnjs.Sbgn.fromXML(xmlString);
-      console.log("sbgn",sbgn)
+      //var xmlString = new XMLSerializer().serializeToString(xmlObject);
+      //console.log("xmlStringl",xmlString)
+      let reader = new libsbmlInstance.SBMLReader();
+    
+      // get document and model from sbml text
+      console.log("reader", reader);
+      console.log("xmlString", xmlString)
+      let doc = reader.readSBMLFromString(xmlString);
+      console.log("sdcs")
+      let model = doc.getModel();
+      console.log("model",model)
     }
     catch (err) {
       throw new Error("Could not parse sbgnml. "+ err);
     }
-
+/*
     var map;
     if(sbgn.maps.length < 1) { // empty sbgn
       return {nodes: [], edges: []};
@@ -1356,10 +1488,13 @@ module.exports = function () {
     
     //console.log(cytoscapeJsGraph);
     //console.log( elementUtilities.nodeTypes);
+    */
+    var cytoscapeJsGraph = {};
     return cytoscapeJsGraph;
+    
   };
   
-    sbgnmlToJson.doValidation = function(xmlString) {
+    sbmlToJson.doValidation = function(xmlString) {
    	var errors = [];
 	    try {
       		 errors = libsbgnjs.Sbgn.doValidation(xmlString);
@@ -1370,6 +1505,8 @@ module.exports = function () {
 	  return errors;
   };
 
-  return sbgnmlToJson;
+  return sbmlToJson;
+
 };
+
 

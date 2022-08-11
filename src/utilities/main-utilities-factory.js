@@ -8,7 +8,7 @@ var libs = libUtilities.getLibs();
 var jQuery = $ = libs.jQuery;
 
 module.exports = function () {
-  var elementUtilities, jsonToSbgnml, sbgnmlToJson, tdToJson, nwtToJson,
+  var elementUtilities, jsonToSbgnml, sbgnmlToJson, sbmlToJson, tdToJson, nwtToJson,
       sifToJson, optionUtilities, graphUtilities, layoutLoader, jsonToNwt;
   var cy, options;
 
@@ -17,6 +17,7 @@ module.exports = function () {
     jsonToSbgnml = param.jsonToSbgnmlConverter;
     jsonToNwt = param.jsonToNwtConverter;
     sbgnmlToJson = param.sbgnmlToJsonConverter;
+    sbmlToJson = param.sbmlToJsonConverter;
     nwtToJson = param.nwtToJsonConverter;
     tdToJson = param.tdToJsonConverter;
     sifToJson = param.sifToJsonConverter;
@@ -608,6 +609,10 @@ module.exports = function () {
     return sbgnmlToJson.convert(data, urlParams);
   };
 
+  mainUtilities.convertSbmlToJson = function(data, urlParams) {
+    return sbmlToJson.convert(data, urlParams);
+  };
+
   mainUtilities.convertNwtToJson = function(data) {
     return nwtToJson.convert(data);
   };
@@ -670,6 +675,8 @@ mainUtilities.getMapProperties = function() {
       return tdToJson.mapPropertiesToObj();
     else if( elementUtilities.fileFormat == 'sif' )
       return sifToJson.mapPropertiesToObj();
+    else if( elementUtilities.fileFormat == 'sbml' )
+      return sbmlToJson.mapPropertiesToObj();
     else{
       console.log( "File format mismatched!")
       return
@@ -681,6 +688,10 @@ mainUtilities.getMapProperties = function() {
  };
   mainUtilities.doValidation = function(file) {
     return sbgnmlToJson.doValidation(file);
+  }
+
+  mainUtilities.doValidation = function(file) {
+    return sbmlToJson.doValidation(file);
   }
 
   mainUtilities.setCompoundPadding = function(newPaddingValue) {
