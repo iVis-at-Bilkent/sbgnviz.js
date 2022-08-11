@@ -25,7 +25,7 @@
   },
   "dependencies": {
     "libsbgn.js": "github:sbgn/libsbgn.js#develop",
-    "libsbmljs_stable": "5.17.0-beta1",
+    "libsbmljs_stable": "^5.18.0-beta1",
     "pretty-data": "^0.40.0",
     "xml2js": "^0.4.17"
   },
@@ -34,6 +34,7 @@
     "@babel/preset-env": "^7.14.2",
     "babel-loader": "^8.2.2",
     "chai": "^4.3.4",
+    "copy-webpack-plugin": "^11.0.0",
     "jquery": "^2.2.4",
     "karma": "^6.3.2",
     "karma-browserify": "^8.0.0",
