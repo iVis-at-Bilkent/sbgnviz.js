@@ -8,6 +8,8 @@ var classes = require("./classes");
 
 module.exports = function () {
   var elementUtilities, graphUtilities, handledElements, mainUtilities;
+  let resultJson = [];
+  let speciesCompartmentMap = new Map;
 
   function sbmlToJson(param) {
     optionUtilities = param.optionUtilities;
@@ -21,6 +23,23 @@ module.exports = function () {
     elementUtilities.elementTypes.forEach(function (type) {
       handledElements[type] = true;
     });
+  }
+
+  var sboToNodeClass = {
+    278: "rna",
+    253: "complex",
+    289: "hypothetical complex",
+    291: "degradation",
+    298: "drug",
+    243: "gene",
+    252: "protein",
+    327: "ion",
+    284: "ion channel",
+    358: "phenotype",
+    244: "receptor",
+    247: "simple molecule",
+    252: "truncated protein",
+    285: "unknown molecule"
   }
 
   sbmlToJson.insertedNodes = {};
@@ -1240,6 +1259,7 @@ module.exports = function () {
   };
 
   sbmlToJson.mapPropertiesToObj = function() {
+    /*
     if (this.map.extension && this.map.extension.has('mapProperties')) { // render extension was found
        var xml = this.map.extension.get('mapProperties');
        var obj;
@@ -1251,8 +1271,8 @@ module.exports = function () {
         
           return {mapProperties : {compoundPadding : mainUtilities.getCompoundPadding()}};
         }
-     
-
+        */
+       return {};
     
   };
 
@@ -1260,10 +1280,12 @@ module.exports = function () {
     console.log("converting to json")
     
     var self = this;
+    var cytoscapeJsGraph = {};
     var cytoscapeJsNodes = [];
     var cytoscapeJsEdges = [];
     var compartmentChildrenMap = {}; // Map compartments children temporarily
     elementUtilities.fileFormat = 'sbml';
+    let model = null;
 
     var sbgn;
     try {
@@ -1272,241 +1294,320 @@ module.exports = function () {
       let reader = new libsbmlInstance.SBMLReader();
     
       // get document and model from sbml text
-      console.log("reader", reader);
-      console.log("xmlString", xmlString)
       let doc = reader.readSBMLFromString(xmlString);
-      console.log("sdcs")
-      let model = doc.getModel();
-      console.log("model",model)
+      model = doc.getModel();
+      console.log("model.getNumSpecies()",model.getNumSpecies())
     }
     catch (err) {
       throw new Error("Could not parse sbgnml. "+ err);
     }
-/*
-    var map;
-    if(sbgn.maps.length < 1) { // empty sbgn
-      return {nodes: [], edges: []};
+    let result = []; 
+    
+    let plugin;
+    try {
+      plugin = model.findPlugin('layout');
+    }
+    catch(err) {
+      plugin = undefined;
+    }
+    console.log('plugin', plugin)
+
+    let layoutplugin;
+    let layout;    
+    
+    if(plugin) {
+      layoutplugin = libsbmlInstance.castObject(plugin, libsbmlInstance.LayoutModelPlugin);
+      layout = layoutplugin.layouts[0];
+    }   
+    console.log('layout', layout) 
+
+    if(layout) {
+      let edgeArray = [];
+      let compoundMap = new Map();
+      let compartmentMap = new Map();
+      let compartmentNodeMap = new Map();
+
+      // traverse compartments
+      for(let i = 0; i < model.getNumCompartments(); i++){
+        let compartment = model.getCompartment(i);
+        if(compartment.getId() !== "default") {
+          compartmentMap.set(compartment.getId(), compartment.getName());
+        }
+      }
+
+      // traverse compartment glyphs
+      for(let i = 0; i < layout.getNumCompartmentGlyphs(); i++){
+        let compartmentGlyph = layout.getCompartmentGlyph(i);
+        if(compartmentGlyph.getCompartmentId() !== "default") {
+          let bbox = compartmentGlyph.getBoundingBox();
+          let data = {id: compartmentGlyph.getCompartmentId(), label: compartmentMap.get(compartmentGlyph.getCompartmentId()),
+            width: bbox.width, height: bbox.height};
+          let position = {x: bbox.x + bbox.width / 2, y: bbox.y + bbox.height / 2};
+          compartmentNodeMap.set(compartmentGlyph.getCompartmentId(), {"data": data, "position": position, "group": "nodes", "classes": "compartment"});
+          compoundMap.set(compartmentGlyph.getCompartmentId(), [bbox.x, bbox.y, bbox.width, bbox.height, bbox.width*bbox.height]);
+        }
+      }
+
+      let speciesMap = new Map();
+      let speciesNodeMap = new Map();
+      let speciesGlyphIdSpeciesIdMap = new Map();
+
+      // traverse species
+      for(let i = 0; i < model.getNumSpecies(); i++){
+        let species = model.getSpecies(i);
+        speciesMap.set(species.getId(), [species.getName(), species.getCompartment(), species.getSBOTerm()]);
+      }
+
+      // traverse species glyphs
+      for(let i = 0; i < layout.getNumSpeciesGlyphs(); i++){
+        let speciesGlyph = layout.specglyphs[i];
+        speciesGlyphIdSpeciesIdMap.set(speciesGlyph.getId(), speciesGlyph.getSpeciesId());
+        let bbox = speciesGlyph.getBoundingBox();
+        let data = {id: speciesGlyph.getId(), label: speciesMap.get(speciesGlyph.getSpeciesId())[0], compref: speciesMap.get(speciesGlyph.getSpeciesId())[1],
+          sboTerm: speciesMap.get(speciesGlyph.getSpeciesId())[2], width: bbox.width, height: bbox.height};
+        let position = {x: bbox.x + bbox.width / 2, y: bbox.y + bbox.height / 2};
+        speciesNodeMap.set(speciesGlyph.getId(), {"data": data, "position": position, "group": "nodes", "classes": "species"});
+        if(speciesMap.get(speciesGlyph.getSpeciesId())[2] == 253 || speciesMap.get(speciesGlyph.getSpeciesId())[2] == 289) {
+          compoundMap.set(speciesGlyph.getId(), [bbox.x, bbox.y, bbox.width, bbox.height, bbox.width*bbox.height]);
+        }
+      }
+
+      let reactionMap = new Map();
+      let reactionNodeMap = new Map();
+      let reactionSpeciesModifierMap = new Map();
+
+      // traverse reactions
+      for(let i = 0; i < model.getNumReactions(); i++){
+        let reaction = model.getReaction(i);
+        reactionMap.set(reaction.getId(), [reaction.getName(), reaction.getSBOTerm()]);
+        reactionSpeciesModifierMap.set(reaction.getId(), {});
+        // fill reactionSpeciesModifierMap
+        for(let l = 0; l < reaction.getNumModifiers(); l++){
+          let modifier = reaction.getModifier(l);
+          reactionSpeciesModifierMap.get(reaction.getId())[modifier.getSpecies()] = modifier.getSBOTerm();
+        }            
+      }
+
+      // traverse reaction glyphs
+      for(let i = 0; i < layout.getNumReactionGlyphs(); i++){
+        let reactionGlyph = layout.getReactionGlyph(i);
+        let data = {id: reactionGlyph.getReactionId(), label: reactionMap.get(reactionGlyph.getReactionId())[0], sboTerm: reactionMap.get(reactionGlyph.getReactionId())[1],
+          width: 15, height: 15};
+        let position = {x: reactionGlyph.getCurve().getCurveSegment(0).getStart().x() + 10, y: reactionGlyph.getCurve().getCurveSegment(0).getStart().y() + 10};
+        reactionNodeMap.set(reactionGlyph.getReactionId(), {"data": data, "position": position, "group": "nodes", "classes": "reaction"});
+
+        // add edges
+        for(let j = 0; j < reactionGlyph.getNumSpeciesReferenceGlyphs(); j++){
+          let speciesReferenceGlyph = reactionGlyph.getSpeciesReferenceGlyph(j);
+          let role = speciesReferenceGlyph.getRole();
+          if(role === 1 || role === 3) {
+            let edgeData = {id: reactionGlyph.getReactionId() + "_" + speciesReferenceGlyph.getSpeciesGlyphId(), source: speciesReferenceGlyph.getSpeciesGlyphId(), target: reactionGlyph.getReactionId()};
+            edgeArray.push({"data": edgeData, "group": "edges", "classes": "reactantEdge"});
+          }
+          else if(role === 2 || role === 4) {
+            let edgeData = {id: speciesReferenceGlyph.getSpeciesGlyphId() + "_" + reactionGlyph.getReactionId(), source: reactionGlyph.getReactionId(), target: speciesReferenceGlyph.getSpeciesGlyphId()};
+            edgeArray.push({"data": edgeData, "group": "edges", "classes": "productEdge"});
+          }
+          else if(role === 5 || role === 6 || role === 7) {
+            let edgeData = {id: speciesReferenceGlyph.getSpeciesGlyphId() + "_" + reactionGlyph.getReactionId(), source: speciesReferenceGlyph.getSpeciesGlyphId(), target: reactionGlyph.getReactionId(), 
+              sboTerm: reactionSpeciesModifierMap.get(reactionGlyph.getReactionId())[speciesGlyphIdSpeciesIdMap.get(speciesReferenceGlyph.getSpeciesGlyphId())]};
+            edgeArray.push({"data": edgeData, "group": "edges"});
+          }
+          else {
+            let edgeData = {id: reactionGlyph.getReactionId() + "_" + speciesReferenceGlyph.getSpeciesGlyphId(), source: reactionGlyph.getReactionId(), target: speciesReferenceGlyph.getSpeciesGlyphId(), 
+              sboTerm: reactionSpeciesModifierMap.get(reactionGlyph.getReactionId())[speciesGlyphIdSpeciesIdMap.get(speciesReferenceGlyph.getSpeciesGlyphId())]};
+            edgeArray.push({"data": edgeData, "group": "edges"});          
+          }        
+        }
+      }
+
+      // infer nesting
+      let areaMap = new Map();
+      compoundMap.forEach(function(value, key){
+        areaMap.set(key, value[4]);
+      });
+      let sortedAreaMap = new Map([...areaMap.entries()].sort((a, b) => a[1] - b[1]));
+
+      function contains(a, b) {
+        return !(
+          b.x1 <= a.x1 ||
+          b.y1 <= a.y1 ||
+          b.x2 >= a.x2 ||
+          b.y2 >= a.y2
+        );
+      };
+
+      let mergedMap = new Map([...compartmentNodeMap, ...speciesNodeMap, ...reactionNodeMap]);
+      let finalNodeArray = [];
+      mergedMap.forEach(function(value, key) {
+        let nodeId = key;
+        let nodeRect = {x1: value["position"].x - value["data"].width / 2,
+          y1: value["position"].y - value["data"].height / 2,
+          x2: value["position"].x + value["data"].width / 2,
+          y2: value["position"].y + value["data"].height / 2
+        };
+        let isFound = false;
+        sortedAreaMap.forEach(function(value, key) {
+          let compoundRect = {x1: compoundMap.get(key)[0],
+            y1: compoundMap.get(key)[1],
+            x2: compoundMap.get(key)[0] + compoundMap.get(key)[2],
+            y2: compoundMap.get(key)[1] + compoundMap.get(key)[3]
+          };
+          if(contains(compoundRect, nodeRect) && !isFound) {
+            mergedMap.get(nodeId)["data"]["parent"] = key;
+            isFound = true;
+          }
+        });
+        finalNodeArray.push(value);
+      });
+
+      result = finalNodeArray.concat(edgeArray);
+      console.log("result", result)
+      return result;
     }
     else {
-      map = sbgn.maps[0]; // take first map of the file as the main map
-    }
+      // add compartments, species and reactions
+      console.log("in else part")
+      sbmlToJson.addCompartments(model);
+      sbmlToJson.addSpecies(model, cytoscapeJsNodes);
+      sbmlToJson.addReactions(model, cytoscapeJsEdges);
 
-    this.map = map;
-    elementUtilities.mapType = elementUtilities.languageToMapType(map.language);
-
-    var compartments = self.getAllCompartments(map.glyphs);
-
-    var glyphs = map.glyphs;
-    var arcs = map.arcs;
-
-    var i;
-    for (i = 0; i < glyphs.length; i++) {
-      var glyph = glyphs[i];
-
-      // libsbgn library lists the glyphs of complexes in ele.glyphMembers but it does not store the glyphs of compartments
-      // store glyph members of compartments here.
-      var compartmentRef = glyph.compartmentRef;
-
-      if (glyph.class_ === 'compartment') {
-        if (compartmentChildrenMap[glyph.id] === undefined) {
-          compartmentChildrenMap[glyph.id] = glyph.glyphMembers;
-        }
-
-        glyph.glyphMembers = compartmentChildrenMap[glyph.id];
-      }
-
-      if (compartmentRef) {
-        if (compartmentChildrenMap[compartmentRef] === undefined) {
-          compartmentChildrenMap[compartmentRef] = [];
-        }
-        compartmentChildrenMap[compartmentRef].push(glyph);
-      }
-    }
-
-    var minDistanceToChildren = Number.MAX_SAFE_INTEGER;
-
-    if(urlParams && urlParams.compoundPadding) {
-      mainUtilities.setCompoundPadding(Number(urlParams.compoundPadding));
-    }
-    else if (!map.extension) {
-      for (var i = 0; i < glyphs.length; i++) {
-        var glyph = glyphs[i];
-
-        childNodes = glyph.glyphMembers.filter(function(child){ return child.class_ != "state variable" && child.class_ != "unit of information"
-        && child.class_ != "residue variable" && child.class_ != "binding region"});
-        if(childNodes.length > 0){ // compound node
-          var hasMin = false;
-          for (var j = 0; j < childNodes.length; j++) {           
-            var childNode = childNodes[j];
-            const childClass = childNode.class_;
-            if (childClass === "source and sink" || childClass === "emptyset") {
-              childClass = "empty set";
-            }
-            var borderWidth = elementUtilities.getDefaultProperties(childClass)["border-width"];
-            var stateAndInfos = childNode.glyphMembers.filter(function(child){ return child.class_ == "state variable" || child.class_ == "unit of information"
-            || child.class_ == "residue variable" || child.class_ == "binding region"});
-            if(stateAndInfos.length > 0){
-              for(var k = 0 ; k<stateAndInfos.length; k++){
-                var stateBbox = stateAndInfos[k].bbox;
-                if(stateBbox.y - glyph.bbox.y < minDistanceToChildren){
-                  minDistanceToChildren = stateBbox.y - glyph.bbox.y - borderWidth;
-                  hasMin = true;
-                }
-                if(stateBbox.x - glyph.bbox.x < minDistanceToChildren){
-                  minDistanceToChildren = stateBbox.x - glyph.bbox.x - borderWidth;
-                  hasMin = true;
-                }
-
-                if(glyph.bbox.y +  glyph.bbox.h - (stateBbox.y + stateBbox.h)  < minDistanceToChildren){
-                  minDistanceToChildren = glyph.bbox.y +  glyph.bbox.h - (stateBbox.y + stateBbox.h) - borderWidth;
-                  hasMin = true;
-                }
-                if(glyph.bbox.x +  glyph.bbox.w - (stateBbox.x + stateBbox.w)  < minDistanceToChildren){
-                  minDistanceToChildren = glyph.bbox.x +  glyph.bbox.w - (stateBbox.x + stateBbox.w) - borderWidth;
-                  hasMin = true;
-                }
-              }
-            }
-            var childNodeBbox = childNode.bbox; 
-            
-            
-            var left =childNodeBbox.x - glyph.bbox.x - borderWidth/2;
-            var right =  (glyph.bbox.x + glyph.bbox.w) - (childNodeBbox.x + childNodeBbox.w) - borderWidth/2;
-            var top = childNodeBbox.y - glyph.bbox.y - borderWidth/2;
-            var bottom = (glyph.bbox.y + glyph.bbox.h) - (childNodeBbox.y + childNodeBbox.h) - borderWidth/2;
-            
-            if(left < minDistanceToChildren){
-              minDistanceToChildren = left;
-              hasMin = true;
-            }
-            if(right < minDistanceToChildren){
-              minDistanceToChildren = right;
-              hasMin = true;
-            }
-            if(top < minDistanceToChildren){
-              minDistanceToChildren = top;
-              hasMin = true;
-            }
-            if(bottom < minDistanceToChildren){
-              minDistanceToChildren = bottom;
-              hasMin = true;
-            }           
-          }
-
-          if(hasMin){
-            if(glyph.class_ == "complex"){
-              var stateAndInfos = glyph.glyphMembers.filter(function(child){ return child.class_ == "state variable" || child.class_ == "unit of information"
-              || child.class_ == "residue variable" || child.class_ == "binding region"});
-              var extraComplexPadding = typeof options.extraComplexPadding === 'function' ? options.extraComplexPadding.call() : options.extraComplexPadding;
-              if(glyph.label != undefined && glyph.label.text != undefined && glyph.label.text.length > 0){
-               
-                    minDistanceToChildren = minDistanceToChildren - 0.5 * extraComplexPadding;
-                    var hasTopBottomInfo = false;
-                    stateAndInfos.forEach(function(stateAndInfo){
-                      if( Number((stateAndInfo.bbox.y + stateAndInfo.bbox.h/2).toFixed(2)) == Number((glyph.bbox.y + glyph.bbox.h).toFixed(2))){
-                        hasTopBottomInfo = true;
-                      }
-                    });
-    
-                    if(hasTopBottomInfo){
-                      minDistanceToChildren = minDistanceToChildren - 0.5 * extraComplexPadding;
-                    }
-                 
-               
-              }else if(stateAndInfos.length > 0){
-                minDistanceToChildren -= 2;
-              }
-  
-  
-  
-            }else{
-              var extraCompartmentPadding = typeof options.extraCompartmentPadding === 'function' ? options.extraCompartmentPadding.call() : options.extraCompartmentPadding;
-              minDistanceToChildren = minDistanceToChildren - extraCompartmentPadding;
-            }
-          }
-          
-
-        }
-      }   
-        minDistanceToChildren = Math.round(minDistanceToChildren);
-        var newPadding = minDistanceToChildren - 1; // comes from cytoscape internal implementation of bounding box which is outerwidth + 1 (on each side)
-        if(newPadding < 0 || minDistanceToChildren == Math.round(Number.MAX_SAFE_INTEGER)){
-          newPadding = 0;
-        }
-        mainUtilities.setCompoundPadding(newPadding);
+      let result = resultJson;
+      cytoscapeJsGraph.nodes = cytoscapeJsNodes
+      cytoscapeJsGraph.edges = cytoscapeJsEdges
+      resultJson = [];
       
-     
-    }else{
-      mainUtilities.setCompoundPadding(Number(self.mapPropertiesToObj().mapProperties.compoundPadding));
+      speciesCompartmentMap = new Map;
+      console.log("cytoscapeJsGraph", cytoscapeJsGraph)
+      return cytoscapeJsGraph;
     }
-
-    
-
-    for (i = 0; i < glyphs.length; i++) {
-      var glyph = glyphs[i];
-      self.traverseNodes(glyph, cytoscapeJsNodes, '', compartments,minDistanceToChildren);
-    }
-
-    for (i = 0; i < arcs.length; i++) {
-      var arc = arcs[i];
-      self.addCytoscapeJsEdge(arc, cytoscapeJsEdges, xmlObject);
-    }
-
-    if (map.extension && map.extension.has('renderInformation')) { // render extension was found
-      self.applyStyle(map.extension.get('renderInformation'), cytoscapeJsNodes, cytoscapeJsEdges);
-    }
-
-    var cytoscapeJsGraph = {};
-    cytoscapeJsGraph.nodes = cytoscapeJsNodes;
-    cytoscapeJsGraph.edges = cytoscapeJsEdges;
-
-    this.insertedNodes = {};
-
-
-    var shouldDisablePorts = false;
-    cytoscapeJsGraph.nodes.forEach(function(node) {
-      if((node.data.bbox.w == 0 || isNaN(node.data.bbox.w)) && (node.data.bbox.h == 0 || isNaN(node.data.bbox.h))){
-        node.data.bbox.w = elementUtilities.getDefaultProperties(node.data.class).width;
-        node.data.bbox.h = elementUtilities.getDefaultProperties(node.data.class).height;     
-       // node.data.bbox.x = 15;     
-       // node.data.bbox.y = 10; 
-      } 
-      node.data.ports.forEach(function(port){
-        if (isNaN(port.x) || isNaN(port.y)){
-          shouldDisablePorts = true;
-        }
-      });     
-    }); 
-
-      if(shouldDisablePorts){      
-      graphUtilities.disablePorts();
-    }
-    //getDefaultProperties
-    //elementUtilities.nodeTypes.forEach(function(type){
-    //  console.log(elementUtilities.getDefaultProperties(type));
-    //});
-    
-    //console.log(cytoscapeJsGraph);
-    //console.log( elementUtilities.nodeTypes);
-    */
-    var cytoscapeJsGraph = {};
-    return cytoscapeJsGraph;
     
   };
+
+
+// add compartment nodes
+sbmlToJson.addCompartments = function (model) {
   
-    sbmlToJson.doValidation = function(xmlString) {
-   	var errors = [];
-	    try {
-      		 errors = libsbgnjs.Sbgn.doValidation(xmlString);
-   	   }
-    	  catch (err) {
-      		throw new Error("Could not do validation. "+ err);
-    	  }
-	  return errors;
-  };
+  for(let i = 0; i < model.getNumCompartments(); i++){
+    let compartment = model.getCompartment(i);
+    console.log("compartment", compartment)
+    if(compartment.getId() !== "default") {
+    let compartmentData = {"id": compartment.getId(), "label": compartment.getName()};
+      resultJson.push({"data": compartmentData, "group": "nodes", "classes": "compartment"});
+    }
+  }
+};
 
-  return sbmlToJson;
+// add species nodes
+sbmlToJson.addSpecies = function(model, cytoscapeJsNodes) {
 
+  for(let i = 0; i < model.getNumSpecies(); i++){
+    let species = model.getSpecies(i);
+    console.log("species", species)
+    //speciesCompartmentMap.set(species.getId(), species.getCompartment());
+    var sboTerm = species.getSBOTerm()
+
+    //Create node obj
+    var nodeObj = {};
+    var styleObj = {};
+    if(sbmlToJson[sboTerm])
+    {
+      nodeObj.class = sbmlToJson[sboTerm]
+    }
+    else 
+    {
+      nodeObj.class = "simple molecule"
+    }
+    nodeObj.id = species.getId();
+    var tempBbox = {};
+    tempBbox.x = 0
+    tempBbox.y = 0
+    tempBbox.w = 30
+    tempBbox.h = 30
+    nodeObj.bbox = tempBbox;   
+    nodeObj.label = species.getName();
+    nodeObj.statesandinfos = {};
+    var cytoscapeJsNode = {data: nodeObj, style: styleObj};
+    elementUtilities.extendNodeDataWithClassDefaults( nodeObj, nodeObj.class );
+    console.log("cytoscapeJsNode", cytoscapeJsNode)
+
+    //let speciesData = {"id": species.getId(), "label": species.getName(), "parent": species.getCompartment(), "sboTerm": species.getSBOTerm()};
+    cytoscapeJsNodes.push(cytoscapeJsNode)
+    console.log("cytoscapeJsNodes", cytoscapeJsNodes)
+  }  
+};
+
+// add reaction nodes and corresponding edges
+sbmlToJson.addReactions = function(model, cytoscapeJsEdges) {
+  for(let i = 0; i < model.getNumReactions(); i++){
+
+    let reaction = model.getReaction(i);
+    let reactionParentMap = new Map();
+
+    // add reactant->reaction edges
+    for(let j = 0; j < reaction.getNumReactants(); j++){
+      let reactant = reaction.getReactant(j);
+      let reactantEdgeData = {"id": reactant.getSpecies() + '_' + reaction.getId(), "source": reactant.getSpecies(), "target": reaction.getId()};
+      resultJson.push({"data": reactantEdgeData, "group": "edges", "classes": "reactantEdge"});
+      console.log("reactant", reactant)
+      // collect possible parent info
+      let speciesCompartment = speciesCompartmentMap.get(reactant.getSpecies());
+      if(reactionParentMap.has(speciesCompartment))
+        reactionParentMap.set(speciesCompartment, reactionParentMap.get(speciesCompartment) + 1);
+      else
+        reactionParentMap.set(speciesCompartment, 1);
+    }
+    
+    // add reaction->product edges
+    for(let k = 0; k < reaction.getNumProducts(); k++){
+      let product = reaction.getProduct(k);
+      let productEdgeData = {"id": reaction.getId() + '_' + product.getSpecies(), "source": reaction.getId(), "target": product.getSpecies()};
+      resultJson.push({"data": productEdgeData, "group": "edges", "classes": "productEdge"});
+      console.log("product", product)
+      // collect possible parent info
+      let speciesCompartment = speciesCompartmentMap.get(product.getSpecies());
+      if(reactionParentMap.has(speciesCompartment))
+        reactionParentMap.set(speciesCompartment, reactionParentMap.get(speciesCompartment) + 1);
+      else
+        reactionParentMap.set(speciesCompartment, 1);      
+    }
+    
+    // add modifier->reaction edges
+    for(let l = 0; l < reaction.getNumModifiers(); l++){
+      let modifier = reaction.getModifier(l);
+      let modifierEdgeData = {"id": modifier.getSpecies() + '_' + reaction.getId(), "source": modifier.getSpecies(), "target": reaction.getId(), "sboTerm": modifier.getSBOTerm()};
+      resultJson.push({"data": modifierEdgeData, "group": "edges", "classes": "modifierEdge"});
+      
+      console.log("modifier", modifier)
+      // collect possible parent info
+      let speciesCompartment = speciesCompartmentMap.get(modifier.getSpecies());
+      if(reactionParentMap.has(speciesCompartment))
+        reactionParentMap.set(speciesCompartment, reactionParentMap.get(speciesCompartment) + 1);
+      else
+        reactionParentMap.set(speciesCompartment, 1);      
+    }
+
+    // add reaction node
+    let parent = reaction.getCompartment();
+    if(!parent) {
+      // find the max occurrence
+      var max_count = 0, result = -1;
+      reactionParentMap.forEach((value, key) => {
+          if (max_count < value) {
+              result = key;
+              max_count = value;
+          }
+      });
+      parent = result;
+    }
+    
+    let reactionData = {"id": reaction.getId(), "label": reaction.getName(), "parent": parent};
+    reactionData.width = 15;
+    reactionData.height = 15;
+    resultJson.push({"data": reactionData, "group": "nodes", "classes": "reaction"});    
+  }  
+};
+return sbmlToJson;
 };
 
 

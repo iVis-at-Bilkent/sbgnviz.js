@@ -845,6 +845,7 @@ module.exports = function () {
 
         if ( canHaveInfoBox ) {
           var oldStyle = context.fillStyle;
+          console.log("node before forceOpacityToOne",node )
           $$.sbgn.forceOpacityToOne(node, context);
           $$.sbgn.drawStateAndInfos(node, context, centerX, centerY);
           context.fillStyle = oldStyle;

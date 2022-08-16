@@ -282,7 +282,6 @@ module.exports = function () {
    var textType = /text.*/;
 
    var reader = new FileReader();
-   console.log("loading file")
 
    reader.onload = function (e) {
      var text = this.result;
@@ -374,7 +373,6 @@ module.exports = function () {
 
  // supported versions are either 0.2 or 0.3
  fileUtilities.saveAsNwt = function(filename, version, renderInfo, mapProperties, nodes, edges) {
-   console.log("Save as newt", renderInfo)
    var sbgnmlText = jsonToNwt.createNwt(filename, version, renderInfo, mapProperties, nodes, edges);
    var blob = new Blob([sbgnmlText], {
      type: "text/plain;charset=utf-8;",
@@ -468,7 +466,9 @@ module.exports = function () {
   return sbgnmlText;
   */
   var convert = function( text ) {
-    return sbmlToJson.convert(text);
+    var converted = sbmlToJson.convert(text)
+    console.log("converted",converted)
+    return converted;
   };
 
   fileUtilities.loadFile( file, convert, callback1, callback2, fileUtilities.collapseMarkedNodes );
@@ -514,7 +514,9 @@ fileUtilities.createJsonFromSBGN = function(){
 fileUtilities.createJsonFromSBML = function(){
 
   var sbgnmlText = jsonToSbgnml.createSbgnml(); //SBML
-  return sbmlToJson.convert(textToXmlObject(sbgnmlText));
+  var converted_ = sbmlToJson.convert(textToXmlObject(sbgnmlText));
+  console.log("converted_",converted_)
+  return converted_;
 };
 
 fileUtilities.createJsonFromSif = function(){

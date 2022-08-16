@@ -53,6 +53,7 @@ module.exports = function () {
 
   graphUtilities.updateGraph = function(cyGraph, callback, layoutOptions, tileInfoBoxes) {
 
+    console.log("cyGraph", cyGraph)
     var isLayoutRequired;
     if(layoutOptions === undefined){
       isLayoutRequired = false;
@@ -73,6 +74,7 @@ module.exports = function () {
     cy.remove('*');
     cy.add(cyGraph);
 
+    console.log("cy in update graph", cy)
     //add position information to data for preset layout
     var positionMap = {};
     cy.nodes().forEach(function(node) {

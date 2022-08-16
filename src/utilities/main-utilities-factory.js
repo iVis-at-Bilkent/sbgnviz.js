@@ -610,7 +610,9 @@ module.exports = function () {
   };
 
   mainUtilities.convertSbmlToJson = function(data, urlParams) {
-    return sbmlToJson.convert(data, urlParams);
+    var converted2 = sbmlToJson.convert(data, urlParams);
+    console.log("converted2",converted2) 
+    return converted2;
   };
 
   mainUtilities.convertNwtToJson = function(data) {
@@ -668,7 +670,7 @@ module.exports = function () {
 mainUtilities.getMapProperties = function() {
   if( elementUtilities.fileFormat !== undefined){
     if( elementUtilities.fileFormat == 'sbgnml')
-      return sbgnmlToJson.mapPropertiesToObj();
+       this.showNodesSmart
     else if( elementUtilities.fileFormat == 'nwt' )
       return nwtToJson.mapPropertiesToObj();
     else if( elementUtilities.fileFormat == 'td')
