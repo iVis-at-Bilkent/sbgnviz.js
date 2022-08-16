@@ -1510,6 +1510,11 @@ sbmlToJson.addSpecies = function(model, cytoscapeJsNodes) {
     //Create node obj
     var nodeObj = {};
     var styleObj = {};
+    var tempBbox = {};
+    tempBbox.x = 0
+    tempBbox.y = 0
+    tempBbox.w = 30
+    tempBbox.h = 30
     if(sbmlToJson[sboTerm])
     {
       nodeObj.class = sbmlToJson[sboTerm]
@@ -1517,13 +1522,11 @@ sbmlToJson.addSpecies = function(model, cytoscapeJsNodes) {
     else 
     {
       nodeObj.class = "simple molecule"
+      tempBbox.w = 50
+    tempBbox.h = 30
     }
     nodeObj.id = species.getId();
-    var tempBbox = {};
-    tempBbox.x = 0
-    tempBbox.y = 0
-    tempBbox.w = 30
-    tempBbox.h = 30
+    
     nodeObj.bbox = tempBbox;   
     nodeObj.label = species.getName();
     nodeObj.statesandinfos = {};
