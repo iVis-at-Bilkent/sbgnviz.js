@@ -1515,9 +1515,9 @@ sbmlToJson.addSpecies = function(model, cytoscapeJsNodes) {
     tempBbox.y = 0
     tempBbox.w = 30
     tempBbox.h = 30
-    if(sbmlToJson[sboTerm])
+    if(sboToNodeClass[sboTerm])
     {
-      nodeObj.class = sbmlToJson[sboTerm]
+      nodeObj.class = sboToNodeClass[sboTerm]
     }
     else 
     {
