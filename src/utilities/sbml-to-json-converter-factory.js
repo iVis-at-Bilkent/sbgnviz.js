@@ -38,9 +38,47 @@ module.exports = function () {
     358: "phenotype",
     244: "receptor",
     247: "simple molecule", // truncated protein removed for now
-    285: "unknown molecule"
+    285: "unknown molecule",
+    173: "and",
+    174: "or",
+    238: "not",
+    398: "unknown logical operator"
   }
 
+  var sboToEdgeClass = {
+    594: "modulation",
+    459: "stimulation",
+    13: "catalysis",
+    537: "inhibition",
+    461: "trigger",
+    185: "transport",
+    536: "unknown inhibition",
+    462: "unknown catalysis",
+    171: "positive influence",
+    407: "negative influence",
+    344: "reduced modulation",
+    411: "reduced stimulation",
+    168: "reduced trigger",
+    169: "unknown negative influence",
+    172: "unknown positive influence",
+    170: "unknown reduced stimulation",
+    342: "unknown reduced modulation",
+    205: "unknown reduced trigger",
+  }
+  var sboTwoEdgeOneNodeClass = {
+    176: ["consumption","process", "production"], //state transition
+    396: ["consumption","unknown process", "production"], //Unknown transition
+    183: ["transcription consumption","process", "transcription production"], //Transcription
+    184: ["translation consumption","process", "translation production"], //Translation
+    185: ["consumption","process","transport"], //Transport
+    395: ["consumption", "omitted process", "production"] //Known transition omitted
+  } 
+
+  var sboAssociationDissociation = {
+    177: ["consumption", "consumption", "association", "consumption", "process", "production"], //Heterodimer association
+    180: ["consumption", "process", "consumption", "dissociation", "production", "production"], //Dissociation
+    178: ["consumption", "truncated process", "consumption", "production", "production"], //Truncation,
+  }
   sbmlToJson.insertedNodes = {};
 
   sbmlToJson.map = undefined;
