@@ -442,7 +442,7 @@ module.exports = function () {
 
  }
 
- fileUtilities.loadSbml = function(file, callback1, callback2){
+ fileUtilities.loadSbml = function(file, callback1, callback2, layoutBy){
    /*
   var reader = new FileReader();
   reader.onload = function (e) { 
@@ -471,7 +471,26 @@ module.exports = function () {
     return converted;
   };
 
-  fileUtilities.loadFile( file, convert, callback1, callback2, fileUtilities.collapseMarkedNodes );
+  var runLayout = function() {
+    if ( layoutBy ) {
+      if ( typeof layoutBy === 'function' ) {
+        layoutBy();
+      }
+      else {
+        var layout = cy.layout( layoutBy );
+
+        // for backward compatibility need to make this if check
+        if ( layout && layout.run ) {
+          layout.run();
+        }
+      }
+    }
+
+    cy.fit( cy.elements(":visible"), 20 );
+    console.log("ran layout?")
+  };
+
+  fileUtilities.loadFile( file, convert, callback1, callback2, fileUtilities.collapseMarkedNodes, runLayout);
  
 };
 

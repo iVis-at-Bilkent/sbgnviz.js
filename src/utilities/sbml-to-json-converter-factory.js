@@ -37,8 +37,7 @@ module.exports = function () {
     284: "ion channel",
     358: "phenotype",
     244: "receptor",
-    247: "simple molecule",
-    252: "truncated protein",
+    247: "simple molecule", // truncated protein removed for now
     285: "unknown molecule"
   }
 
