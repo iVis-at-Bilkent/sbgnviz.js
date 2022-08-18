@@ -1576,11 +1576,17 @@ sbmlToJson.addReactions = function(model, cytoscapeJsEdges, cytoscapeJsNodes) {
 
     //If reaction containing process node
     console.log("sboTerm", sboTerm)
-    if (sboTwoEdgeOneNodeClass[sboTerm])
+    if (sboTwoEdgeOneNodeClass[sboTerm]) //If reaction with two edges
     {
         classNameEdge1 = sboTwoEdgeOneNodeClass[sboTerm][0]
         classNameEdge2 = sboTwoEdgeOneNodeClass[sboTerm][2]
         classNameNode = sboTwoEdgeOneNodeClass[sboTerm][1]
+    }
+    else if (sboToEdgeClass[sboTerm]) //If reaction with two edge
+    {
+        classNameEdge1 = sboToEdgeClass[sboTerm];
+        classNameEdge2 = null;
+        classNameNode = null;
     }
     else  // default values
     {
@@ -1588,38 +1594,69 @@ sbmlToJson.addReactions = function(model, cytoscapeJsEdges, cytoscapeJsNodes) {
       classNameEdge2 = "production"
       classNameNode = "process"
     }
+
     console.log("classNameEdge1", classNameEdge1)
     console.log("classNameEdge2", classNameEdge2)
     console.log("classNameNode", classNameNode)
 
 
-
+    //Reaction with two edges
     //Create process node
-    let newNodeId = sbmlToJson.addNodes(classNameNode, cytoscapeJsNodes, i)
+    var newNodeId = null;
+    if(classNameNode)
+    {
+      newNodeId = sbmlToJson.addNodes(classNameNode, cytoscapeJsNodes, i)
+    }
 
     //First edge (consumption)
-    let reactant = reaction.getReactant(i);
-    var edgeObjReactant = {};
-    var styleObjReactant = {};
-    edgeObjReactant.source = reactant.getSpecies(); //Is this the label or id?
-    edgeObjReactant.class = classNameEdge1;
-    edgeObjReactant.id = reactant.getSpecies() + "_" + i
-    edgeObjReactant.target = newNodeId
-    elementUtilities.extendEdgeDataWithClassDefaults( edgeObjReactant, edgeObjReactant.class );
-    var cytoscapeJsEdge1 = {data: edgeObjReactant, style: styleObjReactant};
-    cytoscapeJsEdges.push(cytoscapeJsEdge1)
+    if (classNameEdge1 && newNodeId)
+    {
+      let reactant = reaction.getReactant(i);
+      var edgeObjReactant = {};
+      var styleObjReactant = {};
+      edgeObjReactant.source = reactant.getSpecies(); //Is this the label or id?
+      edgeObjReactant.class = classNameEdge1;
+      edgeObjReactant.id = reactant.getSpecies() + "_" + i
+      edgeObjReactant.target = newNodeId
+      elementUtilities.extendEdgeDataWithClassDefaults( edgeObjReactant, edgeObjReactant.class );
+      var cytoscapeJsEdge1 = {data: edgeObjReactant, style: styleObjReactant};
+      cytoscapeJsEdges.push(cytoscapeJsEdge1)
+    }
+    
 
     //Second edge (production)
-    let product = reaction.getProduct(i);
-    var edgeObjProduct = {};
-    var styleObjProduct = {};
-    edgeObjProduct.source =  newNodeId;//Is this the label or id?
-    edgeObjProduct.class = classNameEdge2;
-    edgeObjProduct.id = product.getSpecies() + "_" + i
-    edgeObjProduct.target = product.getSpecies();
-    elementUtilities.extendEdgeDataWithClassDefaults( edgeObjProduct, edgeObjProduct.class );
-    var cytoscapeJsEdge2 = {data: edgeObjProduct, style: styleObjProduct};
-    cytoscapeJsEdges.push(cytoscapeJsEdge2)
+    if (classNameEdge2)
+    {
+      let product = reaction.getProduct(i);
+      var edgeObjProduct = {};
+      var styleObjProduct = {};
+      edgeObjProduct.source =  newNodeId;//Is this the label or id?
+      edgeObjProduct.class = classNameEdge2;
+      edgeObjProduct.id = product.getSpecies() + "_" + i
+      edgeObjProduct.target = product.getSpecies();
+      elementUtilities.extendEdgeDataWithClassDefaults( edgeObjProduct, edgeObjProduct.class );
+      var cytoscapeJsEdge2 = {data: edgeObjProduct, style: styleObjProduct};
+      cytoscapeJsEdges.push(cytoscapeJsEdge2)
+    }
+
+
+    //Reaction with one edge
+    if(classNameEdge1 && !classNameNode)
+    {
+      let reactant = reaction.getReactant(i);
+      let product = reaction.getProduct(i);
+      var edgeObj = {};
+      var styleObj = {};
+      edgeObj.source = reactant.getSpecies(); //Is this the label or id?
+      edgeObj.class = classNameEdge1;
+      edgeObj.id = reactant.getSpecies() + "_" + i
+      edgeObj.target = product.getSpecies();
+      elementUtilities.extendEdgeDataWithClassDefaults( edgeObj, edgeObj.class );
+      var cytoscapeJsEdge1 = {data: edgeObj, style: styleObj};
+      cytoscapeJsEdges.push(cytoscapeJsEdge1)
+    }
+    
+    
 
     /*
     // add reactant->reaction edges
