@@ -1143,9 +1143,7 @@ module.exports = function () {
     var sbgn;
     try {
       var xmlString = new XMLSerializer().serializeToString(xmlObject);
-      console.log("xmlStringl",xmlString)
       sbgn = libsbgnjs.Sbgn.fromXML(xmlString);
-      console.log("sbgn",sbgn)
     }
     catch (err) {
       throw new Error("Could not parse sbgnml. "+ err);

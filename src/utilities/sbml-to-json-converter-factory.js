@@ -67,7 +67,7 @@ module.exports = function () {
   }
   var sboTwoEdgeOneNodeClass = {
     176: ["consumption","process", "production"], //state transition
-    396: ["consumption","unknown process", "production"], //Unknown transition
+    396: ["consumption","uncertain process", "production"], //Unknown transition
     183: ["transcription consumption","process", "transcription production"], //Transcription
     184: ["translation consumption","process", "translation production"], //Translation
     185: ["consumption","process","transport"], //Transport
@@ -1314,7 +1314,6 @@ module.exports = function () {
   };
 
   sbmlToJson.convert = function (xmlString, urlParams) {
-    console.log("converting to json")
     
     var self = this;
     var cytoscapeJsGraph = {};
@@ -1333,7 +1332,6 @@ module.exports = function () {
       // get document and model from sbml text
       let doc = reader.readSBMLFromString(xmlString);
       model = doc.getModel();
-      console.log("model.getNumSpecies()",model.getNumSpecies())
     }
     catch (err) {
       throw new Error("Could not parse sbgnml. "+ err);
@@ -1347,7 +1345,6 @@ module.exports = function () {
     catch(err) {
       plugin = undefined;
     }
-    console.log('plugin', plugin)
 
     let layoutplugin;
     let layout;    
@@ -1356,7 +1353,6 @@ module.exports = function () {
       layoutplugin = libsbmlInstance.castObject(plugin, libsbmlInstance.LayoutModelPlugin);
       layout = layoutplugin.layouts[0];
     }   
-    console.log('layout', layout) 
 
     if(layout) {
       let edgeArray = [];
@@ -1499,15 +1495,13 @@ module.exports = function () {
       });
 
       result = finalNodeArray.concat(edgeArray);
-      console.log("result", result)
       return result;
     }
     else {
       // add compartments, species and reactions
-      console.log("in else part")
       sbmlToJson.addCompartments(model);
       sbmlToJson.addSpecies(model, cytoscapeJsNodes);
-      sbmlToJson.addReactions(model, cytoscapeJsEdges);
+      sbmlToJson.addReactions(model, cytoscapeJsEdges,cytoscapeJsNodes );
 
       let result = resultJson;
       cytoscapeJsGraph.nodes = cytoscapeJsNodes
@@ -1515,7 +1509,6 @@ module.exports = function () {
       resultJson = [];
       
       speciesCompartmentMap = new Map;
-      console.log("cytoscapeJsGraph", cytoscapeJsGraph)
       return cytoscapeJsGraph;
     }
     
@@ -1527,7 +1520,6 @@ sbmlToJson.addCompartments = function (model) {
   
   for(let i = 0; i < model.getNumCompartments(); i++){
     let compartment = model.getCompartment(i);
-    console.log("compartment", compartment)
     if(compartment.getId() !== "default") {
     let compartmentData = {"id": compartment.getId(), "label": compartment.getName()};
       resultJson.push({"data": compartmentData, "group": "nodes", "classes": "compartment"});
@@ -1540,7 +1532,6 @@ sbmlToJson.addSpecies = function(model, cytoscapeJsNodes) {
 
   for(let i = 0; i < model.getNumSpecies(); i++){
     let species = model.getSpecies(i);
-    console.log("species", species)
     //speciesCompartmentMap.set(species.getId(), species.getCompartment());
     var sboTerm = species.getSBOTerm()
 
@@ -1560,7 +1551,7 @@ sbmlToJson.addSpecies = function(model, cytoscapeJsNodes) {
     {
       nodeObj.class = "simple molecule"
       tempBbox.w = 50
-    tempBbox.h = 30
+      tempBbox.h = 30
     }
     nodeObj.id = species.getId();
     
@@ -1569,62 +1560,130 @@ sbmlToJson.addSpecies = function(model, cytoscapeJsNodes) {
     nodeObj.statesandinfos = {};
     var cytoscapeJsNode = {data: nodeObj, style: styleObj};
     elementUtilities.extendNodeDataWithClassDefaults( nodeObj, nodeObj.class );
-    console.log("cytoscapeJsNode", cytoscapeJsNode)
-
-    //let speciesData = {"id": species.getId(), "label": species.getName(), "parent": species.getCompartment(), "sboTerm": species.getSBOTerm()};
     cytoscapeJsNodes.push(cytoscapeJsNode)
-    console.log("cytoscapeJsNodes", cytoscapeJsNodes)
   }  
 };
 
 // add reaction nodes and corresponding edges
-sbmlToJson.addReactions = function(model, cytoscapeJsEdges) {
-  for(let i = 0; i < model.getNumReactions(); i++){
-
+//Here we are assuming each reactions has one reactant and one product
+sbmlToJson.addReactions = function(model, cytoscapeJsEdges, cytoscapeJsNodes) {
+  for(let i = 0; i < model.getNumReactions(); i++){  
     let reaction = model.getReaction(i);
-    let reactionParentMap = new Map();
+    let sboTerm = reaction.getSBOTerm()
+    var  classNameEdge1;
+    var classNameEdge2;
+    var classNameNode;
 
+    //If reaction containing process node
+    console.log("sboTerm", sboTerm)
+    if (sboTwoEdgeOneNodeClass[sboTerm])
+    {
+        classNameEdge1 = sboTwoEdgeOneNodeClass[sboTerm][0]
+        classNameEdge2 = sboTwoEdgeOneNodeClass[sboTerm][2]
+        classNameNode = sboTwoEdgeOneNodeClass[sboTerm][1]
+    }
+    else  // default values
+    {
+      classNameEdge1 = "consumption"
+      classNameEdge2 = "production"
+      classNameNode = "process"
+    }
+    console.log("classNameEdge1", classNameEdge1)
+    console.log("classNameEdge2", classNameEdge2)
+    console.log("classNameNode", classNameNode)
+
+
+
+    //Create process node
+    let newNodeId = sbmlToJson.addNodes(classNameNode, cytoscapeJsNodes, i)
+
+    //First edge (consumption)
+    let reactant = reaction.getReactant(i);
+    var edgeObjReactant = {};
+    var styleObjReactant = {};
+    edgeObjReactant.source = reactant.getSpecies(); //Is this the label or id?
+    edgeObjReactant.class = classNameEdge1;
+    edgeObjReactant.id = reactant.getSpecies() + "_" + i
+    edgeObjReactant.target = newNodeId
+    elementUtilities.extendEdgeDataWithClassDefaults( edgeObjReactant, edgeObjReactant.class );
+    var cytoscapeJsEdge1 = {data: edgeObjReactant, style: styleObjReactant};
+    cytoscapeJsEdges.push(cytoscapeJsEdge1)
+
+    //Second edge (production)
+    let product = reaction.getProduct(i);
+    var edgeObjProduct = {};
+    var styleObjProduct = {};
+    edgeObjProduct.source =  newNodeId;//Is this the label or id?
+    edgeObjProduct.class = classNameEdge2;
+    edgeObjProduct.id = product.getSpecies() + "_" + i
+    edgeObjProduct.target = product.getSpecies();
+    elementUtilities.extendEdgeDataWithClassDefaults( edgeObjProduct, edgeObjProduct.class );
+    var cytoscapeJsEdge2 = {data: edgeObjProduct, style: styleObjProduct};
+    cytoscapeJsEdges.push(cytoscapeJsEdge2)
+
+    /*
     // add reactant->reaction edges
     for(let j = 0; j < reaction.getNumReactants(); j++){
       let reactant = reaction.getReactant(j);
+      console.log("reactant", reactant.getSpecies())
+      let sboTerm = reactant.getSBOTerm()
+      var edgeObj = {};
+      var styleObj = {};
+      edgeObj.source = reactant.getSpecies(); //Is this the label or id?
+
+      
+      
+      edgeObj.class = classNameEdge1
+      let newNodeId = sbmlToJson.addNodes("process", cytoscapeJsNodes, j)
+      edgeObj.target = newNodeId
+
       let reactantEdgeData = {"id": reactant.getSpecies() + '_' + reaction.getId(), "source": reactant.getSpecies(), "target": reaction.getId()};
       resultJson.push({"data": reactantEdgeData, "group": "edges", "classes": "reactantEdge"});
-      console.log("reactant", reactant)
+
       // collect possible parent info
       let speciesCompartment = speciesCompartmentMap.get(reactant.getSpecies());
       if(reactionParentMap.has(speciesCompartment))
         reactionParentMap.set(speciesCompartment, reactionParentMap.get(speciesCompartment) + 1);
       else
         reactionParentMap.set(speciesCompartment, 1);
+
     }
+
     
     // add reaction->product edges
     for(let k = 0; k < reaction.getNumProducts(); k++){
       let product = reaction.getProduct(k);
+      console.log("product", product.getSpecies())
       let productEdgeData = {"id": reaction.getId() + '_' + product.getSpecies(), "source": reaction.getId(), "target": product.getSpecies()};
       resultJson.push({"data": productEdgeData, "group": "edges", "classes": "productEdge"});
       console.log("product", product)
+  
       // collect possible parent info
       let speciesCompartment = speciesCompartmentMap.get(product.getSpecies());
       if(reactionParentMap.has(speciesCompartment))
         reactionParentMap.set(speciesCompartment, reactionParentMap.get(speciesCompartment) + 1);
       else
-        reactionParentMap.set(speciesCompartment, 1);      
+        reactionParentMap.set(speciesCompartment, 1); 
+           
     }
-    
+ 
     // add modifier->reaction edges
     for(let l = 0; l < reaction.getNumModifiers(); l++){
       let modifier = reaction.getModifier(l);
+      console.log("modifier", modifier.getSpecies())
       let modifierEdgeData = {"id": modifier.getSpecies() + '_' + reaction.getId(), "source": modifier.getSpecies(), "target": reaction.getId(), "sboTerm": modifier.getSBOTerm()};
       resultJson.push({"data": modifierEdgeData, "group": "edges", "classes": "modifierEdge"});
       
       console.log("modifier", modifier)
+
+     
       // collect possible parent info
       let speciesCompartment = speciesCompartmentMap.get(modifier.getSpecies());
       if(reactionParentMap.has(speciesCompartment))
         reactionParentMap.set(speciesCompartment, reactionParentMap.get(speciesCompartment) + 1);
       else
-        reactionParentMap.set(speciesCompartment, 1);      
+        reactionParentMap.set(speciesCompartment, 1);    
+      
     }
 
     // add reaction node
@@ -1645,8 +1704,93 @@ sbmlToJson.addReactions = function(model, cytoscapeJsEdges) {
     reactionData.width = 15;
     reactionData.height = 15;
     resultJson.push({"data": reactionData, "group": "nodes", "classes": "reaction"});    
+    */
   }  
+
 };
+
+//This function is used to add more nodes(process, association, dissociation) when itterating through the reactions. 
+sbmlToJson.addNodes = function(node_class, cytoscapeJsNodes, index, ele) { 
+    var nodeObj = {};
+    var styleObj = {};
+    var tempBbox = {};
+    tempBbox.x = 0
+    tempBbox.y = 0
+    tempBbox.w = 10
+    tempBbox.h = 10
+    nodeObj.class = node_class
+    nodeObj.id = node_class + "" + index;
+    nodeObj.bbox = tempBbox; 
+    nodeObj.statesandinfos = {};
+    var ports = [];
+    //Adding ports
+    // add port information
+    /*
+    var ports = [];
+    var portElements = ele.ports;
+
+    for (var i = 0; i < portElements.length; i++) {
+      var portEl = portElements[i];
+      var id = portEl.id;
+      var relativeXPos = parseFloat(portEl.x) - nodeObj.bbox.x;
+      var relativeYPos = parseFloat(portEl.y) - nodeObj.bbox.y;
+
+      relativeXPos = relativeXPos / parseFloat(nodeObj.bbox.w) * 100;
+      relativeYPos = relativeYPos / parseFloat(nodeObj.bbox.h) * 100;
+      
+      // In case port position is not vertically/horizontally aligned with the node center, decide a direction
+      if(Math.abs(relativeXPos) > 0 && Math.abs(relativeYPos) > 0) {
+        if(Math.abs(relativeXPos) >= Math.abs(relativeYPos))
+          relativeYPos = 0;
+        else
+          relativeXPos = 0;
+      }
+
+      // We assume that ports are not inside the node shape.
+      // Therefore, abs. value of their relative x and y coordinates (relative to node center) should be bigger than 50.
+      if (Math.abs(relativeXPos) < 50) {
+        relativeXPos = 0;
+      }
+
+      if (Math.abs(relativeYPos) < 50) {
+        relativeYPos = 0;
+      }
+
+      if (relativeXPos === 0 && relativeYPos === 0) {
+        continue;
+      }
+      
+      // If port length is longer than the node size (for example, some sbgn files generated from Reactome database has very long ports),
+      // set the port length to 70 which is default in sbgnviz
+      if(Math.abs(relativeXPos) > 150 || Math.abs(relativeYPos) > 150) {
+        if(Math.abs(relativeXPos) > 150)
+          relativeXPos = relativeXPos / Math.abs(relativeXPos) * 70;
+        else
+          relativeYPos = relativeYPos / Math.abs(relativeYPos) * 70;
+      }      
+      
+
+      ports.push({
+        id: id,
+        x: relativeXPos,
+        y: relativeYPos
+      });
+    }
+    */
+    ports.push({
+      id: 1,
+      x: 0,
+      y: 0
+    });
+  
+
+    nodeObj.ports = ports;
+
+    var cytoscapeJsNode = {data: nodeObj, style: styleObj};
+    elementUtilities.extendNodeDataWithClassDefaults( nodeObj, nodeObj.class );
+    cytoscapeJsNodes.push(cytoscapeJsNode)
+    return nodeObj.id;
+}
 return sbmlToJson;
 };
 

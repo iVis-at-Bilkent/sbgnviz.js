@@ -285,7 +285,6 @@ module.exports = function () {
 
    reader.onload = function (e) {
      var text = this.result;
-     console.log("text", text)
     var matchResult = text.match("<renderInformation[^]*</renderInformation>");
     if(matchResult != null){
     var imagesElementMatch = text.match("<listOfBackgroundImages[^]*</listOfBackgroundImages>");
@@ -467,7 +466,6 @@ module.exports = function () {
   */
   var convert = function( text ) {
     var converted = sbmlToJson.convert(text)
-    console.log("converted",converted)
     return converted;
   };
 
@@ -487,7 +485,6 @@ module.exports = function () {
     }
 
     cy.fit( cy.elements(":visible"), 20 );
-    console.log("ran layout?")
   };
 
   fileUtilities.loadFile( file, convert, callback1, callback2, fileUtilities.collapseMarkedNodes, runLayout);
