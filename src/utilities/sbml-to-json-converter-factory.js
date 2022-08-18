@@ -1569,6 +1569,7 @@ sbmlToJson.addSpecies = function(model, cytoscapeJsNodes) {
 sbmlToJson.addReactions = function(model, cytoscapeJsEdges, cytoscapeJsNodes) {
   for(let i = 0; i < model.getNumReactions(); i++){  
     let reaction = model.getReaction(i);
+    console.log("reaction", reaction.getId())
     let sboTerm = reaction.getSBOTerm()
     var  classNameEdge1;
     var classNameEdge2;
@@ -1611,7 +1612,7 @@ sbmlToJson.addReactions = function(model, cytoscapeJsEdges, cytoscapeJsNodes) {
     //First edge (consumption)
     if (classNameEdge1 && newNodeId)
     {
-      let reactant = reaction.getReactant(i);
+      let reactant = reaction.getReactant(0);
       var edgeObjReactant = {};
       var styleObjReactant = {};
       edgeObjReactant.source = reactant.getSpecies(); //Is this the label or id?
@@ -1627,7 +1628,7 @@ sbmlToJson.addReactions = function(model, cytoscapeJsEdges, cytoscapeJsNodes) {
     //Second edge (production)
     if (classNameEdge2)
     {
-      let product = reaction.getProduct(i);
+      let product = reaction.getProduct(0);
       var edgeObjProduct = {};
       var styleObjProduct = {};
       edgeObjProduct.source =  newNodeId;//Is this the label or id?
@@ -1643,8 +1644,8 @@ sbmlToJson.addReactions = function(model, cytoscapeJsEdges, cytoscapeJsNodes) {
     //Reaction with one edge
     if(classNameEdge1 && !classNameNode)
     {
-      let reactant = reaction.getReactant(i);
-      let product = reaction.getProduct(i);
+      let reactant = reaction.getReactant(0);
+      let product = reaction.getProduct(0);
       var edgeObj = {};
       var styleObj = {};
       edgeObj.source = reactant.getSpecies(); //Is this the label or id?
