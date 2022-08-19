@@ -37,7 +37,8 @@ module.exports = function () {
     284: "ion channel",
     358: "phenotype",
     244: "receptor",
-    247: "simple molecule", // truncated protein removed for now
+    247: "simple molecule", 
+    248: "truncated protein",
     285: "unknown molecule",
     173: "and",
     174: "or",
@@ -269,7 +270,6 @@ module.exports = function () {
       // add compartments, species and reactions
       sbmlToJson.addCompartments(model);
       sbmlToJson.addSpecies(model, cytoscapeJsNodes);
-      console.log("resultJson after adding species", resultJson )
       sbmlToJson.addReactions(model, cytoscapeJsEdges,cytoscapeJsNodes );
 
 
@@ -303,6 +303,7 @@ sbmlToJson.addSpecies = function(model, cytoscapeJsNodes) {
   for(let i = 0; i < model.getNumSpecies(); i++){
     let species = model.getSpecies(i);
     speciesCompartmentMap.set(species.getId(), species.getCompartment());
+    var sboTerm = species.getSBOTerm();
     let speciesData = {"id": species.getId(), "label": species.getName(), "parent": species.getCompartment(), "sboTerm": species.getSBOTerm()};
     resultJson.push({"data": speciesData, "group": "nodes", "classes": "species"});
   }
@@ -322,7 +323,7 @@ sbmlToJson.addJSNodes = function(resultJson,cytoscapeJsNodes) {
       var tempBbox = {};
       tempBbox.x = 0;
       tempBbox.y = 0;
-      tempBbox.w = 30;
+      tempBbox.w = 50;
       tempBbox.h = 30;
       var sboTerm = resultJson[i].data.sboTerm;
       console.log("sboterm", sboTerm)
@@ -355,11 +356,44 @@ sbmlToJson.addReactions = function(model, cytoscapeJsEdges, cytoscapeJsNodes) {
 
     let reaction = model.getReaction(i);
     let reactionParentMap = new Map();
+    var edgeClass1 = null;
+    var edgeClass2 = null;
+    var nodeClass = null;
+
+    //Map sbo term if exists
+    var sboTermReaction = reaction.getSBOTerm();
+    if(sboToEdgeClass[sboTermReaction])
+    {
+      edgeClass1 = sboToEdgeClass[sboTermReaction]
+    }
+    else if (sboTwoEdgeOneNodeClass[sboTermReaction])
+    {
+      edgeClass1 = sboTwoEdgeOneNodeClass[sboTermReaction][0];
+      nodeClass = sboTwoEdgeOneNodeClass[sboTermReaction][1];
+      edgeClass2 = sboTwoEdgeOneNodeClass[sboTermReaction][2];
+    } else if (sboTermReaction == 177)
+    {
+      let association = {"id": 'association_' + reaction.getId(), "class": "association"};
+      association.width = 15;
+      association.height = 15;
+      resultJson.push({"data": association, "group": "nodes", "classes": "reaction"});    
+    }
+
+
 
     // add reactant->reaction edges
     for(let j = 0; j < reaction.getNumReactants(); j++){
       let reactant = reaction.getReactant(j);
       let reactantEdgeData = {"id": reactant.getSpecies() + '_' + reaction.getId(), "source": reactant.getSpecies(), "target": reaction.getId()};
+      if (edgeClass1) 
+      {
+        reactantEdgeData.class = edgeClass1;
+      }
+      if(sboTermReaction == 177)
+      {
+        reactantEdgeData.target = 'association_' + reaction.getId()
+        
+      }
       resultJson.push({"data": reactantEdgeData, "group": "edges", "classes": "reactantEdge"});
       
       // collect possible parent info
@@ -374,6 +408,10 @@ sbmlToJson.addReactions = function(model, cytoscapeJsEdges, cytoscapeJsNodes) {
     for(let k = 0; k < reaction.getNumProducts(); k++){
       let product = reaction.getProduct(k);
       let productEdgeData = {"id": reaction.getId() + '_' + product.getSpecies(), "source": reaction.getId(), "target": product.getSpecies()};
+      if (edgeClass1) 
+      {
+        productEdgeData.class = edgeClass2;
+      }
       resultJson.push({"data": productEdgeData, "group": "edges", "classes": "productEdge"});
       
       // collect possible parent info
@@ -387,7 +425,14 @@ sbmlToJson.addReactions = function(model, cytoscapeJsEdges, cytoscapeJsNodes) {
     // add modifier->reaction edges
     for(let l = 0; l < reaction.getNumModifiers(); l++){
       let modifier = reaction.getModifier(l);
+      var sboTerm = modifier.getSBOTerm();
+      console.log("sboTerm modifier", sboTerm)
       let modifierEdgeData = {"id": modifier.getSpecies() + '_' + reaction.getId(), "source": modifier.getSpecies(), "target": reaction.getId(), "sboTerm": modifier.getSBOTerm()};
+      if(sboToEdgeClass[sboTerm])
+      {
+  
+        modifierEdgeData.class = sboToEdgeClass[sboTerm];
+      }
       resultJson.push({"data": modifierEdgeData, "group": "edges", "classes": "modifierEdge"});
       
       // collect possible parent info
@@ -415,6 +460,15 @@ sbmlToJson.addReactions = function(model, cytoscapeJsEdges, cytoscapeJsNodes) {
     let reactionData = {"id": reaction.getId(), "label": reaction.getName(), "parent": parent};
     reactionData.width = 15;
     reactionData.height = 15;
+    if(nodeClass)
+    {
+      reactionData.class = nodeClass
+    }
+    if(sboTermReaction == 177)
+    {
+      var extraEdge = {"id": 'association_' + reaction.getId() + '_' + reaction.getId(), "source": 'association_' + reaction.getId(), "target": reaction.getId(), "class": "consumption"}
+      resultJson.push({"data": extraEdge, "group": "edges", "classes": "extra"});
+    }
     resultJson.push({"data": reactionData, "group": "nodes", "classes": "reaction"});    
   }  
 
@@ -425,12 +479,16 @@ sbmlToJson.addReactions = function(model, cytoscapeJsEdges, cytoscapeJsNodes) {
 
 sbmlToJson.addJSEdges= function(resultJson, cytoscapeJsNodes, cytoscapeJsEdges)
 {
-  var classNameEdge1 = "consumption";
-  var classNameEdge2 = "production";
+  //Default values
+  var classNameEdge1 = "consumption"; //Reactant
+  var classNameEdge2 = "production"; //Product
+  var classNameEdge3 = "catalysis";  //Modifier
+
   for(let i = 0; i < resultJson.length; i++){
+    
     if( resultJson[i].group == 'nodes' && resultJson[i].classes == "reaction")
     {
-      sbmlToJson.addNodes("process", cytoscapeJsNodes, resultJson[i].data )
+      sbmlToJson.addNodes(cytoscapeJsNodes, resultJson[i].data )
 
     }
     if ( resultJson[i].group == 'edges')
@@ -440,12 +498,39 @@ sbmlToJson.addJSEdges= function(resultJson, cytoscapeJsNodes, cytoscapeJsEdges)
         edgeObj.source = resultJson[i].data.source; //Is this the label or id?
         if (resultJson[i].classes == "reactantEdge")
         {
-          edgeObj.class = classNameEdge1;
+          if (resultJson[i].data.class)
+          {
+            edgeObj.class = resultJson[i].data.class;
+          }
+          else
+          {
+            edgeObj.class = classNameEdge1;
+          }
         }
-        else
+        else if(resultJson[i].classes == "modifierEdge")
         {
-          edgeObj.class = classNameEdge2;
+          if (resultJson[i].data.class)
+          {
+            edgeObj.class = resultJson[i].data.class;
+          }
+          else
+          {
+            edgeObj.class = classNameEdge3;
+          }
         }
+        else 
+        {
+          if (resultJson[i].data.class)
+          {
+            console.log("heerrree",resultJson[i].data.class  )
+            edgeObj.class = resultJson[i].data.class;
+          }
+          else
+          {
+            edgeObj.class = classNameEdge2;
+          }
+        }
+    
         edgeObj.id = resultJson[i].data.id
         edgeObj.target = resultJson[i].data.target;
         elementUtilities.extendEdgeDataWithClassDefaults( edgeObj, edgeObj.class );
@@ -456,15 +541,21 @@ sbmlToJson.addJSEdges= function(resultJson, cytoscapeJsNodes, cytoscapeJsEdges)
 }
 
 //This function is used to add more nodes(process, association, dissociation) when itterating through the reactions. 
-sbmlToJson.addNodes = function(node_class, cytoscapeJsNodes, data) { 
+sbmlToJson.addNodes = function( cytoscapeJsNodes, data) { 
+  console.log("data", data)
     var nodeObj = {};
     var styleObj = {};
     var tempBbox = {};
+    var className = "process"
+    if(data.class)
+    {
+      className = data.class;
+    }
     tempBbox.x = 0
     tempBbox.y = 0
     tempBbox.w = data.width;
     tempBbox.h = data.height;
-    nodeObj.class = node_class
+    nodeObj.class = className;
     nodeObj.id = data.id
     nodeObj.bbox = tempBbox; 
     nodeObj.statesandinfos = {};
@@ -480,6 +571,7 @@ sbmlToJson.addNodes = function(node_class, cytoscapeJsNodes, data) {
 
     var cytoscapeJsNode = {data: nodeObj, style: styleObj};
     elementUtilities.extendNodeDataWithClassDefaults( nodeObj, nodeObj.class );
+    console.log("in addNode nodeObj",nodeObj)
     cytoscapeJsNodes.push(cytoscapeJsNode)
     return nodeObj.id;
 }
