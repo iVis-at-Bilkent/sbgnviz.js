@@ -378,6 +378,13 @@ sbmlToJson.addReactions = function(model, cytoscapeJsEdges, cytoscapeJsNodes) {
       association.height = 15;
       resultJson.push({"data": association, "group": "nodes", "classes": "reaction"});    
     }
+    else if (sboTermReaction == 180)
+    {
+      let dissociation = {"id": 'dissociation_' + reaction.getId(), "class": "dissociation"};
+      dissociation.width = 15;
+      dissociation.height = 15;
+      resultJson.push({"data": dissociation, "group": "nodes", "classes": "reaction"});    
+    }
 
 
 
@@ -394,8 +401,9 @@ sbmlToJson.addReactions = function(model, cytoscapeJsEdges, cytoscapeJsNodes) {
         reactantEdgeData.target = 'association_' + reaction.getId()
         
       }
+     
+
       resultJson.push({"data": reactantEdgeData, "group": "edges", "classes": "reactantEdge"});
-      
       // collect possible parent info
       let speciesCompartment = speciesCompartmentMap.get(reactant.getSpecies());
       if(reactionParentMap.has(speciesCompartment))
@@ -411,6 +419,10 @@ sbmlToJson.addReactions = function(model, cytoscapeJsEdges, cytoscapeJsNodes) {
       if (edgeClass1) 
       {
         productEdgeData.class = edgeClass2;
+      }
+      if(sboTermReaction == 180)
+      {
+        productEdgeData.source = "dissociation_"+reaction.getId()
       }
       resultJson.push({"data": productEdgeData, "group": "edges", "classes": "productEdge"});
       
@@ -467,6 +479,11 @@ sbmlToJson.addReactions = function(model, cytoscapeJsEdges, cytoscapeJsNodes) {
     if(sboTermReaction == 177)
     {
       var extraEdge = {"id": 'association_' + reaction.getId() + '_' + reaction.getId(), "source": 'association_' + reaction.getId(), "target": reaction.getId(), "class": "consumption"}
+      resultJson.push({"data": extraEdge, "group": "edges", "classes": "extra"});
+    }
+    else if(sboTermReaction == 180)
+    {
+      var extraEdge = {"id": 'dissociation_' + reaction.getId() + '_' + reaction.getId(), "source":  reaction.getId(), "target": "dissociation_"+reaction.getId(), "class": "consumption"}
       resultJson.push({"data": extraEdge, "group": "edges", "classes": "extra"});
     }
     resultJson.push({"data": reactionData, "group": "nodes", "classes": "reaction"});    
