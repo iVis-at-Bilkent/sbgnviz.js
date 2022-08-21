@@ -385,6 +385,10 @@ sbmlToJson.addReactions = function(model, cytoscapeJsEdges, cytoscapeJsNodes) {
       dissociation.height = 15;
       resultJson.push({"data": dissociation, "group": "nodes", "classes": "reaction"});    
     }
+    else if (sboTermReaction == 178)
+    {
+      nodeClass = 'truncated process'
+    }
 
 
 
