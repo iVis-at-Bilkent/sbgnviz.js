@@ -47,15 +47,9 @@ module.exports = function () {
   }
 
   var sboToEdgeClass = {
-    594: "modulation",
-    459: "stimulation",
-    13: "catalysis",
-    537: "inhibition",
-    461: "trigger",
-    185: "transport",
-    536: "unknown inhibition",
-    462: "unknown catalysis",
-    171: "positive influence",
+    20: "unknown inhibition",
+    13: "unknown catalysis",
+    397: "positive influence",
     407: "negative influence",
     344: "reduced modulation",
     411: "reduced stimulation",
@@ -65,6 +59,12 @@ module.exports = function () {
     170: "unknown reduced stimulation",
     342: "unknown reduced modulation",
     205: "unknown reduced trigger",
+    19: "modulation",
+    21: "stimulation",
+    13: "catalysis",
+    20: "inhibition",
+    461: "trigger",
+    185: "transport"
   }
   var sboTwoEdgeOneNodeClass = {
     176: ["consumption","process", "production"], //state transition
@@ -362,9 +362,11 @@ sbmlToJson.addReactions = function(model, cytoscapeJsEdges, cytoscapeJsNodes) {
 
     //Map sbo term if exists
     var sboTermReaction = reaction.getSBOTerm();
+    console.log("sboTermReaction",sboTermReaction)
     if(sboToEdgeClass[sboTermReaction])
     {
       edgeClass1 = sboToEdgeClass[sboTermReaction]
+      console.log("edgeClass1",edgeClass1)
     }
     else if (sboTwoEdgeOneNodeClass[sboTermReaction])
     {
@@ -442,13 +444,16 @@ sbmlToJson.addReactions = function(model, cytoscapeJsEdges, cytoscapeJsNodes) {
     for(let l = 0; l < reaction.getNumModifiers(); l++){
       let modifier = reaction.getModifier(l);
       var sboTerm = modifier.getSBOTerm();
+      var metaId = modifier.getMetaId();
       console.log("sboTerm modifier", sboTerm)
+      console.log("metaId modifier", metaId)
       let modifierEdgeData = {"id": modifier.getSpecies() + '_' + reaction.getId(), "source": modifier.getSpecies(), "target": reaction.getId(), "sboTerm": modifier.getSBOTerm()};
       if(sboToEdgeClass[sboTerm])
       {
   
         modifierEdgeData.class = sboToEdgeClass[sboTerm];
       }
+
       resultJson.push({"data": modifierEdgeData, "group": "edges", "classes": "modifierEdge"});
       
       // collect possible parent info
