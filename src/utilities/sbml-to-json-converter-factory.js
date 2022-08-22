@@ -360,6 +360,7 @@ sbmlToJson.addReactions = function(model, cytoscapeJsEdges, cytoscapeJsNodes) {
     var edgeClass2 = null;
     var nodeClass = null;
     var reducedNotation = false;
+    var logicalBoolean = false;
 
     //Map sbo term if exists
     var sboTermReaction = reaction.getSBOTerm();
@@ -393,10 +394,14 @@ sbmlToJson.addReactions = function(model, cytoscapeJsEdges, cytoscapeJsNodes) {
     {
       nodeClass = 'truncated process'
     }
-    else if(sboTermReaction == 397) //397 stands for reduced notation but does not specify which one. Positive influence is used for default
+    else if(sboTermReaction == 397) //397 stands for reduced notation in CD but does not specify which one. Positive influence is used for default
     {
       edgeClass1 = "positive influence sbml"
       reducedNotation = true;
+    } else if(sboTermReaction == 231 ) //231 stand for boolean logic reactions in CD but does not specify which one. And logical gate will be used for default
+    {
+      logicalBoolean = true;
+      nodeClass = 'and'
     }
 
 
@@ -444,6 +449,10 @@ sbmlToJson.addReactions = function(model, cytoscapeJsEdges, cytoscapeJsNodes) {
       if(sboTermReaction == 180)
       {
         productEdgeData.source = "dissociation_"+reaction.getId()
+      }
+      if(sboTermReaction == 231)
+      {
+        productEdgeData.class = "trigger"
       }
       resultJson.push({"data": productEdgeData, "group": "edges", "classes": "productEdge"});
       
