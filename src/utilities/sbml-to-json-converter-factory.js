@@ -393,6 +393,11 @@ sbmlToJson.addReactions = function(model, cytoscapeJsEdges, cytoscapeJsNodes) {
     {
       nodeClass = 'truncated process'
     }
+    else if(sboTermReaction == 397) //397 stands for reduced notation but does not specify which one. Positive influence is used for default
+    {
+      edgeClass1 = "positive influence sbml"
+      reducedNotation = true;
+    }
 
 
     if (reducedNotation)
