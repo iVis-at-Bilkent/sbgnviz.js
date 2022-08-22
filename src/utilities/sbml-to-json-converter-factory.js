@@ -49,7 +49,7 @@ module.exports = function () {
   var sboToEdgeClass = {
     20: "unknown inhibition",
     13: "unknown catalysis",
-    397: "positive influence",
+    171: "positive influence sbml",
     407: "negative influence",
     344: "reduced modulation",
     411: "reduced stimulation",
@@ -359,6 +359,7 @@ sbmlToJson.addReactions = function(model, cytoscapeJsEdges, cytoscapeJsNodes) {
     var edgeClass1 = null;
     var edgeClass2 = null;
     var nodeClass = null;
+    var reducedNotation = false;
 
     //Map sbo term if exists
     var sboTermReaction = reaction.getSBOTerm();
@@ -367,6 +368,7 @@ sbmlToJson.addReactions = function(model, cytoscapeJsEdges, cytoscapeJsNodes) {
     {
       edgeClass1 = sboToEdgeClass[sboTermReaction]
       console.log("edgeClass1",edgeClass1)
+      reducedNotation = true;
     }
     else if (sboTwoEdgeOneNodeClass[sboTermReaction])
     {
@@ -393,7 +395,15 @@ sbmlToJson.addReactions = function(model, cytoscapeJsEdges, cytoscapeJsNodes) {
     }
 
 
-
+    if (reducedNotation)
+    {
+      let reactant = reaction.getReactant(0);
+      let product = reaction.getProduct(0); 
+      let edgeData = {"id": reactant.getSpecies() + '_' + reaction.getId(), "source": reactant.getSpecies(), "target": product.getSpecies(), "class": edgeClass1};
+      resultJson.push({"data": edgeData, "group": "edges", "classes": "reducedNotation"});
+      continue;
+    }
+  
     // add reactant->reaction edges
     for(let j = 0; j < reaction.getNumReactants(); j++){
       let reactant = reaction.getReactant(j);
@@ -406,7 +416,7 @@ sbmlToJson.addReactions = function(model, cytoscapeJsEdges, cytoscapeJsNodes) {
       {
         reactantEdgeData.target = 'association_' + reaction.getId()
         
-      }
+      } 
      
 
       resultJson.push({"data": reactantEdgeData, "group": "edges", "classes": "reactantEdge"});
