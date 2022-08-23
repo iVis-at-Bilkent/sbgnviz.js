@@ -405,6 +405,58 @@ sbmlToJson.checkSourceTargetInCompartement = function(sourceId, targetId)
     return null;
   }
 };
+
+//This function checks if a process nodes has both source and target
+sbmlToJson.checkIfTargetAndSourceExist = function(processId, resultJson)
+{
+  var hasSource = false;
+  var hasTarget = false;
+  console.log("Looking for:", processId)
+  console.log("resultJson", resultJson)
+  for( let i = 0; i < resultJson.length; i++)
+  {
+    var currentObj = resultJson[i]
+   
+    if (currentObj.group = "edges" )
+    {
+    
+      if (currentObj.data.source == processId)
+      {
+        hasTarget = true;
+      }
+      if (currentObj.data.target == processId)
+      {
+        hasSource = true;
+      }
+    }
+  }
+  console.log("has target", hasTarget)
+  console.log("has source", hasSource)
+  if(hasSource && hasTarget)
+  {
+    return;
+  }
+  if(!hasSource)
+  {
+    console.log("does not have source", processId)
+    let degradation = {"id": 'degradation' + processId, "class": "degradation"};
+    degradation.width = 15;
+    degradation.height = 15;
+    resultJson.push({"data": degradation, "group": "nodes", "classes": "degradation"});  
+    let reactantEdgeData = {"id": 'degradation_' + processId, "source": 'degradation' + processId, "target": processId, "class": "consumption"};
+    resultJson.push({"data": reactantEdgeData, "group": "edges", "classes": "forDegradation"});
+  }
+  if(!hasTarget)
+  {
+    console.log("does not have target", processId)
+    let degradation = {"id": 'degradation' + processId, "class": "degradation"};
+    degradation.width = 15;
+    degradation.height = 15;
+    resultJson.push({"data": degradation, "group": "nodes", "classes": "degradation"});  
+    let reactantEdgeData = {"id": 'degradation_' + processId, "source": processId, "target": 'degradation' + processId, "class": "production"};
+    resultJson.push({"data": reactantEdgeData, "group": "edges", "classes": "forDegradation"});
+  }
+}
 sbmlToJson.addReactions = function(model, cytoscapeJsEdges, cytoscapeJsNodes) {
   for(let i = 0; i < model.getNumReactions(); i++){
 
@@ -515,6 +567,17 @@ sbmlToJson.addReactions = function(model, cytoscapeJsEdges, cytoscapeJsNodes) {
       else
         reactionParentMap.set(speciesCompartment, 1);      
     }
+
+    let reactionData = {"id": reaction.getId(), "label": reaction.getName(), "parent": parent};
+    reactionData.width = 15;
+    reactionData.height = 15;
+    if(nodeClass)
+    {
+      reactionData.class = nodeClass
+    }
+    resultJson.push({"data": reactionData, "group": "nodes", "classes": "reaction"}); 
+    console.log("resultJson before passing", resultJson)
+    ///sbmlToJson.checkIfTargetAndSourceExist(reaction.getId(), resultJson);
     
     // add modifier->reaction edges
     for(let l = 0; l < reaction.getNumModifiers(); l++){
@@ -550,16 +613,7 @@ sbmlToJson.addReactions = function(model, cytoscapeJsEdges, cytoscapeJsNodes) {
           }
       });
       parent = result;
-    }
-    
-    let reactionData = {"id": reaction.getId(), "label": reaction.getName(), "parent": parent};
-    reactionData.width = 15;
-    reactionData.height = 15;
-    if(nodeClass)
-    {
-      reactionData.class = nodeClass
-    }
-    resultJson.push({"data": reactionData, "group": "nodes", "classes": "reaction"});    
+    }   
 
 
     //Add extra noded
@@ -608,11 +662,14 @@ sbmlToJson.addJSEdges= function(resultJson, cytoscapeJsNodes, cytoscapeJsEdges)
 
   for(let i = 0; i < resultJson.length; i++){
     
-    if( resultJson[i].group == 'nodes' && resultJson[i].classes == "reaction" )
+    if( resultJson[i].group == 'nodes' && ( resultJson[i].classes == "reaction" || resultJson[i].classes == "degradation"))
     {
+      console.log("creating extra nodes",resultJson[i].data.id)
       sbmlToJson.addNodes(cytoscapeJsNodes, resultJson[i].data )
 
     }
+  }
+  for(let i = 0; i < resultJson.length; i++){
     if ( resultJson[i].group == 'edges')
     {
         var edgeObj = {};
