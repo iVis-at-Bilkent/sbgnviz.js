@@ -91,6 +91,7 @@ module.exports = function () {
     var compartmentChildrenMap = {}; // Map compartments children temporarily
     elementUtilities.fileFormat = 'sbml';
     let model = null;
+    elementUtilities.mapType = 'SBML';
 
     var sbgn;
     try {
