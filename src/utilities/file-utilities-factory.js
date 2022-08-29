@@ -75,7 +75,7 @@ module.exports = function () {
  }
  // Helper functions End
 
- var sbgnmlToJson, sbmlToJson, jsonToSbgnml, jsonToNwt, uiUtilities, tdToJson,
+ var sbgnmlToJson, sbmlToJson, jsonToSbgnml, jsonToSbml, jsonToNwt, uiUtilities, tdToJson,
      sifToJson, graphUtilities, layoutToText, nwtToJson, jsonToSif,sbgnmlToCd,cdToSbgnml,sbgnmlToSbml,sbmlToSbgnml;
  var updateGraph;
  var options, cy;
@@ -85,6 +85,7 @@ module.exports = function () {
    sbmlToJson = param.sbmlToJsonConverter;
    nwtToJson = param.nwtToJsonConverter;
    jsonToSbgnml = param.jsonToSbgnmlConverter;
+   jsonToSbml = param.jsonToSbmlConverter;
    jsonToNwt = param.jsonToNwtConverter;
    jsonToSif = param.jsonToSifConverter;
    uiUtilities = param.uiUtilities;
@@ -416,29 +417,14 @@ module.exports = function () {
   reader.readAsText(file);
  }
 
- fileUtilities.saveAsSbml = function(filename,errorCallback){
+ fileUtilities.saveAsSbml = function(filename){
   uiUtilities.startSpinner("load-spinner");
-  var sbgnml = this.convertSbgn();
-  
-  this.convertSbgnmlToSbml(sbgnml, function(data){
-    
-    if(!data.result){
-      errorCallback(sbgnml,data.error);
-    }else if( data.message.indexOf("Internal server error") !== -1)
-    {
-      errorCallback(sbgnml,data.message);
-    }else{    
-      var blob = new Blob([data.message], {
-        type: "text/plain;charset=utf-8;",
-      });
-      saveAs(blob, filename); 
-      
-    }
-
-    uiUtilities.endSpinner("load-spinner");
-    
-  });
-
+  var sbgnText = jsonToSbml.createSbml(filename);
+   var blob = new Blob([sbgnText], {
+     type: "text/plain;charset=utf-8;",
+   });
+   saveAs(blob, filename);
+   uiUtilities.endSpinner("load-spinner");
  }
 
  fileUtilities.loadSbml = function(file, callback1, callback2, layoutBy){

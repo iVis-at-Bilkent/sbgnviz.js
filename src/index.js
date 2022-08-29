@@ -21,6 +21,7 @@
 
     // Other utilities
     var jsonToSbgnmlConverter = require('./utilities/json-to-sbgnml-converter-factory')();
+    var jsonToSbmlConverter = require('./utilities/json-to-sbml-converter-factory')();
     var jsonToNwtConverter = require('./utilities/json-to-nwt-converter-factory')();
     var sbgnmlToJsonConverter = require('./utilities/sbgnml-to-json-converter-factory')();
     var sbmlToJsonConverter = require('./utilities/sbml-to-json-converter-factory')();
@@ -48,6 +49,7 @@
     param.elementUtilities = elementUtilities;
     param.undoRedoActionFunctions = undoRedoActionFunctions;
     param.jsonToSbgnmlConverter = jsonToSbgnmlConverter;
+    param.jsonToSbmlConverter = jsonToSbmlConverter;
     param.jsonToNwtConverter = jsonToNwtConverter;
     param.sbgnmlToJsonConverter = sbgnmlToJsonConverter;
     param.sbmlToJsonConverter = sbmlToJsonConverter;
@@ -76,6 +78,7 @@
     elementUtilities(param);
     undoRedoActionFunctions(param);
     jsonToSbgnmlConverter(param);
+    jsonToSbmlConverter(param);
     jsonToNwtConverter(param);
     sbgnmlToJsonConverter(param);
     sbmlToJsonConverter(param);

@@ -83,7 +83,6 @@ module.exports = function () {
 
 
   sbmlToJson.convert = function (xmlString, urlParams) {
-    
     var self = this;
     var cytoscapeJsGraph = {};
     var cytoscapeJsNodes = [];

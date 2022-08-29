@@ -15,6 +15,7 @@ module.exports = function () {
   function mainUtilities (param) {
     elementUtilities = param.elementUtilities;
     jsonToSbgnml = param.jsonToSbgnmlConverter;
+    jsonToSbml = param.jsonToSbmlConverter;
     jsonToNwt = param.jsonToNwtConverter;
     sbgnmlToJson = param.sbgnmlToJsonConverter;
     sbmlToJson = param.sbmlToJsonConverter;
