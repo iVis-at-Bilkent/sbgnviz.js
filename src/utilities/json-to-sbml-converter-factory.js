@@ -44,7 +44,7 @@ module.exports = function () {
     jsonToSbml.createSbml = function(filename) {
         console.log("in createSbml")
         var jsObj = jsonToSbml.buildJsObj(filename);
-        return jsonToSbml.buildString({sbgn: jsObj});
+        return jsObj;
     }
 
     jsonToSbml.buildJsObj = function(filename){
@@ -52,19 +52,35 @@ module.exports = function () {
         var nodes = cy.nodes();
         var sbmlDoc =  new libsbmlInstance.SBMLDocument(3, 1)
         var model = sbmlDoc.createModel()
+        model.setId('model1')
         console.log("edges", edges)
         console.log("nodes", nodes)
          
         //Set species
         for (let i = 0; i < nodes.length; i++)
         {
-            var newSpecies = new libsbmlInstance.Species(3,1);
-            var nodeClass = node._private.data.class;
+            const newSpecies = model.createSpecies();
+            var nodeClass = nodes[i]._private.data.class;
             if(nodesToSbo[nodeClass])
             {
                 newSpecies.setSBOTerm(nodesToSbo[nodeClass])
             }
+            newSpecies.setId('spec_'+i);
+            if(nodes[i]._private.data.label)
+            {
+                newSpecies.setName(nodes[i]._private.data.class)
+            }
+            
         }
+
+        const writer = new libsbmlInstance.SBMLWriter()
+        const serializedSBML = writer.writeSBMLToString(sbmlDoc)
+
+        console.log(serializedSBML)
+
+        libsbmlInstance.destroy(sbmlDoc)
+        libsbmlInstance.destroy(writer)
+        return serializedSBML;
 
      }
     jsonToSbml.buildString = function(obj) {}
