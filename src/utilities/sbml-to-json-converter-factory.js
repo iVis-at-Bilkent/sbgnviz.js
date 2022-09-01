@@ -314,7 +314,7 @@ sbmlToJson.addJSCompartments = function(resultJson, cytoscapeJsNodes)
 
       nodeObj.bbox = tempBbox;   
       nodeObj.label = resultJson[i].data.label;
-      nodeObj.statesandinfos = {};
+      nodeObj.statesandinfos = [];
       if(resultJson[i].data.parent)
       {
         nodeObj.parent = resultJson[i].data.parent;
@@ -369,7 +369,7 @@ sbmlToJson.addJSNodes = function(resultJson,cytoscapeJsNodes) {
 
       nodeObj.bbox = tempBbox;   
       nodeObj.label = resultJson[i].data.label;
-      nodeObj.statesandinfos = {};
+      nodeObj.statesandinfos = [];
       nodeObj.parent = resultJson[i].data.parent;
       var cytoscapeJsNode = {data: nodeObj, style: styleObj};
       elementUtilities.extendNodeDataWithClassDefaults( nodeObj, nodeObj.class );
@@ -770,12 +770,12 @@ sbmlToJson.addNodes = function( cytoscapeJsNodes, data) {
     nodeObj.class = className;
     nodeObj.id = data.id
     nodeObj.bbox = tempBbox; 
-    nodeObj.statesandinfos = {};
+    nodeObj.statesandinfos = [];
     var ports = [];
     ports.push({
       id: 1,
-      x: 0,
-      y: 0
+      x: tempBbox.w / 2,
+      y: tempBbox.y/2
     });
   
 
