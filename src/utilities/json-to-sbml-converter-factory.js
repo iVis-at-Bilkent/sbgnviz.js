@@ -280,9 +280,9 @@ module.exports = function () {
                     }
                     if(modifierNotationEdge[targetObject.edgeClass])
                     {
-                        if(!process[currentKey].modifiers)
+                        if(!truncatedProcess[currentKey].modifiers)
                         {
-                            process[currentKey].modifiers = []
+                            truncatedProcess[currentKey].modifiers = []
                         }
                         truncatedProcess[currentKey].modifiers.push({"modifier": targetObject.source, "modifierEdge": targetObject.edgeClass });
                     }
@@ -501,7 +501,42 @@ module.exports = function () {
             {
                 for (let j = 0; j < modifiers.length; j++)
                 {
-                    let curModifier = targmodifiersets[i]
+                    let curModifier = truncatedObj.modifiers[i]
+                    const spr3 = rxn.createModifier()
+                    spr3.setSpecies(curModifier.modifier)
+                }
+            }
+        }
+
+        //Build association reaction
+        let associationsKeys = Object.keys(associations)
+        for (let i = 0; i < associationsKeys.length; i++)
+        {
+            let curKey = associationsKeys[i];
+            let assocOb = associations[curKey];
+            let sources = assocOb.source;
+            let targets = assocOb.target;
+            let modifiers = assocOb.modifiers;
+            const rxn = model.createReaction()
+            rxn.setId('association_'+ curKey)
+            rxn.setSBOTerm(177)
+            for (let j = 0; j < sources.length; j++)
+            {
+                let curSource = sources[j]
+                const spr1 = rxn.createReactant()
+                spr1.setSpecies(curSource)
+            }
+            for (let j = 0; j < targets.length; j++)
+            {
+                let curTarget = targets[j]
+                const spr2 = rxn.createProduct()
+                spr2.setSpecies(curTarget)
+            }
+            if(modifiers)
+            {
+                for (let j = 0; j < modifiers.length; j++)
+                {
+                    let curModifier = modifiers[i]
                     const spr3 = rxn.createModifier()
                     spr3.setSpecies(curModifier.modifier)
                 }
