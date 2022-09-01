@@ -543,6 +543,41 @@ module.exports = function () {
             }
         }
 
+        //Build dissociation reaction
+        let dissociationsKeys = Object.keys(dissociations)
+        for (let i = 0; i < dissociationsKeys.length; i++)
+        {
+            let curKey = dissociationsKeys[i];
+            let assocOb = dissociations[curKey];
+            let sources = assocOb.source;
+            let targets = assocOb.target;
+            let modifiers = assocOb.modifiers;
+            const rxn = model.createReaction()
+            rxn.setId('dissociation_'+ curKey)
+            rxn.setSBOTerm(180)
+            for (let j = 0; j < sources.length; j++)
+            {
+                let curSource = sources[j]
+                const spr1 = rxn.createReactant()
+                spr1.setSpecies(curSource)
+            }
+            for (let j = 0; j < targets.length; j++)
+            {
+                let curTarget = targets[j]
+                const spr2 = rxn.createProduct()
+                spr2.setSpecies(curTarget)
+            }
+            if(modifiers)
+            {
+                for (let j = 0; j < modifiers.length; j++)
+                {
+                    let curModifier = modifiers[i]
+                    const spr3 = rxn.createModifier()
+                    spr3.setSpecies(curModifier.modifier)
+                }
+            }
+        }
+
        // console.log("reactions",reactions)
         const writer = new libsbmlInstance.SBMLWriter()
         const serializedSBML = writer.writeSBMLToString(sbmlDoc)
