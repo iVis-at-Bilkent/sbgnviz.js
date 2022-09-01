@@ -20,6 +20,7 @@ module.exports = function () {
    if (!className) {
      className = 'default-class';
    }
+console.log("spinner started", className)
 
    if ($('.' + className).length === 0) {
     var containerWidth = $(options.networkContainerSelector).width();
