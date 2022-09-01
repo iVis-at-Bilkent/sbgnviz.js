@@ -107,27 +107,31 @@ module.exports = function () {
         //Set species
         for (let i = 0; i < nodes.length; i++)
         {
-            const newSpecies = model.createSpecies();
             var nodeClass = nodes[i]._private.data.class;
-            if(nodesToSbo[nodeClass])
+            console.log("nodeClass", nodeClass)
+            if(jsonToSbml.isSpecies(nodeClass))
             {
-                newSpecies.setSBOTerm(nodesToSbo[nodeClass])
+                const newSpecies = model.createSpecies();
+                if(nodesToSbo[nodeClass])
+                {
+                    newSpecies.setSBOTerm(nodesToSbo[nodeClass])
+                }
+                if(nodes[i]._private.parent)
+                {
+                    let parent = nodes[i]._private.parent[0]._private.data.id.replace(/-/g, "_");
+                    newSpecies.setCompartment(parent)
+                }
+    
+                const new_id = nodes[i]._private.data.id
+                var newStr = new_id.replace(/-/g, "_"); //Replacsing - with _ because libsml doesn't allow - in id
+                newSpecies.setId(newStr);
+                if(nodes[i]._private.data.label)
+                {
+                    newSpecies.setName(nodes[i]._private.data.class)
+                }
             }
-            if(nodes[i]._private.parent)
-            {
-                let parent = nodes[i]._private.parent[0]._private.data.id.replace(/-/g, "_");
-                newSpecies.setCompartment(parent)
-            }
-
-            const new_id = nodes[i]._private.data.id
             nodesIdName[nodes[i]._private.data.id.replace(/-/g, "_")] = nodes[i]._private.data.class;
-            var newStr = new_id.replace(/-/g, "_"); //Replacsing - with _ because libsml doesn't allow - in id
-            newSpecies.setId(newStr);
-            if(nodes[i]._private.data.label)
-            {
-                newSpecies.setName(nodes[i]._private.data.class)
-            }
-            
+                   
         }
 
         //Building source: {target, edgeClass, edgeId} map
@@ -495,6 +499,11 @@ module.exports = function () {
     }
     jsonToSbml.isLogicalOperatorNode = function(nodeClass) {
         return nodeClass == "and" || nodeClass == "not" || nodeClass == "or" || nodeClass == "unknown logical operator"
+    }
+    jsonToSbml.isSpecies = function(nodeClass) {
+        console.log("in is species nodeClass", nodeClass)
+        return !jsonToSbml.isLogicalOperatorNode(nodeClass) && !jsonToSbml.isProcessNode(nodeClass) && !jsonToSbml.isTruncatedProcessNode(nodeClass) 
+        && nodeClass != "association" &&  nodeClass != "dissociation" 
     }
     jsonToSbml.buildString = function(obj) {}
     jsonToSbml.getRenderExtensionSbgnml = function(renderInfo) {}
