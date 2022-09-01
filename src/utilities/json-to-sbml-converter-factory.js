@@ -601,6 +601,7 @@ module.exports = function () {
             }
             const spr2 = rxn.createProduct()
             spr2.setSpecies(target.target)
+            spr2.setSBOTerm(168)
         }
        // console.log("reactions",reactions)
         const writer = new libsbmlInstance.SBMLWriter()

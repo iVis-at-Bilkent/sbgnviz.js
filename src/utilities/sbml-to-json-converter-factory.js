@@ -507,6 +507,27 @@ sbmlToJson.addReactions = function(model, cytoscapeJsEdges, cytoscapeJsNodes) {
       logicalBoolean = true;
       nodeClass = 'and'
     }
+    else if(sboTermReaction == 173 ) 
+    {
+      logicalBoolean = true;
+      nodeClass = 'and'
+    }
+    else if(sboTermReaction == 174 ) 
+    {
+      logicalBoolean = true;
+      nodeClass = 'or'
+    }
+    else if(sboTermReaction == 238 ) 
+    {
+      logicalBoolean = true;
+      nodeClass = 'not'
+    }
+    else if(sboTermReaction == 398 ) 
+    {
+      logicalBoolean = true;
+      nodeClass = 'unknown logical operator'
+    }
+
 
 
     if (reducedNotation)
@@ -516,6 +537,26 @@ sbmlToJson.addReactions = function(model, cytoscapeJsEdges, cytoscapeJsNodes) {
       let edgeData = {"id": reactant.getSpecies() + '_' + reaction.getId(), "source": reactant.getSpecies(), "target": product.getSpecies(), "class": edgeClass1};
       resultJson.push({"data": edgeData, "group": "edges", "classes": "reducedNotation"});
       continue;
+    }
+    if(logicalBoolean)
+    {
+      //Add boolean logic node
+      let boolNode = {"id": nodeClass+"_"+reaction.getId(), "label":"", "parent": parent, "class": nodeClass};
+      boolNode.width = 15;
+      boolNode.height = 15;
+      resultJson.push({"data": boolNode, "group": "nodes", "classes": "boolean"}); 
+
+      for(let j = 0; j < reaction.getNumReactants(); j++){
+        let reactant = reaction.getReactant(j);
+        let reactantEdgeData = {"id": reactant.getSpecies() + '_' + reaction.getId(), "source": reactant.getSpecies(), "target": nodeClass+"_"+reaction.getId(), "class": "consumption"};
+        resultJson.push({"data": reactantEdgeData, "group": "edges", "classes": "reactantEdge"});
+      }
+    
+      let product = reaction.getProduct(0);
+      let reactantEdgeData = {"id": product.getSpecies() + '_' + reaction.getId(), "source": nodeClass+"_"+reaction.getId(), "target": product.getSpecies(), "class": "reduced trigger"};
+      resultJson.push({"data": reactantEdgeData, "group": "edges", "classes": "reactantEdge"});
+      continue;
+
     }
   
     // add reactant->reaction edges
@@ -662,7 +703,7 @@ sbmlToJson.addJSEdges= function(resultJson, cytoscapeJsNodes, cytoscapeJsEdges)
 
   for(let i = 0; i < resultJson.length; i++){
     
-    if( resultJson[i].group == 'nodes' && ( resultJson[i].classes == "reaction" || resultJson[i].classes == "degradation"))
+    if( resultJson[i].group == 'nodes' && ( resultJson[i].classes == "reaction" || resultJson[i].classes == "degradation" || resultJson[i].classes == "boolean"))
     {
       console.log("creating extra nodes",resultJson[i].data.id)
       sbmlToJson.addNodes(cytoscapeJsNodes, resultJson[i].data )
