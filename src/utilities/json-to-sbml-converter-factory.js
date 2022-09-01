@@ -87,8 +87,8 @@ module.exports = function () {
         var sbmlDoc =  new libsbmlInstance.SBMLDocument(2, 4)
         var model = sbmlDoc.createModel()
         model.setId('model1')
-        console.log("edges", edges)
-        console.log("nodes", nodes)
+        //console.log("edges", edges)
+       // console.log("nodes", nodes)
         let nodesIdName = {}
          
         //Create compartment
@@ -108,7 +108,6 @@ module.exports = function () {
         for (let i = 0; i < nodes.length; i++)
         {
             var nodeClass = nodes[i]._private.data.class;
-            console.log("nodeClass", nodeClass)
             if(jsonToSbml.isSpecies(nodeClass))
             {
                 const newSpecies = model.createSpecies();
@@ -388,12 +387,12 @@ module.exports = function () {
                 delete process[curKey];
             }
         }
-        console.log("reducedNotation", reducedNotation);
-        console.log("process", process)
-        console.log("truncatedProcess", truncatedProcess)
-        console.log("associations",associations)
-        console.log("dissociations",dissociations)
-        console.log("logicalOperators",logicalOperators)
+        //console.log("reducedNotation", reducedNotation);
+       // console.log("process", process)
+        //console.log("truncatedProcess", truncatedProcess)
+        //console.log("associations",associations)
+        //console.log("dissociations",dissociations)
+        //console.log("logicalOperators",logicalOperators)
 
         //Build sbml reactions
         //Build reduced notion reactions
@@ -419,14 +418,11 @@ module.exports = function () {
         }
 
         //build process reactions
-        console.log(process.length);
-        console.log(processKeys.length);
         let newProcessKeys = Object.keys(process)
         for (let i = 0; i < newProcessKeys.length; i++)
         {
             let curKey = newProcessKeys[i];
             let curProcess = process[curKey];
-            console.log("curProcess",curProcess)
             let curSource = curProcess.source;
             let curSourceEdge = curProcess.sourceEdge;
             let curTarget = curProcess.target;
@@ -625,7 +621,6 @@ module.exports = function () {
         return nodeClass == "and" || nodeClass == "not" || nodeClass == "or" || nodeClass == "unknown logical operator"
     }
     jsonToSbml.isSpecies = function(nodeClass) {
-        console.log("in is species nodeClass", nodeClass)
         return !jsonToSbml.isLogicalOperatorNode(nodeClass) && !jsonToSbml.isProcessNode(nodeClass) && !jsonToSbml.isTruncatedProcessNode(nodeClass) 
         && nodeClass != "association" &&  nodeClass != "dissociation" 
     }

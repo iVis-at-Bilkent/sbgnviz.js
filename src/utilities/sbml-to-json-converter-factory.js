@@ -411,8 +411,6 @@ sbmlToJson.checkIfTargetAndSourceExist = function(processId, resultJson)
 {
   var hasSource = false;
   var hasTarget = false;
-  console.log("Looking for:", processId)
-  console.log("resultJson", resultJson)
   for( let i = 0; i < resultJson.length; i++)
   {
     var currentObj = resultJson[i]
@@ -430,15 +428,12 @@ sbmlToJson.checkIfTargetAndSourceExist = function(processId, resultJson)
       }
     }
   }
-  console.log("has target", hasTarget)
-  console.log("has source", hasSource)
   if(hasSource && hasTarget)
   {
     return;
   }
   if(!hasSource)
   {
-    console.log("does not have source", processId)
     let degradation = {"id": 'degradation' + processId, "class": "degradation"};
     degradation.width = 15;
     degradation.height = 15;
@@ -448,7 +443,6 @@ sbmlToJson.checkIfTargetAndSourceExist = function(processId, resultJson)
   }
   if(!hasTarget)
   {
-    console.log("does not have target", processId)
     let degradation = {"id": 'degradation' + processId, "class": "degradation"};
     degradation.width = 15;
     degradation.height = 15;
@@ -540,6 +534,9 @@ sbmlToJson.addReactions = function(model, cytoscapeJsEdges, cytoscapeJsNodes) {
     }
     if(logicalBoolean)
     {
+      //Get parents
+      let parent = reaction.getCompartment();
+
       //Add boolean logic node
       let boolNode = {"id": nodeClass+"_"+reaction.getId(), "label":"", "parent": parent, "class": nodeClass};
       boolNode.width = 15;
@@ -617,7 +614,6 @@ sbmlToJson.addReactions = function(model, cytoscapeJsEdges, cytoscapeJsNodes) {
       reactionData.class = nodeClass
     }
     resultJson.push({"data": reactionData, "group": "nodes", "classes": "reaction"}); 
-    console.log("resultJson before passing", resultJson)
     ///sbmlToJson.checkIfTargetAndSourceExist(reaction.getId(), resultJson);
     
     // add modifier->reaction edges
@@ -689,7 +685,6 @@ sbmlToJson.addReactions = function(model, cytoscapeJsEdges, cytoscapeJsNodes) {
     }
   }  
 
-  console.log("resultJson after addinf reactions", resultJson)
   sbmlToJson.addJSEdges(resultJson, cytoscapeJsNodes, cytoscapeJsEdges)
 
 };
@@ -705,7 +700,6 @@ sbmlToJson.addJSEdges= function(resultJson, cytoscapeJsNodes, cytoscapeJsEdges)
     
     if( resultJson[i].group == 'nodes' && ( resultJson[i].classes == "reaction" || resultJson[i].classes == "degradation" || resultJson[i].classes == "boolean"))
     {
-      console.log("creating extra nodes",resultJson[i].data.id)
       sbmlToJson.addNodes(cytoscapeJsNodes, resultJson[i].data )
 
     }
@@ -715,7 +709,6 @@ sbmlToJson.addJSEdges= function(resultJson, cytoscapeJsNodes, cytoscapeJsEdges)
     {
         var edgeObj = {};
         var styleObj = {};
-        console.log("resultJson[i]", resultJson[i])
         edgeObj.source = resultJson[i].data.source; //Is this the label or id?
         if (resultJson[i].classes == "reactantEdge")
         {
