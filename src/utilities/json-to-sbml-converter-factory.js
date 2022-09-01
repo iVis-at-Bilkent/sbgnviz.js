@@ -477,7 +477,36 @@ module.exports = function () {
             }
             
         }
-        
+        //Build truncatedProcess reaction
+        let truncatedProcessKeys = Object.keys(truncatedProcess)
+        for (let i = 0; i < truncatedProcessKeys.length; i++)
+        {
+            let curKey = truncatedProcessKeys[i];
+            let truncatedObj = truncatedProcess[curKey];
+            let curSource = truncatedObj.source;
+            let targets = truncatedObj.targets;
+            let modifiers = truncatedObj.modifiers;
+            const rxn = model.createReaction()
+            rxn.setId('trunacted_'+ curKey)
+            rxn.setSBOTerm(178)
+            const spr1 = rxn.createReactant()
+            spr1.setSpecies(curSource)
+            for (let j = 0; j < targets.length; j++)
+            {
+                let curTarget = targets[j]
+                const spr2 = rxn.createProduct()
+                spr2.setSpecies(curTarget.target)
+            }
+            if(modifiers)
+            {
+                for (let j = 0; j < modifiers.length; j++)
+                {
+                    let curModifier = targmodifiersets[i]
+                    const spr3 = rxn.createModifier()
+                    spr3.setSpecies(curModifier.modifier)
+                }
+            }
+        }
 
        // console.log("reactions",reactions)
         const writer = new libsbmlInstance.SBMLWriter()
