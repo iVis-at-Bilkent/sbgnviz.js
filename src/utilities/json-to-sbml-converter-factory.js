@@ -548,10 +548,10 @@ module.exports = function () {
         for (let i = 0; i < dissociationsKeys.length; i++)
         {
             let curKey = dissociationsKeys[i];
-            let assocOb = dissociations[curKey];
-            let sources = assocOb.source;
-            let targets = assocOb.target;
-            let modifiers = assocOb.modifiers;
+            let dissOb = dissociations[curKey];
+            let sources = dissOb.source;
+            let targets = dissOb.target;
+            let modifiers = dissOb.modifiers;
             const rxn = model.createReaction()
             rxn.setId('dissociation_'+ curKey)
             rxn.setSBOTerm(180)
@@ -578,6 +578,30 @@ module.exports = function () {
             }
         }
 
+        //Build logical operator reactions
+        let logicalOperatorsKeys = Object.keys(logicalOperators)
+        for (let i = 0; i < logicalOperatorsKeys.length; i++)
+        {
+            let curKey = logicalOperatorsKeys[i];
+            let logicObj = logicalOperators[curKey];
+            let sources = logicObj.source;
+            let target = logicObj.target;
+            const rxn = model.createReaction()
+            rxn.setId('logical_operator_'+ curKey)
+            let logicalClass = nodesIdName[curKey]
+            if(nodesToSbo[logicalClass])
+            {
+                rxn.setSBOTerm(nodesToSbo[logicalClass])
+            }
+            for (let j = 0; j < sources.length; j++)
+            {
+                let curSource = sources[j]
+                const spr1 = rxn.createReactant()
+                spr1.setSpecies(curSource.source)
+            }
+            const spr2 = rxn.createProduct()
+            spr2.setSpecies(target.target)
+        }
        // console.log("reactions",reactions)
         const writer = new libsbmlInstance.SBMLWriter()
         const serializedSBML = writer.writeSBMLToString(sbmlDoc)
