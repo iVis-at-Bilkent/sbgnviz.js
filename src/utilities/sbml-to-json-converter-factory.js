@@ -774,8 +774,13 @@ sbmlToJson.addNodes = function( cytoscapeJsNodes, data) {
     var ports = [];
     ports.push({
       id: 1,
-      x: tempBbox.w / 2,
-      y: tempBbox.y/2
+      x: -70,
+      y: 0
+    });
+    ports.push({
+      id: 1,
+      x: 70,
+      y: 0
     });
   
 
