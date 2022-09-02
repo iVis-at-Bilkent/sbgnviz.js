@@ -829,7 +829,7 @@ module.exports = function () {
     if (!handledElements[ele.class_]) {
       return;
     }
-
+    console.log("ele",ele)
     var self = this;
     var sourceAndTarget = self.getArcSourceAndTarget(ele, xmlObject);
 
@@ -925,6 +925,7 @@ module.exports = function () {
       });
     }
 
+    console.log("edgeObj",edgeObj)
     var cytoscapeJsEdge = {data: edgeObj, style: styleObj};
     jsonArray.push(cytoscapeJsEdge);
   };
@@ -1307,7 +1308,7 @@ module.exports = function () {
     }
 
     
-
+    console.log("glyphs", glyphs)
     for (i = 0; i < glyphs.length; i++) {
       var glyph = glyphs[i];
       self.traverseNodes(glyph, cytoscapeJsNodes, '', compartments,minDistanceToChildren);

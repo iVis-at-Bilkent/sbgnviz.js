@@ -704,12 +704,24 @@ sbmlToJson.addJSEdges= function(resultJson, cytoscapeJsNodes, cytoscapeJsEdges)
 
     }
   }
+  //Create map-  nodeId: nodeClass
+  let nodeIdClass = {}
+  for(let i = 0; i < cytoscapeJsNodes.length; i++)
+  {
+    let currentNodeData = cytoscapeJsNodes[i].data;
+    nodeIdClass[currentNodeData.id] = currentNodeData.class;
+  }
+
   for(let i = 0; i < resultJson.length; i++){
     if ( resultJson[i].group == 'edges')
     {
         var edgeObj = {};
         var styleObj = {};
         edgeObj.source = resultJson[i].data.source; //Is this the label or id?
+        if(sbmlToJson.isProcessNode(nodeIdClass[edgeObj.source]) || sbmlToJson.isLogicalOperator(nodeIdClass[edgeObj.source]) || sbmlToJson.isAssocOrDissoc(nodeIdClass[edgeObj.source]))
+        {
+          edgeObj.portsource = resultJson[i].data.source+".1"
+        }
         if (resultJson[i].classes == "reactantEdge")
         {
           if (resultJson[i].data.class)
@@ -746,11 +758,26 @@ sbmlToJson.addJSEdges= function(resultJson, cytoscapeJsNodes, cytoscapeJsEdges)
     
         edgeObj.id = resultJson[i].data.id
         edgeObj.target = resultJson[i].data.target;
+        if(sbmlToJson.isProcessNode(nodeIdClass[edgeObj.target]) || sbmlToJson.isLogicalOperator(nodeIdClass[edgeObj.target]) || sbmlToJson.isAssocOrDissoc(nodeIdClass[edgeObj.target]))
+        {
+          edgeObj.porttarget = edgeObj.target + ".2"
+        }
         elementUtilities.extendEdgeDataWithClassDefaults( edgeObj, edgeObj.class );
         var cytoscapeJsEdge1 = {data: edgeObj, style: styleObj};
         cytoscapeJsEdges.push(cytoscapeJsEdge1)
     }
   }
+}
+sbmlToJson.isProcessNode = function( nodeClass) { 
+  return nodeClass.startsWith("process");
+}
+
+sbmlToJson.isLogicalOperator = function( nodeClass) { 
+  return nodeClass == "or" || nodeClass == "not" || nodeClass == "and" || nodeClass == "unknown logical operator";
+}
+
+sbmlToJson.isAssocOrDissoc = function( nodeClass) { 
+  return nodeClass == "association" || nodeClass == "dissociation";
 }
 
 //This function is used to add more nodes(process, association, dissociation) when itterating through the reactions. 
@@ -773,12 +800,12 @@ sbmlToJson.addNodes = function( cytoscapeJsNodes, data) {
     nodeObj.statesandinfos = [];
     var ports = [];
     ports.push({
-      id: 1,
+      id: nodeObj.id +".1",
       x: -70,
       y: 0
     });
     ports.push({
-      id: 1,
+      id: nodeObj.id +".2",
       x: 70,
       y: 0
     });
