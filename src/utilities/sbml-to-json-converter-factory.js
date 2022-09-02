@@ -66,6 +66,18 @@ module.exports = function () {
     461: "trigger",
     185: "transport"
   }
+
+  //Set of modifiers
+  const modifiers = new Set();
+  modifiers.add("catalysis");
+  modifiers.add("inhibition");
+  modifiers.add("modulation");
+  modifiers.add("stimulation");
+  modifiers.add("trigger");
+  modifiers.add("unknown catalysis");
+  modifiers.add("unknown inhibition");
+
+
   var sboTwoEdgeOneNodeClass = {
     176: ["consumption","process", "production"], //state transition
     396: ["consumption","uncertain process", "production"], //Unknown transition
@@ -758,7 +770,7 @@ sbmlToJson.addJSEdges= function(resultJson, cytoscapeJsNodes, cytoscapeJsEdges)
     
         edgeObj.id = resultJson[i].data.id
         edgeObj.target = resultJson[i].data.target;
-        if(sbmlToJson.isProcessNode(nodeIdClass[edgeObj.target]) || sbmlToJson.isLogicalOperator(nodeIdClass[edgeObj.target]) || sbmlToJson.isAssocOrDissoc(nodeIdClass[edgeObj.target]))
+        if(!modifiers.has(edgeObj.class)  && (sbmlToJson.isProcessNode(nodeIdClass[edgeObj.target]) || sbmlToJson.isLogicalOperator(nodeIdClass[edgeObj.target]) || sbmlToJson.isAssocOrDissoc(nodeIdClass[edgeObj.target])))
         {
           edgeObj.porttarget = edgeObj.target + ".2"
         }
