@@ -396,7 +396,6 @@ sbmlToJson.addJSNodes = function(resultJson,cytoscapeJsNodes) {
       nodeObj.label = resultJson[i].data.label;
       nodeObj.statesandinfos = [];
       nodeObj.parent = resultJson[i].data.parent;
-      console.log("node", nodeObj.class, nodeObj.bbox)
       var cytoscapeJsNode = {data: nodeObj, style: styleObj};
       elementUtilities.extendNodeDataWithClassDefaults( nodeObj, nodeObj.class );
       cytoscapeJsNodes.push(cytoscapeJsNode)
@@ -749,7 +748,6 @@ sbmlToJson.addJSEdges= function(resultJson, cytoscapeJsNodes, cytoscapeJsEdges)
   for(let i = 0; i < resultJson.length; i++){
     if ( resultJson[i].group == 'edges')
     {
-        console.log("resultJson[i]",resultJson[i])
         var edgeObj = {};
         var styleObj = {};
         edgeObj.source = resultJson[i].data.source; //Is this the label or id?
