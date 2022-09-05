@@ -27,7 +27,7 @@ module.exports = function () {
 
   var sboToNodeClass = {
     278: "rna",
-    253: "complex",
+    253: "complex sbml",
     289: "hypothetical complex",
     291: "degradation",
     298: "drug",
@@ -35,7 +35,7 @@ module.exports = function () {
     252: "protein",
     327: "ion",
     284: "ion channel",
-    358: "phenotype",
+    358: "phenotype sbml",
     244: "receptor",
     247: "simple molecule", 
     248: "truncated protein",
@@ -366,6 +366,7 @@ sbmlToJson.addJSNodes = function(resultJson,cytoscapeJsNodes) {
       tempBbox.y = 0;
       tempBbox.w = 50;
       tempBbox.h = 30;
+
       var sboTerm = resultJson[i].data.sboTerm;
       if(sboToNodeClass[sboTerm])
       {
@@ -377,6 +378,13 @@ sbmlToJson.addJSNodes = function(resultJson,cytoscapeJsNodes) {
         tempBbox.w = 50
         tempBbox.h = 30
       }
+      //Check if node should have same height and same width
+      if(sbmlToJson.mustBeSquare(nodeObj.class))
+      {
+        tempBbox.w = 30
+        tempBbox.h = 30
+      }
+
       nodeObj.id = resultJson[i].data.id
 
       nodeObj.bbox = tempBbox;   
@@ -390,6 +398,10 @@ sbmlToJson.addJSNodes = function(resultJson,cytoscapeJsNodes) {
   }
   
 };
+sbmlToJson.mustBeSquare = function(className)
+{
+  return (className == "ion" || className == "degradation")
+}
 
 sbmlToJson.getDataOfNode = function(nodeId)
 {

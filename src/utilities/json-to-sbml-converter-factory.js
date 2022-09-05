@@ -15,7 +15,7 @@ module.exports = function () {
     var nodesToSbo = 
     {
         "rna": 278,
-        "complex": 253,
+        "complex sbml": 253,
         "hypothetical complex": 289,
         "degradation": 291,
         "drug": 298,
@@ -23,7 +23,7 @@ module.exports = function () {
         "protein": 252,
         "ion": 327,
         "ion channel": 284,
-        "phenotype": 358,
+        "phenotype sbml": 358,
         "receptor": 244,
         "simple molecule": 247, 
         "truncated protein": 248,
