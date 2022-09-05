@@ -50,13 +50,13 @@ module.exports = function () {
 
     var modifierNotationEdge = 
     {
-        "modulation": 19,
-        "stimulation": 21,
+        "modulation": 594,
+        "stimulation": 459,
         "catalysis": 13,
-        "inhibition": 20,
+        "inhibition": 537,
         "trigger": 461,
-        "unknown inhibition": 20,
-        "unknown catalysis": 13, 
+        "unknown inhibition": 536,
+        "unknown catalysis": 462, 
     }
     var twoOrThreeEdge = 
     {
@@ -226,7 +226,7 @@ module.exports = function () {
                         {
                             process[currentKey].modifiers = []
                         }
-                        process[currentKey].modifiers.push({"modifier": targetObject.source, "modifierEdge": targetObject.edgeClass });
+                        process[currentKey].modifiers.push({"modifier": targetObject.source, "modifierEdge": targetObject.edgeClass, "sboTerm": modifierNotationEdge[targetObject.edgeClass] });
                     }
                     else
                     {
@@ -283,7 +283,7 @@ module.exports = function () {
                         {
                             truncatedProcess[currentKey].modifiers = []
                         }
-                        truncatedProcess[currentKey].modifiers.push({"modifier": targetObject.source, "modifierEdge": targetObject.edgeClass });
+                        truncatedProcess[currentKey].modifiers.push({"modifier": targetObject.source, "modifierEdge": targetObject.edgeClass, "sboTerm":modifierNotationEdge[targetObject.edgeClass] });
                     }
                     else
                     {
@@ -443,7 +443,7 @@ module.exports = function () {
                 {
                     const modifier = rxn.createModifier()
                     modifier.setSpecies(modifiers[j].modifier)
-                    modifier.setSBOTerm(modifierNotationEdge[modifiers[j].modifierEdge])
+                    modifier.setSBOTerm(modifiers[j].sboTerm)
                 }
             }
             //Set sbo term for reaction

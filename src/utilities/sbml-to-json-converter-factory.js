@@ -47,8 +47,8 @@ module.exports = function () {
   }
 
   var sboToEdgeClass = {
-    20: "unknown inhibition",
-    13: "unknown catalysis",
+    536: "unknown inhibition",
+    462: "unknown catalysis",
     171: "positive influence sbml",
     407: "negative influence",
     344: "reduced modulation",
@@ -59,10 +59,10 @@ module.exports = function () {
     170: "unknown reduced stimulation",
     342: "unknown reduced modulation",
     205: "unknown reduced trigger",
-    19: "modulation",
-    21: "stimulation",
+    594: "modulation",
+    459: "stimulation",
     13: "catalysis",
-    20: "inhibition",
+    537: "inhibition",
     461: "trigger",
     185: "transport"
   }
@@ -749,6 +749,7 @@ sbmlToJson.addJSEdges= function(resultJson, cytoscapeJsNodes, cytoscapeJsEdges)
   for(let i = 0; i < resultJson.length; i++){
     if ( resultJson[i].group == 'edges')
     {
+        console.log("resultJson[i]",resultJson[i])
         var edgeObj = {};
         var styleObj = {};
         edgeObj.source = resultJson[i].data.source; //Is this the label or id?
