@@ -320,8 +320,8 @@ sbmlToJson.addJSCompartments = function(resultJson, cytoscapeJsNodes)
       nodeObj.class = "compartment"
       tempBbox.x = 0;
       tempBbox.y = 0;
-      tempBbox.w = 50;
-      tempBbox.h = 30;
+      tempBbox.w = 60;
+      tempBbox.h = 60;
       nodeObj.id = resultJson[i].data.id
 
       nodeObj.bbox = tempBbox;   
@@ -379,10 +379,15 @@ sbmlToJson.addJSNodes = function(resultJson,cytoscapeJsNodes) {
         tempBbox.h = 30
       }
       //Check if node should have same height and same width
-      if(sbmlToJson.mustBeSquare(nodeObj.class))
+      if(sbmlToJson.mustBeSquare(nodeObj.class) && !sbmlToJson.complexOrPhenotype(nodeObj.class))
       {
-        tempBbox.w = 30
-        tempBbox.h = 30
+        tempBbox.w = 20
+        tempBbox.h = 20
+      }
+      else if(sbmlToJson.mustBeSquare(nodeObj.class) && sbmlToJson.complexOrPhenotype(nodeObj.class))
+      {
+        tempBbox.w = 50
+        tempBbox.h = 50
       }
 
       nodeObj.id = resultJson[i].data.id
@@ -391,6 +396,7 @@ sbmlToJson.addJSNodes = function(resultJson,cytoscapeJsNodes) {
       nodeObj.label = resultJson[i].data.label;
       nodeObj.statesandinfos = [];
       nodeObj.parent = resultJson[i].data.parent;
+      console.log("node", nodeObj.class, nodeObj.bbox)
       var cytoscapeJsNode = {data: nodeObj, style: styleObj};
       elementUtilities.extendNodeDataWithClassDefaults( nodeObj, nodeObj.class );
       cytoscapeJsNodes.push(cytoscapeJsNode)
@@ -400,7 +406,11 @@ sbmlToJson.addJSNodes = function(resultJson,cytoscapeJsNodes) {
 };
 sbmlToJson.mustBeSquare = function(className)
 {
-  return (className == "ion" || className == "degradation")
+  return (className == "ion" || className == "degradation" || className == "complex sbml" || className == "phenotype sbml")
+}
+sbmlToJson.complexOrPhenotype = function(className)
+{
+  return (className == "complex sbml" || className == "phenotype sbml")
 }
 
 sbmlToJson.getDataOfNode = function(nodeId)
