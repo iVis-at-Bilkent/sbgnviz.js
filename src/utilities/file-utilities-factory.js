@@ -279,7 +279,7 @@ module.exports = function () {
  fileUtilities.loadFile = function(file, convertFcn, callback1, callback2, callback3, callback4) {
    var self = this;
    console.log("loadFile spinner")
-   uiUtilities.startSpinner("load-file-spinner");
+   //uiUtilities.startSpinner("load-file-spinner");
 
    var textType = /text.*/;
 
@@ -337,7 +337,7 @@ module.exports = function () {
          callback3();
        }
 
-       uiUtilities.endSpinner("load-file-spinner");
+       //uiUtilities.endSpinner("load-file-spinner");
        $(document).trigger( "sbgnvizLoadFileEnd", [ file.name, cy ] ); // Trigger an event signaling that a file is loaded
 
        if (typeof callback4 !== 'undefined') {
