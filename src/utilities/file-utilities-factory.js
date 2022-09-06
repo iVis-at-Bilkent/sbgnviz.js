@@ -279,7 +279,7 @@ module.exports = function () {
  fileUtilities.loadFile = function(file, convertFcn, callback1, callback2, callback3, callback4) {
    var self = this;
    console.log("loadFile spinner")
-   //uiUtilities.startSpinner("load-file-spinner");
+   uiUtilities.startSpinner("load-file-spinner");
 
    var textType = /text.*/;
 
