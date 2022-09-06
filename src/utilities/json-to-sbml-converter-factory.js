@@ -101,6 +101,10 @@ module.exports = function () {
                 comp.setId(nodes[i]._private.data.id.replace(/-/g, "_"))
                 comp.setSize(1)
                 comp.setConstant(true)
+                if(nodes[i]._private.data.label)
+                {
+                    comp.setName(nodes[i]._private.data.label)
+                }
             }
         }
 
@@ -126,7 +130,7 @@ module.exports = function () {
                 newSpecies.setId(newStr);
                 if(nodes[i]._private.data.label)
                 {
-                    newSpecies.setName(nodes[i]._private.data.class)
+                    newSpecies.setName(nodes[i]._private.data.label)
                 }
             }
             nodesIdName[nodes[i]._private.data.id.replace(/-/g, "_")] = nodes[i]._private.data.class;
@@ -622,7 +626,7 @@ module.exports = function () {
     }
     jsonToSbml.isSpecies = function(nodeClass) {
         return !jsonToSbml.isLogicalOperatorNode(nodeClass) && !jsonToSbml.isProcessNode(nodeClass) && !jsonToSbml.isTruncatedProcessNode(nodeClass) 
-        && nodeClass != "association" &&  nodeClass != "dissociation" 
+        && nodeClass != "association" &&  nodeClass != "dissociation" &&  nodeClass != "compartment";
     }
     jsonToSbml.buildString = function(obj) {}
     jsonToSbml.getRenderExtensionSbgnml = function(renderInfo) {}
