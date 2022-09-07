@@ -350,9 +350,10 @@ module.exports = function () {
  };
 
  fileUtilities.loadSBGNMLText = async function(textData, tileInfoBoxes, filename, cy, urlParams){
-        await updateGraph(sbgnmlToJson.convert(textToXmlObject(textData), urlParams), undefined, undefined, tileInfoBoxes);
-         await $(document).trigger("sbgnvizLoadFileEnd",  [filename, cy]);
-         uiUtilities.endSpinner("load-file-spinner");
+  await updateGraph(sbgnmlToJson.convert(textToXmlObject(textData), urlParams), undefined, undefined, tileInfoBoxes);
+  await $(document).trigger("sbgnvizLoadFileEnd",  [filename, cy]);
+        uiUtilities.endSpinner("load-file-spinner");
+
 
  };
 
@@ -428,29 +429,8 @@ module.exports = function () {
    uiUtilities.endSpinner("load-spinner");
  }
 
- fileUtilities.loadSbml = function(file, callback1, callback2, layoutBy){
-   /*
-  var reader = new FileReader();
-  reader.onload = function (e) { 
-    
-      this.convertSbmlToSbgnml(e.target.result, function(data){
-      if(data == null){
-        errorCallback();
-      }else{
-        successCallback(data);
-      }
-    });
-  }.bind(this);
-  reader.readAsText(file);
-
- }
-
-
- fileUtilities.convertSbgn= function(filename, version, renderInfo, mapProperties, nodes, edges, hidden = false) {
-  var sbgnmlText = jsonToSbgnml.createSbgnml(filename, "plain", renderInfo, mapProperties, nodes, edges, hidden);
- 
-  return sbgnmlText;
-  */
+ fileUtilities.loadSbmlForSBML = function(file, callback1, callback2, layoutBy)
+ {
   var convert = function( text ) {
     var converted = sbmlToJson.convert(text)
     return converted;
@@ -476,6 +456,30 @@ module.exports = function () {
 
   fileUtilities.loadFile( file, convert, callback1, callback2, fileUtilities.collapseMarkedNodes, runLayout);
  
+ }
+ fileUtilities.loadSbml = function(file, successCallback, errorCallback){
+  var reader = new FileReader();
+
+  reader.onload = function (e) { 
+    
+    this.convertSbmlToSbgnml(e.target.result, function(data){
+      if(data == null){
+        errorCallback();
+      }else{
+        successCallback(data);
+      }
+    });
+  }.bind(this);
+  reader.readAsText(file);
+
+ }
+
+
+ fileUtilities.convertSbgn= function(filename, version, renderInfo, mapProperties, nodes, edges, hidden = false) {
+  var sbgnmlText = jsonToSbgnml.createSbgnml(filename, "plain", renderInfo, mapProperties, nodes, edges, hidden);
+ 
+  return sbgnmlText;
+  
 };
 
  fileUtilities.exportLayoutData = function(filename, byName) {

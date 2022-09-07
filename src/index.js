@@ -1,6 +1,8 @@
 (function(){
   var sbgnviz = function(_options) {
 
+    const libsbml = require('libsbmljs_stable');
+    const libsbmlInstance = libsbml();
     var param = {}; // The parameter to be passed to all utilities instances related to this sbgnviz instance
 
     var optionUtilities = require('./utilities/option-utilities-factory')();
@@ -65,6 +67,7 @@
     param.sbgnmlToSbmlConverter = sbgnmlToSbmlConverter;
     param.sbmlToSbgnmlConverter = sbmlToSbgnmlConverter;
     param.experimentalDataOverlay = experimentalDataOverlay;
+    param.libsbmlInstance = libsbmlInstance;
 
     // call constructors of objects with param
     

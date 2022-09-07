@@ -1,5 +1,4 @@
-const libsbml = require('libsbmljs_stable');
-const libsbmlInstance = libsbml();
+
 var parseString = require("xml2js").parseString;
 var libUtilities = require("./lib-utilities");
 var libs = libUtilities.getLibs();
@@ -7,7 +6,7 @@ var jQuery = ($ = libs.jQuery);
 var classes = require("./classes");
 
 module.exports = function () {
-  var elementUtilities, graphUtilities, handledElements, mainUtilities;
+  var elementUtilities, graphUtilities, handledElements, mainUtilities, libsbmlInstance;
   let resultJson = [];
   let speciesCompartmentMap = new Map;
 
@@ -17,6 +16,7 @@ module.exports = function () {
     elementUtilities = param.elementUtilities;
     graphUtilities = param.graphUtilities;
     mainUtilities = param.mainUtilities;
+    libsbmlInstance = param.libsbmlInstance;
 
     handledElements = {};
 
@@ -104,18 +104,14 @@ module.exports = function () {
     let model = null;
     elementUtilities.mapType = 'SBML';
 
-    var sbgn;
-    try {
+
       //var xmlString = new XMLSerializer().serializeToString(xmlObject);
       let reader = new libsbmlInstance.SBMLReader();
     
       // get document and model from sbml text
       let doc = reader.readSBMLFromString(xmlString);
       model = doc.getModel();
-    }
-    catch (err) {
-      throw new Error("Could not parse sbgnml. "+ err);
-    }
+
     let result = []; 
     
     let plugin;
