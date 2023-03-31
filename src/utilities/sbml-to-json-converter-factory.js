@@ -130,7 +130,6 @@ module.exports = function () {
       layout = layoutplugin.layouts[0];
     }   
 
-    /*
     if(layout) {
       let edgeArray = [];
       let compoundMap = new Map();
@@ -275,8 +274,9 @@ module.exports = function () {
       return result;
     }
     else {
-      */
+     
       // add compartments, species and reactions
+
       sbmlToJson.addCompartments(model, cytoscapeJsNodes);
       sbmlToJson.addSpecies(model, cytoscapeJsNodes);
       sbmlToJson.addReactions(model, cytoscapeJsEdges,cytoscapeJsNodes );
@@ -289,9 +289,8 @@ module.exports = function () {
       
       speciesCompartmentMap = new Map;
       return cytoscapeJsGraph;
-      /*
+    
     }
-    */
     
   };
 
