@@ -112,7 +112,7 @@ module.exports = function () {
       let doc = reader.readSBMLFromString(xmlString);
       model = doc.getModel();
 
-    let result = []; 
+    //let result = []; 
     
     let plugin;
     try {
@@ -130,7 +130,8 @@ module.exports = function () {
       layout = layoutplugin.layouts[0];
     }   
 
-    if(!layout) {
+    /*
+    if(layout) {
       let edgeArray = [];
       let compoundMap = new Map();
       let compartmentMap = new Map();
@@ -274,6 +275,7 @@ module.exports = function () {
       return result;
     }
     else {
+      */
       // add compartments, species and reactions
       sbmlToJson.addCompartments(model, cytoscapeJsNodes);
       sbmlToJson.addSpecies(model, cytoscapeJsNodes);
@@ -287,7 +289,9 @@ module.exports = function () {
       
       speciesCompartmentMap = new Map;
       return cytoscapeJsGraph;
+      /*
     }
+    */
     
   };
 
