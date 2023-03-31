@@ -130,7 +130,7 @@ module.exports = function () {
       layout = layoutplugin.layouts[0];
     }   
 
-    if(layout) {
+    if(!layout) {
       let edgeArray = [];
       let compoundMap = new Map();
       let compartmentMap = new Map();
