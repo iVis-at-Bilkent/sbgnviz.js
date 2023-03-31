@@ -150,7 +150,7 @@ module.exports = function () {
         if(compartmentGlyph.getCompartmentId() !== "default") {
           let bbox = compartmentGlyph.getBoundingBox();
           let data = {id: compartmentGlyph.getCompartmentId(), label: compartmentMap.get(compartmentGlyph.getCompartmentId()),
-            width: bbox.width, height: bbox.height, bbox: {x: 0, y: 0}};
+            width: bbox.width, height: bbox.height, bbox: {x: 0, y: 0}, statesandinfos: []};
           let position = {x: bbox.x + bbox.width / 2, y: bbox.y + bbox.height / 2};
           compartmentNodeMap.set(compartmentGlyph.getCompartmentId(), {"data": data, "position": position, "group": "nodes", "classes": "compartment"});
           compoundMap.set(compartmentGlyph.getCompartmentId(), [bbox.x, bbox.y, bbox.width, bbox.height, bbox.width*bbox.height]);
@@ -173,7 +173,7 @@ module.exports = function () {
         speciesGlyphIdSpeciesIdMap.set(speciesGlyph.getId(), speciesGlyph.getSpeciesId());
         let bbox = speciesGlyph.getBoundingBox();
         let data = {id: speciesGlyph.getId(), label: speciesMap.get(speciesGlyph.getSpeciesId())[0], compref: speciesMap.get(speciesGlyph.getSpeciesId())[1],
-          sboTerm: speciesMap.get(speciesGlyph.getSpeciesId())[2], width: bbox.width, height: bbox.height, bbox: {x: 0, y: 0}};
+          sboTerm: speciesMap.get(speciesGlyph.getSpeciesId())[2], width: bbox.width, height: bbox.height, bbox: {x: 0, y: 0}, statesandinfos: []};
         let position = {x: bbox.x + bbox.width / 2, y: bbox.y + bbox.height / 2};
         speciesNodeMap.set(speciesGlyph.getId(), {"data": data, "position": position, "group": "nodes", "classes": "species"});
         if(speciesMap.get(speciesGlyph.getSpeciesId())[2] == 253 || speciesMap.get(speciesGlyph.getSpeciesId())[2] == 289) {
@@ -201,7 +201,7 @@ module.exports = function () {
       for(let i = 0; i < layout.getNumReactionGlyphs(); i++){
         let reactionGlyph = layout.getReactionGlyph(i);
         let data = {id: reactionGlyph.getReactionId(), label: reactionMap.get(reactionGlyph.getReactionId())[0], sboTerm: reactionMap.get(reactionGlyph.getReactionId())[1],
-          width: 15, height: 15, bbox: {x: 0, y: 0} };
+          width: 15, height: 15, bbox: {x: 0, y: 0}, statesandinfos: [] };
         let position = {x: reactionGlyph.getCurve().getCurveSegment(0).getStart().x() + 10, y: reactionGlyph.getCurve().getCurveSegment(0).getStart().y() + 10};
         reactionNodeMap.set(reactionGlyph.getReactionId(), {"data": data, "position": position, "group": "nodes", "classes": "reaction"});
 
