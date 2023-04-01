@@ -201,7 +201,7 @@ module.exports = function () {
       for(let i = 0; i < layout.getNumReactionGlyphs(); i++){
         let reactionGlyph = layout.getReactionGlyph(i);
         let data = {id: reactionGlyph.getReactionId(), label: reactionMap.get(reactionGlyph.getReactionId())[0], sboTerm: reactionMap.get(reactionGlyph.getReactionId())[1],
-          width: 15, height: 15, bbox: {x: 0, y: 0, w: bbox.width, h: bbox.height}, statesandinfos: [] };
+          width: 15, height: 15, bbox: {x: 0, y: 0, w: 15, h: 15}, statesandinfos: [] };
         let position = {x: reactionGlyph.getCurve().getCurveSegment(0).getStart().x() + 10, y: reactionGlyph.getCurve().getCurveSegment(0).getStart().y() + 10};
         reactionNodeMap.set(reactionGlyph.getReactionId(), {"data": data, "position": position, "group": "nodes", "classes": "reaction"});
 
