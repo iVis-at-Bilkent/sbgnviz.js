@@ -265,6 +265,13 @@ module.exports = function () {
 */
       var extraNodes = []
       sbmlToJson.addReactions(model, edgeArray, extraNodes );
+      var newNodesMap = new Map();
+
+      //Create map from extraNodes
+      for (let k = 0; k <extraNodes.length; k++)
+      {
+        newNodesMap[extraNodes.data.id] = extraNodes.data;
+      }
 
       // infer nesting
       let areaMap = new Map();
