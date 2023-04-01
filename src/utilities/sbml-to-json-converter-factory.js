@@ -855,7 +855,7 @@ sbmlToJson.addJSEdges= function(resultJson, cytoscapeJsNodes, cytoscapeJsEdges)
     
         edgeObj.id = resultJson[i].data.id
         edgeObj.target = resultJson[i].data.target;
-        if(!modifiers.has(edgeObj.class)  && (sbmlToJson.isProcessNode(nodeIdClass[edgeObj.target]) || sbmlToJson.isLogicalOperator(nodeIdClass[edgeObj.target]) || sbmlToJson.isAssocOrDissoc(nodeIdClass[edgeObj.target])))
+        if(!modifiers.has(edgeObj.class)  && nodeIdClass[edgeObj.target] && (sbmlToJson.isProcessNode(nodeIdClass[edgeObj.target]) || sbmlToJson.isLogicalOperator(nodeIdClass[edgeObj.target]) || sbmlToJson.isAssocOrDissoc(nodeIdClass[edgeObj.target])))
         {
           edgeObj.porttarget = edgeObj.target + ".2"
         }
