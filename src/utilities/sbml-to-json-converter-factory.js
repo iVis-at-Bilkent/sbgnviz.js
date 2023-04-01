@@ -815,7 +815,7 @@ sbmlToJson.addJSEdges= function(resultJson, cytoscapeJsNodes, cytoscapeJsEdges)
         var edgeObj = {};
         var styleObj = {};
         edgeObj.source = resultJson[i].data.source; //Is this the label or id?
-        if(sbmlToJson.isProcessNode(nodeIdClass[edgeObj.source]) || sbmlToJson.isLogicalOperator(nodeIdClass[edgeObj.source]) || sbmlToJson.isAssocOrDissoc(nodeIdClass[edgeObj.source]))
+        if(nodeIdClass[edgeObj.source] && sbmlToJson.isProcessNode(nodeIdClass[edgeObj.source]) || sbmlToJson.isLogicalOperator(nodeIdClass[edgeObj.source]) || sbmlToJson.isAssocOrDissoc(nodeIdClass[edgeObj.source]))
         {
           edgeObj.portsource = resultJson[i].data.source+".1"
         }
