@@ -282,7 +282,7 @@ module.exports = function () {
         );
       };
 
-      let mergedMap = new Map([...compartmentNodeMap, ...speciesNodeMap, ...reactionNodeMap, ... extraNodes]);
+      let mergedMap = new Map([...compartmentNodeMap, ...speciesNodeMap, ... extraNodes]);
       let finalNodeArray = [];
       mergedMap.forEach(function(value, key) {
         let nodeId = key;
