@@ -264,7 +264,7 @@ module.exports = function () {
       }
 */
       var extraNodes = []
-      sbmlToJson.addReactions(model, edgeArray, v );
+      sbmlToJson.addReactions(model, edgeArray, extraNodes );
 
       // infer nesting
       let areaMap = new Map();
