@@ -278,25 +278,25 @@ module.exports = function () {
           let speciesReferenceGlyph = reactionGlyph.getSpeciesReferenceGlyph(j);
           let role = speciesReferenceGlyph.getRole();
           if(role === 1 || role === 3) {
-            let edgeData = {id: reactionGlyph.getReactionId() + "_" + speciesReferenceGlyph.getSpeciesGlyphId(), class: "consumption",source: speciesReferenceGlyph.getSpeciesGlyphId(), target: reactionGlyph.getReactionId()};
-            extendEdgeDataWithClassDefaults(edgeData, edgeData.class)
+            let edgeData = {id: reactionGlyph.getReactionId() + "_" + speciesReferenceGlyph.getSpeciesGlyphId(), class: "consumption", source: speciesReferenceGlyph.getSpeciesGlyphId(), target: reactionGlyph.getReactionId()};
+            elementUtilities.extendEdgeDataWithClassDefaults(edgeData, edgeData.class)
             edgeArray.push({"data": edgeData, "group": "edges", "classes": "reactantEdge"});
           }
           else if(role === 2 || role === 4) {
-            let edgeData = {id: speciesReferenceGlyph.getSpeciesGlyphId() + "_" + reactionGlyph.getReactionId(),class: "production", source: reactionGlyph.getReactionId(), target: speciesReferenceGlyph.getSpeciesGlyphId()};
-            extendEdgeDataWithClassDefaults(edgeData, edgeData.class)
+            let edgeData = {id: speciesReferenceGlyph.getSpeciesGlyphId() + "_" + reactionGlyph.getReactionId(), class: "production", source: reactionGlyph.getReactionId(), target: speciesReferenceGlyph.getSpeciesGlyphId()};
+            elementUtilities.extendEdgeDataWithClassDefaults(edgeData, edgeData.class)
             edgeArray.push({"data": edgeData, "group": "edges", "classes": "productEdge"});
           }
           else if(role === 5 || role === 6 || role === 7) {
             let edgeData = {id: speciesReferenceGlyph.getSpeciesGlyphId() + "_" + reactionGlyph.getReactionId(), source: speciesReferenceGlyph.getSpeciesGlyphId(), target: reactionGlyph.getReactionId(), 
               sboTerm: reactionSpeciesModifierMap.get(reactionGlyph.getReactionId())[speciesGlyphIdSpeciesIdMap.get(speciesReferenceGlyph.getSpeciesGlyphId())]};
-              //extendEdgeDataWithClassDefaults(edgeData, edgeData.class)
+              //elementUtilities.extendEdgeDataWithClassDefaults(edgeData, edgeData.class)
             edgeArray.push({"data": edgeData, "group": "edges"});
           }
           else {
             let edgeData = {id: reactionGlyph.getReactionId() + "_" + speciesReferenceGlyph.getSpeciesGlyphId(), source: reactionGlyph.getReactionId(), target: speciesReferenceGlyph.getSpeciesGlyphId(), 
               sboTerm: reactionSpeciesModifierMap.get(reactionGlyph.getReactionId())[speciesGlyphIdSpeciesIdMap.get(speciesReferenceGlyph.getSpeciesGlyphId())]};
-              //extendEdgeDataWithClassDefaults(edgeData, edgeData.class)
+              //elementUtilities.extendEdgeDataWithClassDefaults(edgeData, edgeData.class)
             edgeArray.push({"data": edgeData, "group": "edges"});          
           }        
         }
