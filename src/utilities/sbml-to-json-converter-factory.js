@@ -238,7 +238,24 @@ module.exports = function () {
           twoEdgeFound = true;
           let data = {id: reactionGlyph.getReactionId(), class: sboTwoEdgeOneNodeClass[reactionMap.get(reactionGlyph.getReactionId())[1]][1],
             width: 15, height: 15, bbox: {x: 0, y: 0, w: 15, h: 15}, statesandinfos: [] };
+            var ports = [];
+            ports.push({
+              id: data.id +".1",
+              x: -70,
+              y: 0
+            });
+            ports.push({
+              id: data.id +".2",
+              x: 70,
+              y: 0
+            });
+        
+
+            data.ports = ports;
           elementUtilities.extendNodeDataWithClassDefaults( data, data.class );
+
+         
+
           node1 = sboTwoEdgeOneNodeClass[reactionMap.get(reactionGlyph.getReactionId())[1]][0]
           node2 = sboTwoEdgeOneNodeClass[reactionMap.get(reactionGlyph.getReactionId())[1]][2]
 
