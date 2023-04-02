@@ -288,7 +288,7 @@ module.exports = function () {
             edgeArray.push({"data": edgeData, "group": "edges", "classes": "productEdge"});
           }
           else if(role === 5 || role === 6 || role === 7) {
-            let edgeData = {id: speciesReferenceGlyph.getSpeciesGlyphId() + "_" + reactionGlyph.getReactionId(), source: speciesReferenceGlyph.getSpeciesGlyphId(), target: reactionGlyph.getReactionId(), 
+            let edgeData = {id: speciesReferenceGlyph.getSpeciesGlyphId() + "_" + reactionGlyph.getReactionId(), class: sboToEdgeClass[reactionSpeciesModifierMap.get(reactionGlyph.getReactionId())[speciesGlyphIdSpeciesIdMap.get(speciesReferenceGlyph.getSpeciesGlyphId())]] ,source: speciesReferenceGlyph.getSpeciesGlyphId(), target: reactionGlyph.getReactionId(), 
               sboTerm: reactionSpeciesModifierMap.get(reactionGlyph.getReactionId())[speciesGlyphIdSpeciesIdMap.get(speciesReferenceGlyph.getSpeciesGlyphId())]};
               elementUtilities.extendEdgeDataWithClassDefaults(edgeData, "consumption")
             edgeArray.push({"data": edgeData, "group": "edges"});
