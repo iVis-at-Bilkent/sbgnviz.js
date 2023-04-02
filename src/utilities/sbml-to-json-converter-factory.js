@@ -290,13 +290,13 @@ module.exports = function () {
           else if(role === 5 || role === 6 || role === 7) {
             let edgeData = {id: speciesReferenceGlyph.getSpeciesGlyphId() + "_" + reactionGlyph.getReactionId(), source: speciesReferenceGlyph.getSpeciesGlyphId(), target: reactionGlyph.getReactionId(), 
               sboTerm: reactionSpeciesModifierMap.get(reactionGlyph.getReactionId())[speciesGlyphIdSpeciesIdMap.get(speciesReferenceGlyph.getSpeciesGlyphId())]};
-              extendEdgeDataWithClassDefaults(edgeData, edgeData.class)
+              //extendEdgeDataWithClassDefaults(edgeData, edgeData.class)
             edgeArray.push({"data": edgeData, "group": "edges"});
           }
           else {
             let edgeData = {id: reactionGlyph.getReactionId() + "_" + speciesReferenceGlyph.getSpeciesGlyphId(), source: reactionGlyph.getReactionId(), target: speciesReferenceGlyph.getSpeciesGlyphId(), 
               sboTerm: reactionSpeciesModifierMap.get(reactionGlyph.getReactionId())[speciesGlyphIdSpeciesIdMap.get(speciesReferenceGlyph.getSpeciesGlyphId())]};
-              extendEdgeDataWithClassDefaults(edgeData, edgeData.class)
+              //extendEdgeDataWithClassDefaults(edgeData, edgeData.class)
             edgeArray.push({"data": edgeData, "group": "edges"});          
           }        
         }
