@@ -211,7 +211,6 @@ module.exports = function () {
         }
       }
 
-      /*
       let reactionMap = new Map();
       let reactionNodeMap = new Map();
       let reactionSpeciesModifierMap = new Map();
@@ -262,9 +261,9 @@ module.exports = function () {
           }        
         }
       }
-*/
+     /*  
       var extraNodes = []
-      sbmlToJson.addReactions(model, edgeArray, extraNodes );
+     sbmlToJson.addReactions(model, edgeArray, extraNodes );
       var newNodesMap = new Map();
 
       //Create map from extraNodes
@@ -272,6 +271,7 @@ module.exports = function () {
       {
         newNodesMap[extraNodes.data.id] = extraNodes.data;
       }
+      */
 
       // infer nesting
       let areaMap = new Map();
@@ -289,7 +289,7 @@ module.exports = function () {
         );
       };
 
-      let mergedMap = new Map([...compartmentNodeMap, ...speciesNodeMap, ... extraNodes]);
+      let mergedMap = new Map([...compartmentNodeMap, ...speciesNodeMap, ... reactionNodeMap]);
       let finalNodeArray = [];
       mergedMap.forEach(function(value, key) {
         let nodeId = key;
