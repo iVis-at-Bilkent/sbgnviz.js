@@ -215,7 +215,7 @@ module.exports = function () {
       let reactionNodeMap = new Map();
       let reactionSpeciesModifierMap = new Map();
 
-      // traverse reactions
+      // traverse reactions. Get reaction and their modifiers
       for(let i = 0; i < model.getNumReactions(); i++){
         let reaction = model.getReaction(i);
         reactionMap.set(reaction.getId(), [reaction.getName(), reaction.getSBOTerm()]);
@@ -227,26 +227,45 @@ module.exports = function () {
         }            
       }
 
-      // traverse reaction glyphs
+      // traverse reaction glyphs. 
       for(let i = 0; i < layout.getNumReactionGlyphs(); i++){
         let reactionGlyph = layout.getReactionGlyph(i);
+        let twoEdgeFound = false;
+        var node1;
+        var node2;
+        if(sboTwoEdgeOneNodeClass[reactionMap.get(reactionGlyph.getReactionId())[1]])
+        {
+          twoEdgeFound = true;
+          let data = {id: reactionGlyph.getReactionId(), class: sboTwoEdgeOneNodeClass[reactionMap.get(reactionGlyph.getReactionId())[1]][1],
+            width: 15, height: 15, bbox: {x: 0, y: 0, w: 15, h: 15}, statesandinfos: [] };
+          elementUtilities.extendNodeDataWithClassDefaults( data, data.class );
+          node1 = sboTwoEdgeOneNodeClass[reactionMap.get(reactionGlyph.getReactionId())[1]][0]
+          node2 = sboTwoEdgeOneNodeClass[reactionMap.get(reactionGlyph.getReactionId())[1]][2]
+
+          let position = {x: reactionGlyph.getCurve().getCurveSegment(0).getStart().x() + 10, y: reactionGlyph.getCurve().getCurveSegment(0).getStart().y() + 10};
+          reactionNodeMap.set(reactionGlyph.getReactionId(), {"data": data, "position": position, "group": "nodes", "classes": "reaction"});
+        }else
+        {
         let data = {id: reactionGlyph.getReactionId(), label: reactionMap.get(reactionGlyph.getReactionId())[0], sboTerm: reactionMap.get(reactionGlyph.getReactionId())[1],
           width: 15, height: 15, bbox: {x: 0, y: 0, w: 15, h: 15}, statesandinfos: [] };
           //elementUtilities.extendNodeDataWithClassDefaults( data, data.class );
 
         let position = {x: reactionGlyph.getCurve().getCurveSegment(0).getStart().x() + 10, y: reactionGlyph.getCurve().getCurveSegment(0).getStart().y() + 10};
         reactionNodeMap.set(reactionGlyph.getReactionId(), {"data": data, "position": position, "group": "nodes", "classes": "reaction"});
+        }
+       
+   
 
         // add edges
         for(let j = 0; j < reactionGlyph.getNumSpeciesReferenceGlyphs(); j++){
           let speciesReferenceGlyph = reactionGlyph.getSpeciesReferenceGlyph(j);
           let role = speciesReferenceGlyph.getRole();
           if(role === 1 || role === 3) {
-            let edgeData = {id: reactionGlyph.getReactionId() + "_" + speciesReferenceGlyph.getSpeciesGlyphId(), source: speciesReferenceGlyph.getSpeciesGlyphId(), target: reactionGlyph.getReactionId()};
+            let edgeData = {id: reactionGlyph.getReactionId() + "_" + speciesReferenceGlyph.getSpeciesGlyphId(), class: "consumption",source: speciesReferenceGlyph.getSpeciesGlyphId(), target: reactionGlyph.getReactionId()};
             edgeArray.push({"data": edgeData, "group": "edges", "classes": "reactantEdge"});
           }
           else if(role === 2 || role === 4) {
-            let edgeData = {id: speciesReferenceGlyph.getSpeciesGlyphId() + "_" + reactionGlyph.getReactionId(), source: reactionGlyph.getReactionId(), target: speciesReferenceGlyph.getSpeciesGlyphId()};
+            let edgeData = {id: speciesReferenceGlyph.getSpeciesGlyphId() + "_" + reactionGlyph.getReactionId(),class: "production", source: reactionGlyph.getReactionId(), target: speciesReferenceGlyph.getSpeciesGlyphId()};
             edgeArray.push({"data": edgeData, "group": "edges", "classes": "productEdge"});
           }
           else if(role === 5 || role === 6 || role === 7) {
