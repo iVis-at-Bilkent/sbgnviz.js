@@ -18,12 +18,13 @@
   },
   "homepage": "https://github.com/iVis-at-Bilkent/sbgnviz.js/",
   "peerDependencies": {
-    "jquery": "^2.2.4",
-    "file-saver": "^2.0.2",
     "cytoscape": "iVis-at-Bilkent/cytoscape.js#unstable",
+    "file-saver": "^2.0.2",
+    "jquery": "^2.2.4",
     "tippy.js": "^3.4.0"
   },
   "dependencies": {
+    "@babel/helpers": "^7.22.6",
     "libsbgn.js": "github:sbgn/libsbgn.js#develop",
     "libsbmljs_stable": "^5.18.0-beta1",
     "pretty-data": "^0.40.0",

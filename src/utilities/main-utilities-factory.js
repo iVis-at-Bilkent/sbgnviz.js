@@ -693,10 +693,6 @@ mainUtilities.getMapProperties = function() {
     return sbgnmlToJson.doValidation(file);
   }
 
-  mainUtilities.doValidation = function(file) {
-    return sbmlToJson.doValidation(file);
-  }
-
   mainUtilities.setCompoundPadding = function(newPaddingValue) {
     options.compoundPadding = newPaddingValue;
     optionUtilities.extendOptions(options);    
