@@ -76,7 +76,7 @@ module.exports = function () {
  // Helper functions End
 
  var sbgnmlToJson, jsonToSbgnml, jsonToNwt, uiUtilities, tdToJson,
-     sifToJson, graphUtilities, layoutToText, nwtToJson, jsonToSif,sbgnmlToCd,cdToSbgnml,sbgnmlToSbml,sbmlToSbgnml;
+     sifToJson, graphUtilities, layoutToText, nwtToJson, jsonToSif,sbgnmlToCd,cdToSbgnml,sbgnmlToSbml,sbmlToSbgnml,gpmlToSbgnml,sbgnmlToGpml;
  var updateGraph;
  var options, cy;
 
@@ -98,6 +98,8 @@ module.exports = function () {
    cdToSbgnml = param.cdToSbgnmlConverter;
    sbgnmlToSbml = param.sbgnmlToSbmlConverter;
    sbmlToSbgnml = param.sbmlToSbgnmlConverter;
+   gpmlToSbgnml = param.gpmlToSbgnmlConverter;
+   sbgnmlToGpml = param.sbgnmlToGpmlConverter;
  }
 
  fileUtilities.loadXMLDoc = loadXMLDoc;
@@ -386,9 +388,7 @@ module.exports = function () {
     uiUtilities.endSpinner("load-spinner");
     
   });
-  
-
- }
+ };
 
  fileUtilities.loadCellDesigner = function(file, successCallback, errorCallback){
   var reader = new FileReader();
@@ -406,7 +406,7 @@ module.exports = function () {
   }.bind(this);
   uiUtilities.startSpinner("load-spinner");
   reader.readAsText(file);
- }
+ };
 
  fileUtilities.saveAsSbml = function(filename,errorCallback){
   uiUtilities.startSpinner("load-spinner");
@@ -424,14 +424,10 @@ module.exports = function () {
         type: "text/plain;charset=utf-8;",
       });
       saveAs(blob, filename); 
-      
     }
-
     uiUtilities.endSpinner("load-spinner");
-    
   });
-
- }
+ };
 
  fileUtilities.loadSbml = function(file, successCallback, errorCallback){
   var reader = new FileReader();
@@ -447,8 +443,44 @@ module.exports = function () {
   }.bind(this);
   reader.readAsText(file);
 
- }
+ };
 
+ fileUtilities.saveAsGpml = function(filename,errorCallback){
+  uiUtilities.startSpinner("load-spinner");
+  var sbgnml = this.convertSbgn();
+  
+  this.convertSbgnmlToGpml(sbgnml, function(data){
+    
+    if(!data.result){
+      errorCallback(sbgnml,data.error);
+    }else if( data.message.indexOf("Internal server error") !== -1)
+    {
+      errorCallback(sbgnml,data.message);
+    }else{    
+      var blob = new Blob([data.message], {
+        type: "text/plain;charset=utf-8;",
+      });
+      saveAs(blob, filename); 
+    }
+    uiUtilities.endSpinner("load-spinner");
+  });
+ };
+
+ fileUtilities.loadGpml = function(file, successCallback, errorCallback){
+  var reader = new FileReader();
+  reader.onload = function (e) { 
+    
+      this.convertGpmlToSbgnml(e.target.result, function(data){
+      if(data == null){
+        errorCallback();
+      }else{
+        successCallback(data);
+      }
+    });
+  }.bind(this);
+  reader.readAsText(file);
+
+ }; 
 
  fileUtilities.convertSbgn= function(filename, version, renderInfo, mapProperties, nodes, edges, hidden = false) {
   var sbgnmlText = jsonToSbgnml.createSbgnml(filename, "plain", renderInfo, mapProperties, nodes, edges, hidden);
@@ -501,6 +533,11 @@ fileUtilities.convertSbgnmlToCD = function(sbgnml, callback){
   return sbgnmlToCd.convert(sbgnml,callback);
 };
 
+fileUtilities.convertCDToSbgnml = function(xml,callback){
+
+  return cdToSbgnml.convert(xml,callback);
+};
+
 fileUtilities.convertSbgnmlToSbml = function(sbgnml, callback){
    
   return sbgnmlToSbml.convert(sbgnml,callback);
@@ -508,11 +545,16 @@ fileUtilities.convertSbgnmlToSbml = function(sbgnml, callback){
 
 fileUtilities.convertSbmlToSbgnml = function(sbml, callback){
   return sbmlToSbgnml.convert(sbml,callback);
-}
-fileUtilities.convertCDToSbgnml = function(xml,callback){
-  return cdToSbgnml.convert(xml,callback);
-}
+};
 
+fileUtilities.convertGpmlToSbgnml = function(gpml, callback){
+  return gpmlToSbgnml.convert(gpml,callback);
+};
+
+fileUtilities.convertSbgnmlToGpml = function(sbgnml, callback){
+   
+  return sbgnmlToGpml.convert(sbgnml,callback);
+};
 
  return fileUtilities;
 };
