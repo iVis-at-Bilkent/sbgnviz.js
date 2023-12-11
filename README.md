@@ -251,14 +251,20 @@ Loads the given sbml file. successCallback is the callback function applied upon
 `instance.convertSbgnmlToCD = function(sbgnml, callback)`
 Converts the given sbgnml text to a cell designer format.
 
+`instance.convertCDToSbgnml = function(xml,callback)`
+Converts the given celldesginer text to sbgnml format.
+
 `instance.convertSbgnmlToSbml = function(sbgnml, callback)`
 Converts the given sbgnml text to sbml format.
 
 `instance.convertSbmlToSbgnml = function(sbml, callback)`
 Converts the given sbml text to sbgnml format.
 
-`instance.convertCDToSbgnml = function(xml,callback)`
-Converts the given celldesginer text to sbgnml format.
+`instance.convertSbgnmlToGpml = function(sbgnml, callback)`
+Converts the given sbgnml text to gpml format.
+
+`instance.convertGpmlToSbgnml = function(gpml, callback)`
+Converts the given gpml text to sbgnml format.
 
 `instance.exportLayoutData(filename, byName)`
 
