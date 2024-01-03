@@ -149,10 +149,10 @@ module.exports = function() {
       // extend edges data with sif specific features
       extendElementsData( graphData.edges, elementUtilities.isSIFEdge, sbgnmlToJson.getArcById.bind(sbgnmlToJson), sifEdgePropHandlerMap, xmlObject );
       extendElementsData( graphData.nodes, elementUtilities.isSIFNode, sbgnmlToJson.getGlyphById.bind(sbgnmlToJson), sifNodePropHandlerMap, xmlObject );
-    }
 
-    // apply the style data that is not applied because of restrictions of libsbgn
-    applyExtraStylesData( graphData, xmlObject );
+      // apply the style data that is not applied because of restrictions of libsbgn
+      applyExtraStylesData( graphData, xmlObject );      
+    }
 
     return graphData;
   };
