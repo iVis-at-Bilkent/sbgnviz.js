@@ -226,6 +226,16 @@ module.exports = function () {
        
         ele.minWidthBiasLeft = extraLeft / (extraLeft + extraRight) * 100;
         ele.minWidthBiasRight = 100 - ele.minWidthBiasLeft;
+
+        if (ele.minWidthBiasLeft < 0) {
+          ele.minWidthBiasLeft = 0;
+          ele.minWidthBiasRight = 100;
+        }
+
+        if (ele.minWidthBiasRight < 0) {
+          ele.minWidthBiasRight = 0;
+          ele.minWidthBiasLeft = 100;
+        }          
       }
 
       // If children bbox height is bigger than node bbox height set minHeight, and vertical biases
@@ -236,6 +246,16 @@ module.exports = function () {
 
         ele.minHeightBiasTop = extraTop / (extraTop + extraBottom) * 100;
         ele.minHeightBiasBottom = 100 - ele.minHeightBiasTop;
+
+        if (ele.minHeightBiasTop < 0) {
+          ele.minHeightBiasTop = 0;
+          ele.minHeightBiasBottom = 100;
+        }
+
+        if (ele.minHeightBiasBottom < 0) {
+          ele.minHeightBiasBottom = 0;
+          ele.minHeightBiasTop = 100;
+        }        
       }
       
 
