@@ -77,11 +77,12 @@ module.exports = function () {
 
     //add position information to data for preset layout
     var positionMap = {};
-    cy.nodes().forEach(function(node) {
+    cy.nodes().not(':parent').forEach(function(node) {
       var xPos = node.data('bbox').x;
       var yPos = node.data('bbox').y;
       positionMap[node.data('id')] = {'x': xPos, 'y': yPos};
-
+    });
+    cy.nodes().forEach(function(node) {
       // assign correct parents to info boxes
       var statesandinfos = node.data('statesandinfos');
       for (var j=0; j < statesandinfos.length; j++) {
