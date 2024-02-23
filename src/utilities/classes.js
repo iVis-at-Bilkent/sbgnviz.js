@@ -31,7 +31,23 @@ var getAuxUnitClass = function(unit) {
   // Unit parameter may pass the unit itself or the type of the unit check it
   var unitType = typeof unit === 'string' ? unit : unit.clazz;
   // Retrieve and return unit class according to the unit type
-  var className = unitType === 'state variable' ? 'StateVariable' : 'UnitOfInformation';
+  var className = ''
+  switch (unitType) {
+    case "state variable":
+      className = "StateVariable";
+      break;
+    case "residue variable":
+      className = "ResidueVariable";
+      break;
+    case "binding region":
+      className = "BindingRegion";
+      break;
+    case "unit of information":
+      className = "UnitOfInformation";
+      break;
+  }
+
+  //var className = unitType === 'state variable' ? 'StateVariable' : 'residue variable'? "ResidueVariable":'UnitOfInformation';
   return ns[className];
 };
 
@@ -51,7 +67,6 @@ AuxiliaryUnit.construct = function(parent) {
   obj.anchorSide = null;
   obj.isDisplayed = false;
   obj.style = null;
-
   return obj;
 };
 
@@ -100,7 +115,12 @@ AuxiliaryUnit.checkPoint = function(x, y, node, threshold) {
     } else if (state.clazz == "unit of information") {
       checkPoint = cyBaseNodeShapes["roundrectangle"].checkPoint(
               x, y, padding, stateWidth, stateHeight, stateCenterX, stateCenterY);
-    }
+    }else if( state.clazz == "residue variable") {
+      checkPoint = cyBaseNodeShapes["ellipse"].checkPoint(
+              x, y, padding, stateWidth, stateHeight, stateCenterX, stateCenterY);}
+    else if( state.clazz == "binding region") {
+      checkPoint = cyBaseNodeShapes["roundrectangle"].checkPoint(
+              x, y, padding, stateWidth, stateHeight, stateCenterX, stateCenterY);}
 
     if (checkPoint == true) {
       return state;
@@ -219,42 +239,46 @@ AuxiliaryUnit.drawText = function(mainObj, cy, context, centerX, centerY) {
 };
 
 AuxiliaryUnit.getAbsoluteCoord = function(mainObj, cy) {
-  var parent = getAuxUnitClass(mainObj).getParent(mainObj, cy);
-  var position = parent.position();
-  var padding = parent.padding();
-  /* if(parent.data().complexCalculatedPadding){
-    padding = Number(parent.data().complexCalculatedPadding);
-    //delete parent._private.data.complexCalculatedPadding;
-  }else{
-    padding = parent.padding();
-  } */
-  var parentWidth = parent.width();
-  var parentHeight = parent.height();
-  var borderWidth = Number(parent.css("border-width").replace("px",""));//parent.data()['border-width'];
-  var position = parent.position();
-  if (mainObj === undefined || parent === undefined || position === undefined) {
-    return;
-  }
-  var borderWidth = parent.data()["border-width"];
-  if ( borderWidth === undefined) {
-    return;
-  }
-
-  var absX , absY;
-  if (mainObj.anchorSide == "top" || mainObj.anchorSide == "bottom") {    
-   
-    absX = ((mainObj.bbox.x * (parent.outerWidth() - borderWidth)) / 100) + (position.x - parentWidth/2 - padding);
-    absY = mainObj.anchorSide == "top" ? position.y - parentHeight/2 - padding : position.y + parentHeight/2 + padding ;
-   
-   
-  }
-  else {   
-    absY = ((mainObj.bbox.y * (parent.outerHeight() - borderWidth)) / 100) + (position.y - parentHeight/2 - padding);
-    absX = mainObj.anchorSide == "left" ? position.x - parentWidth/2 - padding :position.x + parentWidth/2 + padding;  
-    
-  }
-
   
+    var parent = getAuxUnitClass(mainObj).getParent(mainObj, cy);
+    var position = parent.position();
+    var padding = parent.padding();
+    /* if(parent.data().complexCalculatedPadding){
+      padding = Number(parent.data().complexCalculatedPadding);
+      //delete parent._private.data.complexCalculatedPadding;
+    }else{
+      padding = parent.padding();
+    } */
+    var parentWidth = parent.width();
+    var parentHeight = parent.height();
+    var borderWidth = Number(parent.css("border-width").replace("px",""));//parent.data()['border-width'];
+    var position = parent.position();
+    if (mainObj === undefined || parent === undefined || position === undefined) {
+      return;
+    }
+    var borderWidth = parent.data()["border-width"];
+    if ( borderWidth === undefined) {
+      return;
+    }
+    
+    var absX , absY;
+    if (mainObj.anchorSide == "top" || mainObj.anchorSide == "bottom") {    
+      
+      absX = ((mainObj.bbox.x * (parent.outerWidth() - borderWidth)) / 100) + (position.x - parentWidth/2 - padding);
+      absY = mainObj.anchorSide == "top" ? position.y - parentHeight/2 - padding : position.y + parentHeight/2 + padding ;
+      
+      
+    }
+    else {   
+      absY = ((mainObj.bbox.y * (parent.outerHeight() - borderWidth)) / 100) + (position.y - parentHeight/2 - padding);
+      absX = mainObj.anchorSide == "left" ? position.x - parentWidth/2 - padding :position.x + parentWidth/2 + padding;  
+      
+    }
+
+  //console.log('mainObj', mainObj)
+  //console.log('mainObj.bbox.y',mainObj.bbox.y)
+  //console.log("parent.outerHeight()", parent.outerHeight())
+  //console.log("position.y",position.y)
   // due to corner of barrel shaped compartment shift absX to right
  /*  if (parent.data("class") == "compartment"){
       absX += parent.outerWidth() * 0.1;
@@ -418,6 +442,9 @@ AuxiliaryUnit.addToParent = function (mainObj, cy, parentNode, location, positio
   }
   if(!location) { // location not provided, need to define it automatically
     location = AuxUnitLayout.selectNextAvailable(parentNode, cy);
+  }else if(location === 'left' || location === 'right')
+  {
+    location = AuxUnitLayout.selectNextAvailableLeftRight(parentNode, cy);
   }
   // here we are sure to have a location even if it was not provided as argument
   // get or create the necessary layout
@@ -434,6 +461,7 @@ AuxiliaryUnit.addToParent = function (mainObj, cy, parentNode, location, positio
     case "right": mainObj.bbox.x = 100; break;
   }
   // add stateVar to layout, precomputing of relative coords will be triggered accordingly
+  //console.log("mainObj.bbox.x in addParent",mainObj)
   var insertedPosition = AuxUnitLayout.addAuxUnit(layout, cy, mainObj, position);
   return insertedPosition;
 }
@@ -522,7 +550,6 @@ StateVariable.remove = function (mainObj, cy) {
   var position = StateVariable.getPositionIndex(mainObj, cy);
   var index = StateVariable.getParent(mainObj, cy).data('statesandinfos').indexOf(mainObj);
   StateVariable.removeFromParent(mainObj, cy);
-  //console.log("after remove", this.parent.data('auxunitlayouts'), this.parent.data('statesandinfos'));
   return {
     clazz: "state variable",
     state: {
@@ -550,6 +577,188 @@ StateVariable.copy = function(mainObj, cy, newParent, newId) {
 
 ns.StateVariable = StateVariable;
 // -------------- END StateVariable -------------- //
+
+
+// -------------- ResidueVariable -------------- //
+/**
+ * This is for CellDesigner palette
+ */
+
+ var ResidueVariable = {};
+
+ // ResidueVariable extends AuxiliaryUnit by inheriting each static property of it
+ for (var prop in AuxiliaryUnit) {
+  ResidueVariable[prop] = AuxiliaryUnit[prop];
+ }
+ 
+ // Construct a residue variable object by extending default behaviours of a AuxiliaryUnit object and returns that object
+ ResidueVariable.construct = function(value, residueVariableDefinition, parent, id) {
+   var obj = AuxiliaryUnit.construct(parent);
+   obj.id = id || elementUtilities.generateStateVarId();
+   obj.residue = {};
+   obj.residue.variable = null;
+   obj.residueVariableDefinition = residueVariableDefinition;
+   obj.clazz = "residue variable";
+ 
+   return obj;
+ };
+ 
+ ResidueVariable.getText = function(mainObj) {
+   var residueVariable = mainObj.residue.variable || '';
+ 
+   return residueVariable;
+ };
+ 
+ ResidueVariable.hasText = function(mainObj) {
+   return  (mainObj.residue.variable && mainObj.residue.variable != "");
+ };
+ 
+ /*this function is called upon creation of residue variable and it returns the location information of the added residue variable
+ */
+ ResidueVariable.create = function(parentNode, cy, value, variable, bbox, location, position, style, index, id) {
+   // create the new residue var of info
+   var residueVar = ResidueVariable.construct();
+   ResidueVariable.setParentRef(residueVar, parentNode);
+ 
+   residueVar.variable = variable;
+   residueVar.residue = {value: value, variable: variable};
+   residueVar.bbox = bbox;
+   residueVar.style = style;
+   if ( id ) {
+    residueVar.id = id;
+   }
+   // link to layout
+   position = ResidueVariable.addToParent(residueVar, cy, parentNode, location, position, index);
+   return {
+     index: ResidueVariable.getParent(residueVar, cy).data('statesandinfos').indexOf(residueVar),
+     location: residueVar.anchorSide,
+     position: position
+   }
+ 
+ };
+ 
+ ResidueVariable.remove = function (mainObj, cy) {
+   var position = ResidueVariable.getPositionIndex(mainObj, cy);
+   var index = ResidueVariable.getParent(mainObj, cy).data('statesandinfos').indexOf(mainObj);
+   ResidueVariable.removeFromParent(mainObj, cy);
+   return {
+     clazz: "residue variable",
+     residue: {
+       variable: mainObj.residue.variable
+     },
+     bbox: {
+       w: mainObj.bbox.w,
+       h: mainObj.bbox.h
+     },
+     location: mainObj.anchorSide,
+     position: position,
+     index: index,
+     style : mainObj.style
+   };
+ };
+ 
+ ResidueVariable.copy = function(mainObj, cy, newParent, newId) {
+   var newResidueVar = AuxiliaryUnit.copy(mainObj, cy, ResidueVariable.construct(), newParent, newId);
+   newResidueVar.residue = jQuery.extend(true, {}, mainObj.residue);
+   newResidueVar.ResidueVariableDefinition = mainObj.ResidueVariableDefinition;
+   newStanewResidueVarteVar.clazz = mainObj.clazz;
+   return newResidueVar;
+ };
+ 
+ ns.ResidueVariable = ResidueVariable;
+ // -------------- END ResidueVariable -------------- //
+
+
+ // -------------- BindingRegion -------------- //
+/**
+ * This is for CellDesigner palette
+ */
+
+ var BindingRegion = {};
+
+ // BindingRegion extends AuxiliaryUnit by inheriting each static property of it
+ for (var prop in AuxiliaryUnit) {
+  BindingRegion[prop] = AuxiliaryUnit[prop];
+ }
+ 
+ // Construct a binding region object by extending default behaviours of a AuxiliaryUnit object and returns that object
+ BindingRegion.construct = function( bindingRegionDefinition, parent, id) {
+   var obj = AuxiliaryUnit.construct(parent);
+   obj.id = id || elementUtilities.generateStateVarId();
+   obj.region = {};
+   obj.region.variable = null;
+   obj.bindingRegionDefinition = bindingRegionDefinition;
+   obj.clazz = "binding region";
+ 
+   return obj;
+ };
+ 
+ BindingRegion.getText = function(mainObj) {
+   var bindingRegion = mainObj.region.variable || '';
+ 
+   return bindingRegion;
+ };
+ 
+ BindingRegion.hasText = function(mainObj) {
+   return  (mainObj.region.variable && mainObj.region.variable != "");
+ };
+ 
+ /*this function is called upon creation of binding region and it returns the location information of the added binding region
+ */
+ BindingRegion.create = function(parentNode, cy, value, variable, bbox, location, position, style, index, id) {
+   // create the new binding region of info
+   var bindingRegion = BindingRegion.construct();
+   BindingRegion.setParentRef(bindingRegion, parentNode);
+ 
+   bindingRegion.variable = variable;
+   bindingRegion.region = {value: value, variable: variable};
+   bindingRegion.bbox = bbox;
+   bindingRegion.style = style;
+   if ( id ) {
+    bindingRegion.id = id;
+   }
+   // link to layout
+   //console.log('bindingRegion.anchorSide',  bindingRegion.anchorSide).
+   position = BindingRegion.addToParent(bindingRegion, cy, parentNode, "left", position, index);
+   return {
+     index: BindingRegion.getParent(bindingRegion, cy).data('statesandinfos').indexOf(bindingRegion),
+     location: bindingRegion.anchorSide,
+     position: position
+   }
+ 
+ };
+ 
+ BindingRegion.remove = function (mainObj, cy) {
+   var position = BindingRegion.getPositionIndex(mainObj, cy);
+   var index = BindingRegion.getParent(mainObj, cy).data('statesandinfos').indexOf(mainObj);
+   BindingRegion.removeFromParent(mainObj, cy);
+   return {
+     clazz: "binding region",
+     region: {
+       variable: mainObj.region.variable
+     },
+     bbox: {
+       w: mainObj.bbox.w,
+       h: mainObj.bbox.h
+     },
+     location: mainObj.anchorSide,
+     position: position,
+     index: index,
+     style : mainObj.style
+   };
+ };
+ 
+ BindingRegion.copy = function(mainObj, cy, newParent, newId) {
+   var newBindingRegion = AuxiliaryUnit.copy(mainObj, cy, BindingRegion.construct(), newParent, newId);
+   newBindingRegion.region = jQuery.extend(true, {}, mainObj.region);
+   newBindingRegion.BindingRegionDefinition = mainObj.BindingRegionDefinition;
+   newBindingRegion.clazz = mainObj.clazz;
+   return newBindingRegion;
+ };
+ 
+ ns.BindingRegion = BindingRegion;
+ // -------------- END BindingRegion -------------- //
+ 
 
 // -------------- UnitOfInformation -------------- //
 /**
@@ -773,7 +982,6 @@ AuxUnitLayout.construct = function(parentNode, location, alignment) {
 };
 
 AuxUnitLayout.getParentNode = function(mainObj, cy) {
-  //console.log(mainObj);
   var parentNode = mainObj.parentNode;
 
   // If parentNode is id of parent node rather than being itself get the parent node by that id
@@ -876,7 +1084,35 @@ AuxUnitLayout.computeCoords = function(mainObj, cy, unit){
      // unit.bbox.x = mainObj.units[lastUnit].bbox.x +  mainObj.units[lastUnit].bbox.w/2 + unit.bbox.w/2 + AuxUnitLayout.getCurrentGap(location);
     }
     unit.bbox.y = (location === "top") ? 0 : 100;
-  }//We don't have the right or left addition cases yet
+  }//We don't have the right or left addition cases yet -- Now we have it
+  else
+  {
+    var position = node.position();
+    var parentWidth = node.data('bbox').w;
+    var padding = node.padding();
+    var parentWidth = node.width();
+    var parentHeight = node.height();
+    var parentX1 = position.x - parentWidth/2 - padding;
+    var parentX2 = position.x + parentWidth/2 + padding;
+    var parentY1 = position.y - parentHeight/2 - padding;
+    var parentY2 = position.y + parentHeight/2 + padding;
+
+    if (mainObj.units.length === 1) {
+      var relativeCoords = AuxiliaryUnit.convertToRelativeCoord(unit, unit.bbox.w/2 + (parentX1) + AuxUnitLayout.getCurrentGap(location), (parentY1) + AuxUnitLayout.getCurrentGap(location), cy);
+      unit.bbox.x = relativeCoords.x ;
+      unit.bbox.y = relativeCoords.y;
+    }
+    else {
+      var lastUnit = mainObj.units[mainObj.units.length - 2];//Get the position of the last unit
+      var lastUnitAbsCord = AuxiliaryUnit.convertToAbsoluteCoord(lastUnit, lastUnit.bbox.x, lastUnit.bbox.y, cy);
+      var relativeCoords = AuxiliaryUnit.convertToRelativeCoord(unit, unit.bbox.w/2+ lastUnitAbsCord.x + lastUnit.bbox.w/2 + AuxUnitLayout.getCurrentGap(location), (parentY1) + AuxUnitLayout.getCurrentGap(location), cy);
+      unit.bbox.x = relativeCoords.x ;
+      unit.bbox.y = relativeCoords.y;
+     // unit.bbox.x = mainObj.units[lastUnit].bbox.x +  mainObj.units[lastUnit].bbox.w/2 + unit.bbox.w/2 + AuxUnitLayout.getCurrentGap(location);
+    }
+    unit.bbox.y = (location === "top") ? 0 : 100;
+  }
+
 };
 
 AuxUnitLayout.removeAuxUnit = function(mainObj, cy, unit) {
@@ -1364,6 +1600,18 @@ AuxUnitLayout.unitLength = function(mainObj) {
   return rightMostPoint;
 };
 
+AuxUnitLayout.unitLengthRightLeft = function(mainObj) {
+  var units = mainObj.units;
+  var topMostPoint = 0;
+  for (var i = 0; i < units.length; i++) {
+    var box = units[i].bbox;
+    if (box.y + box.h / 2 > topMostPoint){
+      topMostPoint = box.y+ box.h / 2;
+    }
+  }
+  return topMostPoint;
+};
+
 //Get Unit Gaps
 AuxUnitLayout.getCurrentTopGap = function(){
   return AuxUnitLayout.currentTopUnitGap;
@@ -1402,6 +1650,30 @@ AuxUnitLayout.selectNextAvailable = function(node) {
     }
     else {
       resultLocation = "bottom";
+    }
+  }
+  AuxUnitLayout.lastPos = resultLocation; //Set last used position
+  return resultLocation;
+};
+
+AuxUnitLayout.selectNextAvailableLeftRight = function(node) {
+  var left = node.data('auxunitlayouts').left;
+  var right = node.data('auxunitlayouts').right;
+  var resultLocation = "left";
+  // start by adding on left if free
+  if(!left || AuxUnitLayout.isEmpty(left)) {
+    resultLocation = "left";
+  }
+  else if(!right || AuxUnitLayout.isEmpty(right)) {
+    resultLocation = "right";
+  }
+  else {
+    // choose the side (left or right) that has the most space available to the right of the rightmost infobox
+    if(AuxUnitLayout.unitLengthRightLeft(left) <= AuxUnitLayout.unitLengthRightLeft(right)) {
+      resultLocation = "left";
+    }
+    else {
+      resultLocation = "right";
     }
   }
   AuxUnitLayout.lastPos = resultLocation; //Set last used position

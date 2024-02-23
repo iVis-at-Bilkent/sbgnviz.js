@@ -1,6 +1,8 @@
 (function(){
   var sbgnviz = function(_options) {
 
+    const libsbml = require('libsbmljs_stable');
+    const libsbmlInstance = libsbml();
     var param = {}; // The parameter to be passed to all utilities instances related to this sbgnviz instance
 
     var optionUtilities = require('./utilities/option-utilities-factory')();
@@ -21,8 +23,10 @@
 
     // Other utilities
     var jsonToSbgnmlConverter = require('./utilities/json-to-sbgnml-converter-factory')();
+    var jsonToSbmlConverter = require('./utilities/json-to-sbml-converter-factory')();
     var jsonToNwtConverter = require('./utilities/json-to-nwt-converter-factory')();
     var sbgnmlToJsonConverter = require('./utilities/sbgnml-to-json-converter-factory')();
+    var sbmlToJsonConverter = require('./utilities/sbml-to-json-converter-factory')();
     var nwtToJsonConverter = require('./utilities/nwt-to-json-converter-factory')();
     var tdToJsonConverter = require('./utilities/tab-delimited-to-json-converter-factory')();
     var sifToJsonConverter = require('./utilities/sif-to-json-converter-factory')();
@@ -49,8 +53,10 @@
     param.elementUtilities = elementUtilities;
     param.undoRedoActionFunctions = undoRedoActionFunctions;
     param.jsonToSbgnmlConverter = jsonToSbgnmlConverter;
+    param.jsonToSbmlConverter = jsonToSbmlConverter;
     param.jsonToNwtConverter = jsonToNwtConverter;
     param.sbgnmlToJsonConverter = sbgnmlToJsonConverter;
+    param.sbmlToJsonConverter = sbmlToJsonConverter;
     param.nwtToJsonConverter = nwtToJsonConverter;
     param.tdToJsonConverter = tdToJsonConverter;
     param.sifToJsonConverter = sifToJsonConverter;
@@ -65,6 +71,7 @@
     param.sbgnmlToGpmlConverter = sbgnmlToGpmlConverter;
     param.gpmlToSbgnmlConverter = gpmlToSbgnmlConverter;
     param.experimentalDataOverlay = experimentalDataOverlay;
+    param.libsbmlInstance = libsbmlInstance;
 
     // call constructors of objects with param
     
@@ -78,8 +85,10 @@
     elementUtilities(param);
     undoRedoActionFunctions(param);
     jsonToSbgnmlConverter(param);
+    jsonToSbmlConverter(param);
     jsonToNwtConverter(param);
     sbgnmlToJsonConverter(param);
+    sbmlToJsonConverter(param);
     nwtToJsonConverter(param);
     tdToJsonConverter(param);
     sifToJsonConverter(param);

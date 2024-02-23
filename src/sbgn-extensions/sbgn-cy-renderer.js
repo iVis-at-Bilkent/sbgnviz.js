@@ -31,6 +31,7 @@ module.exports = function () {
     if( borderWidth > 0 ){
       var parentOpacity = ( node && node.effectiveOpacity() ) || 1;
 
+      
       borderStyle = borderStyle || ( node && node.css( 'border-style' ) );
       borderColor = borderColor || ( node && node.css( 'border-color' ) );
       borderOpacity = (
@@ -49,6 +50,7 @@ module.exports = function () {
       context.strokeStyle = borderColor;
       context.globalAlpha = borderOpacity;
 
+      
       if( context.setLineDash ){ // for very outofdate browsers
         switch( borderStyle ){
           case 'dotted':
@@ -93,6 +95,88 @@ module.exports = function () {
   // Taken from cytoscape.js and modified
   var drawRoundRectanglePath = $$.sbgn.drawRoundRectanglePath = function(
     context, x, y, width, height, radius ){
+    var halfWidth = width / 2;
+    var halfHeight = height / 2;
+    var cornerRadius = radius || cyMath.getRoundRectangleRadius( width, height );
+
+    if( context.beginPath ){ context.beginPath(); }
+
+    // Start at top middle
+    context.moveTo( x, y - halfHeight );
+    // Arc from middle top to right side
+    context.arcTo( x + halfWidth, y - halfHeight, x + halfWidth, y, cornerRadius );
+    // Arc from right side to bottom
+    context.arcTo( x + halfWidth, y + halfHeight, x, y + halfHeight, cornerRadius );
+    // Arc from bottom to left side
+    context.arcTo( x - halfWidth, y + halfHeight, x - halfWidth, y, cornerRadius );
+    // Arc from left side to topBorder
+    context.arcTo( x - halfWidth, y - halfHeight, x, y - halfHeight, cornerRadius );
+    // Join line
+    context.lineTo( x, y - halfHeight );
+
+    context.closePath();
+
+
+    //context.clearRect(0, 0, width, height);
+    //context.beginPath()
+
+  };
+
+
+  var drawProteinPath = $$.sbgn.drawProtein = function(
+    context, x, y, width, height, activePadding1  ){
+    var halfWidth = (width+ activePadding1) / 2;
+    var halfHeight = (height + activePadding1) / 2;
+    var cornerRadius =  cyMath.getRoundRectangleRadius( width, height );
+
+    if( context.beginPath ){ context.beginPath(); }
+
+    // Start at top middle
+    context.moveTo( x, y - halfHeight );
+    // Arc from middle top to right side
+    context.arcTo( x + halfWidth, y - halfHeight, x + halfWidth, y, cornerRadius );
+    // Arc from right side to bottom
+    context.arcTo( x + halfWidth, y + halfHeight, x, y + halfHeight, cornerRadius );
+    // Arc from bottom to left side
+    context.arcTo( x - halfWidth, y + halfHeight, x - halfWidth, y, cornerRadius );
+    // Arc from left side to topBorder
+    context.arcTo( x - halfWidth, y - halfHeight, x, y - halfHeight, cornerRadius );
+    // Join line
+    context.lineTo( x, y - halfHeight );
+
+    context.closePath();
+
+
+    //context.clearRect(0, 0, width, height);
+    //context.beginPath()
+
+  };
+
+
+  var drawReceptorPath = $$.sbgn.drawReceptor = function(
+    context, x, y, width, height, activePadding1  ){
+    var halfPadding  = activePadding1? activePadding1/2: 0;
+    //var points= [-1, -1,   0, -0.5,   1, -1,   1, 0.5,   0, 1,   -1,  0.5 ];
+    var halfW = width / 2;
+    var halfH = height / 2;
+    
+
+    if( context.beginPath ){ context.beginPath(); }
+
+    context.moveTo( x + halfW * (-1) - halfPadding, y + halfH * (-1) - 3*halfPadding/2)
+    context.lineTo( x + halfW * (0), y + halfH * (-0.5) - 3*halfPadding/2)
+    context.lineTo( x + halfW * (1) + halfPadding, y + halfH * (-1) - 3*halfPadding/2)
+    context.lineTo( x + halfW * (1) + halfPadding, y + halfH * (0.5) + halfPadding)
+    context.lineTo( x + halfW * (0), y + halfH * (1) + 3*halfPadding/2)
+    context.lineTo( x + halfW * (-1) - halfPadding, y + halfH * (0.5) + halfPadding)
+
+    context.closePath();
+
+  };
+
+  var drawRoundedDrugPath= $$.sbgn.drawRoundedDrug = function(
+    context, x, y, width, height, radius )
+    {
 
     var halfWidth = width / 2;
     var halfHeight = height / 2;
@@ -113,6 +197,25 @@ module.exports = function () {
     // Join line
     context.lineTo( x, y - halfHeight );
 
+    
+
+    var halfWidthInner = width / 2 - 5;
+    var halfHeightInner = height / 2 - 5;
+    var cornerRadius = radius || cyMath.getRoundRectangleRadius( width, height );
+
+
+    // Start at top middle
+    context.moveTo( x, y - halfHeightInner );
+    // Arc from middle top to right side
+    context.arcTo( x + halfWidthInner, y - halfHeightInner, x + halfWidthInner, y, cornerRadius );
+    // Arc from right side to bottom
+    context.arcTo( x + halfWidthInner, y + halfHeightInner, x, y + halfHeightInner, cornerRadius );
+    // Arc from bottom to left side
+    context.arcTo( x - halfWidthInner, y + halfHeightInner, x - halfWidthInner, y, cornerRadius );
+    // Arc from left side to topBorder
+    context.arcTo( x - halfWidthInner, y - halfHeightInner, x, y - halfHeightInner, cornerRadius );
+    // Join line
+    context.lineTo( x, y - halfHeightInner );
 
     context.closePath();
   };
@@ -142,7 +245,20 @@ module.exports = function () {
     'macromolecule': true,
     'simple chemical': true,
     'biological activity': true,
-    'compartment': true
+    'compartment': true,
+    'gene': true,
+    'rna': true,
+    'simple molecule': true,
+    'unknown molecule': true,
+    'drug': true,
+    'truncated protein': true,
+    'ion channel': true,
+    'receptor': true,
+    'ion': true,
+    'phenotype sbml': true,
+    'complex sbml': true,
+    'protein': true,
+    'degradation': true
   };
 
   var totallyOverridenNodeShapes = $$.sbgn.totallyOverridenNodeShapes = {
@@ -151,7 +267,19 @@ module.exports = function () {
     'simple chemical': true,
     'complex': true,
     'biological activity': true,
-    'compartment': true
+    'compartment': true,
+    'protein':true,
+    'gene':true,
+    'rna':true,
+    'receptor': true,
+    'ion channel': true,
+    'truncated protein': true,
+    'phenotype sbml': true,
+    'ion': true,
+    'simple molecule': true,
+    'unknown molecule': true,
+    'drug': true,
+    'complex sbml': true
   };
 
   var canHaveInfoBoxShapes = $$.sbgn.canHaveInfoBoxShapes = {
@@ -160,15 +288,65 @@ module.exports = function () {
     'nucleic acid feature': true,
     'complex': true,
     'biological activity': true,
-    'compartment': true
+    'compartment': true,
+    'protein': true,
+    'receptor': true,
+    'truncated protein': true,
+    'ion channel': true,
+    'complex sbml': true,
+    'gene': true,
+    'rna': true,
+    'simple molecule': true,
+    'unknown molecule': true,
+    'phenotype sbml': true,
+    'drug': true,
+    'ion': true,
+    'degradation': true
   };
 
   var canBeMultimerShapes = $$.sbgn.canBeMultimerShapes = {
     'macromolecule': true,
     'complex': true,
     'nucleic acid feature': true,
-    'simple chemical': true
+    'simple chemical': true,
+    'receptor': true,
+    'ion channel': true,
+    'truncated protein': true,
+    'gene': true,
+    'rna': true,
+    'phenotype': true,
+    'ion': true,
+    'simple molecule': true,
+    'unknown molecule': true,
+    'drug': true,
+    'phenotype sbml': true,
+    'complex sbml': true,
+    'protein': true
   };
+
+  var canBeActiveShapes = $$.sbgn.canBeActiveShapes = {
+      'protein': true,
+      'complex sbml': true,
+      'receptor': true,
+      'ion channel': true,
+      'truncated protein': true
+  };
+
+  var canBeHypotheticalShapes = $$.sbgn.canBeHypotheticalShapes = {
+    'protein': true,
+    'complex sbml': true,
+    'receptor': true,
+    'ion channel': true,
+    'truncated protein': true,
+    'gene': true,
+    'rna': true,
+    'phenotype sbml': true,
+    'ion': true,
+    'simple molecule': true,
+    'unknown molecule': true,
+    'drug': true,
+    'degradation': true
+};
 
   cyMath.calculateDistance = function (point1, point2) {
     var distance = Math.pow(point1[0] - point2[0], 2) + Math.pow(point1[1] - point2[1], 2);
@@ -178,8 +356,13 @@ module.exports = function () {
   $$.sbgn.colors = {
     clone: "#838383"
   };
+  
 
   $$.sbgn.getDefaultComplexCornerLength = function() {
+    return 24;
+  };
+
+  $$.sbgn.getDefaultGeneCornerLength = function() {
     return 24;
   };
 
@@ -378,7 +561,9 @@ module.exports = function () {
 
   $$.sbgn.drawEllipsePath = function (context, x, y, width, height) {
     cyBaseNodeShapes['ellipse'].drawPath(context, x, y, width, height);
+
   };
+
 
   $$.sbgn.drawBarrel = function (context, x, y, width, height) {
     cyBaseNodeShapes['barrel'].draw(context, x, y, width, height);
@@ -439,6 +624,20 @@ module.exports = function () {
     return false;
   };
 
+  $$.sbgn.isActive = function (node) {
+    var sbgnClass = node._private.data.class;
+    if (sbgnClass && sbgnClass.startsWith( "active"))
+      return true;
+    return false;
+  };
+
+  $$.sbgn.isHypothetical = function (node) {
+    var sbgnClass = node._private.data.class;
+    if (sbgnClass && sbgnClass.includes( "hypothetical"))
+      return true;
+    return false;
+  };
+
   //this function is created to have same corner length when
   //complex's width or height is changed
   $$.sbgn.generateComplexShapePoints = function (cornerLength, width, height) {
@@ -452,11 +651,31 @@ module.exports = function () {
     return complexPoints;
   };
 
+  $$.sbgn.generateGeneShapePoints = function (width, height) {
+
+    return [-1, -1,   1, -1 ,   1, 1,   -1 , 1 ];
+  };
+
+
+  $$.sbgn.generateRNAShapePoints = function (width, height) {
+
+    return [-1, 0.8,   0.5, 0.8 ,   1, -0.8,   -0.5 , -0.8 ];
+  };
+
+  $$.sbgn.generateReceptorShapePoints = function (width, height) {
+
+    return [-1, -1,   0, -0.5,   1, -1,   1, 0.5,   0, 1,   -1,  0.5 ];
+  };
+
   $$.sbgn.generatePerturbingAgentPoints = function() {
     return [-1, -1,   -0.5, 0,  -1, 1,   1, 1,   0.5, 0, 1, -1];
   };
 
   $$.sbgn.getDefaultMultimerPadding = function() {
+    return 5;
+  };
+
+  $$.sbgn.getDefaultActivePadding = function() {
     return 5;
   };
 
@@ -471,16 +690,16 @@ module.exports = function () {
 
   cyStyleProperties.types.nodeShape.enums.push(
     'empty set', 'nucleic acid feature', 'complex', 'macromolecule',
-    'simple chemical', 'biological activity', 'compartment'
+    'simple chemical', 'biological activity', 'compartment', 'gene', 'simple molecule', 'unknown molecule', 'drug', 
+    'truncated protein', 'ion', 'ion channel', 'rna', 'phenotype sbml', 'receptor', 'complex sbml', 'protein', 'degradation'
   );
 
   $$.sbgn.registerSbgnNodeShapes = function () {
 
-    function generateDrawFcn( { plainDrawFcn, extraDrawFcn, canBeMultimer, cloneMarkerFcn,
-      canHaveInfoBox, multimerPadding } ) {
+    function generateDrawFcn( { plainDrawFcn, extraDrawFcn, canBeMultimer, cloneMarkerFcn, canBeActive, canBeHypothetical,
+      canHaveInfoBox, multimerPadding, activePadding} ) {
 
       return function( context, node, imgObj ) {
-
         var borderWidth = parseFloat(node.css('border-width'));
         var width = node.outerWidth() - borderWidth;
         var height = node.outerHeight() - borderWidth;
@@ -489,32 +708,129 @@ module.exports = function () {
         var bgOpacity = node.css('background-opacity');
         var isCloned = cloneMarkerFcn != null && node._private.data.clonemarker;
 
-        if ( canBeMultimer && $$.sbgn.isMultimer( node ) ) {
-          //add multimer shape
-          plainDrawFcn( context, centerX + multimerPadding,
-                  centerY + multimerPadding, width, height );
+        //Ion channel is dran differently when it is active
+        if (node._private.data.class.startsWith('active ion channel') ||  node._private.data.class.startsWith('active hypothetical ion channel') )
+        {
+          plainDrawFcn = $$.sbgn.drawOpenIonChannel;
+        }
 
-          $$.sbgn.drawBorder( { context, node } );
+        if (node._private.data.class.startsWith('ion channel') ||  node._private.data.class.startsWith('hypothetical ion channel') )
+        {
+          plainDrawFcn = $$.sbgn.drawIonChannel;
+        }
+
+    
+        //This is where the multimer is drawn
+       if ( canBeMultimer && $$.sbgn.isMultimer( node ) ) {
+
+          plainDrawFcn( context, centerX + multimerPadding,
+            centerY + multimerPadding, width, height );
+    
+          //If the node is also hypothetical
+          if (canBeHypothetical && $$.sbgn.isHypothetical( node ))
+          {
+             // $$.sbgn.drawImage( context, imgObj );
+              borderStyle = 'dashed'
+              $$.sbgn.drawBorder( { context, node, borderStyle } );
+              //$$.sbgn.drawImage( context, imgObj );
+              context.beginPath();
+
+          }
+          else{
+            $$.sbgn.drawBorder( { context, node } );
+
+          }
 
           if ( extraDrawFcn ) {
             extraDrawFcn( context, centerX + multimerPadding,
-                    centerY + multimerPadding, width, height );
+              centerY + multimerPadding, width, height );
 
 
             $$.sbgn.drawBorder( { context, node } );
           }
-
+      
           if ( isCloned ) {
             cloneMarkerFcn(context,
                     centerX + multimerPadding, centerY + multimerPadding,
                     width - borderWidth, height - borderWidth, isCloned, true, bgOpacity);
           }
+
+
+          //If the node is also active
+          if( canBeActive && $$.sbgn.isActive( node ) && !node._private.data.class.startsWith('active ion channel') && !node._private.data.class.startsWith('active hypothetical ion channel')  ){
+              //add multimer shape
+              plainDrawFcn( context, centerX + multimerPadding ,
+              centerY + multimerPadding, width , height, true, activePadding);
+
+              borderStyle = 'dashed'
+              context.setLineDash([3, 6]);
+              $$.sbgn.drawBorder( { context, node, borderStyle } );
+
+              if ( extraDrawFcn ) {
+                  extraDrawFcn( context, centerX + multimerPadding,
+                    centerY+ multimerPadding, width + activePadding, height + activePadding);
+
+
+              $$.sbgn.drawBorder( { context, node } );
+            }
+
+          }
+        
         }
 
-        plainDrawFcn( context, centerX, centerY, width, height );
+        //This is where the active is drawn
+        if ( canBeActive && $$.sbgn.isActive( node ) && !node._private.data.class.startsWith('active ion channel') && !node._private.data.class.startsWith('active hypothetical ion channel') ) {
+              //add multimer shape
+              plainDrawFcn( context, centerX ,
+              centerY , width, height,true , activePadding);
+      
+              borderStyle = 'dashed'
+              context.setLineDash([3, 6]);
+              $$.sbgn.drawBorder( { context, node, borderStyle } );
 
+              if ( extraDrawFcn ) {
+                  extraDrawFcn( context, centerX,
+                    centerY, width + activePadding, height + activePadding);
+
+
+              $$.sbgn.drawBorder( { context, node } );
+            }
+
+        }
+
+          //This is where the active is drawn
+        if ( canBeHypothetical && $$.sbgn.isHypothetical( node ) ) {
+
+
+            //add multimer shape
+            plainDrawFcn( context, centerX ,
+              centerY , width, height);
+    
+              borderStyle = 'dashed'
+              $$.sbgn.drawBorder( { context, node, borderStyle } );
+             // $$.sbgn.drawImage( context, imgObj );
+              context.beginPath();
+
+            if ( extraDrawFcn ) {
+                  extraDrawFcn( context, centerX,
+                    centerY, width, height);
+
+
+              $$.sbgn.drawBorder( { context, node } );
+            }
+      
+        }
+
+       
+        if ( !(canBeHypothetical && $$.sbgn.isHypothetical( node )) )
+        {
+          plainDrawFcn( context, centerX, centerY, width, height );
+          $$.sbgn.drawImage( context, imgObj );
+
+        }
+       
         $$.sbgn.drawBorder( { context, node } );
-        $$.sbgn.drawImage( context, imgObj );
+        
 
         if ( extraDrawFcn ) {
             extraDrawFcn( context, centerX, centerY, width, height );
@@ -534,10 +850,11 @@ module.exports = function () {
           context.fillStyle = oldStyle;
         }
       };
+      
     }
 
-    function generateIntersectLineFcn( { plainIntersectLineFcn, canBeMultimer, cloneMarkerFcn,
-      canHaveInfoBox, multimerPadding } ) {
+    function generateIntersectLineFcn( { plainIntersectLineFcn, canBeMultimer, cloneMarkerFcn, canBeActive, canBeHypothetical,
+      canHaveInfoBox, multimerPadding, activePadding } ) {
 
       return function( node, x, y ) {
         var borderWidth = parseFloat(node.css('border-width'));
@@ -569,12 +886,28 @@ module.exports = function () {
           intersections = intersections.concat( multimerIntersectionLines );
         }
 
+        if ( canBeActive && $$.sbgn.isActive(node) ) {
+          var activeIntersectionLines = plainIntersectLineFcn(
+                  centerX + activePadding, centerY + activePadding, width,
+                  height, x, y, padding);
+
+          intersections = intersections.concat( activeIntersectionLines );
+        }
+
+        if ( canBeHypothetical && $$.sbgn.isHypothetical(node) ) {
+          var hypotheticalIntersectionLines = plainIntersectLineFcn(
+                  centerX, centerY, width,
+                  height, x, y, padding);
+
+          intersections = intersections.concat( hypotheticalIntersectionLines );
+        }
+
         return $$.sbgn.closestIntersectionPoint([x, y], intersections);
       };
     }
 
-    function generateCheckPointFcn( { plainCheckPointFcn, canBeMultimer, cloneMarkerFcn,
-      canHaveInfoBox, multimerPadding } ) {
+    function generateCheckPointFcn( { plainCheckPointFcn, canBeMultimer, cloneMarkerFcn, canBeActive, canBeHypothetical,
+      canHaveInfoBox, multimerPadding, activePadding } ) {
 
       return function( x, y, node, threshold ) {
 
@@ -601,13 +934,28 @@ module.exports = function () {
                                           centerY + multimerPadding );
         };
 
-        return nodeCheck() || stateAndInfoCheck() || multimerCheck();
+        var activeCheck = function() {
+          return canBeActive && $$.sbgn.isActive(node)
+                  && plainCheckPointFcn( x, y, padding, width, height,
+                                          centerX + activePadding,
+                                          centerY + activePadding );
+        };
+
+        var hypotheticalCheck = function() {
+          return canBeHypothetical && $$.sbgn.isHypothetical(node)
+                  && plainCheckPointFcn( x, y, padding, width, height,
+                                          centerX,
+                                          centerY );
+        };
+
+        return nodeCheck() || stateAndInfoCheck() || multimerCheck() || activeCheck() || hypotheticalCheck();
       };
     }
 
     var shapeNames = [ "simple chemical", "macromolecule", "complex",
       "nucleic acid feature", "empty set", "biological activity",
-      "compartment", "oldCompartment"
+      "compartment", "oldCompartment", "gene", "simple molecule", 'receptor', 'complex sbml',
+      "unknown molecule", "drug", "ion", "truncated protein", "ion channel", "rna", "phenotype sbml", "protein", "degradation"
     ];
 
     shapeNames.forEach( function( shapeName ) {
@@ -615,26 +963,28 @@ module.exports = function () {
       var plainIntersectLineFcn = $$.sbgn.plainIntersectLine[ shapeName ];
       var plainCheckPointFcn = $$.sbgn.plainCheckPoint[ shapeName ];
       var canBeMultimer = $$.sbgn.canBeMultimerShapes[ shapeName ];
+      var canBeActive = $$.sbgn.canBeActiveShapes[ shapeName ];
+      var canBeHypothetical = $$.sbgn.canBeHypotheticalShapes[ shapeName ];
       var cloneMarkerFcn = $$.sbgn.cloneMarker[ shapeName ];
       var canHaveInfoBox = $$.sbgn.canHaveInfoBoxShapes[ shapeName ];
       var multimerPadding = $$.sbgn.getDefaultMultimerPadding();
+      var activePadding = $$.sbgn.getDefaultActivePadding();
       var extraDrawFcn = $$.sbgn.extraDraw[ shapeName ];
 
-      var draw = generateDrawFcn( { plainDrawFcn, canBeMultimer, cloneMarkerFcn,
-        canHaveInfoBox, multimerPadding, extraDrawFcn
+      var draw = generateDrawFcn( { plainDrawFcn, canBeMultimer, cloneMarkerFcn, canBeActive, canBeHypothetical,
+        canHaveInfoBox, multimerPadding, activePadding, extraDrawFcn
       } );
 
       var intersectLine = totallyOverridenNodeShapes[ shapeName ] ?
-        generateIntersectLineFcn( { plainIntersectLineFcn, canBeMultimer, cloneMarkerFcn,
-          canHaveInfoBox, multimerPadding
+        generateIntersectLineFcn( { plainIntersectLineFcn, canBeMultimer, cloneMarkerFcn, canBeActive, canBeHypothetical,
+          canHaveInfoBox, multimerPadding, activePadding
         } ) : plainIntersectLineFcn;
 
       var checkPoint = totallyOverridenNodeShapes[ shapeName ] ?
-        generateCheckPointFcn( { plainCheckPointFcn, canBeMultimer, cloneMarkerFcn,
-          canHaveInfoBox, multimerPadding
+        generateCheckPointFcn( { plainCheckPointFcn, canBeMultimer, cloneMarkerFcn, canBeActive, canBeHypothetical,
+          canHaveInfoBox, multimerPadding, activePadding
         } ) : plainCheckPointFcn;
-
-      var shape = { draw, intersectLine, checkPoint, multimerPadding };
+      var shape = { draw, intersectLine, checkPoint, multimerPadding, activePadding };
 
       cyBaseNodeShapes[ shapeName ] = shape;
     } );
@@ -644,15 +994,160 @@ module.exports = function () {
     //$$.sbgn.drawEllipsePath(context, x, y, width, height);
     //context.fill();
     cyBaseNodeShapes['ellipse'].draw(context, x, y, width, height);
+    context.fill();
   };
 
-  $$.sbgn.drawComplex = function( context, x, y, width, height, cornerLength ) {
+    $$.sbgn.drawTruncatedProtein = function (context, x, y, width, height, isActive, activePadding ) {
+   
+    var halfWidth = width / 2;
+    var halfHeight = height / 2;
+    var cornerRadius = cyMath.getRoundRectangleRadius( width, height );
+    var halfPadding = activePadding? activePadding /2: 0;
+
+    if( context.beginPath ){ context.beginPath(); }
+
+    // Start at top middle
+    context.moveTo( x, y - halfHeight - halfPadding );
+    //Draw a line till right top
+    context.lineTo( x + halfWidth + halfPadding, y - halfHeight - halfPadding);
+    //Draw a line to middle right
+    context.lineTo( x + halfWidth + halfPadding, y + 2*halfHeight/3 + 2*halfPadding);
+    //Draw a line inner
+    context.lineTo( x + 2*halfWidth/3 + halfPadding, y + halfHeight/3 + 2*halfPadding );
+    //Draw a line to bottom right
+    context.lineTo( x + 2*halfWidth/3 + halfPadding, y + halfHeight + halfPadding );
+    //Draw a line to bottom middle
+    context.lineTo( x, y + halfHeight + halfPadding );
+    // Arc from bottom to left side
+    context.arcTo( x - halfWidth -halfPadding, y + halfHeight+ halfPadding, x - halfWidth -halfPadding , y, cornerRadius );
+    // Arc from left side to topBorder
+    context.arcTo( x - halfWidth - halfPadding, y - halfHeight - halfPadding, x, y - halfHeight -halfPadding, cornerRadius );
+
+    context.closePath();
+    if(!isActive)
+    {
+      context.fill();
+    }
+  };
+
+  $$.sbgn.drawIonChannel = function (context, x, y, width, height, radius) {
+
+    var halfWidth = width / 2;
+    var halfHeight = height / 2;
+    var cornerRadius = radius || cyMath.getRoundRectangleRadius( width, height );
+
+    if( context.beginPath ){ context.beginPath(); }
+
+    // Start at top middle
+    context.moveTo( x + halfWidth/4, y - halfHeight );
+    // Arc from middle top to right side
+    context.arcTo( x + halfWidth/2, y - halfHeight, x + halfWidth/2, y, cornerRadius );
+    // Arc from right side to bottom
+    context.arcTo( x + halfWidth/2, y + halfHeight, x/2 + halfWidth/4, y + halfHeight, cornerRadius );
+    // Arc from bottom to left side
+    context.arcTo( x - halfWidth, y + halfHeight, x - halfWidth, y, cornerRadius );
+    // Arc from left side to topBorder
+    context.arcTo( x - halfWidth, y - halfHeight, x + halfWidth/4, y - halfHeight, cornerRadius );
+    // Join line
+    context.lineTo( x + halfWidth/4, y - halfHeight );
+
+    // Start at top middle
+    context.moveTo( x + 3 *halfWidth/4, y - halfHeight );
+    // Arc from middle top to right side
+    context.arcTo( x + halfWidth, y - halfHeight, x + halfWidth, y, cornerRadius );
+    // Arc from right side to bottom
+    context.arcTo( x + halfWidth, y + halfHeight, x + 3 * halfWidth/4, y + halfHeight, cornerRadius );
+    // Arc from bottom to left side
+    context.arcTo( x + halfWidth/2, y + halfHeight, x +  halfWidth/2, y, cornerRadius );
+    // Arc from left side to topBorder
+    context.arcTo( x + halfWidth/2, y - halfHeight, x + 3 * halfWidth/4 , y - halfHeight, cornerRadius );
+    // Join line
+    //context.lineTo( x, y - halfHeight );
+
+
+    context.closePath();
+    context.fill();
+  }
+
+  $$.sbgn.drawOpenIonChannel = function (context, x, y, width, height, radius) {
+   
+    var halfWidth = width / 2;
+    var halfHeight = height / 2;
+    var cornerRadius = radius || cyMath.getRoundRectangleRadius( width, height );
+
+    if( context.beginPath ){ context.beginPath(); }
+
+    // Start at top middle
+    context.moveTo( x - halfWidth/2, y - halfHeight );
+    // Arc from middle top to right side
+    context.arcTo( x , y - halfHeight, x, y, cornerRadius );
+    // Arc from right side to bottom
+    context.arcTo( x, y + halfHeight, x- halfWidth/2, y + halfHeight, cornerRadius );
+    // Arc from bottom to left side
+    context.arcTo( x - halfWidth, y + halfHeight, x - halfWidth, y, cornerRadius );
+    // Arc from left side to topBorder
+    context.arcTo( x - halfWidth, y - halfHeight, x + halfWidth/2, y - halfHeight, cornerRadius );
+    // Join line
+    context.lineTo( x-halfWidth/2, y - halfHeight );
+
+    // Start at top middle
+    context.moveTo( x + 3 *halfWidth/4, y - halfHeight );
+    // Arc from middle top to right side
+    context.arcTo( x + halfWidth, y - halfHeight, x + halfWidth, y, cornerRadius );
+    // Arc from right side to bottom
+    context.arcTo( x + halfWidth, y + halfHeight, x + 3 * halfWidth/4, y + halfHeight, cornerRadius );
+    // Arc from bottom to left side
+    context.arcTo( x + halfWidth/2, y + halfHeight, x +  halfWidth/2, y, cornerRadius );
+    // Arc from left side to topBorder
+    context.arcTo( x + halfWidth/2, y - halfHeight, x + 3 * halfWidth/4 , y - halfHeight, cornerRadius );
+    // Join line
+    //context.lineTo( x, y - halfHeight );
+
+
+    context.closePath();
+    context.fill();
+  };
+
+  $$.sbgn.drawComplex = function( context, x, y, width, height, isActive, cornerLength ) {
     cornerLength = cornerLength || $$.sbgn.getDefaultComplexCornerLength();
     var points = $$.sbgn.generateComplexShapePoints(cornerLength, width, height);
 
     drawPolygonPath(context, x, y, width, height, points);
 
+    if(!isActive)
+    {
+      context.fill();
+    }
+  };
+
+  $$.sbgn.drawGene = function( context, x, y, width, height, isActive ) {
+    cyBaseNodeShapes['rectangle'].draw(context, x, y, width, height);
+    if (!isActive)
+    {
+      context.fill();
+    }
+  };
+
+  $$.sbgn.drawRNA = function( context, x, y, width, height ) {
+    var points = $$.sbgn.generateRNAShapePoints(width, height);
+
+    drawPolygonPath(context, x, y, width, height, points);
+
     context.fill();
+  };
+
+  $$.sbgn.drawPhenotype = function( context, x, y, width, height ) {
+    cyBaseNodeShapes['hexagon'].draw(context, x, y, width, height);
+    context.fill();
+
+  };
+  $$.sbgn.drawReceptor= function( context, x, y, width, height, isActive, activePadding ) {
+     drawReceptorPath(context, x, y, width, height,activePadding)
+    if(!isActive)
+    {
+      context.fill();
+    }
+
   };
 
   $$.sbgn.drawCrossLine = function( context, x, y, width, height ) {
@@ -673,9 +1168,28 @@ module.exports = function () {
     context.fill();
   };
 
-  $$.sbgn.drawRoundRectangle = function( context, x, y, width, height ) {
+  $$.sbgn.drawRoundRectangle = function( context, x, y, width, height, isActive ) {
     drawRoundRectanglePath( context, x, y, width, height );
+    if(!isActive)
+    {
+      context.fill();
+    }
+  
+  };
+
+  $$.sbgn.drawProtein = function( context, x, y, width, height, isActive, activePadding ) {
+    let activePadding1 = activePadding || 0;
+    drawProteinPath( context, x, y, width, height, activePadding1 );
+    if(!isActive)
+    {
+      context.fill();
+    }
+  
+  };
+  $$.sbgn.drawRoundedDrug = function( context, x, y, width, height ) {
+    drawRoundedDrugPath( context, x, y, width, height );
     context.fill();
+  
   };
 
   $$.sbgn.generateNucleicAcidPoints = function() {
@@ -698,14 +1212,28 @@ module.exports = function () {
     "empty set": $$.sbgn.drawEllipse,
     "biological activity": $$.sbgn.drawBiologicalActivity,
     "compartment": $$.sbgn.drawBarrel,
-    "oldCompartment": $$.sbgn.drawRoundRectangle
+    "oldCompartment": $$.sbgn.drawRoundRectangle,
+    "gene":  $$.sbgn.drawGene,
+    "rna": $$.sbgn.drawRNA,
+    "simple molecule": $$.sbgn.drawEllipse,
+    "unknown molecule": $$.sbgn.drawEllipse,
+    "drug": $$.sbgn.drawRoundedDrug,
+    "ion": $$.sbgn.drawEllipse,
+    "truncated protein": $$.sbgn.drawTruncatedProtein,
+    "ion channel" : $$.sbgn.drawIonChannel,
+    "phenotype sbml": $$.sbgn.drawPhenotype,
+    "receptor": $$.sbgn.drawReceptor,
+    "complex sbml": $$.sbgn.drawComplex,
+    "protein": $$.sbgn.drawProtein,
+    "degradation": $$.sbgn.drawEllipse,
   };
 
   // To define an extra drawing for the node that is rendered at the very end,
   // even after the node background image is drawn.
   // E.g. cross lines of "empty set" nodes.
   $$.sbgn.extraDraw = {
-    "empty set": $$.sbgn.drawCrossLine
+    "empty set": $$.sbgn.drawCrossLine,
+    "degradation": $$.sbgn.drawCrossLine
   };
 
   $$.sbgn.plainIntersectLine = {
@@ -730,6 +1258,9 @@ module.exports = function () {
     "empty set": function( centerX, centerY, width, height, x, y, padding ) {
       return cyBaseNodeShapes["ellipse"].intersectLine( centerX, centerY, width, height, x, y, padding );
     },
+    "degradation": function( centerX, centerY, width, height, x, y, padding ) {
+      return cyBaseNodeShapes["ellipse"].intersectLine( centerX, centerY, width, height, x, y, padding );
+    },
     "biological activity": function( centerX, centerY, width, height, x, y, padding ) {
       var points = $$.sbgn.generateBiologicalActivityPoints();
       return cyMath.polygonIntersectLine(
@@ -743,7 +1274,69 @@ module.exports = function () {
       return cyMath.roundRectangleIntersectLine(
         x, y, centerX, centerY, width, height, padding
       );
-    }
+    },
+    "drug": function( centerX, centerY, width, height, x, y, padding ) {
+      return cyMath.roundRectangleIntersectLine(
+        x, y, centerX, centerY, width, height, padding
+      );
+    },
+    "protein": function( centerX, centerY, width, height, x, y, padding ) {
+      return cyMath.roundRectangleIntersectLine(
+        x, y, centerX, centerY, width, height, padding
+      );
+    },
+    "gene": function( centerX, centerY, width, height, x, y, padding ) {
+      return cyBaseNodeShapes["rectangle"].intersectLine( centerX, centerY, width, height, x, y, padding );
+    },
+    "rna": function( centerX, centerY, width, height, x, y, padding ) {
+      var points = $$.sbgn.generateRNAShapePoints(  width, height );
+      return cyMath.polygonIntersectLine(
+        x, y, points, centerX, centerY, width / 2, height / 2, padding
+      );
+    },
+    "receptor": function( centerX, centerY, width, height, x, y, padding ) {
+      var points = $$.sbgn.generateReceptorShapePoints(  width, height );
+      return cyMath.polygonIntersectLine(
+        x, y, points, centerX, centerY, width / 2, height / 2, padding
+      );
+    },
+    "ion channel": function( centerX, centerY, width, height, x, y, padding ) {
+      return cyMath.roundRectangleIntersectLine(
+        x, y, centerX, centerY, width, height, padding
+      );
+    },
+    "truncated protein": function( centerX, centerY, width, height, x, y, padding ) {
+      return cyMath.roundRectangleIntersectLine(
+        x, y, centerX, centerY, width, height, padding
+      );
+    },
+    "ion": function( centerX, centerY, width, height, x, y, padding ) {
+      return cyBaseNodeShapes["ellipse"].intersectLine( centerX, centerY, width, height, x, y, padding );
+
+    },
+    "simple molecule": function( centerX, centerY, width, height, x, y, padding ) {
+      return cyBaseNodeShapes["ellipse"].intersectLine( centerX, centerY, width, height, x, y, padding );
+
+    },
+    "unknown molecule": function( centerX, centerY, width, height, x, y, padding ) {
+    return cyBaseNodeShapes["ellipse"].intersectLine( centerX, centerY, width, height, x, y, padding );
+
+    },
+    "drug": function( centerX, centerY, width, height, x, y, padding ) {
+      return cyMath.roundRectangleIntersectLine(
+        x, y, centerX, centerY, width, height, padding
+      );
+    },
+    "phenotype sbml": function( centerX, centerY, width, height, x, y, padding ) {
+      return cyBaseNodeShapes["ellipse"].intersectLine( centerX, centerY, width, height, x, y, padding );
+
+    },
+    "complex sbml": function( centerX, centerY, width, height, x, y, padding ) {
+      var points = $$.sbgn.generateComplexShapePoints( $$.sbgn.getDefaultComplexCornerLength(), width, height );
+      return cyMath.polygonIntersectLine(
+        x, y, points, centerX, centerY, width / 2, height / 2, padding
+      );
+    },
   };
 
   $$.sbgn.plainCheckPoint = {
@@ -819,10 +1412,18 @@ module.exports = function () {
       return cyMath.pointInsidePolygon(
         x, y, points, centerX, centerY, width, height, [0, -1], padding);
     },
+    "complex sbml" : function( x, y, padding, width, height, centerX, centerY ) {
+      var points = $$.sbgn.generateComplexShapePoints( $$.sbgn.getDefaultComplexCornerLength(), width, height );
+      return cyMath.pointInsidePolygon(
+        x, y, points, centerX, centerY, width, height, [0, -1], padding);
+    },
     "nucleic acid feature": function( x, y, padding, width, height, centerX, centerY ) {
       return cyBaseNodeShapes["bottomroundrectangle"].checkPoint( x, y, padding, width, height, centerX, centerY );
     },
     "empty set": function( x, y, padding, width, height, centerX, centerY ) {
+      return cyBaseNodeShapes["ellipse"].checkPoint( x, y, padding, width, height, centerX, centerY );
+    },
+    "degradation": function( x, y, padding, width, height, centerX, centerY ) {
       return cyBaseNodeShapes["ellipse"].checkPoint( x, y, padding, width, height, centerX, centerY );
     },
     "biological activity": function( x, y, padding, width, height, centerX, centerY ) {
@@ -833,7 +1434,40 @@ module.exports = function () {
     },
     "oldCompartment": function( x, y, padding, width, height, centerX, centerY ) {
       return cyBaseNodeShapes["roundrectangle"].checkPoint( x, y, padding, width, height, centerX, centerY );
-    }
+    },
+    "gene": function( x, y, padding, width, height, centerX, centerY ) {
+      return cyBaseNodeShapes["roundrectangle"].checkPoint( x, y, padding, width, height, centerX, centerY );
+   },
+   "simple molecule": function( x, y, padding, width, height, centerX, centerY ) {
+    return cyBaseNodeShapes["roundrectangle"].checkPoint( x, y, padding, width, height, centerX, centerY );
+   },
+   "unknown molecule": function( x, y, padding, width, height, centerX, centerY ) {
+    return cyBaseNodeShapes["roundrectangle"].checkPoint( x, y, padding, width, height, centerX, centerY );
+   },
+   "drug": function( x, y, padding, width, height, centerX, centerY ) {
+    return cyBaseNodeShapes["roundrectangle"].checkPoint( x, y, padding, width, height, centerX, centerY );
+   },
+   "ion": function( x, y, padding, width, height, centerX, centerY ) {
+    return cyBaseNodeShapes["roundrectangle"].checkPoint( x, y, padding, width, height, centerX, centerY );
+   },
+   "truncated protein": function( x, y, padding, width, height, centerX, centerY ) {
+    return cyBaseNodeShapes["roundrectangle"].checkPoint( x, y, padding, width, height, centerX, centerY );
+   },
+   "ion channel": function( x, y, padding, width, height, centerX, centerY ) {
+    return cyBaseNodeShapes["roundrectangle"].checkPoint( x, y, padding, width, height, centerX, centerY );
+   },
+   "rna": function( x, y, padding, width, height, centerX, centerY ) {
+    return cyBaseNodeShapes["roundrectangle"].checkPoint( x, y, padding, width, height, centerX, centerY );
+   },
+   "phenotype sbml": function( x, y, padding, width, height, centerX, centerY ) {
+    return cyBaseNodeShapes["roundrectangle"].checkPoint( x, y, padding, width, height, centerX, centerY );
+   },
+   "receptor": function( x, y, padding, width, height, centerX, centerY ) {
+    return cyBaseNodeShapes["roundrectangle"].checkPoint( x, y, padding, width, height, centerX, centerY );
+   },
+   "protein": function( x, y, padding, width, height, centerX, centerY ) {
+    return cyBaseNodeShapes["roundrectangle"].checkPoint( x, y, padding, width, height, centerX, centerY );
+   }
   };
 
   $$.sbgn.cloneMarker = {
@@ -1320,9 +1954,18 @@ module.exports = function () {
       var infoBoxHeight = state.bbox.h;
 
       var currIntersections = null;
-
       if ( state.clazz == "state variable" ) {
         var coord = classes.StateVariable.getAbsoluteCoord(state, node.cy());
+        currIntersections = $$.sbgn.intersectLineEllipse(x, y, centerX, centerY,
+                coord.x, coord.y, infoBoxWidth, infoBoxHeight, padding);
+      }
+      else if ( state.clazz == "residue variable" ) {
+        var coord = classes.ResidueVariable.getAbsoluteCoord(state, node.cy());
+        currIntersections = $$.sbgn.intersectLineEllipse(x, y, centerX, centerY,
+                coord.x, coord.y, infoBoxWidth, infoBoxHeight, padding);
+      }
+      else if ( state.clazz == "binding region" ) {
+        var coord = classes.BindingRegion.getAbsoluteCoord(state, node.cy());
         currIntersections = $$.sbgn.intersectLineEllipse(x, y, centerX, centerY,
                 coord.x, coord.y, infoBoxWidth, infoBoxHeight, padding);
       }

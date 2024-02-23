@@ -51,6 +51,7 @@ module.exports = function () {
    TODO implement 0.3 changes when submap support is fully there.
    */
   jsonToSbgnml.buildJsObj = function(filename, version, renderInfo, mapProperties, nodes, edges, hidden = false){
+
     var self = this;
     var mapID = textUtilities.getXMLValidId(filename);
     var hasExtension = false;
@@ -61,6 +62,7 @@ module.exports = function () {
     
     var id = [];
     var i = 0;
+    //console.log("this.nodes",this.nodes)
     this.nodes.forEach(node => ()=>{
       id[i] = node._private.data.id;
       i++;
@@ -99,6 +101,7 @@ module.exports = function () {
       versionNo = version;
     }
     //var versionNo = (version === "plain") ? "0.2" : version;
+    console.log("Version number", versionNo)
     var sbgn = new libsbgnjs.Sbgn({xmlns: 'http://sbgn.org/libsbgn/' + versionNo});
 
     var map;
@@ -390,6 +393,12 @@ module.exports = function () {
        else if(boxGlyph.clazz === "unit of information"){
            glyph.addGlyphMember(this.addInfoBoxGlyph(boxGlyph, statesandinfosId, node));
        }
+       else if(boxGlyph.clazz === "residue variable"){
+        glyph.addGlyphMember(this.addResidueBoxGlyph(boxGlyph, statesandinfosId, node));
+      }
+      else if(boxGlyph.clazz === "binding region"){
+        glyph.addGlyphMember(this.addBindingBoxGlyph(boxGlyph, statesandinfosId, node));
+    }
     }
     // check for annotations
     if (version !== "plain" && node.data('annotations') && !$.isEmptyObject(node.data('annotations'))) {
@@ -398,7 +407,7 @@ module.exports = function () {
       extension.add(annotExt);
     }
     // add glyph members that are not state variables or unit of info: subunits
-    if(nodeClass === "complex" || nodeClass === "complex multimer" || nodeClass === "submap" || nodeClass === "topology group"){
+    if(nodeClass === "complex" || nodeClass === "complex multimer" || nodeClass === "submap" || nodeClass === "topology group" || nodeClass == "active protein"){
        var children = node.children();
        children = children.union(this.allCollapsedNodes);
        if(node.data('collapsedChildren')) {
@@ -611,6 +620,28 @@ module.exports = function () {
 
       return glyph;
   };
+  jsonToSbgnml.addBindingBoxGlyph = function(node, id, mainGlyph){
+
+    var glyph = new libsbgnjs.Glyph({id: id, class_: 'binding region'});
+    var label = new libsbgnjs.Label();
+    if(typeof node.region.variable != 'undefined')
+        label.text = node.region.variable;
+    glyph.setLabel(label);
+    glyph.setBbox(this.addStateAndInfoBbox(mainGlyph, node));
+
+    return glyph;
+  };
+  jsonToSbgnml.addResidueBoxGlyph = function(node, id, mainGlyph){
+
+      var glyph = new libsbgnjs.Glyph({id: id, class_: 'residue variable'});
+      var label = new libsbgnjs.Label();
+      if(typeof node.residue.variable != 'undefined')
+          label.text = node.residue.variable;
+      glyph.setLabel(label);
+      glyph.setBbox(this.addStateAndInfoBbox(mainGlyph, node));
+
+      return glyph;
+};
 
   jsonToSbgnml.addInfoBoxGlyph = function (node, id, mainGlyph) {
       var glyph = new libsbgnjs.Glyph({id: id, class_: 'unit of information'});

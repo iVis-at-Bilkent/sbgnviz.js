@@ -75,15 +75,17 @@ module.exports = function () {
  }
  // Helper functions End
 
- var sbgnmlToJson, jsonToSbgnml, jsonToNwt, uiUtilities, tdToJson,
-     sifToJson, graphUtilities, layoutToText, nwtToJson, jsonToSif,sbgnmlToCd,cdToSbgnml,sbgnmlToSbml,sbmlToSbgnml,gpmlToSbgnml,sbgnmlToGpml;
+ var sbgnmlToJson, sbmlToJson, jsonToSbgnml, jsonToSbml, jsonToNwt, uiUtilities, tdToJson,
+     sifToJson, graphUtilities, layoutToText, nwtToJson, jsonToSif,sbgnmlToCd,cdToSbgnml,sbgnmlToSbml,sbmlToSbgnml;
  var updateGraph;
  var options, cy;
 
  function fileUtilities (param) {
    sbgnmlToJson = param.sbgnmlToJsonConverter;
+   sbmlToJson = param.sbmlToJsonConverter;
    nwtToJson = param.nwtToJsonConverter;
    jsonToSbgnml = param.jsonToSbgnmlConverter;
+   jsonToSbml = param.jsonToSbmlConverter;
    jsonToNwt = param.jsonToNwtConverter;
    jsonToSif = param.jsonToSifConverter;
    uiUtilities = param.uiUtilities;
@@ -278,7 +280,8 @@ module.exports = function () {
  */
  fileUtilities.loadFile = function(file, convertFcn, callback1, callback2, callback3, callback4) {
    var self = this;
-   uiUtilities.startSpinner("load-file-spinner");
+   console.log("loadFile spinner")
+   //uiUtilities.startSpinner("load-file-spinner");
 
    var textType = /text.*/;
 
@@ -336,7 +339,7 @@ module.exports = function () {
          callback3();
        }
 
-       uiUtilities.endSpinner("load-file-spinner");
+       //uiUtilities.endSpinner("load-file-spinner");
        $(document).trigger( "sbgnvizLoadFileEnd", [ file.name, cy ] ); // Trigger an event signaling that a file is loaded
 
        if (typeof callback4 !== 'undefined') {
@@ -349,11 +352,19 @@ module.exports = function () {
  };
 
  fileUtilities.loadSBGNMLText = async function(textData, tileInfoBoxes, filename, cy, urlParams){
-        await updateGraph(sbgnmlToJson.convert(textToXmlObject(textData), urlParams), undefined, undefined, tileInfoBoxes);
-         await $(document).trigger("sbgnvizLoadFileEnd",  [filename, cy]);
-         uiUtilities.endSpinner("load-file-spinner");
+  await updateGraph(sbgnmlToJson.convert(textToXmlObject(textData), urlParams), undefined, undefined, tileInfoBoxes);
+  await $(document).trigger("sbgnvizLoadFileEnd",  [filename, cy]);
+        uiUtilities.endSpinner("load-file-spinner");
+
 
  };
+
+ fileUtilities.loadSBMLText = async function(textData, tileInfoBoxes, filename, cy, urlParams){
+  await updateGraph(sbmlToJson.convert(textToXmlObject(textData), urlParams), undefined, undefined, tileInfoBoxes);
+   await $(document).trigger("sbgnvizLoadFileEnd",  [filename, cy]);
+   uiUtilities.endSpinner("load-file-spinner");
+
+};
 
  // supported versions are either 0.2 or 0.3
  fileUtilities.saveAsSbgnml = function(filename, version, renderInfo, mapProperties, nodes, edges) {
@@ -408,27 +419,44 @@ module.exports = function () {
   reader.readAsText(file);
  };
 
- fileUtilities.saveAsSbml = function(filename,errorCallback){
+ fileUtilities.saveAsSbml = function(filename){
   uiUtilities.startSpinner("load-spinner");
-  var sbgnml = this.convertSbgn();
-  
-  this.convertSbgnmlToSbml(sbgnml, function(data){
-    
-    if(!data.result){
-      errorCallback(sbgnml,data.error);
-    }else if( data.message.indexOf("Internal server error") !== -1)
-    {
-      errorCallback(sbgnml,data.message);
-    }else{    
-      var blob = new Blob([data.message], {
-        type: "text/plain;charset=utf-8;",
-      });
-      saveAs(blob, filename); 
-    }
-    uiUtilities.endSpinner("load-spinner");
-  });
- };
+  var sbgnText = jsonToSbml.createSbml(filename);
+   var blob = new Blob([sbgnText], {
+     type: "text/plain;charset=utf-8;",
+   });
+   saveAs(blob, filename);
+   uiUtilities.endSpinner("load-spinner");
+ }
 
+ fileUtilities.loadSbmlForSBML = function(file, callback1, callback2, layoutBy)
+ {
+  var convert = function( text ) {
+    var converted = sbmlToJson.convert(text)
+    return converted;
+  };
+
+  var runLayout = function() {
+    if ( layoutBy ) {
+      if ( typeof layoutBy === 'function' ) {
+        layoutBy();
+      }
+      else {
+        var layout = cy.layout( layoutBy );
+
+        // for backward compatibility need to make this if check
+        if ( layout && layout.run ) {
+          layout.run();
+        }
+      }
+    }
+
+    cy.fit( cy.elements(":visible"), 20 );
+  };
+
+  fileUtilities.loadFile( file, convert, callback1, callback2, fileUtilities.collapseMarkedNodes, runLayout);
+ 
+ }
  fileUtilities.loadSbml = function(file, successCallback, errorCallback){
   var reader = new FileReader();
   reader.onload = function (e) { 
@@ -470,7 +498,7 @@ module.exports = function () {
   var reader = new FileReader();
   reader.onload = function (e) { 
     
-      this.convertGpmlToSbgnml(e.target.result, function(data){
+    this.convertSbmlToSbgnml(e.target.result, function(data){
       if(data == null){
         errorCallback();
       }else{
@@ -486,6 +514,7 @@ module.exports = function () {
   var sbgnmlText = jsonToSbgnml.createSbgnml(filename, "plain", renderInfo, mapProperties, nodes, edges, hidden);
  
   return sbgnmlText;
+  
 };
 
  fileUtilities.exportLayoutData = function(filename, byName) {
@@ -509,6 +538,9 @@ module.exports = function () {
  fileUtilities.convertSbgnmlTextToJson = function(sbgnmlText){
      return sbgnmlToJson.convert(textToXmlObject(sbgnmlText));
  };
+ fileUtilities.convertSbmlTextToJson = function(sbgnmlText){
+  return sbmlToJson.convert(textToXmlObject(sbgnmlText));
+};
 
  fileUtilities.convertSifTextToJson = function(sifText){
         return sifToJson.convert(sifText);
@@ -519,6 +551,14 @@ fileUtilities.createJsonFromSBGN = function(){
 
     var sbgnmlText = jsonToSbgnml.createSbgnml();
     return sbgnmlToJson.convert(textToXmlObject(sbgnmlText));
+};
+
+fileUtilities.createJsonFromSBML = function(){
+
+  var sbgnmlText = jsonToSbgnml.createSbgnml(); //SBML
+  var converted_ = sbmlToJson.convert(textToXmlObject(sbgnmlText));
+  console.log("converted_",converted_)
+  return converted_;
 };
 
 fileUtilities.createJsonFromSif = function(){

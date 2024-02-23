@@ -4,16 +4,18 @@ var jQuery = $ = libs.jQuery;
 var cytoscape = libs.cytoscape;
 var Tippy = libs.tippy;
 
+
 module.exports = function () {
 
 	var elementUtilities, graphUtilities, mainUtilities, undoRedoActionFunctions, optionUtilities, experimentalDataOverlay;
 	var refreshPaddings, options, cy;
 
-	var sbgnCyInstance = function (param) {
+	var sbgnCyInstance = function (param) 
+	{
 		elementUtilities = param.elementUtilities;
 		graphUtilities = param.graphUtilities;
 		experimentalDataOverlay = param.experimentalDataOverlay;
-    mainUtilities = param.mainUtilities;
+    	mainUtilities = param.mainUtilities;
 		undoRedoActionFunctions = param.undoRedoActionFunctions;
 		refreshPaddings = graphUtilities.refreshPaddings.bind(graphUtilities);
 
@@ -130,7 +132,6 @@ module.exports = function () {
 
 		function showTooltip(event) {
 			var node = event.target || event.cyTarget;
-
 
 			var canHaveTooltip = function( node ) {
 				return elementUtilities.isSIFNode(node) || node.data("tooltip") !==null;
@@ -354,6 +355,7 @@ module.exports = function () {
       });
       
       cy.on("afterRedo", function (e, name, args, res) {
+
         if(name == "layout" || name == "collapse" || name == "expand" || name == "collapseRecursively" || name == "expandRecursively" 
           || (name == "batch" && ((args.length > 0 && args[0]['name'] == "thinBorder") || (args.length > 0 && args[0]['name'] == "thickenBorder")))){
           res.allElements = args.allElements2;
@@ -671,8 +673,8 @@ module.exports = function () {
 								return ele.data('width');
 							}
 			      })
-	          .selector("node[class='association'],[class='dissociation'],[class='and'],[class='or'],[class='not'],[class='process'],[class='omitted process'],[class='uncertain process']")
-	          .css({
+				  .selector("node[class='association'],[class='dissociation'],[class='and'],[class='or'],[class='not'],[class='process'],[class='omitted process'],[class='uncertain process'],[class='truncated process'],[class='unknown logical operator']")
+				  .css({
 	            'shape-polygon-points': function(ele) {
 	              if (graphUtilities.portsEnabled === true && ele.data('ports').length === 2) {
 	                // We assume that the ports of the edge are symetric according to the node center so just checking one port is enough for us
@@ -887,9 +889,12 @@ module.exports = function () {
 	            'target-endpoint': function(ele) {
 	              return elementUtilities.getEndPoint(ele, 'target');
 	            },
-							'line-style': function (ele) {
+				'line-style': function (ele) {
 	              return elementUtilities.getArrayLineStyle(ele);
-	            }
+	            },
+				'line-dash-pattern':  function (ele) {
+					return elementUtilities.getArrayLineDashStyle(ele);
+				}
 	          })
 	          .selector("core")
 	          .css({

@@ -18,7 +18,8 @@ let config = {
     path: path.join( __dirname ),
     filename: pkg.name + '.js',
     library: pkg.name,
-    libraryTarget: 'umd'
+    libraryTarget: 'umd',
+   
   },
   // loader
   module: {
@@ -35,9 +36,12 @@ let config = {
     minimize: false
   },
   plugins: [
-    new NodePolyfillPlugin()
+    new NodePolyfillPlugin(),
   ],
-  externals: [NodeExternals()]
+
+  externals: [NodeExternals()],
+
+  
 };
 
 module.exports = config;

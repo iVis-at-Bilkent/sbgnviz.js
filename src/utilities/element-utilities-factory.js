@@ -31,6 +31,7 @@ module.exports = function () {
   elementUtilities.PD = {}; // namespace for all PD specific stuff
   elementUtilities.AF = {}; // namespace for all AF specific stuff
   elementUtilities.SIF = {}; // namespace for all SIF specific stuff
+  elementUtilities.SBML = {}; // namespace for all SIF specific stuff
 
   elementUtilities.graphTopologyLocked = false;
 
@@ -120,7 +121,7 @@ module.exports = function () {
       "omitted process":      {asSource: {isAllowed: true},    asTarget: {}},
       "uncertain process":    {asSource: {isAllowed: true},    asTarget: {}},
       "phenotype":            {asSource: {},   asTarget: {}},
-      "association":          {asSource: {isAllowed: true, maxEdge: 1, maxTotal: 1},      asTarget: {}},
+      "association":          {asSource: {isAllowed: true},      asTarget: {}},
       "dissociation":         {asSource: {isAllowed: true},    asTarget: {}},
       "and":                  {asSource: {},   asTarget: {}},
       "or":                   {asSource: {},   asTarget: {}},
@@ -457,24 +458,677 @@ module.exports = function () {
 
   };
 
-  elementUtilities.logicalOperatorTypes = ['and', 'or', 'not', 'delay'];
-  elementUtilities.processTypes = ['process', 'omitted process', 'uncertain process',
+  elementUtilities.SBML.connectivityConstraints = {
+    "consumption": {
+      "protein":        {asSource: {isAllowed: true},    asTarget: {}},
+      "simple molecule":      {asSource: {isAllowed: true},    asTarget: {}},
+      "unknown molecule":     {asSource: {isAllowed: true},    asTarget: {}},
+      "complex sbml":              {asSource: {isAllowed: true},    asTarget: {}},
+      "gene":                 {asSource: {isAllowed: true},    asTarget: {}},
+      "compartment":          {asSource: {},   asTarget: {}},
+      "rna":                  {asSource: {isAllowed: true},   asTarget: {}},
+      "degradation":            {asSource: {isAllowed: true},    asTarget: {}},
+      "drug":                 {asSource: {isAllowed: true},   asTarget: {}},
+      "truncated protein":    {asSource: {isAllowed: true},   asTarget: {}},
+      "ion channel":          {asSource: {isAllowed: true},   asTarget: {}},
+      "receptor":             {asSource: {isAllowed: true},   asTarget: {}},
+      "ion":                  {asSource: {isAllowed: true},   asTarget: {}},
+      "process":              {asSource: {isAllowed: true,  maxEdge: 1, maxTotal: 1},   asTarget: {isAllowed: true,  maxEdge: 1, maxTotal: 1}},
+      "omitted process":      {asSource: {},   asTarget: {isAllowed: true,  maxEdge: 1, maxTotal: 1}},
+      "uncertain process":    {asSource: {},   asTarget: {isAllowed: true,  maxEdge: 1, maxTotal: 1}},
+      "truncated process":    {asSource: {},   asTarget: {isAllowed: true,  maxEdge: 1, maxTotal: 1}},
+      "phenotype sbml":            {asSource: {isAllowed: true},   asTarget: {}},
+      "association":          {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "dissociation":         {asSource: {},   asTarget: {isAllowed: true, maxEdge: 1, maxTotal: 1}},
+      "and":                  {asSource: {},   asTarget: {isAllowed: true,  maxEdge: 2, maxTotal: 2}},
+      "or":                   {asSource: {},   asTarget: {isAllowed: true,   maxEdge: 2, maxTotal: 2}},
+      "not":                  {asSource: {},   asTarget: {isAllowed: true,   maxEdge: 2, maxTotal: 2}},
+      "unknown logical operator":  {asSource: {},   asTarget: {isAllowed: true,   maxEdge: 2, maxTotal: 2}},
+    },
+    "production": {
+      "protein":        {asSource: {},    asTarget: {isAllowed: true}},
+      "simple molecule":      {asSource: {},    asTarget: {isAllowed: true}},
+      "unknown molecule":     {asSource: {},    asTarget: {isAllowed: true}},
+      "complex sbml":              {asSource: {},    asTarget: {isAllowed: true}},
+      "gene":                 {asSource: {},    asTarget: {isAllowed: true}},
+      "compartment":          {asSource: {},   asTarget: {}},
+      "rna":                  {asSource: {},   asTarget: {isAllowed: true}},
+      "degradation":            {asSource: {},    asTarget: {isAllowed: true}},
+      "drug":                 {asSource: {},   asTarget: {isAllowed: true}},
+      "truncated protein":    {asSource: {},   asTarget: {isAllowed: true}},
+      "ion channel":          {asSource: {},   asTarget: {isAllowed: true}},
+      "receptor":             {asSource: {},   asTarget: {isAllowed: true}},
+      "ion":                  {asSource: {},   asTarget: {isAllowed: true}},
+      "process":              {asSource: {isAllowed: true,  maxEdge: 1, maxTotal: 1},   asTarget: {}},
+      "omitted process":      {asSource: {isAllowed: true,  maxEdge: 1, maxTotal: 1},   asTarget: {}},
+      "uncertain process":    {asSource: {isAllowed: true,  maxEdge: 1, maxTotal: 1},   asTarget: {}},
+      "truncated process":    {asSource: {isAllowed: true,  maxEdge: 2, maxTotal: 2},   asTarget: {}},
+      "phenotype sbml":            {asSource: {},   asTarget: {isAllowed: true}},
+      "association":          {asSource: {},   asTarget: {}},
+      "dissociation":         {asSource: {isAllowed: true, maxEdge: 2, maxTotal: 2},   asTarget: {}},
+      "and":                  {asSource: {},   asTarget: {}},
+      "or":                   {asSource: {},   asTarget: {}},
+      "not":                  {asSource: {},   asTarget: {}},
+      "unknown logical operator":  {asSource: {},   asTarget: {}},
+    },
+    "modulation": {
+      "protein":        {asSource: {isAllowed: true},   asTarget: {}},
+      "simple molecule":      {asSource: {isAllowed: true},   asTarget: {}},
+      "unknown molecule":     {asSource: {isAllowed: true},   asTarget: {}},
+      "complex sbml":              {asSource: {isAllowed: true},   asTarget: {}},
+      "gene":                 {asSource: {isAllowed: true},   asTarget: {}},
+      "compartment":          {asSource: {},   asTarget: {}},
+      "rna":                  {asSource: {isAllowed: true},   asTarget: {}},
+      "degradation":            {asSource: {isAllowed: true},   asTarget: {}},
+      "drug":                 {asSource: {isAllowed: true},   asTarget: {}},
+      "truncated protein":    {asSource: {isAllowed: true},   asTarget: {}},
+      "ion channel":          {asSource: {isAllowed: true},   asTarget: {}},
+      "receptor":             {asSource: {isAllowed: true},   asTarget: {}},
+      "ion":                  {asSource: {isAllowed: true},   asTarget: {}},
+      "process":              {asSource: {},   asTarget: {isAllowed: true,}},
+      "omitted process":      {asSource: {},   asTarget: {isAllowed: true}},
+      "uncertain process":    {asSource: {},   asTarget: {isAllowed: true}},
+      "truncated process":    {asSource: {},   asTarget: {isAllowed: true}},
+      "phenotype sbml":            {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "association":          {asSource: {},   asTarget: {}},
+      "dissociation":         {asSource: {},   asTarget: {}},
+      "and":                  {asSource: {},   asTarget: {}},
+      "or":                   {asSource: {},   asTarget: {}},
+      "not":                  {asSource: {},   asTarget: {}},
+      "unknown logical operator":  {asSource: {},   asTarget: {}},
+    },
+    "stimulation": {
+      "protein":        {asSource: {isAllowed: true},   asTarget: {}},
+      "simple molecule":      {asSource: {isAllowed: true},   asTarget: {}},
+      "unknown molecule":     {asSource: {isAllowed: true},   asTarget: {}},
+      "complex sbml":              {asSource: {isAllowed: true},   asTarget: {}},
+      "gene":                 {asSource: {isAllowed: true},   asTarget: {}},
+      "compartment":          {asSource: {},   asTarget: {}},
+      "rna":                  {asSource: {isAllowed: true},   asTarget: {}},
+      "degradation":            {asSource: {isAllowed: true},   asTarget: {}},
+      "drug":                 {asSource: {isAllowed: true},   asTarget: {}},
+      "truncated protein":    {asSource: {isAllowed: true},   asTarget: {}},
+      "ion channel":          {asSource: {isAllowed: true},   asTarget: {}},
+      "receptor":             {asSource: {isAllowed: true},   asTarget: {}},
+      "ion":                  {asSource: {isAllowed: true},   asTarget: {}},
+      "process":              {asSource: {},   asTarget: {isAllowed: true}},
+      "omitted process":      {asSource: {},   asTarget: {isAllowed: true}},
+      "uncertain process":    {asSource: {},   asTarget: {isAllowed: true}},
+      "truncated process":    {asSource: {},   asTarget: {isAllowed: true}},
+      "phenotype sbml":            {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "association":          {asSource: {},   asTarget: {}},
+      "dissociation":         {asSource: {},   asTarget: {}},
+      "and":                  {asSource: {},   asTarget: {}},
+      "or":                   {asSource: {},   asTarget: {}},
+      "not":                  {asSource: {},   asTarget: {}},
+      "unknown logical operator":  {asSource: {},   asTarget: {}},
+    },
+    "catalysis": {
+      "protein":        {asSource: {isAllowed: true},   asTarget: {}},
+      "simple molecule":      {asSource: {isAllowed: true},   asTarget: {}},
+      "unknown molecule":     {asSource: {isAllowed: true},   asTarget: {}},
+      "complex sbml":              {asSource: {isAllowed: true},   asTarget: {}},
+      "gene":                 {asSource: {isAllowed: true},   asTarget: {}},
+      "compartment":          {asSource: {},   asTarget: {}},
+      "rna":                  {asSource: {isAllowed: true},   asTarget: {}},
+      "degradation":            {asSource: {isAllowed: true},   asTarget: {}},
+      "drug":                 {asSource: {isAllowed: true},   asTarget: {}},
+      "truncated protein":    {asSource: {isAllowed: true},   asTarget: {}},
+      "ion channel":          {asSource: {isAllowed: true},   asTarget: {}},
+      "receptor":             {asSource: {isAllowed: true},   asTarget: {}},
+      "ion":                  {asSource: {isAllowed: true},   asTarget: {}},
+      "process":              {asSource: {},   asTarget: {isAllowed: true}},
+      "omitted process":      {asSource: {},   asTarget: {isAllowed: true}},
+      "uncertain process":    {asSource: {},   asTarget: {isAllowed: true}},
+      "truncated process":    {asSource: {},   asTarget: {isAllowed: true}},
+      "phenotype sbml":            {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "association":          {asSource: {},   asTarget: {}},
+      "dissociation":         {asSource: {},   asTarget: {}},
+      "and":                  {asSource: {},   asTarget: {}},
+      "or":                   {asSource: {},   asTarget: {}},
+      "not":                  {asSource: {},   asTarget: {}},
+      "unknown logical operator":  {asSource: {},   asTarget: {}},
+   },
+    "inhibition": {
+      "protein":        {asSource: {isAllowed: true},   asTarget: {}},
+      "simple molecule":      {asSource: {isAllowed: true},   asTarget: {}},
+      "unknown molecule":     {asSource: {isAllowed: true},   asTarget: {}},
+      "complex sbml":              {asSource: {isAllowed: true},   asTarget: {}},
+      "gene":                 {asSource: {isAllowed: true},   asTarget: {}},
+      "compartment":          {asSource: {},   asTarget: {}},
+      "rna":                  {asSource: {isAllowed: true},   asTarget: {}},
+      "degradation":            {asSource: {isAllowed: true},   asTarget: {}},
+      "drug":                 {asSource: {isAllowed: true},   asTarget: {}},
+      "truncated protein":    {asSource: {isAllowed: true},   asTarget: {}},
+      "ion channel":          {asSource: {isAllowed: true},   asTarget: {}},
+      "receptor":             {asSource: {isAllowed: true},   asTarget: {}},
+      "ion":                  {asSource: {isAllowed: true},   asTarget: {}},
+      "process":              {asSource: {},   asTarget: {isAllowed: true}},
+      "omitted process":      {asSource: {},   asTarget: {isAllowed: true}},
+      "uncertain process":    {asSource: {},   asTarget: {isAllowed: true}},
+      "truncated process":    {asSource: {},   asTarget: {isAllowed: true}},
+      "phenotype sbml":            {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "association":          {asSource: {},   asTarget: {}},
+      "dissociation":         {asSource: {},   asTarget: {}},
+      "and":                  {asSource: {},   asTarget: {}},
+      "or":                   {asSource: {},   asTarget: {}},
+      "not":                  {asSource: {},   asTarget: {}},
+      "unknown logical operator":  {asSource: {},   asTarget: {}},
+   },
+    "trigger": {
+      "protein":        {asSource: {isAllowed: true},   asTarget: {}},
+      "simple molecule":      {asSource: {isAllowed: true},   asTarget: {}},
+      "unknown molecule":     {asSource: {isAllowed: true},   asTarget: {}},
+      "complex sbml":              {asSource: {isAllowed: true},   asTarget: {}},
+      "gene":                 {asSource: {isAllowed: true},   asTarget: {}},
+      "compartment":          {asSource: {},   asTarget: {}},
+      "rna":                  {asSource: {isAllowed: true},   asTarget: {}},
+      "degradation":            {asSource: {isAllowed: true},   asTarget: {}},
+      "drug":                 {asSource: {isAllowed: true},   asTarget: {}},
+      "truncated protein":    {asSource: {isAllowed: true},   asTarget: {}},
+      "ion channel":          {asSource: {isAllowed: true},   asTarget: {}},
+      "receptor":             {asSource: {isAllowed: true},   asTarget: {}},
+      "ion":                  {asSource: {isAllowed: true},   asTarget: {}},
+      "process":              {asSource: {},   asTarget: {isAllowed: true}},
+      "omitted process":      {asSource: {},   asTarget: {isAllowed: true}},
+      "uncertain process":    {asSource: {},   asTarget: {isAllowed: true}},
+      "truncated process":    {asSource: {},   asTarget: {isAllowed: true}},
+      "phenotype sbml":            {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "association":          {asSource: {},   asTarget: {}},
+      "dissociation":         {asSource: {},   asTarget: {}},
+      "and":                  {asSource: {isAllowed: true,   maxEdge: 1, maxTotal: 1},   asTarget: {}},
+      "or":                   {asSource: {isAllowed: true,   maxEdge: 1, maxTotal: 1},   asTarget: {}},
+      "not":                  {asSource: {isAllowed: true,   maxEdge: 1, maxTotal: 1},   asTarget: {}},
+      "unknown logical operator":  {asSource: {isAllowed: true},   asTarget: {}},
+   },
+    "transport": {
+      "protein":        {asSource: {},   asTarget: {isAllowed: true}},
+      "simple molecule":      {asSource: {},   asTarget: {isAllowed: true}},
+      "unknown molecule":     {asSource: {},   asTarget: {isAllowed: true}},
+      "complex sbml":              {asSource: {},   asTarget: {isAllowed: true}},
+      "gene":                 {asSource: {},   asTarget: {isAllowed: true}},
+      "compartment":          {asSource: {},   asTarget: {}},
+      "rna":                  {asSource: {},   asTarget: {isAllowed: true}},
+      "degradation":            {asSource: {},   asTarget: {isAllowed: true}},
+      "drug":                 {asSource: {},   asTarget: {isAllowed: true}},
+      "truncated protein":    {asSource: {},   asTarget: {isAllowed: true}},
+      "ion channel":          {asSource: {},   asTarget: {isAllowed: true}},
+      "receptor":             {asSource: {},   asTarget: {isAllowed: true}},
+      "ion":                  {asSource: {},   asTarget: {isAllowed: true}},
+      "process":              {asSource: {isAllowed: true,  maxEdge: 1, maxTotal: 1},   asTarget: {}},
+      "omitted process":      {asSource: {},   asTarget: {}},
+      "uncertain process":    {asSource: {},   asTarget: {}},
+      "truncated process":    {asSource: {},   asTarget: {}},
+      "phenotype sbml":            {asSource: {},   asTarget: {isAllowed: true}},
+      "association":          {asSource: {},   asTarget: {}},
+      "dissociation":         {asSource: {},   asTarget: {}},
+      "and":                  {asSource: {},   asTarget: {}},
+      "or":                   {asSource: {},   asTarget: {}},
+      "not":                  {asSource: {},   asTarget: {}},
+      "unknown logical operator":  {asSource: {},   asTarget: {}},
+   },
+    "unknown inhibition": {
+      "protein":        {asSource: {isAllowed: true},   asTarget: {}},
+      "simple molecule":      {asSource: {isAllowed: true},   asTarget: {}},
+      "unknown molecule":     {asSource: {isAllowed: true},   asTarget: {}},
+      "complex sbml":              {asSource: {isAllowed: true},   asTarget: {}},
+      "gene":                 {asSource: {isAllowed: true},   asTarget: {}},
+      "compartment":          {asSource: {},   asTarget: {}},
+      "rna":                  {asSource: {isAllowed: true},   asTarget: {}},
+      "degradation":            {asSource: {isAllowed: true},   asTarget: {}},
+      "drug":                 {asSource: {isAllowed: true},   asTarget: {}},
+      "truncated protein":    {asSource: {isAllowed: true},   asTarget: {}},
+      "ion channel":          {asSource: {isAllowed: true},   asTarget: {}},
+      "receptor":             {asSource: {isAllowed: true},   asTarget: {}},
+      "ion":                  {asSource: {isAllowed: true},   asTarget: {}},
+      "process":              {asSource: {},   asTarget: {isAllowed: true}},
+      "omitted process":      {asSource: {},   asTarget: {isAllowed: true}},
+      "uncertain process":    {asSource: {},   asTarget: {isAllowed: true}},
+      "truncated process":    {asSource: {},   asTarget: {isAllowed: true}},
+      "phenotype sbml":            {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "association":          {asSource: {},   asTarget: {}},
+      "dissociation":         {asSource: {},   asTarget: {}},
+      "and":                  {asSource: {},   asTarget: {}},
+      "or":                   {asSource: {},   asTarget: {}},
+      "not":                  {asSource: {},   asTarget: {}},
+      "unknown logical operator":  {asSource: {},   asTarget: {}},
+   },
+    "unknown catalysis": {
+      "protein":        {asSource: {isAllowed: true},   asTarget: {}},
+      "simple molecule":      {asSource: {isAllowed: true},   asTarget: {}},
+      "unknown molecule":     {asSource: {isAllowed: true},   asTarget: {}},
+      "complex sbml":              {asSource: {isAllowed: true},   asTarget: {}},
+      "gene":                 {asSource: {isAllowed: true},   asTarget: {}},
+      "compartment":          {asSource: {},   asTarget: {}},
+      "rna":                  {asSource: {isAllowed: true},   asTarget: {}},
+      "degradation":            {asSource: {isAllowed: true},   asTarget: {}},
+      "drug":                 {asSource: {isAllowed: true},   asTarget: {}},
+      "truncated protein":    {asSource: {isAllowed: true},   asTarget: {}},
+      "ion channel":          {asSource: {isAllowed: true},   asTarget: {}},
+      "receptor":             {asSource: {isAllowed: true},   asTarget: {}},
+      "ion":                  {asSource: {isAllowed: true},   asTarget: {}},
+      "process":              {asSource: {},   asTarget: {isAllowed: true}},
+      "omitted process":      {asSource: {},   asTarget: {isAllowed: true}},
+      "uncertain process":    {asSource: {},   asTarget: {isAllowed: true}},
+      "truncated process":    {asSource: {},   asTarget: {isAllowed: true}},
+      "phenotype sbml":            {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "association":          {asSource: {},   asTarget: {}},
+      "dissociation":         {asSource: {},   asTarget: {}},
+      "and":                  {asSource: {},   asTarget: {}},
+      "or":                   {asSource: {},   asTarget: {}},
+      "not":                  {asSource: {},   asTarget: {}},
+      "unknown logical operator":  {asSource: {},   asTarget: {}},
+   },
+    "transcription consumption": {
+      "protein":        {asSource: {isAllowed: true},   asTarget: {}},
+      "simple molecule":      {asSource: {isAllowed: true},   asTarget: {}},
+      "unknown molecule":     {asSource: {isAllowed: true},   asTarget: {}},
+      "complex sbml":              {asSource: {isAllowed: true},   asTarget: {}},
+      "gene":                 {asSource: {isAllowed: true},   asTarget: {}},
+      "compartment":          {asSource: {},   asTarget: {}},
+      "rna":                  {asSource: {isAllowed: true},   asTarget: {}},
+      "degradation":            {asSource: {isAllowed: true},   asTarget: {}},
+      "drug":                 {asSource: {isAllowed: true},   asTarget: {}},
+      "truncated protein":    {asSource: {isAllowed: true},   asTarget: {}},
+      "ion channel":          {asSource: {isAllowed: true},   asTarget: {}},
+      "receptor":             {asSource: {isAllowed: true},   asTarget: {}},
+      "ion":                  {asSource: {isAllowed: true},   asTarget: {}},
+      "process":              {asSource: {},   asTarget: {isAllowed: true,  maxEdge: 1, maxTotal: 1}},
+      "omitted process":      {asSource: {},   asTarget: {}},
+      "uncertain process":    {asSource: {},   asTarget: {}},
+      "truncated process":    {asSource: {},   asTarget: {}},
+      "phenotype sbml":            {asSource: {isAllowed: true},   asTarget: {}},
+      "association":          {asSource: {},   asTarget: {}},
+      "dissociation":         {asSource: {},   asTarget: {}},
+      "and":                  {asSource: {},   asTarget: {}},
+      "or":                   {asSource: {},   asTarget: {}},
+      "not":                  {asSource: {},   asTarget: {}},
+      "unknown logical operator":  {asSource: {},   asTarget: {}},
+   },
+    "transcription production": {
+      "protein":        {asSource: {},   asTarget: {isAllowed: true}},
+      "simple molecule":      {asSource: {},   asTarget: {isAllowed: true}},
+      "unknown molecule":     {asSource: {},   asTarget: {isAllowed: true}},
+      "complex sbml":              {asSource: {},   asTarget: {isAllowed: true}},
+      "gene":                 {asSource: {},   asTarget: {isAllowed: true}},
+      "compartment":          {asSource: {},   asTarget: {}},
+      "rna":                  {asSource: {},   asTarget: {isAllowed: true}},
+      "degradation":            {asSource: {},   asTarget: {isAllowed: true}},
+      "drug":                 {asSource: {},   asTarget: {isAllowed: true}},
+      "truncated protein":    {asSource: {},   asTarget: {isAllowed: true}},
+      "ion channel":          {asSource: {},   asTarget: {isAllowed: true}},
+      "receptor":             {asSource: {},   asTarget: {isAllowed: true}},
+      "ion":                  {asSource: {},   asTarget: {isAllowed: true}},
+      "process":              {asSource: {isAllowed: true,  maxEdge: 1, maxTotal: 1},   asTarget: {}},
+      "omitted process":      {asSource: {},   asTarget: {}},
+      "uncertain process":    {asSource: {},   asTarget: {}},
+      "truncated process":    {asSource: {},   asTarget: {}},
+      "phenotype sbml":            {asSource: {},   asTarget: {isAllowed: true}},
+      "association":          {asSource: {},   asTarget: {}},
+      "dissociation":         {asSource: {},   asTarget: {}},
+      "and":                  {asSource: {},   asTarget: {}},
+      "or":                   {asSource: {},   asTarget: {}},
+      "not":                  {asSource: {},   asTarget: {}},
+      "unknown logical operator":  {asSource: {},   asTarget: {}},
+   },
+    "translation consumption": {
+      "protein":        {asSource: {isAllowed: true},   asTarget: {}},
+      "simple molecule":      {asSource: {isAllowed: true},   asTarget: {}},
+      "unknown molecule":     {asSource: {isAllowed: true},   asTarget: {}},
+      "complex sbml":              {asSource: {isAllowed: true},   asTarget: {}},
+      "gene":                 {asSource: {isAllowed: true},   asTarget: {}},
+      "compartment":          {asSource: {},   asTarget: {}},
+      "rna":                  {asSource: {isAllowed: true},   asTarget: {}},
+      "degradation":            {asSource: {isAllowed: true},   asTarget: {}},
+      "drug":                 {asSource: {isAllowed: true},   asTarget: {}},
+      "truncated protein":    {asSource: {isAllowed: true},   asTarget: {}},
+      "ion channel":          {asSource: {isAllowed: true},   asTarget: {}},
+      "receptor":             {asSource: {isAllowed: true},   asTarget: {}},
+      "ion":                  {asSource: {isAllowed: true},   asTarget: {}},
+      "process":              {asSource: {},   asTarget: {isAllowed: true,  maxEdge: 1, maxTotal: 1}},
+      "omitted process":      {asSource: {},   asTarget: {}},
+      "uncertain process":    {asSource: {},   asTarget: {}},
+      "truncated process":    {asSource: {},   asTarget: {}},
+      "phenotype sbml":            {asSource: {isAllowed: true},   asTarget: {}},
+      "association":          {asSource: {},   asTarget: {}},
+      "dissociation":         {asSource: {},   asTarget: {}},
+      "and":                  {asSource: {},   asTarget: {}},
+      "or":                   {asSource: {},   asTarget: {}},
+      "not":                  {asSource: {},   asTarget: {}},
+      "unknown logical operator":  {asSource: {},   asTarget: {}},
+   },
+    "translation production": {
+      "protein":        {asSource: {},   asTarget: {isAllowed: true}},
+      "simple molecule":      {asSource: {},   asTarget: {isAllowed: true}},
+      "unknown molecule":     {asSource: {},   asTarget: {isAllowed: true}},
+      "complex sbml":              {asSource: {},   asTarget: {isAllowed: true}},
+      "gene":                 {asSource: {},   asTarget: {isAllowed: true}},
+      "compartment":          {asSource: {},   asTarget: {}},
+      "rna":                  {asSource: {},   asTarget: {isAllowed: true}},
+      "degradation":            {asSource: {},   asTarget: {isAllowed: true}},
+      "drug":                 {asSource: {},   asTarget: {isAllowed: true}},
+      "truncated protein":    {asSource: {},   asTarget: {isAllowed: true}},
+      "ion channel":          {asSource: {},   asTarget: {isAllowed: true}},
+      "receptor":             {asSource: {},   asTarget: {isAllowed: true}},
+      "ion":                  {asSource: {},   asTarget: {isAllowed: true}},
+      "process":              {asSource: {isAllowed: true,  maxEdge: 1, maxTotal: 1},   asTarget: {}},
+      "omitted process":      {asSource: {},   asTarget: {}},
+      "uncertain process":    {asSource: {},   asTarget: {}},
+      "truncated process":    {asSource: {},   asTarget: {}},
+      "phenotype sbml":            {asSource: {},   asTarget: {isAllowed: true}},
+      "association":          {asSource: {},   asTarget: {}},
+      "dissociation":         {asSource: {},   asTarget: {}},
+      "and":                  {asSource: {},   asTarget: {}},
+      "or":                   {asSource: {},   asTarget: {}},
+      "not":                  {asSource: {},   asTarget: {}},
+      "unknown logical operator":  {asSource: {},   asTarget: {}},
+   },
+    "positive influence sbml": {
+      "protein":        {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "simple molecule":      {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "unknown molecule":     {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "complex sbml":              {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "gene":                 {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "compartment":          {asSource: {},   asTarget: {}},
+      "rna":                  {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "degradation":            {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "drug":                 {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "truncated protein":    {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "ion channel":          {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "receptor":             {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "ion":                  {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "process":              {asSource: {},   asTarget: {}},
+      "omitted process":      {asSource: {},   asTarget: {}},
+      "uncertain process":    {asSource: {},   asTarget: {}},
+      "truncated process":    {asSource: {},   asTarget: {}},
+      "phenotype sbml":            {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "association":          {asSource: {},   asTarget: {}},
+      "dissociation":         {asSource: {},   asTarget: {}},
+      "and":                  {asSource: {},   asTarget: {}},
+      "or":                   {asSource: {},   asTarget: {}},
+      "not":                  {asSource: {},   asTarget: {}},
+      "unknown logical operator":  {asSource: {},   asTarget: {}},
+   },
+    "negative influence": {
+      "protein":        {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "simple molecule":      {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "unknown molecule":     {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "complex sbml":              {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "gene":                 {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "compartment":          {asSource: {},   asTarget: {}},
+      "rna":                  {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "degradation":            {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "drug":                 {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "truncated protein":    {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "ion channel":          {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "receptor":             {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "ion":                  {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "process":              {asSource: {},   asTarget: {}},
+      "omitted process":      {asSource: {},   asTarget: {}},
+      "uncertain process":    {asSource: {},   asTarget: {}},
+      "truncated process":    {asSource: {},   asTarget: {}},
+      "phenotype sbml":            {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "association":          {asSource: {},   asTarget: {}},
+      "dissociation":         {asSource: {},   asTarget: {}},
+      "and":                  {asSource: {},   asTarget: {}},
+      "or":                   {asSource: {},   asTarget: {}},
+      "not":                  {asSource: {},   asTarget: {}},
+      "unknown logical operator":  {asSource: {},   asTarget: {}},
+   },
+    "reduced modulation": {
+      "protein":        {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "simple molecule":      {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "unknown molecule":     {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "complex sbml":              {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "gene":                 {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "compartment":          {asSource: {},   asTarget: {}},
+      "rna":                  {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "degradation":            {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "drug":                 {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "truncated protein":    {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "ion channel":          {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "receptor":             {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "ion":                  {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "process":              {asSource: {},   asTarget: {}},
+      "omitted process":      {asSource: {},   asTarget: {}},
+      "uncertain process":    {asSource: {},   asTarget: {}},
+      "truncated process":    {asSource: {},   asTarget: {}},
+      "phenotype sbml":            {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "association":          {asSource: {},   asTarget: {}},
+      "dissociation":         {asSource: {},   asTarget: {}},
+      "and":                  {asSource: {},   asTarget: {}},
+      "or":                   {asSource: {},   asTarget: {}},
+      "not":                  {asSource: {},   asTarget: {}},
+      "unknown logical operator":  {asSource: {},   asTarget: {}},
+   },
+    "reduced stimulation": {
+      "protein":        {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "simple molecule":      {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "unknown molecule":     {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "complex sbml":              {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "gene":                 {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "compartment":          {asSource: {},   asTarget: {}},
+      "rna":                  {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "degradation":            {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "drug":                 {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "truncated protein":    {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "ion channel":          {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "receptor":             {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "ion":                  {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "process":              {asSource: {},   asTarget: {}},
+      "omitted process":      {asSource: {},   asTarget: {}},
+      "uncertain process":    {asSource: {},   asTarget: {}},
+      "truncated process":    {asSource: {},   asTarget: {}},
+      "phenotype sbml":            {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "association":          {asSource: {},   asTarget: {}},
+      "dissociation":         {asSource: {},   asTarget: {}},
+      "and":                  {asSource: {},   asTarget: {}},
+      "or":                   {asSource: {},   asTarget: {}},
+      "not":                  {asSource: {},   asTarget: {}},
+      "unknown logical operator":  {asSource: {},   asTarget: {}},
+   },
+    "reduced trigger": {
+      "protein":        {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "simple molecule":      {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "unknown molecule":     {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "complex sbml":              {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "gene":                 {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "compartment":          {asSource: {},   asTarget: {}},
+      "rna":                  {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "degradation":            {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "drug":                 {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "truncated protein":    {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "ion channel":          {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "receptor":             {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "ion":                  {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "process":              {asSource: {},   asTarget: {}},
+      "omitted process":      {asSource: {},   asTarget: {}},
+      "uncertain process":    {asSource: {},   asTarget: {}},
+      "truncated process":    {asSource: {},   asTarget: {}},
+      "phenotype sbml":            {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "association":          {asSource: {},   asTarget: {}},
+      "dissociation":         {asSource: {},   asTarget: {}},
+      "and":                  {asSource: {isAllowed: true,   maxEdge: 1, maxTotal: 1},   asTarget: {}},
+      "or":                   {asSource: {isAllowed: true,   maxEdge: 1, maxTotal: 1},   asTarget: {}},
+      "not":                  {asSource: {isAllowed: true,   maxEdge: 1, maxTotal: 1},   asTarget: {}},
+      "unknown logical operator":  {asSource: {isAllowed: true},   asTarget: {}},
+   },
+    "unknown negative influence": {
+      "protein":        {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "simple molecule":      {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "unknown molecule":     {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "complex sbml":              {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "gene":                 {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "compartment":          {asSource: {},   asTarget: {}},
+      "rna":                  {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "degradation":            {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "drug":                 {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "truncated protein":    {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "ion channel":          {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "receptor":             {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "ion":                  {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "process":              {asSource: {},   asTarget: {}},
+      "omitted process":      {asSource: {},   asTarget: {}},
+      "uncertain process":    {asSource: {},   asTarget: {}},
+      "truncated process":    {asSource: {},   asTarget: {}},
+      "phenotype sbml":            {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "association":          {asSource: {},   asTarget: {}},
+      "dissociation":         {asSource: {},   asTarget: {}},
+      "and":                  {asSource: {},   asTarget: {}},
+      "or":                   {asSource: {},   asTarget: {}},
+      "not":                  {asSource: {},   asTarget: {}},
+      "unknown logical operator":  {asSource: {},   asTarget: {}},
+   },
+    "unknown positive influence": {
+      "protein":        {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "simple molecule":      {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "unknown molecule":     {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "complex sbml":              {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "gene":                 {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "compartment":          {asSource: {},   asTarget: {}},
+      "rna":                  {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "degradation":            {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "drug":                 {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "truncated protein":    {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "ion channel":          {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "receptor":             {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "ion":                  {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "process":              {asSource: {},   asTarget: {}},
+      "omitted process":      {asSource: {},   asTarget: {}},
+      "uncertain process":    {asSource: {},   asTarget: {}},
+      "truncated process":    {asSource: {},   asTarget: {}},
+      "phenotype sbml":            {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "association":          {asSource: {},   asTarget: {}},
+      "dissociation":         {asSource: {},   asTarget: {}},
+      "and":                  {asSource: {},   asTarget: {}},
+      "or":                   {asSource: {},   asTarget: {}},
+      "not":                  {asSource: {},   asTarget: {}},
+      "unknown logical operator":  {asSource: {},   asTarget: {}},
+   },
+    "unknown reduced stimulation": {
+      "protein":        {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "simple molecule":      {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "unknown molecule":     {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "complex sbml":              {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "gene":                 {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "compartment":          {asSource: {},   asTarget: {}},
+      "rna":                  {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "degradation":            {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "drug":                 {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "truncated protein":    {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "ion channel":          {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "receptor":             {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "ion":                  {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "process":              {asSource: {},   asTarget: {}},
+      "omitted process":      {asSource: {},   asTarget: {}},
+      "uncertain process":    {asSource: {},   asTarget: {}},
+      "truncated process":    {asSource: {},   asTarget: {}},
+      "phenotype sbml":            {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "association":          {asSource: {},   asTarget: {}},
+      "dissociation":         {asSource: {},   asTarget: {}},
+      "and":                  {asSource: {},   asTarget: {}},
+      "or":                   {asSource: {},   asTarget: {}},
+      "not":                  {asSource: {},   asTarget: {}},
+      "unknown logical operator":  {asSource: {},   asTarget: {}},
+   },
+    "unknown reduced modulation": {
+      "protein":        {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "simple molecule":      {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "unknown molecule":     {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "complex sbml":              {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "gene":                 {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "compartment":          {asSource: {},   asTarget: {}},
+      "rna":                  {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "degradation":            {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "drug":                 {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "truncated protein":    {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "ion channel":          {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "receptor":             {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "ion":                  {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "process":              {asSource: {},   asTarget: {}},
+      "omitted process":      {asSource: {},   asTarget: {}},
+      "uncertain process":    {asSource: {},   asTarget: {}},
+      "truncated process":    {asSource: {},   asTarget: {}},
+      "phenotype sbml":            {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "association":          {asSource: {},   asTarget: {}},
+      "dissociation":         {asSource: {},   asTarget: {}},
+      "and":                  {asSource: {},   asTarget: {}},
+      "or":                   {asSource: {},   asTarget: {}},
+      "not":                  {asSource: {},   asTarget: {}},
+      "unknown logical operator":  {asSource: {},   asTarget: {}},
+   },
+    "unknown reduced trigger": {
+      "protein":        {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "simple molecule":      {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "unknown molecule":     {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "complex sbml":              {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "gene":                 {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "compartment":          {asSource: {},   asTarget: {}},
+      "rna":                  {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "degradation":            {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "drug":                 {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "truncated protein":    {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "ion channel":          {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "receptor":             {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "ion":                  {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "process":              {asSource: {},   asTarget: {}},
+      "omitted process":      {asSource: {},   asTarget: {}},
+      "uncertain process":    {asSource: {},   asTarget: {}},
+      "truncated process":    {asSource: {},   asTarget: {}},
+      "phenotype sbml":            {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
+      "association":          {asSource: {},   asTarget: {}},
+      "dissociation":         {asSource: {},   asTarget: {}},
+      "and":                  {asSource: {},   asTarget: {}},
+      "or":                   {asSource: {},   asTarget: {}},
+      "not":                  {asSource: {},   asTarget: {}},
+      "unknown logical operator":  {asSource: {},   asTarget: {}},
+   }
+  };
+
+  elementUtilities.logicalOperatorTypes = ['and', 'or', 'not', 'delay', 'unknown logical operator'];
+  elementUtilities.processTypes = ['process', 'omitted process', 'uncertain process', 'truncated process',
     'association', 'dissociation', 'phenotype'];
   elementUtilities.biologicalActivityTypes = ['biological activity', 'BA plain', 'BA unspecified entity',
     'BA simple chemical', 'BA macromolecule', 'BA nucleic acid feature',
     'BA perturbing agent', 'BA complex'];
   elementUtilities.epnTypes = ['macromolecule', 'nucleic acid feature', 'simple chemical',
-    'empty set', 'unspecified entity', 'perturbing agent', 'complex', 
+    'empty set', 'unspecified entity', 'perturbing agent', 'complex',  'protein',
     'nucleic acid feature multimer', 'macromolecule multimer', 'simple chemical multimer', 'complex multimer'];
   elementUtilities.sifTypes = ['SIF macromolecule', 'SIF simple chemical'];
   elementUtilities.otherNodeTypes = ['compartment', 'tag', 'submap', 'topology group'];
+  elementUtilities.sbmlType = ['gene', 'rna', 'simple molecule', 'unknown molecule', 'phenotype', 'drug', 'ion', 'protein', 'truncated protein', 
+  'ion channel', 'receptor', 'phenotype sbml',  'complex sbml', 'protein', 'degradation'];
+  elementUtilities.sbmlTypeMultimer = ['gene multimer', 'rna multimer', 'ion channel multimer', 'receptor multimer', 'truncated protein multimer', 'phenotype multimer',
+    'ion multimer', 'simple molecule multimer', 'unknown molecule multimer', 'drug multimer', 'complex multimer', 'phenotype sbml multimer', 'receptor multimer',
+  'complex sbml multimer', 'protein multimer']
+  elementUtilities.sbmlTypeActive = ['active protein', 'active receptor', 'active ion channel','active truncated protein', 'active complex sbml']
+  elementUtilities.sbmlTypeHypothetical = ['hypothetical protein', 'hypothetical receptor', 'hypothetical truncated protein', 'hypothetical ion channel', 
+  'hypothetical gene', 'hypothetical rna', 'hypothetical phenotype sbml', 'hypothetical ion', 'hypothetical uknown molecule', 'hypothetical drug',
+  'hypothetical complex sbml', 'hypothetical degradation']
+  elementUtilities.sbmlTypeActiveHypothetical = ['active hypothetical protein', 'active hypothetical receptor', 'active hypothetical truncated protein', 'hypothetical ion channel', 
+  'active hypothetical complex sbml']
+  elementUtilities.sbmlTypeActiveMultimer =  ['active protein multimer', 'active receptor multimer', 'active ion channel multimer','active truncated protein multimer', 'active complex multimer']
+  elementUtilities.sbmlTypeHypotheticalMultimer = ['hypothetical protein multimer', 'hypothetical receptor multimer', 'hypothetical truncated protein multimer', 'hypothetical ion channel multimer', 
+  'hypothetical gene multimer', 'hypothetical rna multimer', 'hypothetical phenotype sbml multimer', 'hypothetical ion multimer', 'hypothetical uknown molecule multimer', 'hypothetical drug multimer',
+  'hypothetical complex sbml  multimer', 'hypothetical degradation  multimer']
+  elementUtilities.sbmlTypeActiveHypotheticalMultimer =  ['active hypothetical protein multimer', 'active hypothetical receptor multimer', 'active hypothetical ion channel multimer','active hypothetical truncated protein multimer', 'active hypothetical complex multimer']
 
+
+  //elementUtilities.sbmlTypeHypothetical = [''] //Do I need this?
   elementUtilities.nodeTypes = elementUtilities.epnTypes
     .concat( elementUtilities.logicalOperatorTypes )
     .concat( elementUtilities.processTypes )
     .concat( elementUtilities.biologicalActivityTypes )
     .concat( elementUtilities.sifTypes )
-    .concat( elementUtilities.otherNodeTypes );
+    .concat( elementUtilities.otherNodeTypes )
+    .concat( elementUtilities.sbmlType)
+    .concat( elementUtilities.sbmlTypeMultimer)
+    .concat( elementUtilities.sbmlTypeActive)
+    .concat( elementUtilities.sbmlTypeHypothetical)
+    .concat( elementUtilities.sbmlTypeActiveHypothetical)
+    .concat( elementUtilities.sbmlTypeActiveMultimer)
+    .concat( elementUtilities.sbmlTypeHypotheticalMultimer)
+    .concat( elementUtilities.sbmlTypeActiveHypotheticalMultimer);
 
   elementUtilities.compoundNodeTypes = ['complex', 'compartment', 'submap'];
 
@@ -501,8 +1155,15 @@ module.exports = function () {
     'chemical-affects', 'reacts-with', 'used-to-produce',
     'activates', 'inhibits', 'phosphorylates', 'dephosphorylates',
     'upregulates-expression', 'downregulates-expression', 'activates-gtpase',
-    'inhibits-gtpase', 'acetylates', 'deacetylates', 'methylates', 'demethylates'
+    'inhibits-gtpase', 'acetylates', 'deacetylates', 'methylates', 'demethylates',
+    'trigger', 'transport', 'unknown inhibition', 'unknown catalysis', 'transcription consumption', 
+    'transcription production', 'translation consumption', 'translation production', 'negative influence', 
+    'positive influence sbml', 'reduced modulation', 'reduced stimulation', 'reduced trigger' , 
+    'unknown negative influence',  'unknown positive influence', 'unknown reduced stimulation',
+    'unknown reduced modulation', 'unknown reduced trigger'
   ];
+
+
 
   elementUtilities.undirectedEdgeTypes = ['in-complex-with', 'interacts-with',
     'neighbor-of', 'logic arc', 'equivalence arc'];
@@ -532,7 +1193,8 @@ module.exports = function () {
       return null;
     }
 
-    return elementUtilities.getSbgnClass( ele ).replace( ' multimer', '' );
+    //console.log("pure sbgn", elementUtilities.getSbgnClass( ele ).replace( ' multimer', '' ).replace( 'active ', '' ).replace('hypothetical ', ''))
+    return elementUtilities.getSbgnClass( ele ).replace( ' multimer', '' ).replace( 'active ', '' ).replace('hypothetical ', '');
   };
 
   /*
@@ -576,6 +1238,7 @@ module.exports = function () {
     }
 
     var getVal = function( index ) {
+        //console.log("elements[index][dataOrCss](propertyName)",elements[index] )
         var val = isFunction ? propertyName(elements[index]) : elements[index][dataOrCss](propertyName);
         return val;
     }
@@ -613,7 +1276,7 @@ module.exports = function () {
   elementUtilities.canHaveSBGNLabel = function (ele) {
     var sbgnclass = elementUtilities.getPureSbgnClass( ele );
 
-    return sbgnclass != 'and' && sbgnclass != 'or' && sbgnclass != 'not' && sbgnclass != 'delay'
+    return sbgnclass != 'and' && sbgnclass != 'or' && sbgnclass != 'not' && sbgnclass != 'delay' && sbgnclass != 'unknown logical operator'
             && sbgnclass != 'association' && sbgnclass != 'dissociation' && sbgnclass != 'empty set' && !sbgnclass.endsWith('process');
   };
 
@@ -626,7 +1289,32 @@ module.exports = function () {
             || sbgnclass == 'complex' || sbgnclass == 'simple chemical multimer'
             || sbgnclass == 'macromolecule multimer' || sbgnclass == 'nucleic acid feature multimer'
             || sbgnclass == 'complex multimer' || (sbgnclass.startsWith('BA') && sbgnclass != "BA plain")
-            || sbgnclass == 'compartment' || sbgnclass == 'SIF macromolecule' || sbgnclass == 'SIF simple chemical') {
+            || sbgnclass == 'compartment' || sbgnclass == 'SIF macromolecule' || sbgnclass == 'SIF simple chemical'
+            || sbgnclass == 'protein' ||  sbgnclass == 'protein multimer' || sbgnclass == 'active protein' 
+            || sbgnclass == 'hypothetical protein' || sbgnclass == 'active protein multimer' || sbgnclass == 'hypothetical protein multimer' 
+            || sbgnclass == 'active hypothetical protein' || sbgnclass == 'active hypothetical protein multimer'
+            || sbgnclass == 'receptor' ||  sbgnclass == 'receptor multimer' || sbgnclass == 'active receptor' 
+            || sbgnclass == 'hypothetical receptor' || sbgnclass == 'active receptor multimer' || sbgnclass == 'hypothetical receptor multimer' 
+            || sbgnclass == 'active hypothetical receptor' || sbgnclass == 'active hypothetical receptor multimer'
+            || sbgnclass == 'ion channel' ||  sbgnclass == 'ion channel multimer' || sbgnclass == 'active ion channel' 
+            || sbgnclass == 'hypothetical ion channel' || sbgnclass == 'active ion channel multimer' || sbgnclass == 'hypothetical ion channel multimer' 
+            || sbgnclass == 'active hypothetical ion channel' || sbgnclass == 'active hypothetical ion channel multimer'
+            || sbgnclass == 'truncated protein' ||  sbgnclass == 'truncated protein multimer' || sbgnclass == 'active truncated protein' 
+            || sbgnclass == 'hypothetical truncated protein' || sbgnclass == 'active truncated protein multimer' || sbgnclass == 'hypothetical truncated protein multimer' 
+            || sbgnclass == 'active hypothetical truncated protein' || sbgnclass == 'active hypothetical truncated protein multimer'
+            || sbgnclass == 'complex sbml' ||  sbgnclass == 'complex sbml multimer' || sbgnclass == 'active complex sbml' 
+            || sbgnclass == 'hypothetical complex sbml' || sbgnclass == 'active complex sbml multimer' || sbgnclass == 'hypothetical complex sbml multimer' 
+            || sbgnclass == 'active hypothetical complex sbml' || sbgnclass == 'active hypothetical complex sbml multimer' 
+            || sbgnclass == 'gene' ||  sbgnclass == 'gene multimer' || sbgnclass == 'hypothetical gene' || sbgnclass == 'hypothetical gene multimer' 
+            || sbgnclass == 'rna' ||  sbgnclass == 'rna multimer' || sbgnclass == 'hypothetical rna' || sbgnclass == 'hypothetical rna multimer' 
+            || sbgnclass == 'phenotype sbml' ||  sbgnclass == 'phenotype sbml multimer' || sbgnclass == 'hypothetical phenotype sbml' || sbgnclass == 'hypothetical phenotype sbml multimer' 
+            || sbgnclass == 'ion' ||  sbgnclass == 'ion multimer' || sbgnclass == 'hypothetical ion' || sbgnclass == 'hypothetical ion multimer' 
+            || sbgnclass == 'simple molecule' ||  sbgnclass == 'simple molecule multimer' || sbgnclass == 'hypothetical simple molecule' || sbgnclass == 'hypothetical simple molecule multimer' 
+            || sbgnclass == 'unknown molecule' ||  sbgnclass == 'unknown molecule multimer' || sbgnclass == 'hypothetical unknown molecule' || sbgnclass == 'hypothetical unknown molecule multimer' 
+            || sbgnclass == 'drug' ||  sbgnclass == 'drug multimer' || sbgnclass == 'hypothetical drug' || sbgnclass == 'hypothetical drug multimer' 
+            || sbgnclass == 'degradation' ||  sbgnclass == 'degradation multimer' || sbgnclass == 'hypothetical degradation' || sbgnclass == 'hypothetical degradation multimer' 
+
+             ) {
       return true;
     }
     return false;
@@ -635,8 +1323,32 @@ module.exports = function () {
   // Returns whether the given element can have more than one units of information
   elementUtilities.canHaveMultipleUnitOfInformation = function (ele) {
     var sbgnclass = elementUtilities.getPureSbgnClass( ele );
+    if (sbgnclass == 'gene' || sbgnclass == 'rna' || sbgnclass == 'simple molecule' || sbgnclass == 'unknown molecule'
+    || sbgnclass == 'phenotype sbml' || sbgnclass == 'drug' || sbgnclass == 'protein' || sbgnclass == 'truncated protein'
+    || sbgnclass == 'ion channel' || sbgnclass == 'receptor' || sbgnclass == 'ion' || sbgnclass == 'empty set' 
+    || sbgnclass == 'complex sbml')
+    {
+      return false;
+    }
     return !sbgnclass.startsWith('BA');
   };
+
+
+  // Returns whether the given element can have more than one units of information
+  elementUtilities.canHaveOneUnitOfInformation = function (ele) {
+    var sbgnclass = elementUtilities.getPureSbgnClass( ele );
+    if (sbgnclass == 'gene' || sbgnclass == 'rna' || sbgnclass == 'simple molecule' || sbgnclass == 'unknown molecule'
+    || sbgnclass == 'phenotype sbml' || sbgnclass == 'drug' || sbgnclass == 'protein' || sbgnclass == 'truncated protein'
+    || sbgnclass == 'ion channel' || sbgnclass == 'receptor' || sbgnclass == 'ion' || sbgnclass == 'degradation' 
+    || sbgnclass == 'complex sbml')
+    {
+      return true;
+    }
+    return false;
+  };
+
+
+  
 
 
   // Returns whether the give element have state variable
@@ -646,7 +1358,49 @@ module.exports = function () {
     if (sbgnclass == 'macromolecule' || sbgnclass == 'nucleic acid feature'
             || sbgnclass == 'complex'
             || sbgnclass == 'macromolecule multimer' || sbgnclass == 'nucleic acid feature multimer'
-            || sbgnclass == 'complex multimer') {
+            || sbgnclass == 'complex multimer' ) {
+      return true;
+    }
+    return false;
+  };
+
+  elementUtilities.canHaveResidueVariable = function (ele) {
+    var sbgnclass = elementUtilities.getPureSbgnClass( ele );
+
+    if (    sbgnclass == 'protein' ||  sbgnclass == 'protein multimer' || sbgnclass == 'active protein' 
+            || sbgnclass == 'hypothetical protein' || sbgnclass == 'active protein multimer' || sbgnclass == 'hypothetical protein multimer' 
+            || sbgnclass == 'active hypothetical protein' || sbgnclass == 'active hypothetical protein multimer'
+            || sbgnclass == 'receptor' ||  sbgnclass == 'receptor multimer' || sbgnclass == 'active receptor' 
+            || sbgnclass == 'hypothetical receptor' || sbgnclass == 'active receptor multimer' || sbgnclass == 'hypothetical receptor multimer' 
+            || sbgnclass == 'active hypothetical receptor' || sbgnclass == 'active hypothetical receptor multimer'
+            || sbgnclass == 'ion channel' ||  sbgnclass == 'ion channel multimer' || sbgnclass == 'active ion channel' 
+            || sbgnclass == 'hypothetical ion channel' || sbgnclass == 'active ion channel multimer' || sbgnclass == 'hypothetical ion channel multimer' 
+            || sbgnclass == 'active hypothetical ion channel' || sbgnclass == 'active hypothetical ion channel multimer'
+            || sbgnclass == 'truncated protein' ||  sbgnclass == 'truncated protein multimer' || sbgnclass == 'active truncated protein' 
+            || sbgnclass == 'hypothetical truncated protein' || sbgnclass == 'active truncated protein multimer' || sbgnclass == 'hypothetical truncated protein multimer' 
+            || sbgnclass == 'active hypothetical truncated protein' || sbgnclass == 'active hypothetical truncated protein multimer'
+            ) {
+      return true;
+    }
+    return false;
+  };
+
+  elementUtilities.canHaveBindingRegion = function (ele) {
+    var sbgnclass = elementUtilities.getPureSbgnClass( ele );
+
+    if (    sbgnclass == 'protein' ||  sbgnclass == 'protein multimer' || sbgnclass == 'active protein' 
+            || sbgnclass == 'hypothetical protein' || sbgnclass == 'active protein multimer' || sbgnclass == 'hypothetical protein multimer' 
+            || sbgnclass == 'active hypothetical protein' || sbgnclass == 'active hypothetical protein multimer'
+            || sbgnclass == 'receptor' ||  sbgnclass == 'receptor multimer' || sbgnclass == 'active receptor' 
+            || sbgnclass == 'hypothetical receptor' || sbgnclass == 'active receptor multimer' || sbgnclass == 'hypothetical receptor multimer' 
+            || sbgnclass == 'active hypothetical receptor' || sbgnclass == 'active hypothetical receptor multimer'
+            || sbgnclass == 'ion channel' ||  sbgnclass == 'ion channel multimer' || sbgnclass == 'active ion channel' 
+            || sbgnclass == 'hypothetical ion channel' || sbgnclass == 'active ion channel multimer' || sbgnclass == 'hypothetical ion channel multimer' 
+            || sbgnclass == 'active hypothetical ion channel' || sbgnclass == 'active hypothetical ion channel multimer'
+            || sbgnclass == 'truncated protein' ||  sbgnclass == 'truncated protein multimer' || sbgnclass == 'active truncated protein' 
+            || sbgnclass == 'hypothetical truncated protein' || sbgnclass == 'active truncated protein multimer' || sbgnclass == 'hypothetical truncated protein multimer' 
+            || sbgnclass == 'active hypothetical truncated protein' || sbgnclass == 'active hypothetical truncated protein multimer'
+             ) {
       return true;
     }
     return false;
@@ -657,7 +1411,7 @@ module.exports = function () {
     var sbgnclass = elementUtilities.getPureSbgnClass( ele );
 
     return (sbgnclass.indexOf('process') != -1 || sbgnclass == 'empty set'
-            || sbgnclass == 'and' || sbgnclass == 'or' || sbgnclass == 'not'
+            || sbgnclass == 'and' || sbgnclass == 'or' || sbgnclass == 'not' || sbgnclass == 'unknown logical operator' 
             || sbgnclass == 'association' || sbgnclass == 'dissociation' || sbgnclass == 'delay');
   };
 
@@ -697,7 +1451,58 @@ module.exports = function () {
       'macromolecule': true,
       'complex': true,
       'nucleic acid feature': true,
-      'simple chemical': true
+      'simple chemical': true,
+      'receptor': true,
+      'ion channel': true,
+      'truncated protein': true,
+      'gene': true,
+      'rna': true,
+      'phenotype': true,
+      'ion': true,
+      'simple molecule': true,
+      'unknown molecule': true,
+      'drug': true,
+      'complex': true,
+      'phenotype sbml': true,
+      'receptor': true,
+      'complex sbml': true,
+      'protein': true
+    };
+
+    return list[sbgnclass] ? true : false;
+  };
+
+  elementUtilities.canBeActive = function (ele) {
+    var sbgnclass = elementUtilities.getPureSbgnClass( ele );
+
+    var list = {
+      'protein': true,
+      'complex sbml': true,
+      'receptor': true,
+      'ion channel': true,
+      'truncated protein': true
+    };
+
+    return list[sbgnclass] ? true : false;
+  };
+
+  elementUtilities.canBeHypothetical = function (ele) {
+    var sbgnclass = elementUtilities.getPureSbgnClass( ele );
+
+    var list = {
+      'protein': true,
+      'complex sbml': true,
+      'receptor': true,
+      'ion channel': true,
+      'truncated protein': true,
+      'gene': true,
+      'rna': true,
+      'phenotype sbml': true,
+      'ion': true,
+      'simple molecule': true,
+      'unknown molecule': true,
+      'drug': true,
+      'degradation': true
     };
 
     return list[sbgnclass] ? true : false;
@@ -912,8 +1717,8 @@ module.exports = function () {
       // var nonProcesses = nodesToShow.nodes("node[class!='process']");
       // var neighborProcesses = nonProcesses.neighborhood("node[class='process']");
 
-      extendNodeTypes = ['process', 'omitted process', 'uncertain process',
-      'association', 'dissociation', 'phenotype', 'and', 'or', 'not', 'delay'];
+      extendNodeTypes = ['process', 'omitted process', 'uncertain process', 'truncated process',
+      'association', 'dissociation', 'phenotype', 'and', 'or', 'not', 'delay', 'unknown logical operator'];
 
       //Here, logical operators are also considered as processes, since they also get inputs and outputs
       var processes = nodesToShow.filter(function(ele, i){
@@ -1029,11 +1834,31 @@ module.exports = function () {
 
     switch (sbgnclass) {
       case 'controls-expression-of': case 'upregulates-expression':
-      case 'downregulates-expression':
+      case 'downregulates-expression': case 'unknown inhibition':
+      case 'unknown catalysis':  case 'transcription consumption':
+      case 'transcription production': case 'translation consumption':
+      case 'translation production':   case 'unknown negative influence':
+      case 'unknown positive influence': case 'unknown reduced stimulation':
+      case 'unknown reduced modulation': case 'unknown reduced trigger':
         return 'dashed';
       default:
         return 'solid';
     }
+  };
+
+  elementUtilities.getArrayLineDashStyle = function (ele) {
+    var sbgnclass = elementUtilities.getPureSbgnClass( ele );
+
+    switch (sbgnclass) {
+      case 'transcription consumption': case 'transcription production':
+        return [20,10,2,5,2,10];
+      case 'translation consumption': case 'translation production':
+        return [15, 7, 2, 7 ];
+      default:
+        return [6, 3];
+    }
+
+    
   };
 
   elementUtilities.getCyShape = function (ele) {
@@ -1042,6 +1867,13 @@ module.exports = function () {
       if (_class.endsWith(' multimer')) {
           _class = _class.replace(' multimer', '');
       }
+      if (_class.startsWith('active ')) {
+        _class = _class.replace('active ', '');
+      }
+
+      if (_class.includes('hypothetical')) {
+        _class = _class.replace('hypothetical ', '');
+      }
 
       if (_class == 'compartment') {
           return 'compartment';
@@ -1049,7 +1881,7 @@ module.exports = function () {
       if (_class == 'phenotype') {
           return 'hexagon';
       }
-      if (_class == 'perturbing agent' || _class == 'tag') {
+      if (_class == 'perturbing agent' || _class == 'tag' ) {
           return 'polygon';
       }
       if (_class == 'SIF macromolecule') {
@@ -1067,9 +1899,13 @@ module.exports = function () {
           return 'rectangle';
       }
 
+
       // We need to define new node shapes with their class names for these nodes
       if (_class == 'empty set' || _class == 'nucleic acid feature' || _class == 'macromolecule'
-              || _class == 'simple chemical' || _class == 'complex' || _class == 'biological activity' ) {
+              || _class == 'simple chemical' || _class == 'complex' || _class == 'biological activity' || _class == 'cule' || _class == 'gene'
+              || _class == 'unknown molecule' || _class == 'drug' || _class == 'ion' || _class == 'truncated protein' || _class == 'ion channel'
+              || _class == 'rna'   || _class == 'simple molecule' || _class == 'phenotype sbml'|| _class == 'receptor' || _class == 'complex sbml' || _class == 'protein'
+              || _class == 'degradation') {
           return _class;
       }
 
@@ -1080,7 +1916,7 @@ module.exports = function () {
         if (graphUtilities.portsEnabled === true && ele.data('ports').length === 2) {
           return 'polygon'; // The node has ports represent it by polygon
         }
-        else if (_class == 'process' || _class == 'omitted process' || _class == 'uncertain process') {
+        else if (_class == 'process' || _class == 'omitted process' || _class == 'uncertain process' || _class == 'truncated process' ) {
           return 'rectangle'; // If node has no port and has one of these classes it should be in a rectangle shape
         }
 
@@ -1095,8 +1931,10 @@ module.exports = function () {
     var _class = ele.data('class');
 
     if ( _class == 'inhibition' || _class == 'negative influence' ||
-          _class == 'production' || elementUtilities.isSIFEdge( _class ) ) {
-      return 'filled';
+          _class == 'production' || _class == 'transport' || _class == 'transcription production' || _class == 'translation production' || 
+          _class == 'unknown inhibition' || _class == 'unknown negative influence' || _class == 'unknown positive influence'
+          || _class ==  'positive influence sbml' || elementUtilities.isSIFEdge( _class ) ) {
+      return 'filled'; 
     }
 
     return 'hollow';
@@ -1106,13 +1944,15 @@ module.exports = function () {
       var _class = ele.data('class');
 
       switch ( _class ) {
-        case 'necessary stimulation':
+        case 'necessary stimulation': case 'trigger': case 'reduced trigger': 
+        case 'transport': case 'reduced trigger': case 'unknown reduced trigger':
           return 'triangle-cross';
         case 'inhibition': case 'negative influence': case 'inhibits':
         case 'downregulates-expression': case 'dephosphorylates':
         case 'inhibits-gtpase': case 'deacetylates': case 'demethylates':
+        case 'unknown inhibition': case 'unknown negative influence':
           return 'tee';
-        case 'catalysis':
+        case 'catalysis': case 'unknown catalysis':
           return 'circle';
         case 'stimulation': case 'production': case 'positive influence':
         case 'activates': case 'phosphorylates': case 'upregulates-expression':
@@ -1122,8 +1962,13 @@ module.exports = function () {
         case 'consumption-controled-by': case 'controls-production-of':
         case 'controls-transport-of-chemical': case 'used-to-produce':
         case 'activates-gtpase': case 'acetylates': case 'methylates':
+        case 'transcription production': case 'translation production':
+        case 'reduced stimulation': case 'unknown reduced stimulation':
           return 'triangle';
-        case 'modulation': case 'unknown influence':
+        case 'positive influence sbml': case 'unknown positive influence':
+           return 'vee';
+        case 'modulation': case 'unknown influence': case 'reduced modulation':
+        case 'unknown reduced modulation':
           return 'diamond';
         default:
           return 'none';
@@ -1137,6 +1982,14 @@ module.exports = function () {
           _class = _class.replace(' multimer', '');
       }
 
+      if (_class.startsWith('active ')) {
+        _class = _class.replace('active ', '');
+      }
+
+      if (_class.includes('hypothetical')) {
+        _class = _class.replace('hypothetical ', '');
+      }
+
       var content = "";
       if (_class == 'macromolecule' || _class == 'simple chemical'
           || _class == 'phenotype'
@@ -1144,7 +1997,12 @@ module.exports = function () {
           || _class == 'perturbing agent' || _class == 'tag'
           || _class == 'biological activity' || _class.startsWith('BA')
           || _class == 'submap' || _class == 'SIF macromolecule'
-          || _class == 'SIF simple chemical') {
+          || _class == 'SIF simple chemical' || _class == 'protein'
+          || _class == 'receptor' || _class == 'truncated protein'
+          || _class == 'ion channel' || _class == 'complex sbml'
+          || _class == 'gene' || _class == 'rna' || _class == 'simple molecule'
+          || _class == 'unknown molecule' || _class == 'phenotype sbml'
+          || _class == 'drug' || _class == 'ion') {
           content = ele.data('label') ? ele.data('label') : "";
       }
       else if(_class == 'compartment'){
@@ -1175,11 +2033,18 @@ module.exports = function () {
       else if (_class == 'not') {
           content = 'NOT';
       }
+      else if (_class == 'unknown logical operator') {
+        content = '?';
+    }
       else if (_class == 'omitted process') {
           content = '\\\\';
       }
       else if (_class == 'uncertain process') {
           content = '?';
+      }
+      else if (_class == 'truncated process')
+      {
+        content = '/\\/'
       }
       else if (_class == 'dissociation') {
           content = 'o';
@@ -1245,6 +2110,22 @@ module.exports = function () {
     return ['stadium'];
   };
 
+  elementUtilities.getResidueShapeOptions = function(ele) {
+    if ( !elementUtilities.canHaveResidueVariable( ele ) ) {
+      return null;
+    }
+
+    return ['stadium'];
+  };
+  elementUtilities.getBindingRegionShapeOptions = function(ele) {
+    if ( !elementUtilities.canHaveBindingRegion( ele ) ) {
+      return null;
+    }
+
+    return ['rectangle'];
+  };
+
+  
   elementUtilities.getUnitOfInfoShapeOptions = function(ele) {
     var type = elementUtilities.getPureSbgnClass(ele);
 
@@ -1365,6 +2246,22 @@ module.exports = function () {
           stateLabel = "";
         }
         contentHtml += "<div style='text-align:center;font-size:14px;'>" + stateLabel + "</div>";
+      }
+      else if (sbgnstateandinfo.clazz == "residue variable") {
+        var variable = sbgnstateandinfo.residue.variable;
+        var residueLabel = variable
+        if (residueLabel == null) {
+          residueLabel = "";
+        }
+        contentHtml += "<div style='text-align:center;font-size:14px;'>" + residueLabel + "</div>";
+      }
+      else if (sbgnstateandinfo.clazz == "binding region") {
+        var variable = sbgnstateandinfo.region.variable;
+        var regionLabel = variable
+        if (regionLabel == null) {
+          regionLabel = "";
+        }
+        contentHtml += "<div style='text-align:center;font-size:14px;'>" + regionLabel + "</div>";
       }
     }
     return contentHtml;
@@ -1735,7 +2632,7 @@ module.exports = function () {
   elementUtilities.changePortsOrientationAfterLayout = function() {
       //Check all processes and logical operators with ports
       cy.nodes().forEach(function(ele){
-          if (ele.data('class') === 'process' || ele.data('class') === 'omitted process' || ele.data('class') === 'uncertain process' || ele.data('class') === 'association' || ele.data('class') === 'dissociation' || ele.data('class') === 'and' || ele.data('class') === 'or' || ele.data('class') === 'not')
+          if (ele.data('class') === 'process' || ele.data('class') === 'omitted process' || ele.data('class') === 'uncertain process' || ele.data('class') === 'truncated process' || ele.data('class') === 'association' || ele.data('class') === 'dissociation' || ele.data('class') === 'and' || ele.data('class') === 'or' || ele.data('class') === 'not' || ele.data('class') === 'unknown logical operator')
           {
               if ( ele.data('ports').length === 2 )
               {
@@ -1763,7 +2660,7 @@ module.exports = function () {
       var targetingEdges = cy.edges("[target='"+processId+"']"); // Holds edges who have the input port as a target
       var sourcingEdges = cy.edges("[source='"+processId+"']"); // Holds edges who have the output port as a source
       // Checks if the ports belong to a process or logial operator, it does the calculations based on the edges connected to its ports
-      if (ele.data('class') === 'process' || ele.data('class') === 'omitted process' || ele.data('class') === 'uncertain process' || ele.data('class') === 'association' || ele.data('class') === 'dissociation')
+      if (ele.data('class') === 'process' || ele.data('class') === 'omitted process' || ele.data('class') === 'uncertain process' || ele.data('class') === 'truncated process' || ele.data('class') === 'association' || ele.data('class') === 'dissociation')
       {
           targetingEdges.forEach(function(edge){
               if (edge.data('class') === 'consumption')
@@ -1787,7 +2684,7 @@ module.exports = function () {
               }
           });
       }
-      else if (ele.data('class') === 'and' || ele.data('class') === 'or' || ele.data('class') === 'not')
+      else if (ele.data('class') === 'and' || ele.data('class') === 'or' || ele.data('class') === 'not' || ele.data('class') === 'unknown logical operator')
       {
           targetingEdges.forEach(function(edge){
               if (edge.data('class') === 'logic arc')
@@ -1875,7 +2772,7 @@ module.exports = function () {
       var targetingEdges = cy.edges("[target='"+processId+"']");
       var sourcingEdges = cy.edges("[source='"+processId+"']");
       // Checks simple nodes and add them to one of the arrays mentioned above
-      if (ele.data('class') === 'process' || ele.data('class') === 'omitted process' || ele.data('class') === 'uncertain process' || ele.data('class') === 'association' || ele.data('class') === 'dissociation')
+      if (ele.data('class') === 'process' || ele.data('class') === 'omitted process' || ele.data('class') === 'truncated process' || ele.data('class') === 'uncertain process' || ele.data('class') === 'association' || ele.data('class') === 'dissociation')
       {
           targetingEdges.forEach(function(edge){
               var source = cy.getElementById(edge.data('source'));
@@ -1903,7 +2800,7 @@ module.exports = function () {
               }
           });
       }
-      else if (ele.data('class') === 'and' || ele.data('class') === 'or' || ele.data('class') === 'not')
+      else if (ele.data('class') === 'and' || ele.data('class') === 'or' || ele.data('class') === 'not' || ele.data('class') === 'unknown logical operator')
       {
           targetingEdges.forEach(function(edge){
               var source = cy.getElementById(edge.data('source'));
@@ -2249,7 +3146,8 @@ module.exports = function () {
       'background-color': '#ffffff',
       'background-opacity': 1,
       'background-image-opacity': 1,
-      'text-wrap': 'wrap'
+      'text-wrap': 'wrap',
+      'border-style': 'solid'
     };
   };
 
@@ -2315,6 +3213,11 @@ module.exports = function () {
       width: 60,
       height: 30
     },
+    'protein':
+     {
+      width: 60,
+      height: 30
+     },
     'nucleic acid feature': {
       width: 60,
       height: 30
@@ -2324,6 +3227,10 @@ module.exports = function () {
       height: 30
     },
     'empty set': {
+      width: 22,
+      height: 22
+    },
+    'degradation': {
       width: 22,
       height: 22
     },
@@ -2364,6 +3271,61 @@ module.exports = function () {
       height: 30
     },
     'topology group': {
+      width: 44,
+      height: 44
+    },
+    'gene': {
+      width: 50,
+      height: 30
+    },
+    'rna': {
+      width: 50,
+      height: 44
+    },
+    'simple-molecule': {
+      width: 30,
+      height: 30
+    },
+    'unknown molecule': {
+      width: 60,
+      height: 30
+    },
+    'ion': {
+      width: 30,
+      height: 30
+    },
+    'drug': {
+      width: 60,
+      height: 40
+    },
+    'phenotype': {
+      width: 30,
+      height: 30
+    },
+    'simple molecule': {
+      width: 50,
+      height: 40
+    },
+    'truncated protein': {
+      width: 60,
+      height: 40
+    },
+    'ion channel': {
+      width: 60,
+      height: 40
+    },
+    'receptor':
+    {
+      width: 60,
+      height: 40
+    },
+    'phenotype sbml':
+    {
+      width: 50,
+      height: 50
+    },
+    'complex sbml':
+    {
       width: 44,
       height: 44
     }
@@ -2408,6 +3370,7 @@ module.exports = function () {
       'font-weight': 'normal',
       'font-color': '#0f0f0f',
       'border-width': 1,
+      'border-style': 'solid',
       'border-color': '#555555',
       'background-color': '#ffffff',
       'shape-name': getDefaultInfoboxShapeName( nodeClass, infoboxType ),
@@ -2438,12 +3401,12 @@ module.exports = function () {
   };
 
   var getDefaultInfoboxShapeName = function( nodeClass, infoboxType ) {
-    if ( infoboxType === 'state variable' ) {
+    if ( infoboxType === 'state variable' || infoboxType === 'residue variable') {
       return 'stadium';
     }
 
     if ( elementUtilities.isSIFNode( nodeClass ) ) {
-      if ( infoboxType === 'unit of information' ) {
+      if ( infoboxType === 'unit of information' || infoboxType === 'binding region') {
         if ( nodeClass == 'SIF macromolecule' ) {
           return 'stadium';
         }
@@ -2462,10 +3425,19 @@ module.exports = function () {
       var props = getDefaultInfoboxProperties( type, 'state variable' );
       defaultProperties[ type ][ 'state variable' ] = props;
     }
+    if (elementUtilities.canHaveResidueVariable( type )) {
+      var props = getDefaultInfoboxProperties( type, 'residue variable' );
+      defaultProperties[ type ][ 'residue variable' ] = props;
+    }
+    if (elementUtilities.canHaveBindingRegion( type )) {
+      var props = getDefaultInfoboxProperties( type, 'binding region' );
+      defaultProperties[ type ][ 'binding region' ] = props;
+    }
     if (elementUtilities.canHaveUnitOfInformation( type )) {
       var props = getDefaultInfoboxProperties( type, 'unit of information' );
       defaultProperties[ type ][ 'unit of information' ] = props;
     }
+
   } );
 
   elementUtilities.compoundNodeTypes.forEach( function( type ) {
@@ -2478,11 +3450,16 @@ module.exports = function () {
     'background-color': '#707070'
   } );
 
+  $.extend( defaultProperties['unknown molecule'], {
+    'background-color': '#707070'
+  } );
+
   elementUtilities.epnTypes
     .concat( elementUtilities.sifTypes )
     .concat( elementUtilities.otherNodeTypes )
     .concat (elementUtilities.biologicalActivityTypes)
     .concat( ['phenotype'] )
+    .concat( elementUtilities.sbmlType)
     .forEach( function( type ) {
        $.extend( defaultProperties[ type ], getDefaultFontProperties() );
     } );
@@ -2535,10 +3512,14 @@ module.exports = function () {
       'width': true,
       'height': true,
       'state variable': true,
+      'residue variable': true,
+      'binding region': true,
       'unit of information': true,
       'multimer': true,
       'clonemarker': true,
-      'ports-ordering': true
+      'ports-ordering': true,
+      'active': true,
+      'hypothetical': true
     };
 
     extendDataWithClassDefaults( data, className, propsToSkip );
@@ -2571,6 +3552,7 @@ module.exports = function () {
     var pureClass = elementUtilities.getPureSbgnClass( sbgnclass );
 
     // init default properties for the class if not initialized yet
+    //console.log('defaultProperties[ pureClass ] ', defaultProperties[ pureClass ] )
     if ( defaultProperties[ pureClass ] == null ) {
       defaultProperties[ pureClass ] = {};
     }
@@ -2608,6 +3590,8 @@ module.exports = function () {
         return 'AF';
       case 'sif':
         return 'SIF';
+      case 'sbml':
+        return 'SBML'
       case 'hybrid sbgn':
         return 'HybridSbgn';
       default:
@@ -2623,6 +3607,8 @@ module.exports = function () {
         return 'activity flow';
       case 'SIF':
         return 'sif';
+      case 'SBML':
+        return 'sbml'
       case 'HybridSbgn':
         return 'hybrid sbgn';
       default:
