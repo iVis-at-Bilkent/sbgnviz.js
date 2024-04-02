@@ -87,8 +87,8 @@ module.exports = function () {
         var sbmlDoc =  new libsbmlInstance.SBMLDocument(2, 4)
         var model = sbmlDoc.createModel()
         model.setId('model1')
-        //console.log("edges", edges)
-       // console.log("nodes", nodes)
+        console.log("edges", edges)
+         console.log("nodes", nodes)
         let nodesIdName = {}
          
         //Create compartment
@@ -158,8 +158,8 @@ module.exports = function () {
             }
             targetToSource[target].push({"source": source, "edgeClass": edgeClass, "edgeId": edgeId});
         }
-        //console.log("sourceToTarget", sourceToTarget)
-       // console.log("targetToSource", targetToSource)
+        console.log("sourceToTarget", sourceToTarget)
+       console.log("targetToSource", targetToSource)
 
 
         //Build a reducedNotation map: source: target
@@ -391,12 +391,12 @@ module.exports = function () {
                 delete process[curKey];
             }
         }
-        //console.log("reducedNotation", reducedNotation);
-       // console.log("process", process)
-        //console.log("truncatedProcess", truncatedProcess)
-        //console.log("associations",associations)
-        //console.log("dissociations",dissociations)
-        //console.log("logicalOperators",logicalOperators)
+        console.log("reducedNotation", reducedNotation);
+       console.log("process", process)
+        console.log("truncatedProcess", truncatedProcess)
+        console.log("associations",associations)
+        console.log("dissociations",dissociations)
+        console.log("logicalOperators",logicalOperators)
 
         //Build sbml reactions
         //Build reduced notion reactions
@@ -603,7 +603,7 @@ module.exports = function () {
             spr2.setSpecies(target.target)
             spr2.setSBOTerm(168)
         }
-       // console.log("reactions",reactions)
+       console.log("reactions",reactions)
         const writer = new libsbmlInstance.SBMLWriter()
         const serializedSBML = writer.writeSBMLToString(sbmlDoc)
 
