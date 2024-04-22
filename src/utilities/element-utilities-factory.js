@@ -480,7 +480,7 @@ module.exports = function () {
       "phenotype sbml":            {asSource: {isAllowed: true},   asTarget: {}},
       "association":          {asSource: {isAllowed: true},   asTarget: {isAllowed: true}},
       "dissociation":         {asSource: {},   asTarget: {isAllowed: true, maxEdge: 1, maxTotal: 1}},
-      "and":                  {asSource: {},   asTarget: {isAllowed: true,  maxEdge: 2, maxTotal: 2}},
+      "and":                  {asSource: {},   asTarget: {isAllowed: true,  maxEdge: 1, maxTotal: 1}},
       "or":                   {asSource: {},   asTarget: {isAllowed: true,   maxEdge: 2, maxTotal: 2}},
       "not":                  {asSource: {},   asTarget: {isAllowed: true,   maxEdge: 2, maxTotal: 2}},
       "unknown logical operator":  {asSource: {},   asTarget: {isAllowed: true,   maxEdge: 2, maxTotal: 2}},
