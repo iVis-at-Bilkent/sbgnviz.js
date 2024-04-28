@@ -3,6 +3,7 @@ const pkg = require('./package.json');
 const SRC_DIR = './src';
 const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
 const NodeExternals = require('webpack-node-externals');
+const { symlink } = require('fs');
 
 let config = {
   devtool: 'eval-source-map',
@@ -40,7 +41,9 @@ let config = {
   ],
 
   externals: [NodeExternals()],
-
+  resolve:{
+    symlinks:false,
+  }
   
 };
 
