@@ -18,7 +18,7 @@
   },
   "homepage": "https://github.com/iVis-at-Bilkent/sbgnviz.js/",
   "peerDependencies": {
-    "cytoscape": "iVis-at-Bilkent/cytoscape.js#SBML_unstable",
+    "cytoscape": "iVis-at-Bilkent/cytoscape.js#unstable",
     "file-saver": "^2.0.2",
     "jquery": "^2.2.4",
     "tippy.js": "^3.4.0"
