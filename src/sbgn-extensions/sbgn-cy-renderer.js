@@ -9,6 +9,7 @@ var cytoscape = libs.cytoscape;
 var cyMath = math = cytoscape.math;
 var cyBaseNodeShapes = cytoscape.baseNodeShapes;
 var cyStyleProperties = cytoscape.styleProperties;
+alert("sbgnviz");
 
 var classes = require('../utilities/classes');
 
