@@ -51,7 +51,6 @@ module.exports = function () {
    TODO implement 0.3 changes when submap support is fully there.
    */
   jsonToSbgnml.buildJsObj = function(filename, version, renderInfo, mapProperties, nodes, edges, hidden = false){
-
     var self = this;
     var mapID = textUtilities.getXMLValidId(filename);
     var hasExtension = false;
@@ -59,6 +58,7 @@ module.exports = function () {
     var mapType = ( mapProperties && mapProperties.mapType ) || elementUtilities.mapType;
     this.nodes = nodes || cy.nodes();
     this.edges = edges || cy.edges();
+
     
     var id = [];
     var i = 0;
@@ -135,9 +135,9 @@ module.exports = function () {
     // in the getGlyphSbgnml function. If not set accordingly, discrepancies will occur.
     var self = this;
     this.nodes.each(function(ele, i){
-       if(typeof ele === "number") {
-         ele = i;
-       }
+      if(typeof ele === "number") {
+        ele = i;
+      }
        if(jsonToSbgnml.childOfNone(ele, self.nodes)){
         var vis = true;
         if(hidden)
@@ -340,7 +340,7 @@ module.exports = function () {
        }
        else {
            var parent = node.parent()[0];
-           if(parent._private.data.class == "compartment")
+           if(parent._private.data.class == "compartment" || parent._private.data.class ==='complex sbml')
                glyph.compartmentRef = parent._private.data.id;
        }
     }
@@ -459,7 +459,7 @@ module.exports = function () {
     glyphList.push(glyph);
 
     // keep going with all the included glyphs
-    if(nodeClass === "compartment"){
+    if(nodeClass === "compartment"||nodeClass==='complex sbml'){
        var children = node.children();
        children = children.union(this.allCollapsedNodes);
        children = children.filter("[parent = '"+ node.id() + "']")
