@@ -315,6 +315,7 @@ module.exports = function () {
   };
 
   jsonToSbgnml.getGlyphSbgnml = function(node, version, visible = true){
+    console.log("Saving With the changes");
     var self = this;
     var nodeClass = node._private.data.class;
     var glyphList = [];
