@@ -603,7 +603,6 @@ module.exports = function () {
             spr2.setSpecies(target.target)
             spr2.setSBOTerm(168)
         }
-       console.log("reactions",reactions)
         const writer = new libsbmlInstance.SBMLWriter()
         const serializedSBML = writer.writeSBMLToString(sbmlDoc)
 
