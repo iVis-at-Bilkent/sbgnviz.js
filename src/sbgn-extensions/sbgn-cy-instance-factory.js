@@ -553,7 +553,7 @@ module.exports = function () {
 	    });
 	  }
 
-	  var selectionColor = '#d67614';
+	  var selectionColor = '#89898a';
 	  var sbgnStyleSheet = cytoscape.stylesheet()
 	          .selector("node")
 	          .css({
@@ -795,15 +795,15 @@ module.exports = function () {
 	          .css({
 	            'border-style': 'dashed'
 	          })
-	          .selector("node:selected")
-	          .css({
-	            'border-color': selectionColor,
-	            'target-arrow-color': '#000',
-				'text-outline-color': '#000',
-				'border-width': function(ele){
-					return Math.max(parseFloat(ele.data('border-width')) + 2, 3);
-				  }
-	          })
+	        //   .selector("node:selected")
+	        //   .css({
+	        //     'border-color': selectionColor,
+	        //     'target-arrow-color': '#000',
+			// 	'text-outline-color': '#000',
+			// 	'border-width': function(ele){
+			// 		return Math.max(parseFloat(ele.data('border-width')) + 2, 3);
+			// 	  }
+	        //   })
 	          .selector("node:active")
 	          .css({
 	            'background-opacity': 0.7, 'overlay-color': selectionColor,
@@ -836,15 +836,15 @@ module.exports = function () {
 	            'source-arrow-color': '#C4C4C4',
 	            'target-arrow-color': '#C4C4C4'
 	          })
-	          .selector("edge:selected")
-	          .css({
-	            'line-color': selectionColor,
-	            'source-arrow-color': selectionColor,
-				'target-arrow-color': selectionColor,
-				'width': function(ele){
-					return Math.max(parseFloat(ele.data('width')) + 2, 3);
-				  }
-	          })
+	        //   .selector("edge:selected")
+	        //   .css({
+	        //     'line-color': selectionColor,
+	        //     'source-arrow-color': selectionColor,
+			// 	'target-arrow-color': selectionColor,
+			// 	'width': function(ele){
+			// 		return Math.max(parseFloat(ele.data('width')) + 2, 3);
+			// 	  }
+	        //   })
 	          .selector("edge:active")
 	          .css({
 	            'background-opacity': 0.7, 'overlay-color': selectionColor,
