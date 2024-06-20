@@ -234,57 +234,52 @@ module.exports = function () {
 
   // see createSbgnml for info on the structure of renderInfo
   jsonToSbgnml.getRenderExtensionSbgnml = function(renderInfo) {
-      // initialize the main container
-      var renderInformation = new renderExtension.RenderInformation({ id: 'renderInformation',
-                                                                      backgroundColor: renderInfo.background,
-                                                                      programName: pkgName,
-                                                                      programVersion: pkgVersion });
+    // initialize the main container
+    var renderInformation = new renderExtension.RenderInformation({
+        id: 'renderInformation',
+        backgroundColor: renderInfo.background,
+        programName: pkgName,
+        programVersion: pkgVersion
+    });
 
-      // populate list of colors
-      var listOfColorDefinitions = new renderExtension.ListOfColorDefinitions();
-      for (var color in renderInfo.colors) {
-          var colorDefinition = new renderExtension.ColorDefinition({id: renderInfo.colors[color], value: color});
-          listOfColorDefinitions.addColorDefinition(colorDefinition);
-      }
-      renderInformation.setListOfColorDefinitions(listOfColorDefinitions);
-        // populate list of background images
-        var listOfBackgroundImages = new renderExtension.ListOfBackgroundImages();
-        if(!(Object.keys(experimentalDataOverlay.getParsedDataMap()).length > 0)){
-          for (var img in renderInfo.images) {
-              var backgroundImage = new renderExtension.BackgroundImage({id: renderInfo.images[img], value: img});
-              listOfBackgroundImages.addBackgroundImage(backgroundImage);
-          }
+    // populate list of colors
+    var listOfColorDefinitions = new renderExtension.ListOfColorDefinitions();
+    for (var color in renderInfo.colors) {
+        var colorDefinition = new renderExtension.ColorDefinition({ id: renderInfo.colors[color], value: color });
+        listOfColorDefinitions.addColorDefinition(colorDefinition);
+    }
+    renderInformation.setListOfColorDefinitions(listOfColorDefinitions);
+
+    // populate list of background images
+    var listOfBackgroundImages = new renderExtension.ListOfBackgroundImages();
+    if (!(Object.keys(experimentalDataOverlay.getParsedDataMap()).length > 0)) {
+        for (var img in renderInfo.images) {
+            var backgroundImage = new renderExtension.BackgroundImage({ id: renderInfo.images[img], value: img });
+            listOfBackgroundImages.addBackgroundImage(backgroundImage);
         }
-        renderInformation.setListOfBackgroundImages(listOfBackgroundImages);
-      // populates styles
-      var listOfStyles = new renderExtension.ListOfStyles();
-      for (var key in renderInfo.styles) {
-          var style = renderInfo.styles[key];
-          var xmlStyle = new renderExtension.Style({id: textUtilities.getXMLValidId(key), idList: style.idList.join(' ')});
-          var g = new renderExtension.RenderGroup({
-              fontSize: style.properties.fontSize,
-              fontFamily: style.properties.fontFamily,
-              fontWeight: style.properties.fontWeight,
-              fontStyle: style.properties.fontStyle,
-              fontColor: style.properties.fontColor,
-              fill: style.properties.fill, // fill color
-              stroke: style.properties.stroke, // stroke color
-              strokeWidth: style.properties.strokeWidth,
-              backgroundImage: style.properties.backgroundImage,
-              backgroundFit: style.properties.backgroundFit,
-              backgroundPosX: style.properties.backgroundPosX,
-              backgroundPosY: style.properties.backgroundPosY,
-              backgroundWidth: style.properties.backgroundWidth,
-              backgroundHeight: style.properties.backgroundHeight,
-              backgroundImageOpacity: style.properties.backgroundImageOpacity,
-              backgroundOpacity: style.properties.backgroundOpacity
-          });
-          xmlStyle.setRenderGroup(g);
-          listOfStyles.addStyle(xmlStyle);
-      }
-      renderInformation.setListOfStyles(listOfStyles);
-      return renderInformation;
-  };
+    }
+    renderInformation.setListOfBackgroundImages(listOfBackgroundImages);
+
+    // populates styles
+    var listOfStyles = new renderExtension.ListOfStyles();
+    for (var key in renderInfo.styles) {
+        var style = renderInfo.styles[key];
+        var properties = {};
+
+        for (var prop in style.properties) {
+            if (style.properties[prop] !== '') {
+                properties[prop] = style.properties[prop];
+            }
+        }
+
+        var xmlStyle = new renderExtension.Style({ id: textUtilities.getXMLValidId(key), idList: style.idList.join(' ') });
+        var g = new renderExtension.RenderGroup(properties);
+        xmlStyle.setRenderGroup(g);
+        listOfStyles.addStyle(xmlStyle);
+    }
+    renderInformation.setListOfStyles(listOfStyles);
+    return renderInformation;
+};
 
   jsonToSbgnml.getAnnotationExtension = function(cyElement) {
       var annotations = cyElement.data('annotations');
