@@ -670,8 +670,10 @@ module.exports = function () {
    */
 mainUtilities.getMapProperties = function() {
   if( elementUtilities.fileFormat !== undefined){
-    if( elementUtilities.fileFormat == 'sbgnml')
-       this.showNodesSmart
+    if( elementUtilities.fileFormat == 'sbgnml'){
+      //this.showNodesSmart
+      return sbgnmlToJson.mapPropertiesToObj();
+    }
     else if( elementUtilities.fileFormat == 'nwt' )
       return nwtToJson.mapPropertiesToObj();
     else if( elementUtilities.fileFormat == 'td')
