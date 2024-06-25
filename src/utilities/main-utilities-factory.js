@@ -575,7 +575,7 @@ module.exports = function () {
   // Performs layout by given layoutOptions. Considers 'undoable' option. However, by setting notUndoable parameter
   // to a truthy value you can force an undable layout operation independant of 'undoable' option.
   mainUtilities.performLayout = function(layoutOptions, notUndoable) {
-    
+    console.log("test build");
     if (!options.undoable || notUndoable) { // 'notUndoable' flag can be used to have composite actions in undo/redo stack
       // Things to do before performing layout
       mainUtilities.beforePerformLayout();
