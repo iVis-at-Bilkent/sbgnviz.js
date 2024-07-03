@@ -375,6 +375,25 @@ module.exports = function () {
    saveAs(blob, filename);
  };
 
+ fileUtilities.saveAsSbgnmlForSBML = function(filename, errorCallback){
+  // We have sbml map typed nodes and edges in the cytoscape graph and we want to export to sbgnml
+  // Create sbml file first, then get the sbgnml from the Minerva conversion service
+  uiUtilities.startSpinner("load-file-spinner");
+  var sbgnText = jsonToSbml.createSbml(filename);
+  //convert sbml to sbgnml
+  this.convertSbmlToSbgnml(sbgnText, function(data){
+    if(data == null){
+      errorCallback();
+    }else{
+      var blob = new Blob([data], {
+        type: "text/plain;charset=utf-8;",
+      });
+      saveAs(blob, filename);
+    }
+    uiUtilities.endSpinner("load-file-spinner");
+  });
+}
+
  // supported versions are either 0.2 or 0.3
  fileUtilities.saveAsNwt = function(filename, version, renderInfo, mapProperties, nodes, edges) {
    var sbgnmlText = jsonToNwt.createNwt(filename, version, renderInfo, mapProperties, nodes, edges);
@@ -419,15 +438,34 @@ module.exports = function () {
   reader.readAsText(file);
  };
 
- fileUtilities.saveAsSbml = function(filename){
+ fileUtilities.saveAsSbml = function(filename, errorCallback){
   uiUtilities.startSpinner("load-spinner");
-  var sbgnText = jsonToSbml.createSbml(filename);
-   var blob = new Blob([sbgnText], {
-     type: "text/plain;charset=utf-8;",
-   });
-   saveAs(blob, filename);
+  var sbgnml = this.convertSbgn();
+  this.convertSbgnmlToSbml(sbgnml, function(data){
+    if (!data.result) {
+      errorCallback(sbgnml, data.error);
+    } else if (data.message.indexOf("Internal server error") !== -1) {
+      errorCallback(sbgnml, data.message);
+    } else {
+      var blob = new Blob([data.message], {
+        type: "text/plain;charset=utf-8;",
+      });
+      console.log(data.message);
+      saveAs(blob, filename);
+    }
+  });
    uiUtilities.endSpinner("load-spinner");
  }
+
+  fileUtilities.saveSbmlForSBML = function(filename, errorCallback){
+    uiUtilities.startSpinner("load-file-spinner");
+    var sbgnText = jsonToSbml.createSbml(filename);
+    var blob = new Blob([sbgnText], {
+      type: "text/plain;charset=utf-8;",
+    });
+    saveAs(blob, filename);
+    uiUtilities.endSpinner("load-spinner");
+}
 
  fileUtilities.loadSbmlForSBML = function(file, callback1, callback2, layoutBy)
  {
@@ -511,10 +549,8 @@ module.exports = function () {
  }; 
 
  fileUtilities.convertSbgn= function(filename, version, renderInfo, mapProperties, nodes, edges, hidden = false) {
-  var sbgnmlText = jsonToSbgnml.createSbgnml(filename, "plain", renderInfo, mapProperties, nodes, edges, hidden);
- 
+  var sbgnmlText = jsonToSbgnml.createSbgnml(filename, version, renderInfo, mapProperties, nodes, edges, hidden);
   return sbgnmlText;
-  
 };
 
  fileUtilities.exportLayoutData = function(filename, byName) {
