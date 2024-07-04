@@ -208,7 +208,7 @@ module.exports = function () {
         for(let i = 0; i < targetToSourceKeys.length; i++)
         {
             let currentKey = targetToSourceKeys[i];
-            let currectClass = nodesIdName[currentKey]    
+            let currectClass = nodesIdName[currentKey]
             if(jsonToSbml.isProcessNode(currectClass))
             {
                 let targetObjectArray = targetToSource[currentKey]
@@ -404,7 +404,7 @@ module.exports = function () {
 
             for (let j = 0; j < targets.length; j++)
             {
-                let curTarget = targets[i]
+                let curTarget = targets[j]
                 const rxn = model.createReaction()
                 rxn.setId('reduced'+ curTarget.target)
                 rxn.setSBOTerm(reducedNotationEdge[curTarget.edgeClass])
@@ -429,8 +429,8 @@ module.exports = function () {
             let curTargetEdge = curProcess.targetEdge;
             let modifiers = curProcess.modifiers;
 
-            const rxn = model.createReaction()
-            rxn.setId('process_'+ curTarget.source)
+            const rxn = model.createReaction();
+            rxn.setId('process_'+ curKey);
         
             const spr1 = rxn.createReactant()
             spr1.setSpecies(curSource)
@@ -497,7 +497,7 @@ module.exports = function () {
             {
                 for (let j = 0; j < modifiers.length; j++)
                 {
-                    let curModifier = truncatedObj.modifiers[i]
+                    let curModifier = truncatedObj.modifiers[j]
                     const spr3 = rxn.createModifier()
                     spr3.setSpecies(curModifier.modifier)
                 }
