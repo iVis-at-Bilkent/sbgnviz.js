@@ -4482,10 +4482,10 @@ module.exports = function () {
       width: 60,
       height: 40,
     },
-    phenotype: {
-      width: 30,
-      height: 30,
-    },
+    // phenotype: {
+    //   width: 30,
+    //   height: 30,
+    // },
     "simple molecule": {
       width: 50,
       height: 40,
@@ -4750,8 +4750,8 @@ module.exports = function () {
     if (sbgnclass == undefined) {
       return defaultProperties;
     }
-
     var pureClass = elementUtilities.getPureSbgnClass(sbgnclass);
+    console.log(sbgnclass,pureClass);
 
     // init default properties for the class if not initialized yet
     //console.log('defaultProperties[ pureClass ] ', defaultProperties[ pureClass ] )
