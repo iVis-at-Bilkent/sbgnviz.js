@@ -537,7 +537,7 @@ module.exports = function () {
   var reader = new FileReader();
   reader.onload = function (e) { 
     
-    this.convertGpmlToSbgnml(e.target.result, function(data){
+    gpmlToSbgnml.convert(e.target.result, function(data){
       if(data == null){
         errorCallback();
       }else{
