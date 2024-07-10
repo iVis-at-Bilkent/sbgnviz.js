@@ -425,7 +425,8 @@ module.exports = function () {
 
   reader.onload = function (e) { 
   
-    this.convertCDToSbgnml(e.target.result, function(data){
+    // this.convertCDToSbgnml(e.target.result, function(data){
+    cdToSbgnml.convert(e.target.result, function(data){
       uiUtilities.endSpinner("load-spinner");
       if(data == null){
         errorCallback();
