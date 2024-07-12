@@ -6,8 +6,8 @@ var pkgVersion = require('../../package.json').version; // need info about sbgnv
 var pkgName = require('../../package.json').name;
 var prettyprint = require('pretty-data').pd;
 var xml2js = require('xml2js');
-var mapPropertiesBuilder = new xml2js.Builder({rootName: "mapProperties"});
-var compoundExtensionBuilder = new xml2js.Builder({rootName: "extraInfo"});
+var mapPropertiesBuilder = new xml2js.Builder({rootName: "nwt:mapProperties"});
+var compoundExtensionBuilder = new xml2js.Builder({rootName: "nwt:extraInfo"});
 var textUtilities = require('./text-utilities');
 
 module.exports = function () {

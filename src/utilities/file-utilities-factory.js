@@ -391,7 +391,7 @@ module.exports = function () {
       saveAs(blob, filename);
     }
     uiUtilities.endSpinner("load-file-spinner");
-  });
+  }.bind(this));
 }
 
  // supported versions are either 0.2 or 0.3
