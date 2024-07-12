@@ -119,14 +119,17 @@ module.exports = function () {
        }
        map.setExtension(extension);
        if (mapProperties) {
-           delete mapProperties.experimentDescription;
-           var xml = mapPropertiesBuilder.buildObject(mapProperties);
-           map.extension.add(xml);
+          delete mapProperties.experimentDescription;
+          mapProperties.$ = { "xmlns:nwt": "https://newteditor.org/" };
+          var xml = mapPropertiesBuilder.buildObject(mapProperties);
+          map.extension.add(xml);
        }
 
     } else if (mapProperties) {
-       map.setExtension(new libsbgnjs.Extension());
-       map.extension.add(mapPropertiesBuilder.buildObject(mapProperties));
+      map.setExtension(new libsbgnjs.Extension());
+      mapProperties.$ = { "xmlns:nwt": "https://newteditor.org/" };
+      var xml = mapPropertiesBuilder.buildObject(mapProperties);
+      map.extension.add(xml);
     }
 
     // get all glyphs
@@ -362,8 +365,9 @@ module.exports = function () {
       extraInfo.HTBias = Number(node.css("min-height-bias-top").replace("px",""));
       extraInfo.HBBias = Number(node.css("min-height-bias-bottom").replace("px",""));
       glyph.setExtension(new libsbgnjs.Extension());
-      glyph.extension.add(compoundExtensionBuilder.buildObject(extraInfo));
-
+      extraInfo.$ = { "xmlns:nwt": "https://newteditor.org/" };
+      var extraInfoXml = compoundExtensionBuilder.buildObject(extraInfo);
+      glyph.extension.add(extraInfoXml);
     }
    
     //add port information

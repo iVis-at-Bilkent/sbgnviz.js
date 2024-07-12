@@ -11,7 +11,7 @@ module.exports = function() {
 
   sbmlToSbgnml.convert = function (xml, callback) {
       console.log("in convert")
-    var conversionApiUrl = "https://minerva-service.lcsb.uni.lu/minerva/api/convert/SBML:SBGN-ML";
+    var conversionApiUrl = "https://minerva-dev.lcsb.uni.lu/minerva/api/convert/SBML:SBGN-ML";
 
     return $.ajax({
         type: 'post',

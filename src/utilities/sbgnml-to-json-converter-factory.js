@@ -89,11 +89,11 @@ module.exports = function () {
       bbox.y = parseFloat(bbox.y) + parseFloat(bbox.h) / 2;
      
       return bbox;
-    }else if (ele.extension && ele.extension.has('extraInfo')) {// if newt file then extrainfo on the compound node exists
-        var xml = ele.extension.get('extraInfo');
+    }else if (ele.extension && ele.extension.has('nwt:extraInfo')) {// if newt file then extrainfo on the compound node exists
+        var xml = ele.extension.get('nwt:extraInfo');
         var extraInfo;
         parseString(xml, function (err, result) {
-           extraInfo = result.extraInfo;
+           extraInfo = result['nwt:extraInfo'];
         });
         ele.originalW= bbox.w;
         ele.originalH = bbox.h;
@@ -1136,8 +1136,8 @@ module.exports = function () {
   };
 
   sbgnmlToJson.mapPropertiesToObj = function() {
-    if (this.map.extension && this.map.extension.has('mapProperties')) { // render extension was found
-       var xml = this.map.extension.get('mapProperties');
+    if (this.map.extension && this.map.extension.has('nwt:mapProperties')) { // render extension was found
+       var xml = this.map.extension.get('nwt:mapProperties');
        var obj;
        parseString(xml, function (err, result) {
           obj = result;
@@ -1322,7 +1322,7 @@ module.exports = function () {
       
      
     }else{
-      mainUtilities.setCompoundPadding(Number(self.mapPropertiesToObj().mapProperties.compoundPadding));
+      mainUtilities.setCompoundPadding(Number(self.mapPropertiesToObj()['nwt:mapProperties'].compoundPadding));
     }
 
     
