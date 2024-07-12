@@ -1701,7 +1701,6 @@ module.exports = function () {
     "rna",
     "simple molecule",
     "unknown molecule",
-    "phenotype",
     "drug",
     "ion",
     "protein",
@@ -1719,7 +1718,6 @@ module.exports = function () {
     "ion channel multimer",
     "receptor multimer",
     "truncated protein multimer",
-    "phenotype multimer",
     "ion multimer",
     "simple molecule multimer",
     "unknown molecule multimer",
@@ -2351,7 +2349,6 @@ module.exports = function () {
       "truncated protein": true,
       gene: true,
       rna: true,
-      phenotype: true,
       ion: true,
       "simple molecule": true,
       "unknown molecule": true,
@@ -4482,10 +4479,10 @@ module.exports = function () {
       width: 60,
       height: 40,
     },
-    phenotype: {
-      width: 30,
-      height: 30,
-    },
+    // phenotype: {
+    //   width: 30,
+    //   height: 30,
+    // },
     "simple molecule": {
       width: 50,
       height: 40,
@@ -4750,7 +4747,6 @@ module.exports = function () {
     if (sbgnclass == undefined) {
       return defaultProperties;
     }
-
     var pureClass = elementUtilities.getPureSbgnClass(sbgnclass);
 
     // init default properties for the class if not initialized yet
