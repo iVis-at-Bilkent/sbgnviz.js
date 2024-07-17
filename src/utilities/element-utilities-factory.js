@@ -2969,6 +2969,7 @@ module.exports = function () {
   };
 
   elementUtilities.getElementContent = function (ele) {
+    var _language = ele.data("language");
     var _class = ele.data("class");
 
     if (_class.endsWith(" multimer")) {
@@ -3034,7 +3035,10 @@ module.exports = function () {
     } else if (_class == "unknown logical operator") {
       content = "?";
     } else if (_class == "omitted process") {
-      content = "\\\\";
+      if(_language == "PD")
+        content = "\\\\";
+      else
+        content = "//";
     } else if (_class == "uncertain process") {
       content = "?";
     } else if (_class == "truncated process") {
