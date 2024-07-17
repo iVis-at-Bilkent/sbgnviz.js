@@ -3042,7 +3042,7 @@ module.exports = function () {
     } else if (_class == "uncertain process") {
       content = "?";
     } else if (_class == "truncated process") {
-      content = "/\\/";
+      content = "N";
     } else if (_class == "dissociation") {
       content = "o";
     } else if (_class == "delay") {
