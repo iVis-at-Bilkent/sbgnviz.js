@@ -1271,11 +1271,6 @@ module.exports = function () {
         x, y, centerX, centerY, width, height, padding
       );
     },
-    "drug": function( centerX, centerY, width, height, x, y, padding ) {
-      return cyMath.roundRectangleIntersectLine(
-        x, y, centerX, centerY, width, height, padding
-      );
-    },
     "protein": function( centerX, centerY, width, height, x, y, padding ) {
       return cyMath.roundRectangleIntersectLine(
         x, y, centerX, centerY, width, height, padding
@@ -1319,9 +1314,7 @@ module.exports = function () {
 
     },
     "drug": function( centerX, centerY, width, height, x, y, padding ) {
-      return cyMath.roundRectangleIntersectLine(
-        x, y, centerX, centerY, width, height, padding
-      );
+      return cyBaseNodeShapes["ellipse"].intersectLine( centerX, centerY, width, height, x, y, padding );
     },
     "phenotype sbml": function( centerX, centerY, width, height, x, y, padding ) {
       return cyBaseNodeShapes["ellipse"].intersectLine( centerX, centerY, width, height, x, y, padding );
