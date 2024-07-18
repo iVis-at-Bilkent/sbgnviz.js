@@ -177,47 +177,43 @@ module.exports = function () {
   var drawRoundedDrugPath= $$.sbgn.drawRoundedDrug = function(
     context, x, y, width, height, radius )
     {
+      var halfWidth = width / 2;
+      var halfHeight = height / 2;
+      var cornerRadius = Math.min(halfWidth, halfHeight);
 
-    var halfWidth = width / 2;
-    var halfHeight = height / 2;
-    var cornerRadius = radius || cyMath.getRoundRectangleRadius( width, height );
+      context.beginPath();
 
-    if( context.beginPath ){ context.beginPath(); }
+      // Start at top middle
+      context.moveTo(x, y-halfHeight);
+      // Arc from middle top to right side
+      context.arcTo(x+halfWidth, y-halfHeight, x+halfWidth, y, cornerRadius);
+      // Arc from right side to bottom
+      context.arcTo(x+halfWidth, y+halfHeight, x, y+halfHeight, cornerRadius);
+      // Arc from bottom to left side
+      context.arcTo(x-halfWidth, y+halfHeight, x-halfWidth, y, cornerRadius);
+      // Arc from left side to topBorder
+      context.arcTo(x-halfWidth, y-halfHeight, x, y-halfHeight, cornerRadius);
+      // Join line
+      context.lineTo(x, y-halfHeight);
 
-    // Start at top middle
-    context.moveTo( x, y - halfHeight );
-    // Arc from middle top to right side
-    context.arcTo( x + halfWidth, y - halfHeight, x + halfWidth, y, cornerRadius );
-    // Arc from right side to bottom
-    context.arcTo( x + halfWidth, y + halfHeight, x, y + halfHeight, cornerRadius );
-    // Arc from bottom to left side
-    context.arcTo( x - halfWidth, y + halfHeight, x - halfWidth, y, cornerRadius );
-    // Arc from left side to topBorder
-    context.arcTo( x - halfWidth, y - halfHeight, x, y - halfHeight, cornerRadius );
-    // Join line
-    context.lineTo( x, y - halfHeight );
+      var halfWidthInner = width / 2 - 5;
+      var halfHeightInner = height / 2 - 5;
+      var cornerRadius = Math.min( halfWidthInner, halfHeightInner );
 
-    
+      // Start at top middle
+      context.moveTo(x, y-halfHeightInner);
+      // Arc from middle top to right side
+      context.arcTo(x+halfWidthInner, y-halfHeightInner, x+halfWidthInner, y, cornerRadius);
+      // Arc from right side to bottom
+      context.arcTo(x+halfWidthInner, y+halfHeightInner, x, y+halfHeightInner, cornerRadius);
+      // Arc from bottom to left side
+      context.arcTo(x-halfWidthInner, y+halfHeightInner, x-halfWidthInner, y, cornerRadius);
+      // Arc from left side to topBorder
+      context.arcTo(x-halfWidthInner, y-halfHeightInner, x, y-halfHeightInner, cornerRadius);
+      // Join line
+      context.lineTo(x, y-halfHeightInner);
 
-    var halfWidthInner = width / 2 - 5;
-    var halfHeightInner = height / 2 - 5;
-    var cornerRadius = radius || cyMath.getRoundRectangleRadius( width, height );
-
-
-    // Start at top middle
-    context.moveTo( x, y - halfHeightInner );
-    // Arc from middle top to right side
-    context.arcTo( x + halfWidthInner, y - halfHeightInner, x + halfWidthInner, y, cornerRadius );
-    // Arc from right side to bottom
-    context.arcTo( x + halfWidthInner, y + halfHeightInner, x, y + halfHeightInner, cornerRadius );
-    // Arc from bottom to left side
-    context.arcTo( x - halfWidthInner, y + halfHeightInner, x - halfWidthInner, y, cornerRadius );
-    // Arc from left side to topBorder
-    context.arcTo( x - halfWidthInner, y - halfHeightInner, x, y - halfHeightInner, cornerRadius );
-    // Join line
-    context.lineTo( x, y - halfHeightInner );
-
-    context.closePath();
+      context.closePath();
   };
   
   // Taken from cytoscape.js
