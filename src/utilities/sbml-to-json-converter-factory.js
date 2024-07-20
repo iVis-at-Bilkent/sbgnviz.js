@@ -129,7 +129,6 @@ module.exports = function () {
       layoutplugin = libsbmlInstance.castObject(plugin, libsbmlInstance.LayoutModelPlugin);
       layout = layoutplugin.layouts[0];
     }   
-
     if(layout) {
       let edgeArray = [];
       let compoundMap = new Map();
@@ -445,7 +444,6 @@ sbmlToJson.addSpecies = function(model, cytoscapeJsNodes) {
     let speciesData = {"id": species.getId(), "label": species.getName(), "parent": species.getCompartment(), "sboTerm": species.getSBOTerm()};
     resultJson.push({"data": speciesData, "group": "nodes", "classes": "species"});
   }
-
   //Now create different model
   sbmlToJson.addJSNodes(resultJson,cytoscapeJsNodes)
   
@@ -494,16 +492,19 @@ sbmlToJson.addJSNodes = function(resultJson,cytoscapeJsNodes) {
       nodeObj.statesandinfos = [];
       nodeObj.parent = resultJson[i].data.parent;
       var ports = [];
-      ports.push({
-        id: nodeObj.id +".1",
-        x: -70,
-        y: 0
-      });
-      ports.push({
-        id: nodeObj.id +".2",
-        x: 70,
-        y: 0
-      });
+
+      // if(sboToNodeClass[sboTerm]!=='gene'){
+      //   ports.push({
+      //     id: nodeObj.id +".1",
+      //     x: -70,
+      //     y: 0
+      //   });
+      //   ports.push({
+      //     id: nodeObj.id +".2",
+      //     x: 70,
+      //     y: 0
+      //   });
+      // }
         
 
       nodeObj.ports = ports;
