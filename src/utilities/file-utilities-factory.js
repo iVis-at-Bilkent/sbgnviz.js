@@ -459,7 +459,7 @@ module.exports = function () {
  }
 
   fileUtilities.saveSbmlForSBML = function(filename, errorCallback){
-    uiUtilities.startSpinner("load-file-spinner");
+    uiUtilities.startSpinner("load-spinner");
     var sbgnText = jsonToSbml.createSbml(filename);
     var blob = new Blob([sbgnText], {
       type: "text/plain;charset=utf-8;",
