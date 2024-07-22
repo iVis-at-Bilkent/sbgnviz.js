@@ -150,20 +150,7 @@ module.exports = function () {
           let bbox = compartmentGlyph.getBoundingBox();
           let data = {id: compartmentGlyph.getCompartmentId(), class: "compartment", label: compartmentMap.get(compartmentGlyph.getCompartmentId()),
             width: bbox.width, height: bbox.height, bbox: {x: 0, y: 0, w: bbox.width, h: bbox.height}, statesandinfos: []};
-            var ports = [];
-            ports.push({
-              id: data.id +".1",
-              x: -70,
-              y: 0
-            });
-            ports.push({
-              id: data.id +".2",
-              x: 70,
-              y: 0
-            });
-        
-
-            data.ports = ports;
+            data.ports = [];
           elementUtilities.extendNodeDataWithClassDefaults( data, data.class );
           let position = {x: bbox.x + bbox.width / 2, y: bbox.y + bbox.height / 2};
           compartmentNodeMap.set(compartmentGlyph.getCompartmentId(), {"data": data, "position": position, "group": "nodes", "classes": "compartment"});
@@ -187,21 +174,7 @@ module.exports = function () {
         speciesGlyphIdSpeciesIdMap.set(speciesGlyph.getId(), speciesGlyph.getSpeciesId());
         let bbox = speciesGlyph.getBoundingBox();
         let data = {id: speciesGlyph.getId(), class: sboToNodeClass[speciesMap.get(speciesGlyph.getSpeciesId())[2]],label: speciesMap.get(speciesGlyph.getSpeciesId())[0], compref: speciesMap.get(speciesGlyph.getSpeciesId())[1],
-          sboTerm: speciesMap.get(speciesGlyph.getSpeciesId())[2], width: bbox.width, height: bbox.height, bbox: {x: 0, y: 0, w: bbox.width, h: bbox.height}, statesandinfos: []};
-          var ports = [];
-            ports.push({
-              id: data.id +".1",
-              x: -70,
-              y: 0
-            });
-            ports.push({
-              id: data.id +".2",
-              x: 70,
-              y: 0
-            });
-        
-
-            data.ports = ports;
+        sboTerm: speciesMap.get(speciesGlyph.getSpeciesId())[2], width: bbox.width, height: bbox.height, bbox: {x: 0, y: 0, w: bbox.width, h: bbox.height}, statesandinfos: []};            data.ports = [];
         elementUtilities.extendNodeDataWithClassDefaults( data, data.class );
         let position = {x: bbox.x + bbox.width / 2, y: bbox.y + bbox.height / 2};
         speciesNodeMap.set(speciesGlyph.getId(), {"data": data, "position": position, "group": "nodes", "classes": "species"});
@@ -408,21 +381,7 @@ sbmlToJson.addJSCompartments = function(resultJson, cytoscapeJsNodes)
       nodeObj.bbox = tempBbox;   
       nodeObj.label = resultJson[i].data.label;
       nodeObj.statesandinfos = [];
-
-      var ports = [];
-      ports.push({
-        id: nodeObj.id +".1",
-        x: -70,
-        y: 0
-      });
-      ports.push({
-        id: nodeObj.id +".2",
-        x: 70,
-        y: 0
-      });
-        
-
-      nodeObj.ports = ports;
+      nodeObj.ports = [];
       if(resultJson[i].data.parent)
       {
         nodeObj.parent = resultJson[i].data.parent;
@@ -491,23 +450,7 @@ sbmlToJson.addJSNodes = function(resultJson,cytoscapeJsNodes) {
       nodeObj.label = resultJson[i].data.label;
       nodeObj.statesandinfos = [];
       nodeObj.parent = resultJson[i].data.parent;
-      var ports = [];
-
-      // if(sboToNodeClass[sboTerm]!=='gene'){
-      //   ports.push({
-      //     id: nodeObj.id +".1",
-      //     x: -70,
-      //     y: 0
-      //   });
-      //   ports.push({
-      //     id: nodeObj.id +".2",
-      //     x: 70,
-      //     y: 0
-      //   });
-      // }
-        
-
-      nodeObj.ports = ports;
+      nodeObj.ports = [];
       var cytoscapeJsNode = {data: nodeObj, style: styleObj};
       elementUtilities.extendNodeDataWithClassDefaults( nodeObj, nodeObj.class );
       cytoscapeJsNodes.push(cytoscapeJsNode)
