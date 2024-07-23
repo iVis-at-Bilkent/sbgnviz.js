@@ -853,7 +853,7 @@ module.exports = function () {
       receptor: { asSource: { isAllowed: true }, asTarget: {} },
       ion: { asSource: { isAllowed: true }, asTarget: {} },
       process: { asSource: {}, asTarget: { isAllowed: true } },
-      "omitted proces sbml": { asSource: {}, asTarget: { isAllowed: true } },
+      "omitted process": { asSource: {}, asTarget: { isAllowed: true } },
       "uncertain process": { asSource: {}, asTarget: { isAllowed: true } },
       "truncated process": { asSource: {}, asTarget: { isAllowed: true } },
       "phenotype sbml": {
