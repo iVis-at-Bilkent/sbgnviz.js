@@ -2455,6 +2455,11 @@ module.exports = function () {
     return sbgnclass == "tag" || sbgnclass == "terminal";
   };
 
+  elementUtilities.isLogicArc=function(ele){
+    var sbgnclass = elementUtilities.getPureSbgnClass(ele);
+    return sbgnclass=='logic arc';
+  };
+
   // Returns whether the class of given element is a modulation arc as defined in PD specs
   elementUtilities.isModulationArcClass = function (ele) {
     var sbgnclass = elementUtilities.getPureSbgnClass(ele);
@@ -2463,7 +2468,10 @@ module.exports = function () {
       sbgnclass == "stimulation" ||
       sbgnclass == "catalysis" ||
       sbgnclass == "inhibition" ||
-      sbgnclass == "necessary stimulation"
+      sbgnclass == "necessary stimulation"||
+      sbgnclass == "unknown catalysis"||
+      sbgnclass == "unknown inhibition"||
+      sbgnclass == "trigger"
     );
   };
 
@@ -2475,6 +2483,21 @@ module.exports = function () {
       sbgnclass == "negative influence" ||
       sbgnclass == "unknown influence" ||
       sbgnclass == "necessary stimulation"
+    );
+  };
+
+  elementUtilities.isSBMLArcClass=function(ele){
+    var sbgnclass = elementUtilities.getPureSbgnClass(ele);
+    return (
+      sbgnclass == "positive influence sbml" ||
+      sbgnclass == "unknown positive influence" ||
+      sbgnclass == "unknown negative influence" ||
+      sbgnclass == "reduced stimulation"||
+      sbgnclass == "unknown reduced stimulation"||
+      sbgnclass == "reduced modulation"||
+      sbgnclass == "unknown reduced modulation"||
+      sbgnclass == "reduced trigger"||
+      sbgnclass == "unknown reduced trigger"
     );
   };
 
