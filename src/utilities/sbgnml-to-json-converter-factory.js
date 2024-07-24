@@ -90,11 +90,19 @@ module.exports = function () {
      
       return bbox;
     }else if (ele.extension && ele.extension.has('nwt:extraInfo')) {// if newt file then extrainfo on the compound node exists
-        var xml = ele.extension.get('nwt:extraInfo');
+        
+        if (ele.extension.has('nwt:extraInfo')){
+          var extensionString = 'nwt:extraInfo';
+        }
+        else if (ele.extension.has('extraInfo')){
+          var extensionString = 'extraInfo';
+        }
+        var xml = ele.extension.get(extensionString);
         var extraInfo;
         parseString(xml, function (err, result) {
-           extraInfo = result['nwt:extraInfo'];
+           extraInfo = result[extensionString];
         });
+
         ele.originalW= bbox.w;
         ele.originalH = bbox.h;
         bbox.x = parseFloat(bbox.x) + parseFloat(bbox.w) / 2;
@@ -1136,8 +1144,16 @@ module.exports = function () {
   };
 
   sbgnmlToJson.mapPropertiesToObj = function() {
-    if (this.map.extension && this.map.extension.has('nwt:mapProperties')) { // render extension was found
-       var xml = this.map.extension.get('nwt:mapProperties');
+    if (this.map.extension) { // render extension was found
+      let extensionName;
+      if (this.map.extension.has('nwt:mapProperties')) {
+        extensionName = 'nwt:mapProperties';
+      }
+      else if (this.map.extension.has('mapProperties')) {
+      extensionName = 'mapProperties';
+      }
+
+      var xml = this.map.extension.get(extensionName);
        var obj;
        parseString(xml, function (err, result) {
           obj = result;
@@ -1322,7 +1338,15 @@ module.exports = function () {
       
      
     }else{
-      mainUtilities.setCompoundPadding(Number(self.mapPropertiesToObj()['nwt:mapProperties'].compoundPadding));
+      var compoundPadding = 10;
+      //check if self.mapPropertiesToObj() has the 'nwt:mapProperties' field
+      if(this.map.extension.has('nwt:mapProperties')){
+        compoundPadding = Number(self.mapPropertiesToObj()['nwt:mapProperties'].compoundPadding);
+      }
+      else if (this.map.extension.has('mapProperties')){
+        compoundPadding = Number(self.mapPropertiesToObj()['mapProperties'].compoundPadding);
+      }
+      mainUtilities.setCompoundPadding(compoundPadding);
     }
 
     
