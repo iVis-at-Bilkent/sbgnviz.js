@@ -110,6 +110,21 @@ module.exports = function () {
         for (let i = 0; i < nodes.length; i++)
         {
             var nodeClass = nodes[i]._private.data.class;
+            let active = false, hypothetical = false, multimer = false;
+            if(nodeClass.includes('active')){
+                nodeClass = nodeClass.replace('active', '');
+                active = true;
+            }
+            if(nodeClass.includes('hypothetical')){
+                nodeClass = nodeClass.replace('hypothetical', '');
+                hypothetical = true;
+            }
+            if(nodeClass.includes('multimer')){
+                nodeClass = nodeClass.replace('multimer', '');
+                multimer = true;
+            }
+            nodeClass = nodeClass.trim();
+            
             if(jsonToSbml.isSpecies(nodeClass))
             {
                 const newSpecies = model.createSpecies();
