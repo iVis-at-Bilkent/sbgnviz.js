@@ -84,10 +84,18 @@ module.exports = function () {
     jsonToSbml.buildJsObj = function(filename){
         var edges = cy.edges();
         var nodes = cy.nodes();
-        var sbmlDoc =  new libsbmlInstance.SBMLDocument(2, 4)
+        var sbmlDoc =  new libsbmlInstance.SBMLDocument(3, 1);
         var model = sbmlDoc.createModel()
         model.setId('model1')
-        let nodesIdName = {}
+
+        // Layout Information
+        sbmlDoc.enablePackage(libsbmlInstance.LayoutExtension.prototype.getXmlnsL3V1V1(), 'layout', true);
+        const layoutPlugin = libsbmlInstance.castObject(model.findPlugin('layout'), libsbmlInstance.LayoutModelPlugin);
+        const layout = layoutPlugin.createLayout();
+        layout.setId("layout_1");
+        const dim = layout.getDimensions();
+        const box = cy.elements().boundingBox();
+        dim.setWidth(box.w); dim.setHeight(box.h);
          
         //Create compartment
         for (let i = 0; i < nodes.length; i++)
@@ -96,13 +104,23 @@ module.exports = function () {
             if( nodeClass == "compartment")
             {
                 const comp = model.createCompartment()
-                comp.setId(nodes[i]._private.data.id.replace(/-/g, "_"))
+                const compId = nodes[i]._private.data.id.replace(/-/g, "_");
+                comp.setId(compId)
                 comp.setSize(1)
                 comp.setConstant(true)
                 if(nodes[i]._private.data.label)
                 {
                     comp.setName(nodes[i]._private.data.label)
                 }
+
+                // Add Layout Info for Compartment
+                const glyph = layout.createCompartmentGlyph();
+                glyph.setId(compId + '_glyph');
+                glyph.setCompartmentId(compId);
+                let box = nodes[i].boundingBox();
+                let bb = glyph.getBoundingBox();
+                bb.setX(box.x1); bb.setY(box.y1);
+                bb.width = box.w; bb.height = box.h;
             }
         }
 
@@ -124,7 +142,7 @@ module.exports = function () {
                 multimer = true;
             }
             nodeClass = nodeClass.trim();
-            
+
             if(jsonToSbml.isSpecies(nodeClass))
             {
                 const newSpecies = model.createSpecies();
@@ -145,497 +163,230 @@ module.exports = function () {
                 {
                     newSpecies.setName(nodes[i]._private.data.label)
                 }
-            }
-            nodesIdName[nodes[i]._private.data.id.replace(/-/g, "_")] = nodes[i]._private.data.class;
-                   
-        }
 
-        //Building source: {target, edgeClass, edgeId} map
-        let sourceToTarget = {}
-        let targetToSource = {}
-        for (let i = 0; i < edges.length; i++)
-        {
-            var edgeClass = edges[i]._private.data.class;
-            var source = edges[i]._private.data.source.replace(/-/g, "_");
-            var target = edges[i]._private.data.target.replace(/-/g, "_");
-            var edgeId = edges[i]._private.data.id.replace(/-/g, "_");
-            if(!sourceToTarget[source])
-            {
-                sourceToTarget[source] = []
+                // Add Layout Info for Species
+                const glyph = layout.createSpeciesGlyph();
+                glyph.setId(newStr + '_glyph');
+                glyph.setSpeciesId(newStr);
+                let box = nodes[i].boundingBox();
+                let bb = glyph.getBoundingBox();
+                bb.setX(box.x1); bb.setY(box.y1);
+                bb.width = box.w; bb.height = box.h;
             }
-            sourceToTarget[source].push({"target": target, "edgeClass": edgeClass, "edgeId": edgeId})
-
-            if(!targetToSource[target])
-            {
-                targetToSource[target] = [];
-            }
-            targetToSource[target].push({"source": source, "edgeClass": edgeClass, "edgeId": edgeId});
         }
 
 
-        //Build a reducedNotation map: source: target
-        let reducedNotation = {};
-        let sourceToTargetKeys = Object.keys(sourceToTarget)
-        for(let i = 0; i < sourceToTargetKeys.length; i++)
-        {
-            let currentKey = sourceToTargetKeys[i];
-            let curTargetArray = sourceToTarget[currentKey];
-            for(let j = 0; j < curTargetArray.length; j++)
-            {
-                let curTarget = curTargetArray[j]
-                if ( reducedNotationEdge[curTarget.edgeClass] && !jsonToSbml.isLogicalOperatorNode(nodesIdName[currentKey]))
-                {
-                    if(!reducedNotation[currentKey])
-                    {
-                        reducedNotation[currentKey] = []
-                    } 
-                    reducedNotation[currentKey].push({"target": curTarget.target, "edgeClass": curTarget.edgeClass});
+        // The right hand side of -> denotes the type in the syntax below.
+        // Building process array: {process: processNode -> cy node, sources: [sourceEdges] -> list[cy edge], 
+        //                      targets: [targetEdges]: list[cy edge], modifiers: [modifierEdges] -> list[cy edge]}
+        let processes = [];
+        nodes.forEach(function (ele, i) {
+            if(!jsonToSbml.isProcessNode(ele.data('class')))
+                return;
+
+            if(ele.data('class') == 'association' || ele.data('class') == 'dissociation')
+                return;
+
+            var connectedEdges = ele.connectedEdges();
+            let sources = [], targets = [], modifiers = [];
+            let eleId = ele.id();
+            connectedEdges.forEach(function (edge) {
+
+                // Target Edge Detected
+                if(edge.source().id() == eleId){
+
+                    // Dissociation
+                    if(edge.target().data('class') == 'dissociation'){
+                        ele = edge.target();
+                        edge.target().connectedEdges().forEach( function (dissociationEdge) {
+                            if(edge.id() == dissociationEdge.id())
+                                return;
+                            targets.push(dissociationEdge);
+                        });
+                    }
+                    else
+                        targets.push(edge);
+
+                    return;
                 }
+
+                if(jsonToSbml.isModifier(edge.data('class'))){
+                    modifiers.push(edge);
+                    return;
+                }
+
+                // Association
+                if(edge.source().data('class') == 'association'){
+                    ele = edge.source();
+                    edge.source().connectedEdges().forEach( function (associationEdge) {
+                        if(edge.id() == associationEdge.id())
+                            return;
+                        sources.push(associationEdge);
+                    });
+                }
+                else
+                    sources.push(edge);
+            });
+            processes.push({"process": ele, "sources": sources, "targets": targets, "modifiers": modifiers});
+        })
+
+        for(let [i, processArray] of processes.entries()){
+            let process = processArray.process;
+            let processClass = process.data('class');
+            let processId = process.id().replace(/-/g, '_');
+            let sourceEdgeClass = processArray.sources[0].data('class');
+            let targetEdgeClass = processArray.targets[0].data('class');
+
+            var rxn = model.createReaction();
+            rxn.setId('process_'+ processId);
+            if(process._private.parent){
+                let parent = process._private.parent[0].id().replace(/-/g, "_");
+                rxn.setCompartment(parent);
             }
             
-        }
-
-        //Build process map: processId: {source, target, modifier}
-        let process = {}
-        for(let i = 0; i < sourceToTargetKeys.length; i++)
-        {
-            let currentKey = sourceToTargetKeys[i];
-            let currectClass = nodesIdName[currentKey];
-            if(jsonToSbml.isProcessNode(currectClass))
-            {
-                let targetObjectArray = sourceToTarget[currentKey]
-                for(let j = 0; j < targetObjectArray.length; j++)
-                {
-                    let targetObject = targetObjectArray[j]
-                    if(!process[currentKey])
-                    {
-                        process[currentKey] = {}
-                    }
-                    process[currentKey].target = targetObject.target;
-                    process[currentKey].targetClass = nodesIdName[targetObject.target];
-                    process[currentKey].targetEdge = targetObject.edgeClass;
-    
-                }
-            }  
-        }
-
-        let targetToSourceKeys = Object.keys(targetToSource)
-        for(let i = 0; i < targetToSourceKeys.length; i++)
-        {
-            let currentKey = targetToSourceKeys[i];
-            let currectClass = nodesIdName[currentKey]
-            if(jsonToSbml.isProcessNode(currectClass))
-            {
-                let targetObjectArray = targetToSource[currentKey]
-                for(let j = 0; j < targetObjectArray.length; j++)
-                {
-                    let targetObject = targetObjectArray[j]
-                    
-                    if(!process[currentKey])
-                    {
-                        process[currentKey] = {}
-                    }
-                    if(modifierNotationEdge[targetObject.edgeClass])
-                    {
-                        if(!process[currentKey].modifiers)
-                        {
-                            process[currentKey].modifiers = []
-                        }
-                        process[currentKey].modifiers.push({"modifier": targetObject.source, "modifierEdge": targetObject.edgeClass, "sboTerm": modifierNotationEdge[targetObject.edgeClass] });
-                    }
-                    else
-                    {
-                        process[currentKey].source = targetObject.source;
-                        process[currentKey].sourceClass = nodesIdName[targetObject.source];
-                        process[currentKey].sourceEdge = targetObject.edgeClass;
-                    }       
-                } 
+            for(let sourceEdge of processArray.sources){
+                let sourceId = sourceEdge.source().id().replace(/-/g, '_');
+                const spr1 = rxn.createReactant();
+                spr1.setSpecies(sourceId);
             }
-        }
 
-
-        //Build truncatedProcess map: processId: {source, target, modifier}
-        let truncatedProcess = {}
-        for(let i = 0; i < sourceToTargetKeys.length; i++)
-        {
-            let currentKey = sourceToTargetKeys[i];
-            let currectClass = nodesIdName[currentKey];
-            if(jsonToSbml.isTruncatedProcessNode(currectClass))
-            {
-                let targetObjectArray = sourceToTarget[currentKey]
-                for(let j = 0; j < targetObjectArray.length; j++)
-                {
-                    let targetObject = targetObjectArray[j]
-                    if(!truncatedProcess[currentKey])
-                    {
-                        truncatedProcess[currentKey] = {}
-                        truncatedProcess[currentKey].targets = []
-                    }
-                    truncatedProcess[currentKey].targets.push({"target": targetObject.target, "targetClass": nodesIdName[targetObject.target], "targetEdge": targetObject.edgeClass})
-    
-                }
-            }  
-        }
-
-        for(let i = 0; i < targetToSourceKeys.length; i++)
-        {
-            let currentKey = targetToSourceKeys[i];
-            let currectClass = nodesIdName[currentKey]    
-            if(jsonToSbml.isTruncatedProcessNode(currectClass))
-            {
-                let targetObjectArray = targetToSource[currentKey]
-                for(let j = 0; j < targetObjectArray.length; j++)
-                {
-                    let targetObject = targetObjectArray[j]
-                    
-                    if(!truncatedProcess[currentKey])
-                    {
-                        truncatedProcess[currentKey] = {}
-                    }
-                    if(modifierNotationEdge[targetObject.edgeClass])
-                    {
-                        if(!truncatedProcess[currentKey].modifiers)
-                        {
-                            truncatedProcess[currentKey].modifiers = []
-                        }
-                        truncatedProcess[currentKey].modifiers.push({"modifier": targetObject.source, "modifierEdge": targetObject.edgeClass, "sboTerm":modifierNotationEdge[targetObject.edgeClass] });
-                    }
-                    else
-                    {
-                        truncatedProcess[currentKey].source = targetObject.source;
-                        truncatedProcess[currentKey].sourceClass = nodesIdName[targetObject.source];
-                        truncatedProcess[currentKey].sourceEdge = targetObject.edgeClass;
-                    }       
-                } 
+            for(let targetEdge of processArray.targets){
+                let targetId = targetEdge.target().id().replace(/-/g, '_');
+                const spr2 = rxn.createProduct();
+                spr2.setSpecies(targetId);
             }
-        }
 
-
-
-        //Check if process nodes are part of association or dissociation 
-        let processKeys = Object.keys(process)
-        let associations  = {};
-        let dissociations = {};
-        for(let i = 0; i < processKeys.length; i++)
-        {
-            let curId = processKeys[i];
-            let processObj = process[curId];
-            if(processObj.sourceClass == "association")
-            {
-                associations[curId] = {}
-                associations[curId].source = []
-                associations[curId].target = []
-                let sources = targetToSource[processObj.source];
-                for(let i = 0; i < sources.length; i++)
-                {
-                    associations[curId].source.push(sources[i].source);
-                } 
-                associations[curId].target.push(processObj.target);
-                if(processObj.modifiers)
-                {
-                    associations[curId].modifiers = processObj.modifiers;
-                }
+            for(let modifierEdge of processArray.modifiers){
+                let modifierId = modifierEdge.source().id().replace(/-/g, '_');
+                const modifier = rxn.createProduct();
+                modifier.setSpecies(modifierId);
+                modifier.setSBOTerm(modifierNotationEdge[modifierEdge.data('class')]);
             }
-            if(processObj.targetClass == "dissociation")
-            {
-                dissociations[curId] = {}
-                dissociations[curId].source = []
-                dissociations[curId].source.push(processObj.source);
-                dissociations[curId].target = []
-               
-                let targets = sourceToTarget[processObj.target];
-                for(let i = 0; i < targets.length; i++)
-                {
-                    dissociations[curId].target.push(targets[i].target);
-                }                
-                 if(processObj.modifiers)
-                {
-                    dissociations[curId].modifiers = processObj.modifiers;
 
-                }
-            }
-        }
-        
-
-        //Build logical operator map - logialOpId: {[sources], target}
-        let logicalOperators = {}
-        for(let i = 0; i < sourceToTargetKeys.length; i++)
-        {
-            let currentKey = sourceToTargetKeys[i];
-            let currectClass = nodesIdName[currentKey];
-            if(jsonToSbml.isLogicalOperatorNode(currectClass))
-            {
-                let targetObjectArray = sourceToTarget[currentKey]
-                for(let j = 0; j < targetObjectArray.length; j++) // targetObjectArray.length should be 1
-                {
-                    let targetObject = targetObjectArray[j]
-                    logicalOperators[currentKey] = {}
-                    logicalOperators[currentKey].target = {}
-                    logicalOperators[currentKey].target = {"target": targetObject.target, "targetClass": nodesIdName[targetObject.target], "targetEdge": targetObject.edgeClass};
-    
-                }
-            }  
-        }
-        for(let i = 0; i < targetToSourceKeys.length; i++)
-        {
-            let currentKey = targetToSourceKeys[i];
-            let currectClass = nodesIdName[currentKey];
-            if(jsonToSbml.isLogicalOperatorNode(currectClass))
-            {
-                let sourceObjectArray = targetToSource[currentKey]
-                for(let j = 0; j < sourceObjectArray.length; j++) // targetObjectArray.length should be 1
-                {
-                    let sourceObject = sourceObjectArray[j]
-                    if(!logicalOperators[currentKey].source)
-                    {
-                        logicalOperators[currentKey].source = []
-                    }
-                    logicalOperators[currentKey].source.push({"source": sourceObject.source, "sourceClass": nodesIdName[sourceObject.source]})
-                }
-            }  
-        }
-        for (let i = 0; i < processKeys.length; i++)
-        {
-            let curKey = processKeys[i];
-            if(associations[curKey] || dissociations[curKey])
-            {
-                delete process[curKey];
-            }
-        }
-    //     console.log("reducedNotation", reducedNotation);
-    //    console.log("process", process)
-    //     console.log("truncatedProcess", truncatedProcess)
-    //     console.log("associations",associations)
-    //     console.log("dissociations",dissociations)
-    //     console.log("logicalOperators",logicalOperators)
-
-        //Build sbml reactions
-        //Build reduced notion reactions
-        let reducedNotationKeys = Object.keys(reducedNotation)
-        for (let i = 0; i < reducedNotationKeys.length; i++)
-        {
-            let curKey = reducedNotationKeys[i];
-            let targets = reducedNotation[curKey];
-
-            for (let j = 0; j < targets.length; j++)
-            {
-                let curTarget = targets[j]
-                const rxn = model.createReaction()
-                rxn.setId('reduced'+ curTarget.target)
-                rxn.setSBOTerm(reducedNotationEdge[curTarget.edgeClass])
-          
-                const spr1 = rxn.createReactant()
-                spr1.setSpecies(curKey)
-          
-                const spr2 = rxn.createProduct()
-                spr2.setSpecies(curTarget.target)
-            }
-        }
-
-        //build process reactions
-        let newProcessKeys = Object.keys(process)
-        for (let i = 0; i < newProcessKeys.length; i++)
-        {
-            let curKey = newProcessKeys[i];
-            let curProcess = process[curKey];
-            let curSource = curProcess.source;
-            let curSourceEdge = curProcess.sourceEdge;
-            let curTarget = curProcess.target;
-            let curTargetEdge = curProcess.targetEdge;
-            let modifiers = curProcess.modifiers;
-
-            const rxn = model.createReaction();
-            rxn.setId('process_'+ curKey);
-        
-            const spr1 = rxn.createReactant()
-            spr1.setSpecies(curSource)
-        
-            const spr2 = rxn.createProduct()
-            spr2.setSpecies(curTarget)
-            if(modifiers)
-            {
-                for (let j = 0; j < modifiers.length; j++)
-                {
-                    const modifier = rxn.createModifier()
-                    modifier.setSpecies(modifiers[j].modifier)
-                    modifier.setSBOTerm(modifiers[j].sboTerm)
-                }
-            }
             //Set sbo term for reaction
-            if(curSourceEdge == "consumption" && curTargetEdge == "production" && nodesIdName[curKey] == "process")
-            {
-                rxn.setSBOTerm(176)
+            if(sourceEdgeClass == "consumption" && targetEdgeClass == "production" && processClass == "process")
+                rxn.setSBOTerm(176);
+            else if(sourceEdgeClass == "consumption" && targetEdgeClass == "production" && processClass == "omitted process")
+                rxn.setSBOTerm(397);
+            else if(sourceEdgeClass == "consumption" && targetEdgeClass == "production" && processClass == "uncertain process")
+                rxn.setSBOTerm(396);
+            else if(processClass == "truncated process")
+                rxn.setSBOTerm(178);
+            else if(processClass == "association")  
+                rxn.setSBOTerm(177)
+            else if(processClass == "dissociation")  
+                rxn.setSBOTerm(180)
+            else if(sourceEdgeClass == "transcription consumption" && targetEdgeClass == "transcription production")
+                rxn.setSBOTerm(183);
+            else if(sourceEdgeClass == "translation consumption" && targetEdgeClass == "translation production")
+                rxn.setSBOTerm(184);
+            else if(sourceEdgeClass == "consumption" && targetEdgeClass == "transport")
+                rxn.setSBOTerm(185);
+
+            // Not sure how to format this, so just skip. Shouldn't be a big deal. 
+            // Maybe we incorporate this into the annotations.
+            if(processClass == 'association' || processClass == 'dissociation')
+                continue;
+
+            // Add Layout Info for Processes
+            const glyph = layout.createReactionGlyph();
+            glyph.setId("process_" + (i+1));
+            glyph.setReactionId(rxn.getId());
+            var lineSegment = glyph.createLineSegment();
+
+            var bbox = process.data('bbox');
+            var direction = process.data('portsordering');
+            let startX, startY, endX, endY;
+            if(direction == "L-to-R"){
+                startX = bbox.x - bbox.w / 2; startY = bbox.y;
+                endX = bbox.x + bbox.w / 2; endY = bbox.y;
             }
-            else if(curSourceEdge == "consumption" && curTargetEdge == "production" && nodesIdName[curKey] == "omitted process")
-            {
-                rxn.setSBOTerm(395)
+            else if(direction == "R-to-L"){
+                startX = bbox.x + bbox.w / 2; startY = bbox.y;
+                endX = bbox.x - bbox.w / 2; endY = bbox.y;
             }
-            else if(curSourceEdge == "consumption" && curTargetEdge == "production" && nodesIdName[curKey] == "uncertain process")
-            {
-                rxn.setSBOTerm(396)
+            else if(direction == "B-to-T"){
+                startX = bbox.x; startY = bbox.y + bbox.h / 2;
+                endX = bbox.x; endY = bbox.y - bbox.h / 2;
             }
-            else if(curSourceEdge == "transcription consumption" && curTargetEdge == "transcription production")
-            {
-                rxn.setSBOTerm(183)
+            else{
+                startX = bbox.x; startY = bbox.y - bbox.h / 2;
+                endX = bbox.x; endY = bbox.y + bbox.h / 2;
             }
-            else if(curSourceEdge == "translation consumption" && curTargetEdge == "translation production")
-            {
-                rxn.setSBOTerm(184)
+            var start = lineSegment.getStart(); start.setX(startX); start.setY(startY);
+            var end = lineSegment.getEnd(); end.setX(endX); end.setY(endY);
+
+            for(let j = 0; j < processArray.sources.length; j++){
+                let substrate = processArray.sources[j];
+                let substrateId = substrate.id().replace(/-/g, '_');
+                const referenceGlyph = glyph.createSpeciesReferenceGlyph();
+                referenceGlyph.setSpeciesGlyphId(substrateId + '_glyph');
+                referenceGlyph.setRole(1);
+                referenceGlyph.setId("substrate_" + (i+1) + "_" + (j+1));
+
+                var lineSegment = referenceGlyph.createLineSegment();
+                var lineStart = substrate.sourceEndpoint();
+                var lineEnd = substrate.targetEndpoint();
+                var start = lineSegment.getStart(); start.setX(lineStart.x); start.setY(lineStart.y);
+                var end = lineSegment.getEnd(); end.setX(lineEnd.x); end.setY(lineEnd.y);
             }
-            else if(curSourceEdge == "consumption" && curTargetEdge == "transport")
-            {
-                rxn.setSBOTerm(185)
+
+            for(let j = 0; j < processArray.targets.length; j++){
+                let product = processArray.targets[j];
+                let productId = product.id().replace(/-/g, '_');
+                const referenceGlyph = glyph.createSpeciesReferenceGlyph();
+                referenceGlyph.setSpeciesGlyphId(productId + '_glyph');
+                referenceGlyph.setRole(2);
+                referenceGlyph.setId("product_" + (i+1) + "_" + (j+1));
+
+                var lineSegment = referenceGlyph.createLineSegment();
+                var lineStart = product.sourceEndpoint();
+                var lineEnd = product.targetEndpoint();
+                var start = lineSegment.getStart(); start.setX(lineStart.x); start.setY(lineStart.y);
+                var end = lineSegment.getEnd(); end.setX(lineEnd.x); end.setY(lineEnd.y);
             }
-            
-        }
-        //Build truncatedProcess reaction
-        let truncatedProcessKeys = Object.keys(truncatedProcess)
-        for (let i = 0; i < truncatedProcessKeys.length; i++)
-        {
-            let curKey = truncatedProcessKeys[i];
-            let truncatedObj = truncatedProcess[curKey];
-            let curSource = truncatedObj.source;
-            let targets = truncatedObj.targets;
-            let modifiers = truncatedObj.modifiers;
-            const rxn = model.createReaction()
-            rxn.setId('trunacted_'+ curKey)
-            rxn.setSBOTerm(178)
-            const spr1 = rxn.createReactant()
-            spr1.setSpecies(curSource)
-            for (let j = 0; j < targets.length; j++)
-            {
-                let curTarget = targets[j]
-                const spr2 = rxn.createProduct()
-                spr2.setSpecies(curTarget.target)
-            }
-            if(modifiers)
-            {
-                for (let j = 0; j < modifiers.length; j++)
-                {
-                    let curModifier = truncatedObj.modifiers[j]
-                    const spr3 = rxn.createModifier()
-                    spr3.setSpecies(curModifier.modifier)
-                }
+
+            for(let j = 0; j < processArray.modifiers.length; j++){
+                let modifier = processArray.modifiers[j];
+                let modifierId = modifier.id().replace(/-/g, '_');
+                const referenceGlyph = glyph.createSpeciesReferenceGlyph();
+                referenceGlyph.setSpeciesGlyphId(modifierId + '_glyph');
+                referenceGlyph.setRole(3);
+                referenceGlyph.setId("modifier_" + (i+1) + "_" + (j+1));
+
+                var lineSegment = referenceGlyph.createLineSegment();
+                var lineStart = modifier.sourceEndpoint();
+                var lineEnd = modifier.targetEndpoint();
+                var start = lineSegment.getStart(); start.setX(lineStart.x); start.setY(lineStart.y);
+                var end = lineSegment.getEnd(); end.setX(lineEnd.x); end.setY(lineEnd.y);
             }
         }
 
-        //Build association reaction
-        let associationsKeys = Object.keys(associations)
-        for (let i = 0; i < associationsKeys.length; i++)
-        {
-            let curKey = associationsKeys[i];
-            let assocOb = associations[curKey];
-            let sources = assocOb.source;
-            let targets = assocOb.target;
-            let modifiers = assocOb.modifiers;
-            const rxn = model.createReaction()
-            rxn.setId('association_'+ curKey)
-            rxn.setSBOTerm(177)
-            for (let j = 0; j < sources.length; j++)
-            {
-                let curSource = sources[j]
-                const spr1 = rxn.createReactant()
-                spr1.setSpecies(curSource)
-            }
-            for (let j = 0; j < targets.length; j++)
-            {
-                let curTarget = targets[j]
-                const spr2 = rxn.createProduct()
-                spr2.setSpecies(curTarget)
-            }
-            if(modifiers)
-            {
-                for (let j = 0; j < modifiers.length; j++)
-                {
-                    let curModifier = modifiers[i]
-                    const spr3 = rxn.createModifier()
-                    spr3.setSpecies(curModifier.modifier)
-                }
-            }
-        }
+        // TODO: Reduced Processes and Logic Arcs
 
-        //Build dissociation reaction
-        let dissociationsKeys = Object.keys(dissociations)
-        for (let i = 0; i < dissociationsKeys.length; i++)
-        {
-            let curKey = dissociationsKeys[i];
-            let dissOb = dissociations[curKey];
-            let sources = dissOb.source;
-            let targets = dissOb.target;
-            let modifiers = dissOb.modifiers;
-            const rxn = model.createReaction()
-            rxn.setId('dissociation_'+ curKey)
-            rxn.setSBOTerm(180)
-            for (let j = 0; j < sources.length; j++)
-            {
-                let curSource = sources[j]
-                const spr1 = rxn.createReactant()
-                spr1.setSpecies(curSource)
-            }
-            for (let j = 0; j < targets.length; j++)
-            {
-                let curTarget = targets[j]
-                const spr2 = rxn.createProduct()
-                spr2.setSpecies(curTarget)
-            }
-            if(modifiers)
-            {
-                for (let j = 0; j < modifiers.length; j++)
-                {
-                    let curModifier = modifiers[i]
-                    const spr3 = rxn.createModifier()
-                    spr3.setSpecies(curModifier.modifier)
-                }
-            }
-        }
-
-        //Build logical operator reactions
-        let logicalOperatorsKeys = Object.keys(logicalOperators)
-        for (let i = 0; i < logicalOperatorsKeys.length; i++)
-        {
-            let curKey = logicalOperatorsKeys[i];
-            let logicObj = logicalOperators[curKey];
-            let sources = logicObj.source;
-            let target = logicObj.target;
-            const rxn = model.createReaction()
-            rxn.setId('logical_operator_'+ curKey)
-            let logicalClass = nodesIdName[curKey]
-            if(nodesToSbo[logicalClass])
-            {
-                rxn.setSBOTerm(nodesToSbo[logicalClass])
-            }
-            for (let j = 0; j < sources.length; j++)
-            {
-                let curSource = sources[j]
-                const spr1 = rxn.createReactant()
-                spr1.setSpecies(curSource.source)
-            }
-            const spr2 = rxn.createProduct()
-            spr2.setSpecies(target.target)
-            spr2.setSBOTerm(168)
-        }
         const writer = new libsbmlInstance.SBMLWriter()
         const serializedSBML = writer.writeSBMLToString(sbmlDoc)
-
 
         libsbmlInstance.destroy(sbmlDoc)
         libsbmlInstance.destroy(writer)
         return serializedSBML;
-
-     }
+    }
+    
     jsonToSbml.buildReactions = function(model) {}
     jsonToSbml.isProcessNode = function(nodeClass) {
-        return nodeClass.startsWith("process") && nodeClass != "truncated process"
-    }
-    jsonToSbml.isTruncatedProcessNode = function(nodeClass) {
-        return  nodeClass == "truncated process"
+        return nodeClass.endsWith("process") || nodeClass == "association" || nodeClass == "dissociation";
     }
     jsonToSbml.isLogicalOperatorNode = function(nodeClass) {
         return nodeClass == "and" || nodeClass == "not" || nodeClass == "or" || nodeClass == "unknown logical operator"
     }
     jsonToSbml.isSpecies = function(nodeClass) {
-        return !jsonToSbml.isLogicalOperatorNode(nodeClass) && !jsonToSbml.isProcessNode(nodeClass) && !jsonToSbml.isTruncatedProcessNode(nodeClass) 
-        && nodeClass != "association" &&  nodeClass != "dissociation" &&  nodeClass != "compartment";
+        return !jsonToSbml.isLogicalOperatorNode(nodeClass) && !jsonToSbml.isProcessNode(nodeClass)
+        &&  nodeClass != "compartment";
+    }
+    jsonToSbml.isModifier = function(edgeClass) {
+        if(modifierNotationEdge[edgeClass])
+            return true;
+        return false;
     }
     jsonToSbml.buildString = function(obj) {}
     jsonToSbml.getRenderExtensionSbgnml = function(renderInfo) {}
