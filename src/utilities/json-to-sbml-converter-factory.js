@@ -81,6 +81,12 @@ module.exports = function () {
         return jsObj;
     }
 
+    /*
+        Here are the role strings:
+        1 - substrate, 2 - product, 3 - sidesubstrate, 4 - sideproduct, 5 - modifier
+        6 - activator, 7 - inhibitor
+    */
+    
     jsonToSbml.buildJsObj = function(filename){
         var edges = cy.edges();
         var nodes = cy.nodes();
@@ -181,20 +187,24 @@ module.exports = function () {
         //                      targets: [targetEdges]: list[cy edge], modifiers: [modifierEdges] -> list[cy edge]}
         let processes = [];
         nodes.forEach(function (ele, i) {
-            if(!jsonToSbml.isProcessNode(ele.data('class')))
+            var eleClass = ele.data('class')
+                .replace('active', '')
+                .replace('hypothetical', '')
+                .replace('multimer', '')
+                .trim();
+
+            if(!jsonToSbml.isProcessNode(eleClass))
                 return;
 
-            if(ele.data('class') == 'association' || ele.data('class') == 'dissociation')
+            if(eleClass == 'association' || eleClass == 'dissociation')
                 return;
 
             var connectedEdges = ele.connectedEdges();
             let sources = [], targets = [], modifiers = [];
             let eleId = ele.id();
             connectedEdges.forEach(function (edge) {
-
                 // Target Edge Detected
                 if(edge.source().id() == eleId){
-
                     // Dissociation
                     if(edge.target().data('class') == 'dissociation'){
                         ele = edge.target();
@@ -206,12 +216,12 @@ module.exports = function () {
                     }
                     else
                         targets.push(edge);
-
                     return;
                 }
 
                 if(jsonToSbml.isModifier(edge.data('class'))){
-                    modifiers.push(edge);
+                    if(!jsonToSbml.isLogicalOperatorNode(edge.source().data('class')))
+                        modifiers.push(edge);
                     return;
                 }
 
@@ -351,7 +361,7 @@ module.exports = function () {
                 let modifierId = modifier.id().replace(/-/g, '_');
                 const referenceGlyph = glyph.createSpeciesReferenceGlyph();
                 referenceGlyph.setSpeciesGlyphId(modifierId + '_glyph');
-                referenceGlyph.setRole(3);
+                referenceGlyph.setRole(5);
                 referenceGlyph.setId("modifier_" + (i+1) + "_" + (j+1));
 
                 var lineSegment = referenceGlyph.createLineSegment();
@@ -362,7 +372,58 @@ module.exports = function () {
             }
         }
 
-        // TODO: Reduced Processes and Logic Arcs
+        // Building reduced process array: {edge: edge arc -> cy edge, source: source node -> cy node, 
+        //                      target: target node: cy node}
+        let reducedProcesses = [];
+        edges.forEach(function (ele) {
+            if(!jsonToSbml.isReducedArc(ele.data('class'))){
+                return;
+            }
+            if(jsonToSbml.isLogicalOperatorNode(ele.source().data('class'))){
+                return;
+            }
+            reducedProcesses.push({edge: ele, source: ele.source(), target: ele.target()});
+        });
+
+        for(let [i, reducedProcessArray] of reducedProcesses.entries()){
+            var edgeId = reducedProcessArray.edge.id().replace(/-/g, '_');
+            var sourceId = reducedProcessArray.source.id().replace(/-/g, '_');
+            var targetId = reducedProcessArray.target.id().replace(/-/g, '_');
+            console.log(reducedProcessArray.target);
+            const rxn = model.createReaction()
+            rxn.setId('reduced_'+ edgeId);
+            rxn.setSBOTerm(reducedNotationEdge[reducedProcessArray.edge.data('class')])
+        
+            const spr1 = rxn.createReactant()
+            spr1.setSpecies(sourceId);
+        
+            const spr2 = rxn.createProduct()
+            spr2.setSpecies(targetId);
+
+            // Layout Info for Reduced Process
+            const glyph = layout.createReactionGlyph();
+            glyph.setId("reduced_" + (i+1));
+            glyph.setReactionId(rxn.getId());
+
+            // Modifier
+            const referenceGlyph = glyph.createSpeciesReferenceGlyph();
+            referenceGlyph.setSpeciesGlyphId(sourceId + '_glyph');
+            referenceGlyph.setRole(5);
+            referenceGlyph.setId("reduced_modulator_" + (i+1));
+
+            var lineSegment = referenceGlyph.createLineSegment();
+            var lineStart = reducedProcessArray.edge.sourceEndpoint();
+            var lineEnd = reducedProcessArray.edge.targetEndpoint();
+            var start = lineSegment.getStart(); start.setX(lineStart.x); start.setY(lineStart.y);
+            var end = lineSegment.getEnd(); end.setX(lineEnd.x); end.setY(lineEnd.y);
+
+            // Product
+            const referenceGlyph2 = glyph.createSpeciesReferenceGlyph();
+            referenceGlyph2.setSpeciesGlyphId(  + '_glyph');
+            referenceGlyph2.setRole(5);
+            referenceGlyph2.setId("reduced_product_" + (i+1));
+        }
+
 
         const writer = new libsbmlInstance.SBMLWriter()
         const serializedSBML = writer.writeSBMLToString(sbmlDoc)
@@ -385,6 +446,11 @@ module.exports = function () {
     }
     jsonToSbml.isModifier = function(edgeClass) {
         if(modifierNotationEdge[edgeClass])
+            return true;
+        return false;
+    }
+    jsonToSbml.isReducedArc = function(edgeClass) {
+        if(reducedNotationEdge[edgeClass])
             return true;
         return false;
     }
