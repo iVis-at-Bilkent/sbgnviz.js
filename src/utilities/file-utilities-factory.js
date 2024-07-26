@@ -467,8 +467,30 @@ module.exports = function () {
     saveAs(blob, filename);
     uiUtilities.endSpinner("load-spinner");
 }
+fileUtilities.hasLayoutSBML = function(file) {
+  return new Promise((resolve, reject) => {
+    var reader = new FileReader();
+    var layoutFound = false;
 
- fileUtilities.loadSbmlForSBML = function(file, callback1, callback2, layoutBy)
+    reader.onload = function(e) {
+      var text = this.result;
+      var matchResult = text.match("<listOfLayouts[^]*</listOfLayouts>");
+      if (matchResult != null) {
+        layoutFound = true;
+        console.log("Layout found in SBML file");
+      }
+      resolve(layoutFound);
+    };
+
+    reader.onerror = function() {
+      reject(new Error("Failed to read the file"));
+    };
+
+    reader.readAsText(file);
+  });
+};
+
+ fileUtilities.loadSbmlForSBML = async function(file, callback1, callback2, layoutBy)
  {
   var convert = function( text ) {
     var converted = sbmlToJson.convert(text)
@@ -492,9 +514,13 @@ module.exports = function () {
 
     cy.fit( cy.elements(":visible"), 20 );
   };
-
-  fileUtilities.loadFile( file, convert, callback1, callback2, fileUtilities.collapseMarkedNodes, runLayout);
- 
+  let layoutFound = await fileUtilities.hasLayoutSBML(file);
+  if (layoutFound){
+    fileUtilities.loadFile( file, convert, callback1, callback2, fileUtilities.collapseMarkedNodes, undefined);
+  }
+  else{
+    fileUtilities.loadFile( file, convert, callback1, callback2, fileUtilities.collapseMarkedNodes, runLayout);
+  }
  }
  fileUtilities.loadSbml = function(file, successCallback, errorCallback){
   var reader = new FileReader();
