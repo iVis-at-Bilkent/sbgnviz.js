@@ -131,6 +131,7 @@ module.exports = function () {
         }
 
         //Set species
+        let infoId = 1;
         for (let i = 0; i < nodes.length; i++)
         {
             var nodeClass = nodes[i]._private.data.class;
@@ -149,36 +150,61 @@ module.exports = function () {
             }
             nodeClass = nodeClass.trim();
 
-            if(jsonToSbml.isSpecies(nodeClass))
-            {
-                const newSpecies = model.createSpecies();
-                if(nodesToSbo[nodeClass])
-                {
-                    newSpecies.setSBOTerm(nodesToSbo[nodeClass])
-                }
-                if(nodes[i]._private.parent)
-                {
-                    let parent = nodes[i]._private.parent[0]._private.data.id.replace(/-/g, "_");
-                    newSpecies.setCompartment(parent)
-                }
-    
-                const new_id = nodes[i]._private.data.id
-                var newStr = new_id.replace(/-/g, "_"); //Replacsing - with _ because libsml doesn't allow - in id
-                newSpecies.setId(newStr);
-                if(nodes[i]._private.data.label)
-                {
-                    newSpecies.setName(nodes[i]._private.data.label)
-                }
+            if(!jsonToSbml.isSpecies(nodeClass))
+                continue;
 
-                // Add Layout Info for Species
-                const glyph = layout.createSpeciesGlyph();
-                glyph.setId(newStr + '_glyph');
-                glyph.setSpeciesId(newStr);
-                let box = nodes[i].boundingBox();
-                let bb = glyph.getBoundingBox();
-                bb.setX(box.x1); bb.setY(box.y1);
-                bb.width = box.w; bb.height = box.h;
+            var newSpecies = model.createSpecies();
+            if(nodesToSbo[nodeClass])
+            {
+                newSpecies.setSBOTerm(nodesToSbo[nodeClass])
             }
+            if(nodes[i]._private.parent)
+            {
+                let parent = nodes[i]._private.parent[0]._private.data.id.replace(/-/g, "_");
+                newSpecies.setCompartment(parent)
+            }
+
+            const new_id = nodes[i]._private.data.id
+            var newStr = new_id.replace(/-/g, "_"); //Replacing - with _ because libsml doesn't allow - in id
+            newSpecies.setId(newStr);
+            if(nodes[i]._private.data.label)
+            {
+                newSpecies.setName(nodes[i]._private.data.label)
+            }
+
+            // Add Layout Info for Species
+            const glyph = layout.createSpeciesGlyph();
+            glyph.setId(newStr + '_glyph');
+            glyph.setSpeciesId(newStr);
+            let box = nodes[i].boundingBox();
+            let bb = glyph.getBoundingBox();
+            bb.setX(box.x1); bb.setY(box.y1);
+            bb.width = box.w; bb.height = box.h;
+
+            // Add State Info for Species as Annotation
+            if(!active && !hypothetical && !multimer && nodes[i].data('statesandinfos').length == 0)
+                continue;
+            
+            let annotationString = '<nwt:extension xmlns:nwt="https://newteditor.org/">';
+            annotationString += '<nwt:info nwt:multimer="' + multimer + '" nwt:active="' + active + 
+                                    '" nwt:hypothetical="' + hypothetical + '" nwt:infoid="info_' + infoId +
+                                    '" nwt:id="' + newSpecies.getId() + '">';
+            for(let item of nodes[i].data('statesandinfos')){
+                console.log(item)
+                if(item.clazz == "residue variable"){
+                    annotationString += '<nwt:residuevariable>' + item.residue.variable + '</nwt:residuevariable>';
+                }
+                else if(item.clazz == "binding region"){
+                    annotationString += '<nwt:bindingregion>' + item.region.variable + '</nwt:bindingregion>';
+                }
+                else if(item.clazz == "unit of information"){
+                    annotationString += '<nwt:unitinfo>' + item.label.text + '</nwt:unitinfo>';
+                }
+            }
+            annotationString += '</nwt:info>'
+            annotationString += '</nwt:extension>'
+            infoId += 1;
+            newSpecies.setAnnotation(annotationString);
         }
 
 
@@ -423,7 +449,6 @@ module.exports = function () {
             referenceGlyph2.setRole(5);
             referenceGlyph2.setId("reduced_product_" + (i+1));
         }
-
 
         const writer = new libsbmlInstance.SBMLWriter()
         const serializedSBML = writer.writeSBMLToString(sbmlDoc)
