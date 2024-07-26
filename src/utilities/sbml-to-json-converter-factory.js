@@ -138,7 +138,6 @@ module.exports = function () {
       resultJson = [];
       
       speciesCompartmentMap = new Map;
-      console.log('cytoscapeJsGraph: ', cytoscapeJsGraph);
       return cytoscapeJsGraph;
   };
 
@@ -235,7 +234,6 @@ sbmlToJson.addJSNodes = function(resultJson,cytoscapeJsNodes, speciesGlyphIdSpec
         tempBbox.y = bbox.y + bbox.height / 2;
         tempBbox.w = bbox.width;
         tempBbox.h = bbox.height;
-        console.log('tempBbox: ', tempBbox);
       }
       else {
         tempBbox.x = 0;
@@ -602,7 +600,6 @@ sbmlToJson.addReactions = function(model, cytoscapeJsEdges, cytoscapeJsNodes) {
     }
   }
 
-  console.log(reactionGlyphMap);
   sbmlToJson.addJSEdges(resultJson, cytoscapeJsNodes, cytoscapeJsEdges,reactionGlyphMap)
 };
 
@@ -622,7 +619,7 @@ sbmlToJson.addJSEdges= function(resultJson, cytoscapeJsNodes, cytoscapeJsEdges,r
         let reactionGlyphId = reactionGlyphMap.get(resultJson[i].data.id);
         let reactionGlyph = layout.getReactionGlyph(reactionGlyphId);
         
-        //TO-DO: Check here!
+        //TO-DO: Known issue about the position of the reaction node
         let specRef = reactionGlyph.getSpeciesReferenceGlyph(0);
         let position = {x: specRef.getCurve().getCurveSegment(0).getStart().x() + 10, y: specRef.getCurve().getCurveSegment(0).getStart().y() + 10};
         //create and set bbox values for the reaction node
@@ -634,7 +631,6 @@ sbmlToJson.addJSEdges= function(resultJson, cytoscapeJsNodes, cytoscapeJsEdges,r
         resultJson[i].data.bbox = tempBbox;
       }
 
-      console.log('resultJson[i].data: ', resultJson[i].data);
       sbmlToJson.addNodes(cytoscapeJsNodes, resultJson[i].data );
 
     }
@@ -698,7 +694,6 @@ sbmlToJson.addJSEdges= function(resultJson, cytoscapeJsNodes, cytoscapeJsEdges,r
           edgeObj.porttarget = edgeObj.target + ".2"
         }
 
-        console.log(edgeObj);
 
         elementUtilities.extendEdgeDataWithClassDefaults( edgeObj, edgeObj.class );
         var cytoscapeJsEdge1 = {data: edgeObj, style: styleObj};
