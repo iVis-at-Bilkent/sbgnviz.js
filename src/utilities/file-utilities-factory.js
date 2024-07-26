@@ -474,10 +474,9 @@ fileUtilities.hasLayoutSBML = function(file) {
 
     reader.onload = function(e) {
       var text = this.result;
-      var matchResult = text.match("<listOfLayouts[^]*</listOfLayouts>");
+      var matchResult = text.match(/<[^>]*listOfLayouts[^>]*>[\s\S]*<\/[^>]*listOfLayouts[^>]*>/);
       if (matchResult != null) {
         layoutFound = true;
-        console.log("Layout found in SBML file");
       }
       resolve(layoutFound);
     };
@@ -516,6 +515,7 @@ fileUtilities.hasLayoutSBML = function(file) {
   };
   let layoutFound = await fileUtilities.hasLayoutSBML(file);
   if (layoutFound){
+    console.log("Layout found in SBML file");
     fileUtilities.loadFile( file, convert, callback1, callback2, fileUtilities.collapseMarkedNodes, undefined);
   }
   else{
