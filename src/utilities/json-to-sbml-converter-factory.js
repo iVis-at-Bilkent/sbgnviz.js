@@ -268,7 +268,7 @@ module.exports = function () {
 
             for(let modifierEdge of processArray.modifiers){
                 let modifierId = modifierEdge.source().id().replace(/-/g, '_');
-                const modifier = rxn.createProduct();
+                const modifier = rxn.createModifier();
                 modifier.setSpecies(modifierId);
                 modifier.setSBOTerm(modifierNotationEdge[modifierEdge.data('class')]);
             }
