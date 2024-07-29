@@ -201,9 +201,20 @@ sbmlToJson.addSpecies = function(model, cytoscapeJsNodes) {
 
   for(let i = 0; i < model.getNumSpecies(); i++){
     let species = model.getSpecies(i);
+    let active = false, hypothetical = false, multimer = false;
+    parseString(species.getAnnotationString(), function(err, result){
+      if(!result)
+        return;
+      var stateBooleans = result.annotation["nwt:extension"][0]["nwt:info"][0].$;
+      active = stateBooleans["nwt:active"] == "true" ? true : false;
+      hypothetical = stateBooleans["nwt:hypothetical"] == "true" ? true : false;
+      multimer = stateBooleans["nwt:multimer"] == "true" ? true : false;
+    })
     speciesCompartmentMap.set(species.getId(), species.getCompartment());
     var sboTerm = species.getSBOTerm();
-    let speciesData = {"id": species.getId(), "label": species.getName(), "parent": species.getCompartment(), "sboTerm": species.getSBOTerm()};
+    let speciesData = {"id": species.getId(), "label": species.getName(), 
+                      "parent": species.getCompartment(), "sboTerm": species.getSBOTerm(),
+                      "active": active, "multimer": multimer, "hypothetical": hypothetical};
     resultJson.push({"data": speciesData, "group": "nodes", "classes": "species"});
   }
   let speciesGlyphIdSpeciesIdMap = new Map();
@@ -271,6 +282,12 @@ sbmlToJson.addJSNodes = function(resultJson,cytoscapeJsNodes, speciesGlyphIdSpec
       nodeObj.statesandinfos = [];
       nodeObj.parent = resultJson[i].data.parent;
       nodeObj.ports = [];
+      if(resultJson[i].data.hypothetical)
+        nodeObj.class = "hypothetical " + nodeObj.class;
+      if(resultJson[i].data.active)
+        nodeObj.class = "active " + nodeObj.class;
+      if(resultJson[i].data.multimer)
+        nodeObj.class = nodeObj.class + " multimer";
       var cytoscapeJsNode = {data: nodeObj, style: styleObj};
       elementUtilities.extendNodeDataWithClassDefaults( nodeObj, nodeObj.class );
       cytoscapeJsNodes.push(cytoscapeJsNode)

@@ -200,7 +200,6 @@ module.exports = function () {
                                     '" nwt:hypothetical="' + hypothetical + '" nwt:infoid="info_' + infoId +
                                     '" nwt:id="' + newSpecies.getId() + '">';
             for(let item of nodes[i].data('statesandinfos')){
-                console.log(item)
                 if(item.clazz == "residue variable"){
                     annotationString += '<nwt:residuevariable>' + item.residue.variable + '</nwt:residuevariable>';
                 }
