@@ -144,18 +144,19 @@ module.exports = function () {
 
 // add compartment nodes
 sbmlToJson.addCompartments = function (model,cytoscapeJsNodes) {
-  
+  compartmentMap = new Map();
   for(let i = 0; i < model.getNumCompartments(); i++){
     let compartment = model.getCompartment(i);
+    compartmentMap.set(compartment.getId(), i);
     if(compartment.getId() !== "default") {
     let compartmentData = {"id": compartment.getId(), "label": compartment.getName(), "class": "compartment"};
       resultJson.push({"data": compartmentData, "group": "nodes", "classes": "compartment"});
     }
   }
-  sbmlToJson.addJSCompartments(resultJson, cytoscapeJsNodes);
+  sbmlToJson.addJSCompartments(compartmentMap, resultJson, cytoscapeJsNodes);
 };
 
-sbmlToJson.addJSCompartments = function(resultJson, cytoscapeJsNodes)
+sbmlToJson.addJSCompartments = function(compartmentMap, resultJson, cytoscapeJsNodes)
 {
   for(let i = 0; i < resultJson.length; i++){
     if ( resultJson[i].group == 'nodes' && resultJson[i].classes == "compartment" )
@@ -166,7 +167,7 @@ sbmlToJson.addJSCompartments = function(resultJson, cytoscapeJsNodes)
       nodeObj.class = "compartment"
 
       if (layout){
-        let compartmentGlyph = layout.getCompartmentGlyph(resultJson[i].data.id);
+        let compartmentGlyph = layout.getCompartmentGlyph(compartmentMap.get(resultJson[i].data.id));
         let boundingBox = compartmentGlyph.getBoundingBox();
         tempBbox.x = boundingBox.x + boundingBox.width / 2;
         tempBbox.y = boundingBox.y + boundingBox.height / 2;
