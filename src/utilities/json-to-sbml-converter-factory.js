@@ -90,12 +90,13 @@ module.exports = function () {
     jsonToSbml.buildJsObj = function(filename){
         var edges = cy.edges();
         var nodes = cy.nodes();
-        var sbmlDoc =  new libsbmlInstance.SBMLDocument(3, 1);
+        var sbmlDoc =  new libsbmlInstance.SBMLDocument(3, 2);
         var model = sbmlDoc.createModel()
         model.setId('model1')
-
+        
         // Layout Information
         sbmlDoc.enablePackage(libsbmlInstance.LayoutExtension.prototype.getXmlnsL3V1V1(), 'layout', true);
+        sbmlDoc.setPackageRequired('layout', false);
         const layoutPlugin = libsbmlInstance.castObject(model.findPlugin('layout'), libsbmlInstance.LayoutModelPlugin);
         const layout = layoutPlugin.createLayout();
         layout.setId("layout_1");
@@ -132,6 +133,7 @@ module.exports = function () {
 
         //Set species
         let infoId = 1;
+        let defaultNeeded = false;
         for (let i = 0; i < nodes.length; i++)
         {
             var nodeClass = nodes[i]._private.data.class;
@@ -158,11 +160,19 @@ module.exports = function () {
             {
                 newSpecies.setSBOTerm(nodesToSbo[nodeClass])
             }
+
             if(nodes[i]._private.parent)
             {
                 let parent = nodes[i]._private.parent[0]._private.data.id.replace(/-/g, "_");
                 newSpecies.setCompartment(parent)
             }
+            else{
+                defaultNeeded = true;
+                newSpecies.setCompartment('default');
+            }
+            newSpecies.setHasOnlySubstanceUnits(false);
+            newSpecies.setConstant(true);
+            newSpecies.setBoundaryCondition(true);
 
             const new_id = nodes[i]._private.data.id
             var newStr = new_id.replace(/-/g, "_"); //Replacing - with _ because libsml doesn't allow - in id
@@ -207,6 +217,13 @@ module.exports = function () {
             newSpecies.setAnnotation(annotationString);
         }
 
+        // Add default compartment
+        if(defaultNeeded){
+            const defaultCompartment = model.createCompartment();
+            defaultCompartment.setId('default');
+            defaultCompartment.setSize(1);
+            defaultCompartment.setConstant(true);
+        }
 
         // The right hand side of -> denotes the type in the syntax below.
         // Building process array: {process: processNode -> cy node, sources: [sourceEdges] -> list[cy edge], 
@@ -275,6 +292,7 @@ module.exports = function () {
 
             var rxn = model.createReaction();
             rxn.setId('process_'+ processId);
+            rxn.setReversible(false);
             if(process._private.parent){
                 let parent = process._private.parent[0].id().replace(/-/g, "_");
                 rxn.setCompartment(parent);
@@ -284,12 +302,14 @@ module.exports = function () {
                 let sourceId = sourceEdge.source().id().replace(/-/g, '_');
                 const spr1 = rxn.createReactant();
                 spr1.setSpecies(sourceId);
+                spr1.setConstant(true);
             }
 
             for(let targetEdge of processArray.targets){
                 let targetId = targetEdge.target().id().replace(/-/g, '_');
                 const spr2 = rxn.createProduct();
                 spr2.setSpecies(targetId);
+                spr2.setConstant(true);
             }
 
             for(let modifierEdge of processArray.modifiers){
@@ -354,7 +374,7 @@ module.exports = function () {
 
             for(let j = 0; j < processArray.sources.length; j++){
                 let substrate = processArray.sources[j];
-                let substrateId = substrate.id().replace(/-/g, '_');
+                let substrateId = substrate.source().id().replace(/-/g, '_');
                 const referenceGlyph = glyph.createSpeciesReferenceGlyph();
                 referenceGlyph.setSpeciesGlyphId(substrateId + '_glyph');
                 referenceGlyph.setRole(1);
@@ -369,7 +389,7 @@ module.exports = function () {
 
             for(let j = 0; j < processArray.targets.length; j++){
                 let product = processArray.targets[j];
-                let productId = product.id().replace(/-/g, '_');
+                let productId = product.target().id().replace(/-/g, '_');
                 const referenceGlyph = glyph.createSpeciesReferenceGlyph();
                 referenceGlyph.setSpeciesGlyphId(productId + '_glyph');
                 referenceGlyph.setRole(2);
@@ -384,7 +404,7 @@ module.exports = function () {
 
             for(let j = 0; j < processArray.modifiers.length; j++){
                 let modifier = processArray.modifiers[j];
-                let modifierId = modifier.id().replace(/-/g, '_');
+                let modifierId = modifier.source().id().replace(/-/g, '_');
                 const referenceGlyph = glyph.createSpeciesReferenceGlyph();
                 referenceGlyph.setSpeciesGlyphId(modifierId + '_glyph');
                 referenceGlyph.setRole(5);
