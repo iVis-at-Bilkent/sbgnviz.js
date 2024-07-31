@@ -203,6 +203,7 @@ sbmlToJson.addSpecies = function(model, cytoscapeJsNodes) {
   for(let i = 0; i < model.getNumSpecies(); i++){
     let species = model.getSpecies(i);
     let active = false, hypothetical = false, multimer = false;
+    let bindingRegion = [], residueVariable = [], unitOfInfo = [];
     parseString(species.getAnnotationString(), function(err, result){
       if(!result)
         return;
@@ -210,12 +211,16 @@ sbmlToJson.addSpecies = function(model, cytoscapeJsNodes) {
       active = stateBooleans["nwt:active"] == "true" ? true : false;
       hypothetical = stateBooleans["nwt:hypothetical"] == "true" ? true : false;
       multimer = stateBooleans["nwt:multimer"] == "true" ? true : false;
+      bindingRegion = result.annotation["nwt:extension"][0]["nwt:info"][0]["nwt:bindingregion"] || [];
+      residueVariable = result.annotation["nwt:extension"][0]["nwt:info"][0]["nwt:residuevariable"] || [];
+      unitOfInfo = result.annotation["nwt:extension"][0]["nwt:info"][0]["nwt:unitinfo"] || [];
     })
     speciesCompartmentMap.set(species.getId(), species.getCompartment());
     var sboTerm = species.getSBOTerm();
     let speciesData = {"id": species.getId(), "label": species.getName(), 
                       "parent": species.getCompartment(), "sboTerm": species.getSBOTerm(),
-                      "active": active, "multimer": multimer, "hypothetical": hypothetical};
+                      "active": active, "multimer": multimer, "hypothetical": hypothetical,
+                      "bindingRegion": bindingRegion, "residueVariable": residueVariable, "unitOfInfo": unitOfInfo};
     resultJson.push({"data": speciesData, "group": "nodes", "classes": "species"});
   }
   let speciesGlyphIdSpeciesIdMap = new Map();
@@ -231,70 +236,94 @@ sbmlToJson.addSpecies = function(model, cytoscapeJsNodes) {
 };
 
 sbmlToJson.addJSNodes = function(resultJson,cytoscapeJsNodes, speciesGlyphIdSpeciesIdMap) {
-
   for(let i = 0; i < resultJson.length; i++){
-    if ( resultJson[i].group == 'nodes' && resultJson[i].classes == 'species' )
-    {
-      var nodeObj = {};
-      var styleObj = {};
-      var tempBbox = {};
-      if (layout){
-        specGlyphId = speciesGlyphIdSpeciesIdMap.get(resultJson[i].data.id);
-        let speciesGlyph = layout.specglyphs[specGlyphId];
-        let bbox = speciesGlyph.getBoundingBox();
-        tempBbox.x = bbox.x + bbox.width / 2;
-        tempBbox.y = bbox.y + bbox.height / 2;
-        tempBbox.w = bbox.width;
-        tempBbox.h = bbox.height;
-      }
-      else {
-        tempBbox.x = 0;
-        tempBbox.y = 0;
-        tempBbox.w = 50;
-        tempBbox.h = 30;
-      }
-        var sboTerm = resultJson[i].data.sboTerm;
-        if(sboToNodeClass[sboTerm])
-        {
-          nodeObj.class = sboToNodeClass[sboTerm]
-        }
-        else 
-        {
-          nodeObj.class = "simple molecule"
-          tempBbox.w = 50
-          tempBbox.h = 30
-        }
-        //Check if node should have same height and same width
-        if(sbmlToJson.mustBeSquare(nodeObj.class) && !sbmlToJson.complexOrPhenotype(nodeObj.class))
-        {
-          tempBbox.w = 20
-          tempBbox.h = 20
-        }
-        else if(sbmlToJson.mustBeSquare(nodeObj.class) && sbmlToJson.complexOrPhenotype(nodeObj.class))
-        {
-          tempBbox.w = 50
-          tempBbox.h = 50
-        }
-      
-      nodeObj.id = resultJson[i].data.id
-
-      nodeObj.bbox = tempBbox;   
-      nodeObj.label = resultJson[i].data.label;
-      nodeObj.statesandinfos = [];
-      nodeObj.parent = resultJson[i].data.parent;
-      nodeObj.ports = [];
-      if(resultJson[i].data.hypothetical)
-        nodeObj.class = "hypothetical " + nodeObj.class;
-      if(resultJson[i].data.active)
-        nodeObj.class = "active " + nodeObj.class;
-      if(resultJson[i].data.multimer)
-        nodeObj.class = nodeObj.class + " multimer";
-      var cytoscapeJsNode = {data: nodeObj, style: styleObj};
-      elementUtilities.extendNodeDataWithClassDefaults( nodeObj, nodeObj.class );
-      cytoscapeJsNodes.push(cytoscapeJsNode)
+    if( resultJson[i].group != 'nodes' || resultJson[i].classes != 'species')
+      continue;
+    var nodeObj = {};
+    var styleObj = {};
+    var tempBbox = {};
+    if (layout){
+      specGlyphId = speciesGlyphIdSpeciesIdMap.get(resultJson[i].data.id);
+      let speciesGlyph = layout.specglyphs[specGlyphId];
+      let bbox = speciesGlyph.getBoundingBox();
+      tempBbox.x = bbox.x + bbox.width / 2;
+      tempBbox.y = bbox.y + bbox.height / 2;
+      tempBbox.w = bbox.width;
+      tempBbox.h = bbox.height;
+    } else {
+      tempBbox.x = 0;
+      tempBbox.y = 0;
+      tempBbox.w = 50;
+      tempBbox.h = 30;
     }
+    var sboTerm = resultJson[i].data.sboTerm;
+    if(sboToNodeClass[sboTerm]) {
+      nodeObj.class = sboToNodeClass[sboTerm]
+    } else {
+      nodeObj.class = "simple molecule"
+      tempBbox.w = 50
+      tempBbox.h = 30
+    }
+    //Check if node should have same height and same width
+    if(sbmlToJson.mustBeSquare(nodeObj.class) && !sbmlToJson.complexOrPhenotype(nodeObj.class)) {
+      tempBbox.w = 20
+      tempBbox.h = 20
+    } else if(sbmlToJson.mustBeSquare(nodeObj.class) && sbmlToJson.complexOrPhenotype(nodeObj.class)) {
+      tempBbox.w = 50
+      tempBbox.h = 50
+    }
+    
+    nodeObj.id = resultJson[i].data.id
+
+    nodeObj.bbox = tempBbox;   
+    nodeObj.label = resultJson[i].data.label;
+    nodeObj.statesandinfos = [];
+    nodeObj.parent = resultJson[i].data.parent;
+    nodeObj.ports = [];
+
+    // State and Info Boxes
+    var bindingRegions = resultJson[i].data.bindingRegion;
+    for(let region of bindingRegions){
+      let infoBox = classes.BindingRegion.construct(undefined, resultJson[i].data.id, undefined);
+      infoBox.region.variable =  region._;
+      infoBox.style = elementUtilities.getDefaultInfoboxStyle(nodeObj.class, "binding region");
+      infoBox.bbox = {'x': parseFloat(region.$['nwt:x']), 'y': parseFloat(region.$['nwt:y']), 
+                      'w': parseFloat(region.$['nwt:w']), 'h': parseFloat(region.$['nwt:h'])};
+      nodeObj.statesandinfos.push(infoBox);
+    }
+
+    var residueVariables = resultJson[i].data.residueVariable;
+    for(let residue of residueVariables){
+      let infoBox = classes.ResidueVariable.construct(undefined, undefined, resultJson[i].data.id, undefined);
+      infoBox.residue.variable =  residue._ || "HELLO";
+      infoBox.style = elementUtilities.getDefaultInfoboxStyle(nodeObj.class, "residue variable");
+      infoBox.bbox = {'x': parseFloat(residue.$['nwt:x']), 'y': parseFloat(residue.$['nwt:y']), 
+                      'w': parseFloat(residue.$['nwt:w']), 'h': parseFloat(residue.$['nwt:h'])};
+      nodeObj.statesandinfos.push(infoBox);
+    }
+
+    var unitsOfInformation = resultJson[i].data.unitOfInfo;
+    for(let unit of unitsOfInformation){
+      let infoBox = classes.UnitOfInformation.construct(undefined, resultJson[i].data.id, undefined);
+      infoBox.label.text = unit._;
+      infoBox.style = elementUtilities.getDefaultInfoboxStyle(nodeObj.class, "unit of information");
+      infoBox.bbox = {'x': parseFloat(unit.$['nwt:x']), 'y': parseFloat(unit.$['nwt:y']), 
+                      'w': parseFloat(unit.$['nwt:w']), 'h': parseFloat(unit.$['nwt:h'])};
+      nodeObj.statesandinfos.push(infoBox);
+    }
+
+    // Add status info
+    if(resultJson[i].data.hypothetical)
+      nodeObj.class = "hypothetical " + nodeObj.class;
+    if(resultJson[i].data.active)
+      nodeObj.class = "active " + nodeObj.class;
+    if(resultJson[i].data.multimer)
+      nodeObj.class = nodeObj.class + " multimer";
+
+    var cytoscapeJsNode = {data: nodeObj, style: styleObj};
+    elementUtilities.extendNodeDataWithClassDefaults( nodeObj, nodeObj.class );
+    cytoscapeJsNodes.push(cytoscapeJsNode);
   }
-  
 };
 sbmlToJson.mustBeSquare = function(className)
 {

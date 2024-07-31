@@ -321,7 +321,6 @@ module.exports = function () {
        var cyGraph;
        try {
          cyGraph = convertFcn( text );
-         console.log(cyGraph);
          // Users may want to do customized things while an external file is being loaded
          // Trigger an event for this purpose and specify the 'filename' as an event parameter
          $(document).trigger( "sbgnvizLoadFile", [ file.name, cy ] ); // Aliases for sbgnvizLoadFileStart

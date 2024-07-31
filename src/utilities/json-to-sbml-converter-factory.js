@@ -103,7 +103,7 @@ module.exports = function () {
         const dim = layout.getDimensions();
         const box = cy.elements().boundingBox();
         dim.setWidth(box.w); dim.setHeight(box.h);
-         
+
         //Create compartment
         for (let i = 0; i < nodes.length; i++)
         {
@@ -124,9 +124,9 @@ module.exports = function () {
                 const glyph = layout.createCompartmentGlyph();
                 glyph.setId(compId + '_glyph');
                 glyph.setCompartmentId(compId);
-                let box = nodes[i].boundingBox();
+                let box = nodes[i].data('bbox');
                 let bb = glyph.getBoundingBox();
-                bb.setX(box.x1); bb.setY(box.y1);
+                bb.setX(box.x); bb.setY(box.y);
                 bb.width = box.w; bb.height = box.h;
             }
         }
@@ -186,9 +186,9 @@ module.exports = function () {
             const glyph = layout.createSpeciesGlyph();
             glyph.setId(newStr + '_glyph');
             glyph.setSpeciesId(newStr);
-            let box = nodes[i].boundingBox();
+            let box = nodes[i].data('bbox');
             let bb = glyph.getBoundingBox();
-            bb.setX(box.x1); bb.setY(box.y1);
+            bb.setX(box.x); bb.setY(box.y);
             bb.width = box.w; bb.height = box.h;
 
             // Add State Info for Species as Annotation
@@ -200,14 +200,17 @@ module.exports = function () {
                                     '" nwt:hypothetical="' + hypothetical + '" nwt:infoid="info_' + infoId +
                                     '" nwt:id="' + newSpecies.getId() + '">';
             for(let item of nodes[i].data('statesandinfos')){
+                let boundingBox = item.bbox;
+                let boundingBoxStr =  'nwt:x="' + boundingBox.x + '" nwt:y="' + boundingBox.y + 
+                                    '" nwt:w="' + boundingBox.w + '" nwt:h="' + boundingBox.h + '"';
                 if(item.clazz == "residue variable"){
-                    annotationString += '<nwt:residuevariable>' + item.residue.variable + '</nwt:residuevariable>';
+                    annotationString += '<nwt:residuevariable ' + boundingBoxStr + '>' + item.residue.variable + '</nwt:residuevariable>';
                 }
                 else if(item.clazz == "binding region"){
-                    annotationString += '<nwt:bindingregion>' + item.region.variable + '</nwt:bindingregion>';
+                    annotationString += '<nwt:bindingregion ' + boundingBoxStr + '>' + item.region.variable + '</nwt:bindingregion>';
                 }
                 else if(item.clazz == "unit of information"){
-                    annotationString += '<nwt:unitinfo>' + item.label.text + '</nwt:unitinfo>';
+                    annotationString += '<nwt:unitinfo ' + boundingBoxStr + '>' + item.label.text + '</nwt:unitinfo>';
                 }
             }
             annotationString += '</nwt:info>'
