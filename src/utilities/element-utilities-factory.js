@@ -2460,6 +2460,20 @@ module.exports = function () {
     return sbgnclass=='logic arc';
   };
 
+
+  elementUtilities.isProcessNode=function(ele){
+    var sbgnclass = elementUtilities.getPureSbgnClass(ele);
+    return (
+      sbgnclass == "process" ||
+      sbgnclass == "omitted process" ||
+      sbgnclass == "uncertain process" ||
+      sbgnclass == "truncated process" ||
+      sbgnclass == "association"||
+      sbgnclass == "dissociation"
+    );
+  };
+
+
   // Returns whether the class of given element is a modulation arc as defined in PD specs
   elementUtilities.isModulationArcClass = function (ele) {
     var sbgnclass = elementUtilities.getPureSbgnClass(ele);
