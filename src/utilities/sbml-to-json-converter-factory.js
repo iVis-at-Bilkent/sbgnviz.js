@@ -295,7 +295,7 @@ sbmlToJson.addJSNodes = function(resultJson,cytoscapeJsNodes, speciesGlyphIdSpec
     var residueVariables = resultJson[i].data.residueVariable;
     for(let residue of residueVariables){
       let infoBox = classes.ResidueVariable.construct(undefined, undefined, resultJson[i].data.id, undefined);
-      infoBox.residue.variable =  residue._ || "HELLO";
+      infoBox.residue.variable =  residue._;
       infoBox.style = elementUtilities.getDefaultInfoboxStyle(nodeObj.class, "residue variable");
       infoBox.bbox = {'x': parseFloat(residue.$['nwt:x']), 'y': parseFloat(residue.$['nwt:y']), 
                       'w': parseFloat(residue.$['nwt:w']), 'h': parseFloat(residue.$['nwt:h'])};

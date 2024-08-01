@@ -7,6 +7,7 @@ var xml2js = require('xml2js');
 var mapPropertiesBuilder = new xml2js.Builder({rootName: "nwt:mapProperties"});
 var compoundExtensionBuilder = new xml2js.Builder({rootName: "nwt:extraInfo"});
 var textUtilities = require('./text-utilities');
+var classes = require('./classes');
 
 module.exports = function () {
     var elementUtilities, graphUtilities, experimentalDataOverlay;
@@ -92,7 +93,7 @@ module.exports = function () {
         var nodes = cy.nodes();
         var sbmlDoc =  new libsbmlInstance.SBMLDocument(3, 2);
         var model = sbmlDoc.createModel()
-        model.setId('model1')
+        model.setId('model1');
         
         // Layout Information
         sbmlDoc.enablePackage(libsbmlInstance.LayoutExtension.prototype.getXmlnsL3V1V1(), 'layout', true);
@@ -126,7 +127,7 @@ module.exports = function () {
                 glyph.setCompartmentId(compId);
                 let box = nodes[i].data('bbox');
                 let bb = glyph.getBoundingBox();
-                bb.setX(box.x); bb.setY(box.y);
+                bb.setX(box.x - box.w / 2); bb.setY(box.y - box.h / 2);
                 bb.width = box.w; bb.height = box.h;
             }
         }
@@ -188,7 +189,7 @@ module.exports = function () {
             glyph.setSpeciesId(newStr);
             let box = nodes[i].data('bbox');
             let bb = glyph.getBoundingBox();
-            bb.setX(box.x); bb.setY(box.y);
+            bb.setX(box.x - box.w / 2); bb.setY(box.y - box.h / 2);
             bb.width = box.w; bb.height = box.h;
 
             // Add State Info for Species as Annotation
@@ -201,7 +202,8 @@ module.exports = function () {
                                     '" nwt:id="' + newSpecies.getId() + '">';
             for(let item of nodes[i].data('statesandinfos')){
                 let boundingBox = item.bbox;
-                let boundingBoxStr =  'nwt:x="' + boundingBox.x + '" nwt:y="' + boundingBox.y + 
+                let absoluteCoords = classes.AuxiliaryUnit.getAbsoluteCoord(item, cy);
+                let boundingBoxStr =  'nwt:x="' + (absoluteCoords.x - boundingBox.w / 2) + '" nwt:y="' + (absoluteCoords.y - boundingBox.h / 2) + 
                                     '" nwt:w="' + boundingBox.w + '" nwt:h="' + boundingBox.h + '"';
                 if(item.clazz == "residue variable"){
                     annotationString += '<nwt:residuevariable ' + boundingBoxStr + '>' + item.residue.variable + '</nwt:residuevariable>';

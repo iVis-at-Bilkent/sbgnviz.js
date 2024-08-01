@@ -394,8 +394,6 @@ AuxiliaryUnit.setAnchorSide = function(mainObj, node) {
     padding = node.data('class') == "complex" ? Number(node.data().complexCalculatedPadding) : node.padding();
   }
   
- 
-  
   var parentX = (node.data('class') == "compartment" || node.data('class') == "complex") ? node.data('bbox').x : node.position().x;
   var parentY = (node.data('class') == "compartment" || node.data('class') == "complex") ? node.data('bbox').y : node.position().y;
   var parentX1 = Number((parentX - width / 2 - padding).toFixed(2));
@@ -404,7 +402,6 @@ AuxiliaryUnit.setAnchorSide = function(mainObj, node) {
   var parentY2 = Number((parentY + height/ 2+ padding).toFixed(2));
   var centerX = Number((thisX+thisW/2).toFixed(2));
   var centerY = Number((thisY+thisH/2).toFixed(2));
-
 
   if (centerY ==parentY1){
     mainObj.anchorSide = "top";
@@ -424,8 +421,6 @@ AuxiliaryUnit.setAnchorSide = function(mainObj, node) {
   return true;
 
 };
-
-
 
 AuxiliaryUnit.addToParent = function (mainObj, cy, parentNode, location, position, index) {
 
