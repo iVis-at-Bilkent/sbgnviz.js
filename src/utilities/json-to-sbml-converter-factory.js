@@ -126,6 +126,7 @@ module.exports = function () {
                 glyph.setId(compId + '_glyph');
                 glyph.setCompartmentId(compId);
                 let box = nodes[i].data('bbox');
+                box.x = nodes[i].position().x; box.y = nodes[i].position().y;
                 let bb = glyph.getBoundingBox();
                 bb.setX(box.x - box.w / 2); bb.setY(box.y - box.h / 2);
                 bb.width = box.w; bb.height = box.h;
@@ -189,6 +190,7 @@ module.exports = function () {
             glyph.setSpeciesId(newStr);
             let box = nodes[i].data('bbox');
             let bb = glyph.getBoundingBox();
+            box.x = nodes[i].position().x; box.y = nodes[i].position().y;
             bb.setX(box.x - box.w / 2); bb.setY(box.y - box.h / 2);
             bb.width = box.w; bb.height = box.h;
 
@@ -355,6 +357,7 @@ module.exports = function () {
             var lineSegment = glyph.createLineSegment();
 
             var bbox = process.data('bbox');
+            bbox.x = process.position().x; bbox.y = process.position().y;
             var direction = process.data('portsordering');
             let startX, startY, endX, endY;
             if(direction == "L-to-R"){
