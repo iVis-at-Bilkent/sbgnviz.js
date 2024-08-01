@@ -85,7 +85,7 @@ module.exports = function () {
     183: ["transcription consumption","process", "transcription production"], //Transcription
     184: ["translation consumption","process", "translation production"], //Translation
     185: ["consumption","process","transport"], //Transport
-    395: ["consumption", "omitted process", "production"] //Known transition omitted
+    397: ["consumption", "omitted process", "production"] //Known transition omitted
   } 
 
   var sboAssociationDissociation = {
@@ -447,11 +447,7 @@ sbmlToJson.addReactions = function(model, cytoscapeJsEdges, cytoscapeJsNodes) {
     {
       nodeClass = 'truncated process'
     }
-    else if(sboTermReaction == 397) //397 stands for reduced notation in CD but does not specify which one. Positive influence is used for default
-    {
-      edgeClass1 = "positive influence sbml"
-      reducedNotation = true;
-    } else if(sboTermReaction == 231 ) //231 stand for boolean logic reactions in CD but does not specify which one. And logical gate will be used for default
+    else if(sboTermReaction == 231 ) //231 stand for boolean logic reactions in CD but does not specify which one. And logical gate will be used for default
     {
       logicalBoolean = true;
       nodeClass = 'and'
