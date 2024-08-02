@@ -358,7 +358,20 @@ module.exports = function () {
 
             var bbox = process.data('bbox');
             bbox.x = process.position().x; bbox.y = process.position().y;
-            var direction = process.data('portsordering');
+            var ports1 = process.data('ports')[0], ports2 = process.data('ports')[1];
+            let direction = "L-to-R";
+            if(ports1.x > 0){
+                direction = "L-to-R";
+            }
+            else if(ports1.x < 0){
+                direction = "R-to-L";
+            }
+            else if(ports1.y > 0){
+                direction = "B-to-T";
+            }
+            else{
+                direction = "T-to-B";
+            }
             let startX, startY, endX, endY;
             if(direction == "L-to-R"){
                 startX = bbox.x - bbox.w / 2; startY = bbox.y;

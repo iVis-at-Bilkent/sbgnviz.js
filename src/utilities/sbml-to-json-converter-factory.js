@@ -653,9 +653,9 @@ sbmlToJson.addJSEdges= function(resultJson, cytoscapeJsNodes, cytoscapeJsEdges,r
   var classNameEdge3 = "catalysis";  //Modifier
 
   for(let i = 0; i < resultJson.length; i++){
-    
-    if( resultJson[i].group == 'nodes' && ( resultJson[i].classes == "reaction" || resultJson[i].classes == "degradation" || resultJson[i].classes == "boolean"))
-    {
+    if( resultJson[i].group == 'nodes' 
+      && ( resultJson[i].classes == "reaction" || resultJson[i].classes == "degradation" || resultJson[i].classes == "boolean")){
+      var portOrdering = "L-to-R";
       if (layout) {
         // get reaction glyph
         let reactionGlyphId = reactionGlyphMap.get(resultJson[i].data.id);
@@ -673,8 +673,57 @@ sbmlToJson.addJSEdges= function(resultJson, cytoscapeJsNodes, cytoscapeJsEdges,r
         tempBbox.w = reactionCurveLength;
         tempBbox.h = reactionCurveLength;
         resultJson[i].data.bbox = tempBbox;
+        
+        console.log(reactionCurveStart.x(), reactionCurveStart.y(), reactionCurveEnd.x(), reactionCurveEnd.y());
+
+        // Set port ordering string
+        if(reactionCurveStart.x() == reactionCurveEnd.x() && reactionCurveStart.y() < reactionCurveEnd.y()){
+          portOrdering = "B-to-T";
+        }
+        else if(reactionCurveStart.x() == reactionCurveEnd.x() && reactionCurveStart.y() > reactionCurveEnd.y()){
+          portOrdering = "T-to-B";
+        }
+        else if(reactionCurveStart.x() < reactionCurveEnd.x() && reactionCurveStart.y() == reactionCurveEnd.y()){
+          portOrdering = "L-to-R";
+        }
+        else if(reactionCurveStart.x() > reactionCurveEnd.x() && reactionCurveStart.y() == reactionCurveEnd.y()){
+          portOrdering = "R-to-L";
+        }
       }
 
+      console.log(portOrdering);
+
+      // x:-70, x:70 -> R-to-L
+      // x:70, x:-70 -> L-to-R
+      // y:-70, y:70 -> B-to-T
+      // y:70, y:-70 -> T-to-B
+      var port1 = {x: 0, y: 0}, port2 = {x: 0, y: 0};
+      if(portOrdering == "L-to-R"){
+        port1.x = 70; port2.x = -70;
+      }
+      else if(portOrdering == "R-to-L"){
+        port1.x = -70; port2.x = 70;
+      }
+      else if(portOrdering == "T-to-B"){
+        port1.y = 70; port2.y = -70;
+      }
+      else if(portOrdering == "B-to-T"){
+        port1.y = -70; port2.y = 70;
+      }
+
+      var ports = [];
+      ports.push({
+        id: resultJson[i].data.id +".1",
+        x: port1.x,
+        y: port1.y
+      });
+      ports.push({
+        id: resultJson[i].data.id +".2",
+        x: port2.x,
+        y: port2.y
+      });
+  
+      resultJson[i].data.ports = ports;
       sbmlToJson.addNodes(cytoscapeJsNodes, resultJson[i].data );
     }
   }
@@ -779,20 +828,8 @@ sbmlToJson.addNodes = function( cytoscapeJsNodes, data) {
     nodeObj.class = className;
     nodeObj.id = data.id
     nodeObj.statesandinfos = [];
-    var ports = [];
-    ports.push({
-      id: nodeObj.id +".1",
-      x: -70,
-      y: 0
-    });
-    ports.push({
-      id: nodeObj.id +".2",
-      x: 70,
-      y: 0
-    });
-  
-
-    nodeObj.ports = ports;
+    
+    nodeObj.ports = data.ports;
     nodeObj.parent = data.parent;
 
     var cytoscapeJsNode = {data: nodeObj, style: styleObj};
