@@ -94,7 +94,7 @@ module.exports = function () {
         var sbmlDoc =  new libsbmlInstance.SBMLDocument(3, 2);
         var model = sbmlDoc.createModel()
         model.setId('model1');
-        
+
         // Layout Information
         sbmlDoc.enablePackage(libsbmlInstance.LayoutExtension.prototype.getXmlnsL3V1V1(), 'layout', true);
         sbmlDoc.setPackageRequired('layout', false);

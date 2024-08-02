@@ -646,8 +646,7 @@ sbmlToJson.addReactions = function(model, cytoscapeJsEdges, cytoscapeJsNodes) {
   sbmlToJson.addJSEdges(resultJson, cytoscapeJsNodes, cytoscapeJsEdges,reactionGlyphMap)
 };
 
-sbmlToJson.addJSEdges= function(resultJson, cytoscapeJsNodes, cytoscapeJsEdges,reactionGlyphMap)
-{
+sbmlToJson.addJSEdges= function(resultJson, cytoscapeJsNodes, cytoscapeJsEdges,reactionGlyphMap) {  
   //Default values
   var classNameEdge1 = "consumption"; //Reactant
   var classNameEdge2 = "production"; //Product
@@ -663,19 +662,20 @@ sbmlToJson.addJSEdges= function(resultJson, cytoscapeJsNodes, cytoscapeJsEdges,r
         let reactionGlyph = layout.getReactionGlyph(reactionGlyphId);
         
         //TO-DO: Known issue about the position of the reaction node
-        let specRef = reactionGlyph.getSpeciesReferenceGlyph(0);
-        let position = {x: specRef.getCurve().getCurveSegment(0).getStart().x() + 10, y: specRef.getCurve().getCurveSegment(0).getStart().y() + 10};
         //create and set bbox values for the reaction node
+        let reactionCurveStart = reactionGlyph.getCurve().getCurveSegment(0).getStart();
+        let reactionCurveEnd = reactionGlyph.getCurve().getCurveSegment(0).getEnd();
+        let reactionCurveLength = Math.max(Math.abs(reactionCurveStart.x() - reactionCurveEnd.x()),
+                                  Math.abs(reactionCurveStart.y() - reactionCurveEnd.y()));
         let tempBbox = {};
-        tempBbox.x = position.x;
-        tempBbox.y = position.y;
-        tempBbox.w = resultJson[i].data.width;
-        tempBbox.h = resultJson[i].data.height;
+        tempBbox.x = (reactionCurveStart.x() + reactionCurveEnd.x()) / 2;
+        tempBbox.y = (reactionCurveStart.y() + reactionCurveEnd.y()) / 2;
+        tempBbox.w = reactionCurveLength;
+        tempBbox.h = reactionCurveLength;
         resultJson[i].data.bbox = tempBbox;
       }
 
       sbmlToJson.addNodes(cytoscapeJsNodes, resultJson[i].data );
-
     }
   }
   //Create map-  nodeId: nodeClass
