@@ -745,7 +745,7 @@ sbmlToJson.addJSEdges= function(resultJson, cytoscapeJsNodes, cytoscapeJsEdges,r
   }
 }
 sbmlToJson.isProcessNode = function( nodeClass) { 
-  return nodeClass.startsWith("process");
+  return nodeClass.endsWith("process");
 }
 
 sbmlToJson.isLogicalOperator = function( nodeClass) { 
