@@ -205,7 +205,7 @@ sbmlToJson.addSpecies = function(model, cytoscapeJsNodes) {
     let active = false, hypothetical = false, multimer = false;
     let bindingRegion = [], residueVariable = [], unitOfInfo = [];
     parseString(species.getAnnotationString(), function(err, result){
-      if(!result)
+      if(!result || !result.annotation["nwt:extension"])
         return;
       var stateBooleans = result.annotation["nwt:extension"][0]["nwt:info"][0].$;
       active = stateBooleans["nwt:active"] == "true" ? true : false;
@@ -674,8 +674,6 @@ sbmlToJson.addJSEdges= function(resultJson, cytoscapeJsNodes, cytoscapeJsEdges,r
         tempBbox.h = reactionCurveLength;
         resultJson[i].data.bbox = tempBbox;
         
-        console.log(reactionCurveStart.x(), reactionCurveStart.y(), reactionCurveEnd.x(), reactionCurveEnd.y());
-
         // Set port ordering string
         if(reactionCurveStart.x() == reactionCurveEnd.x() && reactionCurveStart.y() < reactionCurveEnd.y()){
           portOrdering = "B-to-T";
@@ -690,8 +688,6 @@ sbmlToJson.addJSEdges= function(resultJson, cytoscapeJsNodes, cytoscapeJsEdges,r
           portOrdering = "R-to-L";
         }
       }
-
-      console.log(portOrdering);
 
       // x:-70, x:70 -> R-to-L
       // x:70, x:-70 -> L-to-R
