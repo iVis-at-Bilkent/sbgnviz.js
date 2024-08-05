@@ -135,6 +135,7 @@ module.exports = function () {
         //Set species
         let infoId = 1;
         let defaultNeeded = false;
+        console.log(nodes);
         for (let i = 0; i < nodes.length; i++)
         {
             var nodeClass = nodes[i]._private.data.class;
@@ -161,21 +162,25 @@ module.exports = function () {
             {
                 newSpecies.setSBOTerm(nodesToSbo[nodeClass])
             }
-
-            if(nodes[i]._private.parent)
-            {
-                let parent = nodes[i]._private.parent[0]._private.data.id.replace(/-/g, "_");
-                newSpecies.setCompartment(parent)
+            
+            let parent = nodes[i].parent();
+            while(parent.length > 0 && parent.data('class') !== 'compartment'){
+                parent = parent.parent();
+            }
+            
+            if(parent.length > 0 && parent.data('class') === 'compartment'){
+                newSpecies.setCompartment(parent.id().replace(/-/g, "_"));
             }
             else{
                 defaultNeeded = true;
                 newSpecies.setCompartment('default');
             }
+
             newSpecies.setHasOnlySubstanceUnits(false);
             newSpecies.setConstant(true);
             newSpecies.setBoundaryCondition(true);
 
-            const new_id = nodes[i]._private.data.id
+            const new_id = nodes[i].id();
             var newStr = new_id.replace(/-/g, "_"); //Replacing - with _ because libsml doesn't allow - in id
             newSpecies.setId(newStr);
             if(nodes[i]._private.data.label)

@@ -124,14 +124,21 @@ module.exports = function () {
       layout = layoutplugin.layouts[0];
     }   
 
-     
     // add compartments, species and reactions
     let compartmentBoundingBoxes = new Map;
+    let containerNodeMap = new Map;
 
-    sbmlToJson.addCompartments(model, cytoscapeJsNodes, compartmentBoundingBoxes);
-    sbmlToJson.addSpecies(model, cytoscapeJsNodes, compartmentBoundingBoxes);
+    sbmlToJson.addCompartments(model, cytoscapeJsNodes, compartmentBoundingBoxes, containerNodeMap);
+    sbmlToJson.addSpecies(model, cytoscapeJsNodes, compartmentBoundingBoxes, containerNodeMap);
     sbmlToJson.addReactions(model, cytoscapeJsEdges,cytoscapeJsNodes);
     sbmlToJson.fixCompartmentBiases(model, cytoscapeJsNodes, compartmentBoundingBoxes);
+
+    var inferNestingOnLoad = options.inferNestingOnLoad;
+    inferNestingOnLoad = typeof inferNestingOnLoad === 'function' ? inferNestingOnLoad.call() : inferNestingOnLoad;
+    if(inferNestingOnLoad)
+      sbmlToJson.inferNestingOnLoadSBML(cytoscapeJsNodes, containerNodeMap);
+
+    console.log(cytoscapeJsNodes);
 
     let result = resultJson;
     cytoscapeJsGraph.nodes = cytoscapeJsNodes
@@ -144,7 +151,7 @@ module.exports = function () {
 
 
 // add compartment nodes
-sbmlToJson.addCompartments = function (model,cytoscapeJsNodes, compartmentBoundingBoxes) {
+sbmlToJson.addCompartments = function (model,cytoscapeJsNodes, compartmentBoundingBoxes, containerNodeMap) {
   compartmentMap = new Map();
   for(let i = 0; i < model.getNumCompartments(); i++){
     let compartment = model.getCompartment(i);
@@ -153,13 +160,14 @@ sbmlToJson.addCompartments = function (model,cytoscapeJsNodes, compartmentBoundi
     let compartmentData = {"id": compartment.getId(), "label": compartment.getName(), "class": "compartment"};
       resultJson.push({"data": compartmentData, "group": "nodes", "classes": "compartment"});
     }
-    if(!compartmentBoundingBoxes.has(compartment.getId()));
+    if(!compartmentBoundingBoxes.has(compartment.getId())){
       compartmentBoundingBoxes.set(compartment.getId(), {x1: 0, y1: 0, x2: 0, y2: 0});
+    }
   }
-  sbmlToJson.addJSCompartments(compartmentMap, resultJson, cytoscapeJsNodes);
+  sbmlToJson.addJSCompartments(compartmentMap, resultJson, cytoscapeJsNodes, containerNodeMap);
 };
 
-sbmlToJson.addJSCompartments = function(compartmentMap, resultJson, cytoscapeJsNodes)
+sbmlToJson.addJSCompartments = function(compartmentMap, resultJson, cytoscapeJsNodes, containerNodeMap)
 {
   for(let i = 0; i < resultJson.length; i++){
     if ( resultJson[i].group == 'nodes' && resultJson[i].classes == "compartment" )
@@ -186,16 +194,18 @@ sbmlToJson.addJSCompartments = function(compartmentMap, resultJson, cytoscapeJsN
         tempBbox.w = 60;
         tempBbox.h = 60;
       }
-      nodeObj.id = resultJson[i].data.id
 
+      nodeObj.id = resultJson[i].data.id;
       nodeObj.bbox = tempBbox;   
       nodeObj.label = resultJson[i].data.label;
       nodeObj.statesandinfos = [];
       nodeObj.ports = [];
       if(resultJson[i].data.parent)
-      {
         nodeObj.parent = resultJson[i].data.parent;
-      }
+      containerNodeMap.set(nodeObj.id, 
+        {x1: nodeObj.bbox.x - nodeObj.bbox.w / 2, y1: nodeObj.bbox.y - nodeObj.bbox.h / 2, 
+        x2: nodeObj.bbox.x + nodeObj.bbox.w / 2, y2: nodeObj.bbox.y + nodeObj.bbox.h / 2,
+        area: nodeObj.bbox.w * nodeObj.bbox.h});
       var cytoscapeJsNode = {data: nodeObj, style: styleObj};
       elementUtilities.extendNodeDataWithClassDefaults( nodeObj, nodeObj.class );
       cytoscapeJsNodes.push(cytoscapeJsNode)
@@ -204,7 +214,7 @@ sbmlToJson.addJSCompartments = function(compartmentMap, resultJson, cytoscapeJsN
 }
 
 // add species nodes
-sbmlToJson.addSpecies = function(model, cytoscapeJsNodes, compartmentBoundingBoxes) {
+sbmlToJson.addSpecies = function(model, cytoscapeJsNodes, compartmentBoundingBoxes, containerNodeMap) {
 
   for(let i = 0; i < model.getNumSpecies(); i++){
     let species = model.getSpecies(i);
@@ -238,10 +248,10 @@ sbmlToJson.addSpecies = function(model, cytoscapeJsNodes, compartmentBoundingBox
     }
   }
   //Now create different model
-  sbmlToJson.addJSNodes(resultJson,cytoscapeJsNodes,speciesGlyphIdSpeciesIdMap, compartmentBoundingBoxes);
+  sbmlToJson.addJSNodes(resultJson,cytoscapeJsNodes,speciesGlyphIdSpeciesIdMap, compartmentBoundingBoxes, containerNodeMap);
 };
 
-sbmlToJson.addJSNodes = function(resultJson,cytoscapeJsNodes, speciesGlyphIdSpeciesIdMap, compartmentBoundingBoxes) {
+sbmlToJson.addJSNodes = function(resultJson,cytoscapeJsNodes, speciesGlyphIdSpeciesIdMap, compartmentBoundingBoxes, containerNodeMap) {
   for(let i = 0; i < resultJson.length; i++){
     if( resultJson[i].group != 'nodes' || resultJson[i].classes != 'species')
       continue;
@@ -284,8 +294,14 @@ sbmlToJson.addJSNodes = function(resultJson,cytoscapeJsNodes, speciesGlyphIdSpec
     nodeObj.bbox = tempBbox;   
     nodeObj.label = resultJson[i].data.label;
     nodeObj.statesandinfos = [];
-    nodeObj.parent = resultJson[i].data.parent;
     nodeObj.ports = [];
+    nodeObj.parent = resultJson[i].data.parent;
+
+    if(sboTerm == 253)
+      containerNodeMap.set(nodeObj.id, 
+        {x1: nodeObj.bbox.x - nodeObj.bbox.w / 2, y1: nodeObj.bbox.y - nodeObj.bbox.h / 2, 
+        x2: nodeObj.bbox.x + nodeObj.bbox.w / 2, y2: nodeObj.bbox.y + nodeObj.bbox.h / 2,
+        area: nodeObj.bbox.w * nodeObj.bbox.h});
 
     sbmlToJson.updateCompartmentBox(compartmentBoundingBoxes, nodeObj.parent, tempBbox);
     
@@ -356,6 +372,39 @@ sbmlToJson.fixCompartmentBiases = function(model, cytoscapeJsNodes, compartmentB
       cytoscapeJsNodes[i].data.minHeightBiasTop = (topMargin / (topMargin + bottomMargin)) * 100;
       cytoscapeJsNodes[i].data.minHeightBiasBottom = (bottomMargin / (topMargin + bottomMargin)) * 100;
     }
+  }
+};
+
+sbmlToJson.inferNestingOnLoadSBML = function(cytoscapeJsNodes, containerNodeMap) {
+  let contains = function(a, b){ // box a containts box b
+    return (a.x1 <= b.x1 && a.y1 <= b.y1) && (a.x2 >= b.x2 && a.y2 >= b.y2);
+  } ;
+
+  let areaSortedContainerMap = new Map([...containerNodeMap.entries()].sort(function(a, b){
+    return a[1].area - b[1].area;
+  }));
+  console.log(areaSortedContainerMap);
+  for(let i = 0; i < cytoscapeJsNodes.length; i++){
+    let boundingBox = {
+      x1: cytoscapeJsNodes[i].data.bbox.x - cytoscapeJsNodes[i].data.bbox.w / 2,
+      y1: cytoscapeJsNodes[i].data.bbox.y - cytoscapeJsNodes[i].data.bbox.h / 2,
+      x2: cytoscapeJsNodes[i].data.bbox.x + cytoscapeJsNodes[i].data.bbox.w / 2,
+      y2: cytoscapeJsNodes[i].data.bbox.y + cytoscapeJsNodes[i].data.bbox.h / 2,
+    };
+
+    console.log(boundingBox);
+
+    let isFound = false;
+    areaSortedContainerMap.forEach(function(value, key) {
+      if(key == cytoscapeJsNodes[i].data.id)
+        return;
+      
+      if(contains(value, boundingBox) && !isFound){
+        cytoscapeJsNodes[i].data.parent = key;
+        isFound = true;
+        return;
+      }
+    });
   }
 };
 
@@ -885,12 +934,13 @@ sbmlToJson.mapPropertiesToObj = function() {
   
 };
 
-// x, y -> middle point for newBox, top left point for compartmentBoundingBoxes
+// x, y -> middle point for newBox, top left - bottom right points for compartmentBoundingBoxes
 sbmlToJson.updateCompartmentBox = function(compartmentBoundingBoxes, compartmentId, newBox) {
   let bbox = compartmentBoundingBoxes.get(compartmentId);
   if(bbox.x1 == 0 && bbox.y1 == 0 && bbox.x2 == 0 && bbox.y2 == 0) { // Uninitialized
-    compartmentBoundingBoxes.set(compartmentId, {x1: newBox.x - newBox.w / 2, y1: newBox.y - newBox.h / 2, 
-                                                x2: newBox.x + newBox.w / 2, y2: newBox.y + newBox.h / 2});
+    compartmentBoundingBoxes.set(compartmentId, 
+      {x1: newBox.x - newBox.w / 2, y1: newBox.y - newBox.h / 2, 
+      x2: newBox.x + newBox.w / 2, y2: newBox.y + newBox.h / 2});
     return;
   }
 
