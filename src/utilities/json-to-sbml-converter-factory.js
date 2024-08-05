@@ -109,28 +109,27 @@ module.exports = function () {
         for (let i = 0; i < nodes.length; i++)
         {
             var nodeClass = nodes[i]._private.data.class;
-            if( nodeClass == "compartment")
-            {
-                const comp = model.createCompartment()
-                const compId = nodes[i]._private.data.id.replace(/-/g, "_");
-                comp.setId(compId)
-                comp.setSize(1)
-                comp.setConstant(true)
-                if(nodes[i]._private.data.label)
-                {
-                    comp.setName(nodes[i]._private.data.label)
-                }
+            if( nodeClass !== "compartment")
+                continue;
 
-                // Add Layout Info for Compartment
-                const glyph = layout.createCompartmentGlyph();
-                glyph.setId(compId + '_glyph');
-                glyph.setCompartmentId(compId);
-                let box = nodes[i].data('bbox');
-                box.x = nodes[i].position().x; box.y = nodes[i].position().y;
-                let bb = glyph.getBoundingBox();
-                bb.setX(box.x - box.w / 2); bb.setY(box.y - box.h / 2);
-                bb.width = box.w; bb.height = box.h;
-            }
+            const comp = model.createCompartment()
+            const compId = nodes[i]._private.data.id.replace(/-/g, "_");
+            comp.setId(compId)
+            comp.setSize(1)
+            comp.setConstant(true)
+            if(nodes[i]._private.data.label)
+                comp.setName(nodes[i]._private.data.label)
+
+            // Add Layout Info for Compartment
+            const glyph = layout.createCompartmentGlyph();
+            glyph.setId(compId + '_glyph');
+            glyph.setCompartmentId(compId);
+            let box = {x: 0, y: 0, w: 0, h: 0};
+            box.x = nodes[i].position().x; box.y = nodes[i].position().y;
+            box.w = nodes[i].width(); box.h = nodes[i].height();
+            let bb = glyph.getBoundingBox();
+            bb.setX(box.x - box.w / 2); bb.setY(box.y - box.h / 2);
+            bb.width = box.w; bb.height = box.h;
         }
 
         //Set species
@@ -188,9 +187,10 @@ module.exports = function () {
             const glyph = layout.createSpeciesGlyph();
             glyph.setId(newStr + '_glyph');
             glyph.setSpeciesId(newStr);
-            let box = nodes[i].data('bbox');
+            let box = {x: 0, y: 0, w: 0, h: 0};
             let bb = glyph.getBoundingBox();
             box.x = nodes[i].position().x; box.y = nodes[i].position().y;
+            box.w = nodes[i].width(); box.h = nodes[i].height();
             bb.setX(box.x - box.w / 2); bb.setY(box.y - box.h / 2);
             bb.width = box.w; bb.height = box.h;
 
