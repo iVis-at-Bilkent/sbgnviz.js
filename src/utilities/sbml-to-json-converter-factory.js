@@ -138,8 +138,6 @@ module.exports = function () {
     if(inferNestingOnLoad)
       sbmlToJson.inferNestingOnLoadSBML(cytoscapeJsNodes, containerNodeMap);
 
-    console.log(cytoscapeJsNodes);
-
     let result = resultJson;
     cytoscapeJsGraph.nodes = cytoscapeJsNodes
     cytoscapeJsGraph.edges = cytoscapeJsEdges
@@ -556,8 +554,6 @@ sbmlToJson.addReactions = function(model, cytoscapeJsEdges, cytoscapeJsNodes) {
       nodeClass = 'unknown logical operator'
     }
 
-
-
     if (reducedNotation)
     {
       let reactant = reaction.getReactant(0);
@@ -640,6 +636,9 @@ sbmlToJson.addReactions = function(model, cytoscapeJsEdges, cytoscapeJsNodes) {
         reactionParentMap.set(speciesCompartment, 1);      
     }
 
+    // add reaction node
+    let parent = reaction.getCompartment();
+
     let reactionData = {"id": reaction.getId(), "label": reaction.getName(), "parent": parent};
     reactionData.width = 15;
     reactionData.height = 15;
@@ -648,7 +647,6 @@ sbmlToJson.addReactions = function(model, cytoscapeJsEdges, cytoscapeJsNodes) {
       reactionData.class = nodeClass
     }
     resultJson.push({"data": reactionData, "group": "nodes", "classes": "reaction"}); 
-    ///sbmlToJson.checkIfTargetAndSourceExist(reaction.getId(), resultJson);
     
     // add modifier->reaction edges
     for(let l = 0; l < reaction.getNumModifiers(); l++){
@@ -672,21 +670,6 @@ sbmlToJson.addReactions = function(model, cytoscapeJsEdges, cytoscapeJsNodes) {
         reactionParentMap.set(speciesCompartment, 1);      
     }
 
-    // add reaction node
-    let parent = reaction.getCompartment();
-    if(!parent) {
-      // find the max occurrence
-      var max_count = 0, result = -1;
-      reactionParentMap.forEach((value, key) => {
-          if (max_count < value) {
-              result = key;
-              max_count = value;
-          }
-      });
-      parent = result;
-    }   
-
-
     //Add extra noded
     if (sboTermReaction == 177)
     {
@@ -703,8 +686,6 @@ sbmlToJson.addReactions = function(model, cytoscapeJsEdges, cytoscapeJsNodes) {
       resultJson.push({"data": extraNode, "group": "nodes", "classes": "reaction"});    
     }
 
-
-    
     //Add extra edges
     if(sboTermReaction == 177)
     {
@@ -743,8 +724,7 @@ sbmlToJson.addJSEdges= function(resultJson, cytoscapeJsNodes, cytoscapeJsEdges,r
         // get reaction glyph
         let reactionGlyphId = reactionGlyphMap.get(resultJson[i].data.id);
         let reactionGlyph = layout.getReactionGlyph(reactionGlyphId);
-        
-        //TO-DO: Known issue about the position of the reaction node
+
         //create and set bbox values for the reaction node
         let reactionCurveStart = reactionGlyph.getCurve().getCurveSegment(0).getStart();
         let reactionCurveEnd = reactionGlyph.getCurve().getCurveSegment(0).getEnd();
@@ -772,10 +752,6 @@ sbmlToJson.addJSEdges= function(resultJson, cytoscapeJsNodes, cytoscapeJsEdges,r
         }
       }
 
-      // x:-70, x:70 -> R-to-L
-      // x:70, x:-70 -> L-to-R
-      // y:-70, y:70 -> B-to-T
-      // y:70, y:-70 -> T-to-B
       var port1 = {x: 0, y: 0}, port2 = {x: 0, y: 0};
       if(portOrdering == "L-to-R"){
         port1.x = 70; port2.x = -70;
@@ -783,10 +759,10 @@ sbmlToJson.addJSEdges= function(resultJson, cytoscapeJsNodes, cytoscapeJsEdges,r
       else if(portOrdering == "R-to-L"){
         port1.x = -70; port2.x = 70;
       }
-      else if(portOrdering == "T-to-B"){
+      else if(portOrdering == "B-to-T"){
         port1.y = 70; port2.y = -70;
       }
-      else if(portOrdering == "B-to-T"){
+      else if(portOrdering == "T-to-B"){
         port1.y = -70; port2.y = 70;
       }
 

@@ -105,7 +105,7 @@ module.exports = function () {
         const box = cy.elements().boundingBox();
         dim.setWidth(box.w); dim.setHeight(box.h);
 
-        //Create compartment
+        // Create compartment
         for (let i = 0; i < nodes.length; i++)
         {
             var nodeClass = nodes[i]._private.data.class;
@@ -132,10 +132,9 @@ module.exports = function () {
             bb.width = box.w; bb.height = box.h;
         }
 
-        //Set species
+        // Set species
         let infoId = 1;
         let defaultNeeded = false;
-        console.log(nodes);
         for (let i = 0; i < nodes.length; i++)
         {
             var nodeClass = nodes[i]._private.data.class;
@@ -360,23 +359,28 @@ module.exports = function () {
             glyph.setId("process_" + (i+1));
             glyph.setReactionId(rxn.getId());
             var lineSegment = glyph.createLineSegment();
-
             var bbox = process.data('bbox');
             bbox.x = process.position().x; bbox.y = process.position().y;
+
             var ports1 = process.data('ports')[0], ports2 = process.data('ports')[1];
             let direction = "L-to-R";
-            if(ports1.x > 0){
+            let portZeroIsInput = false, portOneIsInput = false;
+            process.connectedEdges().forEach(function(ele) {
+                if(portZeroIsInput || portOneIsInput || !ele.data('porttarget'))
+                    return;
+                portZeroIsInput = ele.data('porttarget').endsWith('.1');
+                portOneIsInput = ele.data('porttarget').endsWith('.2');
+            });
+
+            if((portZeroIsInput && ports1.x < 0) || (portOneIsInput && ports1.x > 0))
                 direction = "L-to-R";
-            }
-            else if(ports1.x < 0){
+            else if((portZeroIsInput && ports1.x > 0) || (portOneIsInput && ports1.x < 0))
                 direction = "R-to-L";
-            }
-            else if(ports1.y > 0){
-                direction = "B-to-T";
-            }
-            else{
+            else if((portZeroIsInput && ports1.y < 0) || (portOneIsInput && ports1.y > 0))
                 direction = "T-to-B";
-            }
+            else if((portZeroIsInput && ports1.y > 0) || (portOneIsInput && ports1.y < 0))
+                direction = "B-to-T";
+
             let startX, startY, endX, endY;
             if(direction == "L-to-R"){
                 startX = bbox.x - bbox.w / 2; startY = bbox.y;
