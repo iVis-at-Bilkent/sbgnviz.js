@@ -460,16 +460,16 @@ module.exports = function () {
 
   fileUtilities.saveSbmlForSBML = function(filename, errorCallback){
     uiUtilities.startSpinner("load-spinner");
-    try {
+    // try {
       var sbgnText = jsonToSbml.createSbml(filename);
       var blob = new Blob([sbgnText], {
         type: "text/plain;charset=utf-8;",
       });
       saveAs(blob, filename);
-    }
-    catch(err) {
-      errorCallback();
-    }
+    // }
+    // catch(err) {
+    //   errorCallback();
+    // }
     uiUtilities.endSpinner("load-spinner");
 }
 fileUtilities.hasLayoutSBML = function(file) {

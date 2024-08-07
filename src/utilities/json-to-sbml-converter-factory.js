@@ -297,9 +297,7 @@ module.exports = function () {
             let process = processArray.process;
             let processClass = process.data('class');
             let processId = process.id().replace(/-/g, '_');
-            let sourceEdgeClass = processArray.sources[0].data('class');
-            let targetEdgeClass = processArray.targets[0].data('class');
-
+            
             var rxn = model.createReaction();
             rxn.setId('process_'+ processId);
             rxn.setReversible(false);
@@ -314,14 +312,14 @@ module.exports = function () {
                 spr1.setSpecies(sourceId);
                 spr1.setConstant(true);
             }
-
+            
             for(let targetEdge of processArray.targets){
                 let targetId = targetEdge.target().id().replace(/-/g, '_');
                 const spr2 = rxn.createProduct();
                 spr2.setSpecies(targetId);
                 spr2.setConstant(true);
             }
-
+            
             for(let modifierEdge of processArray.modifiers){
                 let modifierId = modifierEdge.source().id().replace(/-/g, '_');
                 const modifier = rxn.createModifier();
@@ -330,11 +328,23 @@ module.exports = function () {
             }
 
             //Set sbo term for reaction
-            if(sourceEdgeClass == "consumption" && targetEdgeClass == "production" && processClass == "process")
+            let sourceEdgeClass = 'undefined', targetEdgeClass = 'undefined';
+            if(processArray.sources[0])
+                sourceEdgeClass = processArray.sources[0].data('class');
+            if(processArray.targets[0])
+                targetEdgeClass = processArray.targets[0].data('class');
+
+            if((sourceEdgeClass == "consumption" || sourceEdgeClass == "undefined") 
+                && (targetEdgeClass == "production" || targetEdgeClass == "undefined") 
+                && processClass == "process")
                 rxn.setSBOTerm(176);
-            else if(sourceEdgeClass == "consumption" && targetEdgeClass == "production" && processClass == "omitted process")
+            else if((sourceEdgeClass == "consumption" || sourceEdgeClass == "undefined") 
+                && (targetEdgeClass == "production" || targetEdgeClass == "undefined") 
+                && processClass == "omitted process")
                 rxn.setSBOTerm(397);
-            else if(sourceEdgeClass == "consumption" && targetEdgeClass == "production" && processClass == "uncertain process")
+            else if((sourceEdgeClass == "consumption" || sourceEdgeClass == "undefined") 
+                && (targetEdgeClass == "production" || targetEdgeClass == "undefined") 
+                && processClass == "uncertain process")
                 rxn.setSBOTerm(396);
             else if(processClass == "truncated process")
                 rxn.setSBOTerm(178);
@@ -342,12 +352,14 @@ module.exports = function () {
                 rxn.setSBOTerm(177)
             else if(processClass == "dissociation")  
                 rxn.setSBOTerm(180)
-            else if(sourceEdgeClass == "transcription consumption" && targetEdgeClass == "transcription production")
+            else if(sourceEdgeClass == "transcription consumption" || targetEdgeClass == "transcription production")
                 rxn.setSBOTerm(183);
-            else if(sourceEdgeClass == "translation consumption" && targetEdgeClass == "translation production")
+            else if(sourceEdgeClass == "translation consumption" || targetEdgeClass == "translation production")
                 rxn.setSBOTerm(184);
-            else if(sourceEdgeClass == "consumption" && targetEdgeClass == "transport")
+            else if(targetEdgeClass == "transport")
                 rxn.setSBOTerm(185);
+            else
+                rxn.setSBOTerm(176);
 
             // Not sure how to format this, so just skip. Shouldn't be a big deal. 
             // Maybe we incorporate this into the annotations.
