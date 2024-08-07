@@ -227,14 +227,6 @@ module.exports = function () {
             newSpecies.setAnnotation(annotationString);
         }
 
-        // Add default compartment
-        if(defaultNeeded){
-            const defaultCompartment = model.createCompartment();
-            defaultCompartment.setId('default');
-            defaultCompartment.setSize(1);
-            defaultCompartment.setConstant(true);
-        }
-
         // The right hand side of -> denotes the type in the syntax below.
         // Building process array: {process: processNode -> cy node, sources: [sourceEdges] -> list[cy edge], 
         //                      targets: [targetEdges]: list[cy edge], modifiers: [modifierEdges] -> list[cy edge]}
@@ -249,46 +241,20 @@ module.exports = function () {
             if(!jsonToSbml.isProcessNode(eleClass))
                 return;
 
-            if(eleClass == 'association' || eleClass == 'dissociation')
-                return;
-
             var connectedEdges = ele.connectedEdges();
             let sources = [], targets = [], modifiers = [];
             let eleId = ele.id();
             connectedEdges.forEach(function (edge) {
-                // Target Edge Detected
                 if(edge.source().id() == eleId){
-                    // Dissociation
-                    if(edge.target().data('class') == 'dissociation'){
-                        ele = edge.target();
-                        edge.target().connectedEdges().forEach( function (dissociationEdge) {
-                            if(edge.id() == dissociationEdge.id())
-                                return;
-                            targets.push(dissociationEdge);
-                        });
-                    }
-                    else
-                        targets.push(edge);
+                    targets.push(edge);
                     return;
                 }
-
                 if(jsonToSbml.isModifier(edge.data('class'))){
                     if(!jsonToSbml.isLogicalOperatorNode(edge.source().data('class')))
                         modifiers.push(edge);
                     return;
                 }
-
-                // Association
-                if(edge.source().data('class') == 'association'){
-                    ele = edge.source();
-                    edge.source().connectedEdges().forEach( function (associationEdge) {
-                        if(edge.id() == associationEdge.id())
-                            return;
-                        sources.push(associationEdge);
-                    });
-                }
-                else
-                    sources.push(edge);
+                sources.push(edge);
             });
             processes.push({"process": ele, "sources": sources, "targets": targets, "modifiers": modifiers});
         })
@@ -301,9 +267,19 @@ module.exports = function () {
             var rxn = model.createReaction();
             rxn.setId('process_'+ processId);
             rxn.setReversible(false);
-            if(process._private.parent){
-                let parent = process._private.parent[0].id().replace(/-/g, "_");
-                rxn.setCompartment(parent);
+
+            // Parent Info
+            let parent = process.parent();
+            while(parent.length > 0 && parent.data('class') !== 'compartment'){
+                parent = parent.parent();
+            }
+            
+            if(parent.length > 0 && parent.data('class') === 'compartment'){
+                rxn.setCompartment(parent.id().replace(/-/g, "_"));
+            }
+            else{
+                defaultNeeded = true;
+                rxn.setCompartment('default');
             }
             
             for(let sourceEdge of processArray.sources){
@@ -360,11 +336,6 @@ module.exports = function () {
                 rxn.setSBOTerm(185);
             else
                 rxn.setSBOTerm(176);
-
-            // Not sure how to format this, so just skip. Shouldn't be a big deal. 
-            // Maybe we incorporate this into the annotations.
-            if(processClass == 'association' || processClass == 'dissociation')
-                continue;
 
             // Add Layout Info for Processes
             const glyph = layout.createReactionGlyph();
@@ -457,6 +428,14 @@ module.exports = function () {
                 var start = lineSegment.getStart(); start.setX(lineStart.x); start.setY(lineStart.y);
                 var end = lineSegment.getEnd(); end.setX(lineEnd.x); end.setY(lineEnd.y);
             }
+        }
+
+        // Add default compartment
+        if(defaultNeeded){
+            const defaultCompartment = model.createCompartment();
+            defaultCompartment.setId('default');
+            defaultCompartment.setSize(1);
+            defaultCompartment.setConstant(true);
         }
 
         // Building reduced process array: {edge: edge arc -> cy edge, source: source node -> cy node, 

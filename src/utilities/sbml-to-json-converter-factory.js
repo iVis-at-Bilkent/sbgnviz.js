@@ -512,17 +512,11 @@ sbmlToJson.addReactions = function(model, cytoscapeJsEdges, cytoscapeJsNodes) {
       edgeClass2 = sboTwoEdgeOneNodeClass[sboTermReaction][2];
     } else if (sboTermReaction == 177)
     {
-      let association = {"id": 'association_' + reaction.getId(), "class": "association"};
-      association.width = 15;
-      association.height = 15;
-      resultJson.push({"data": association, "group": "nodes", "classes": "reaction"});    
+      nodeClass = "association"; 
     }
     else if (sboTermReaction == 180)
     {
-      let dissociation = {"id": 'dissociation_' + reaction.getId(), "class": "dissociation"};
-      dissociation.width = 15;
-      dissociation.height = 15;
-      resultJson.push({"data": dissociation, "group": "nodes", "classes": "reaction"});    
+      nodeClass = "dissociation";   
     }
     else if (sboTermReaction == 178)
     {
@@ -591,16 +585,9 @@ sbmlToJson.addReactions = function(model, cytoscapeJsEdges, cytoscapeJsNodes) {
       let reactant = reaction.getReactant(j);
       let reactantEdgeData = {"id": reactant.getSpecies() + '_' + reaction.getId(), "source": reactant.getSpecies(), "target": reaction.getId()};
       if (edgeClass1) 
-      {
         reactantEdgeData.class = edgeClass1;
-      }
-      if(sboTermReaction == 177)
-      {
-        reactantEdgeData.target = 'association_' + reaction.getId()
-        
-      }      
-
       resultJson.push({"data": reactantEdgeData, "group": "edges", "classes": "reactantEdge"});
+
       // collect possible parent info
       let speciesCompartment = speciesCompartmentMap.get(reactant.getSpecies());
       if(reactionParentMap.has(speciesCompartment))
@@ -614,20 +601,11 @@ sbmlToJson.addReactions = function(model, cytoscapeJsEdges, cytoscapeJsNodes) {
       let product = reaction.getProduct(k);
       let productEdgeData = {"id": reaction.getId() + '_' + product.getSpecies(), "source": reaction.getId(), "target": product.getSpecies()};
       if (edgeClass1) 
-      {
         productEdgeData.class = edgeClass2;
-      }
-      if(sboTermReaction == 180)
-      {
-        productEdgeData.source = "dissociation_"+reaction.getId()
-      }
       if(sboTermReaction == 231)
-      {
-        productEdgeData.class = "trigger"
-      }
+        productEdgeData.class = "trigger";
       resultJson.push({"data": productEdgeData, "group": "edges", "classes": "productEdge"});
 
-      
       // collect possible parent info
       let speciesCompartment = speciesCompartmentMap.get(product.getSpecies());
       if(reactionParentMap.has(speciesCompartment))
@@ -642,8 +620,7 @@ sbmlToJson.addReactions = function(model, cytoscapeJsEdges, cytoscapeJsNodes) {
     let reactionData = {"id": reaction.getId(), "label": reaction.getName(), "parent": parent};
     reactionData.width = 15;
     reactionData.height = 15;
-    if(nodeClass)
-    {
+    if(nodeClass){
       reactionData.class = nodeClass
     }
     resultJson.push({"data": reactionData, "group": "nodes", "classes": "reaction"}); 
@@ -655,10 +632,7 @@ sbmlToJson.addReactions = function(model, cytoscapeJsEdges, cytoscapeJsNodes) {
       var metaId = modifier.getMetaId();
       let modifierEdgeData = {"id": modifier.getSpecies() + '_' + reaction.getId(), "source": modifier.getSpecies(), "target": reaction.getId(), "sboTerm": modifier.getSBOTerm()};
       if(sboToEdgeClass[sboTerm])
-      {
-  
         modifierEdgeData.class = sboToEdgeClass[sboTerm];
-      }
 
       resultJson.push({"data": modifierEdgeData, "group": "edges", "classes": "modifierEdge"});
       
@@ -668,35 +642,6 @@ sbmlToJson.addReactions = function(model, cytoscapeJsEdges, cytoscapeJsNodes) {
         reactionParentMap.set(speciesCompartment, reactionParentMap.get(speciesCompartment) + 1);
       else
         reactionParentMap.set(speciesCompartment, 1);      
-    }
-
-    //Add extra noded
-    if (sboTermReaction == 177)
-    {
-      var extraNode = {"id": 'association_' + reaction.getId(), "class": "association", "parent": parent};
-      extraNode.width = 15;
-      extraNode.height = 15;
-      resultJson.push({"data": extraNode, "group": "nodes", "classes": "reaction"});    
-    }
-    else if (sboTermReaction == 180)
-    {
-      var extraNode = {"id": 'dissociation_' + reaction.getId(), "class": "dissociation", "parent": parent};
-      extraNode.width = 15;
-      extraNode.height = 15;
-      resultJson.push({"data": extraNode, "group": "nodes", "classes": "reaction"});    
-    }
-
-    //Add extra edges
-    if(sboTermReaction == 177)
-    {
-      var extraEdge = {"id": 'association_' + reaction.getId() + '_' + reaction.getId(), "source": 'association_' + reaction.getId(), "target": reaction.getId(), "class": "consumption"}
-      resultJson.push({"data": extraEdge, "group": "edges", "classes": "extra"});
-    }
-    else if(sboTermReaction == 180)
-    {
-      var extraEdge = {"id": 'dissociation_' + reaction.getId() + '_' + reaction.getId(), "source":  reaction.getId(), "target": "dissociation_"+reaction.getId(), "class": "consumption"}
-      resultJson.push({"data": extraEdge, "group": "edges", "classes": "extra"});
-
     }
   }  
 

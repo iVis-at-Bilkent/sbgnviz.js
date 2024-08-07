@@ -681,7 +681,7 @@ module.exports = function () {
       receptor: { asSource: { isAllowed: true }, asTarget: {} },
       ion: { asSource: { isAllowed: true }, asTarget: {} },
       process: {
-        asSource: { isAllowed: true, maxEdge: 1, maxTotal: 1 },
+        asSource: {},
         asTarget: { isAllowed: true, maxEdge: 1, maxTotal: 1 },
       },
       "omitted process": {
@@ -698,8 +698,8 @@ module.exports = function () {
       },
       "phenotype sbml": { asSource: { isAllowed: true }, asTarget: {} },
       association: {
-        asSource: { isAllowed: true },
-        asTarget: { isAllowed: true },
+        asSource: {},
+        asTarget: { isAllowed: true},
       },
       dissociation: {
         asSource: {},
@@ -741,9 +741,12 @@ module.exports = function () {
         asTarget: {},
       },
       "phenotype sbml": { asSource: {}, asTarget: { isAllowed: true } },
-      association: { asSource: {}, asTarget: {} },
+      association: { 
+        asSource: { isAllowed: true, maxEdge: 1, maxTotal: 1 }, 
+        asTarget: {} 
+      },
       dissociation: {
-        asSource: { isAllowed: true, maxEdge: 2, maxTotal: 2 },
+        asSource: { isAllowed: true },
         asTarget: {},
       },
       and: { asSource: {}, asTarget: {} },
