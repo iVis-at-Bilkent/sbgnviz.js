@@ -382,10 +382,10 @@ module.exports = function () {
   var sbgnText = jsonToSbml.createSbml(filename);
   //convert sbml to sbgnml
   this.convertSbmlToSbgnml(sbgnText, function(data){
-    if(data == null){
+    if(!data.result){
       errorCallback();
     }else{
-      var blob = new Blob([data], {
+      var blob = new Blob([data.message], {
         type: "text/plain;charset=utf-8;",
       });
       saveAs(blob, filename);
