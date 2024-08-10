@@ -135,7 +135,7 @@ module.exports = function () {
 
     var inferNestingOnLoad = options.inferNestingOnLoad;
     inferNestingOnLoad = typeof inferNestingOnLoad === 'function' ? inferNestingOnLoad.call() : inferNestingOnLoad;
-    if(inferNestingOnLoad)
+    if(layout)
       sbmlToJson.inferNestingOnLoadSBML(cytoscapeJsNodes, containerNodeMap);
 
     let result = resultJson;
