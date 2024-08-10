@@ -441,6 +441,7 @@ module.exports = function () {
 
  fileUtilities.saveAsSbml = function(filename, errorCallback){
   uiUtilities.startSpinner("load-spinner");
+  console.log("HERE");
   var sbgnml = this.convertSbgn();
   this.convertSbgnmlToSbml(sbgnml, function(data){
     if (!data.result) {
@@ -451,11 +452,10 @@ module.exports = function () {
       var blob = new Blob([data.message], {
         type: "text/plain;charset=utf-8;",
       });
-      console.log(data.message);
       saveAs(blob, filename);
     }
+    uiUtilities.endSpinner("load-spinner");
   });
-   uiUtilities.endSpinner("load-spinner");
  }
 
   fileUtilities.saveSbmlForSBML = function(filename, errorCallback){
