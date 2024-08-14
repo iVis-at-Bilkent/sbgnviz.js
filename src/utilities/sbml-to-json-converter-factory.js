@@ -231,7 +231,7 @@ sbmlToJson.addSpecies = function(model, cytoscapeJsNodes, compartmentBoundingBox
     })
     speciesCompartmentMap.set(species.getId(), species.getCompartment());
     var sboTerm = species.getSBOTerm();
-    let speciesData = {"id": species.getId(), "label": species.getName(), 
+    let speciesData = {"id": species.getId(), "label": species.getName() || species.getId(), 
                       "parent": species.getCompartment(), "sboTerm": species.getSBOTerm(),
                       "active": active, "multimer": multimer, "hypothetical": hypothetical,
                       "bindingRegion": bindingRegion, "residueVariable": residueVariable, "unitOfInfo": unitOfInfo};
@@ -381,7 +381,6 @@ sbmlToJson.inferNestingOnLoadSBML = function(cytoscapeJsNodes, containerNodeMap)
   let areaSortedContainerMap = new Map([...containerNodeMap.entries()].sort(function(a, b){
     return a[1].area - b[1].area;
   }));
-  console.log(areaSortedContainerMap);
   for(let i = 0; i < cytoscapeJsNodes.length; i++){
     let boundingBox = {
       x1: cytoscapeJsNodes[i].data.bbox.x - cytoscapeJsNodes[i].data.bbox.w / 2,
@@ -389,8 +388,6 @@ sbmlToJson.inferNestingOnLoadSBML = function(cytoscapeJsNodes, containerNodeMap)
       x2: cytoscapeJsNodes[i].data.bbox.x + cytoscapeJsNodes[i].data.bbox.w / 2,
       y2: cytoscapeJsNodes[i].data.bbox.y + cytoscapeJsNodes[i].data.bbox.h / 2,
     };
-
-    console.log(boundingBox);
 
     let isFound = false;
     areaSortedContainerMap.forEach(function(value, key) {
@@ -547,6 +544,11 @@ sbmlToJson.addReactions = function(model, cytoscapeJsEdges, cytoscapeJsNodes) {
       logicalBoolean = true;
       nodeClass = 'unknown logical operator'
     }
+    else{
+      edgeClass1 = "consumption";
+      nodeClass = "process";
+      edgeClass2 = "production";
+    }
 
     if (reducedNotation)
     {
@@ -680,6 +682,10 @@ sbmlToJson.addJSEdges= function(resultJson, cytoscapeJsNodes, cytoscapeJsEdges,r
         tempBbox.y = (reactionCurveStart.y() + reactionCurveEnd.y()) / 2;
         tempBbox.w = reactionCurveLength;
         tempBbox.h = reactionCurveLength;
+        if(tempBbox.w <= 0)
+          tempBbox.w = 20;
+        if(tempBbox.h <= 0)
+          tempBbox.h = 20;
         resultJson[i].data.bbox = tempBbox;
         
         // Set port ordering string
