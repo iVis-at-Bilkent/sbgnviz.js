@@ -1239,7 +1239,7 @@ module.exports = function () {
           var hasMin = false;
           for (var j = 0; j < childNodes.length; j++) {           
             var childNode = childNodes[j];
-            const childClass = childNode.class_;
+            var childClass = childNode.class_;
             if (childClass === "source and sink" || childClass === "emptyset") {
               childClass = "empty set";
             }
