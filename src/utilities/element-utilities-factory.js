@@ -682,7 +682,7 @@ module.exports = function () {
       ion: { asSource: { isAllowed: true }, asTarget: {} },
       process: {
         asSource: {},
-        asTarget: { isAllowed: true, maxEdge: 1, maxTotal: 1 },
+        asTarget: { isAllowed: true },
       },
       "omitted process": {
         asSource: {},
@@ -698,7 +698,7 @@ module.exports = function () {
       },
       "phenotype sbml": { asSource: { isAllowed: true }, asTarget: {} },
       association: {
-        asSource: {},
+        asSource: {isAllowed:true,maxEdge:1,maxTotal:1},
         asTarget: { isAllowed: true},
       },
       dissociation: {
@@ -741,13 +741,13 @@ module.exports = function () {
         asTarget: {},
       },
       "phenotype sbml": { asSource: {}, asTarget: { isAllowed: true } },
-      association: { 
-        asSource: { isAllowed: true, maxEdge: 1, maxTotal: 1 }, 
-        asTarget: {} 
+      association: {
+        asSource: {isAllowed:true,maxEdge:1,maxTotal:1},
+        asTarget: { isAllowed: true},
       },
       dissociation: {
-        asSource: { isAllowed: true },
-        asTarget: {},
+        asSource: {isAllowed:true},
+        asTarget: { isAllowed: true, maxEdge: 1, maxTotal: 1 },
       },
       and: { asSource: {}, asTarget: {} },
       or: { asSource: {}, asTarget: {} },
@@ -1046,8 +1046,14 @@ module.exports = function () {
       "uncertain process": { asSource: {}, asTarget: {} },
       "truncated process": { asSource: {}, asTarget: {} },
       "phenotype sbml": { asSource: { isAllowed: true }, asTarget: {} },
-      association: { asSource: {}, asTarget: {} },
-      dissociation: { asSource: {}, asTarget: {} },
+      association: {
+        asSource: {isAllowed:true,maxEdge:1,maxTotal:1},
+        asTarget: { isAllowed: true},
+      },
+      dissociation: {
+        asSource: {},
+        asTarget: { isAllowed: true, maxEdge: 1, maxTotal: 1 },
+      },
       and: { asSource: {}, asTarget: {} },
       or: { asSource: {}, asTarget: {} },
       not: { asSource: {}, asTarget: {} },
@@ -1078,8 +1084,14 @@ module.exports = function () {
       "uncertain process": { asSource: {}, asTarget: {} },
       "truncated process": { asSource: {}, asTarget: {} },
       "phenotype sbml": { asSource: {}, asTarget: { isAllowed: true } },
-      association: { asSource: {}, asTarget: {} },
-      dissociation: { asSource: {}, asTarget: {} },
+      association: {
+        asSource: {isAllowed:true,maxEdge:1,maxTotal:1},
+        asTarget: { isAllowed: true},
+      },
+      dissociation: {
+        asSource: {isAllowed:true},
+        asTarget: { isAllowed: true, maxEdge: 1, maxTotal: 1 },
+      },
       and: { asSource: {}, asTarget: {} },
       or: { asSource: {}, asTarget: {} },
       not: { asSource: {}, asTarget: {} },
@@ -1107,8 +1119,14 @@ module.exports = function () {
       "uncertain process": { asSource: {}, asTarget: {} },
       "truncated process": { asSource: {}, asTarget: {} },
       "phenotype sbml": { asSource: { isAllowed: true }, asTarget: {} },
-      association: { asSource: {}, asTarget: {} },
-      dissociation: { asSource: {}, asTarget: {} },
+      association: {
+        asSource: {isAllowed:true,maxEdge:1,maxTotal:1},
+        asTarget: { isAllowed: true},
+      },
+      dissociation: {
+        asSource: {},
+        asTarget: { isAllowed: true, maxEdge: 1, maxTotal: 1 },
+      },
       and: { asSource: {}, asTarget: {} },
       or: { asSource: {}, asTarget: {} },
       not: { asSource: {}, asTarget: {} },
@@ -1139,8 +1157,14 @@ module.exports = function () {
       "uncertain process": { asSource: {}, asTarget: {} },
       "truncated process": { asSource: {}, asTarget: {} },
       "phenotype sbml": { asSource: {}, asTarget: { isAllowed: true } },
-      association: { asSource: {}, asTarget: {} },
-      dissociation: { asSource: {}, asTarget: {} },
+      association: {
+        asSource: {isAllowed:true,maxEdge:1,maxTotal:1},
+        asTarget: { isAllowed: true},
+      },
+      dissociation: {
+        asSource: {isAllowed:true},
+        asTarget: { isAllowed: true, maxEdge: 1, maxTotal: 1 },
+      },
       and: { asSource: {}, asTarget: {} },
       or: { asSource: {}, asTarget: {} },
       not: { asSource: {}, asTarget: {} },
