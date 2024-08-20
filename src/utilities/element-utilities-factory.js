@@ -686,15 +686,15 @@ module.exports = function () {
       },
       "omitted process": {
         asSource: {},
-        asTarget: { isAllowed: true, maxEdge: 1, maxTotal: 1 },
+        asTarget: { isAllowed: true },
       },
       "uncertain process": {
         asSource: {},
-        asTarget: { isAllowed: true, maxEdge: 1, maxTotal: 1 },
+        asTarget: { isAllowed: true },
       },
       "truncated process": {
         asSource: {},
-        asTarget: { isAllowed: true, maxEdge: 1, maxTotal: 1 },
+        asTarget: { isAllowed: true },
       },
       "phenotype sbml": { asSource: { isAllowed: true }, asTarget: {} },
       association: {
@@ -725,19 +725,19 @@ module.exports = function () {
       receptor: { asSource: {}, asTarget: { isAllowed: true } },
       ion: { asSource: {}, asTarget: { isAllowed: true } },
       process: {
-        asSource: { isAllowed: true, maxEdge: 1, maxTotal: 1 },
+        asSource: { isAllowed: true },
         asTarget: {},
       },
       "omitted process": {
-        asSource: { isAllowed: true, maxEdge: 1, maxTotal: 1 },
+        asSource: { isAllowed: true },
         asTarget: {},
       },
       "uncertain process": {
-        asSource: { isAllowed: true, maxEdge: 1, maxTotal: 1 },
+        asSource: { isAllowed: true },
         asTarget: {},
       },
       "truncated process": {
-        asSource: { isAllowed: true, maxEdge: 2, maxTotal: 2 },
+        asSource: { isAllowed: true },
         asTarget: {},
       },
       "phenotype sbml": { asSource: {}, asTarget: { isAllowed: true } },
@@ -914,7 +914,7 @@ module.exports = function () {
       receptor: { asSource: {}, asTarget: { isAllowed: true } },
       ion: { asSource: {}, asTarget: { isAllowed: true } },
       process: {
-        asSource: { isAllowed: true, maxEdge: 1, maxTotal: 1 },
+        asSource: { isAllowed: true},
         asTarget: {},
       },
       "omitted process": { asSource: {}, asTarget: {} },
@@ -1040,9 +1040,11 @@ module.exports = function () {
       ion: { asSource: { isAllowed: true }, asTarget: {} },
       process: {
         asSource: {},
-        asTarget: { isAllowed: true, maxEdge: 1, maxTotal: 1 },
+        asTarget: { isAllowed: true, },
       },
-      "omitted process": { asSource: {}, asTarget: {} },
+      "omitted process": { asSource: {
+        
+      }, asTarget: {} },
       "uncertain process": { asSource: {}, asTarget: {} },
       "truncated process": { asSource: {}, asTarget: {} },
       "phenotype sbml": { asSource: { isAllowed: true }, asTarget: {} },
@@ -1077,7 +1079,7 @@ module.exports = function () {
       receptor: { asSource: {}, asTarget: { isAllowed: true } },
       ion: { asSource: {}, asTarget: { isAllowed: true } },
       process: {
-        asSource: { isAllowed: true, maxEdge: 1, maxTotal: 1 },
+        asSource: { isAllowed: true},
         asTarget: {},
       },
       "omitted process": { asSource: {}, asTarget: {} },
@@ -1113,7 +1115,7 @@ module.exports = function () {
       ion: { asSource: { isAllowed: true }, asTarget: {} },
       process: {
         asSource: {},
-        asTarget: { isAllowed: true, maxEdge: 1, maxTotal: 1 },
+        asTarget: { isAllowed: true },
       },
       "omitted process": { asSource: {}, asTarget: {} },
       "uncertain process": { asSource: {}, asTarget: {} },
@@ -1150,7 +1152,7 @@ module.exports = function () {
       receptor: { asSource: {}, asTarget: { isAllowed: true } },
       ion: { asSource: {}, asTarget: { isAllowed: true } },
       process: {
-        asSource: { isAllowed: true, maxEdge: 1, maxTotal: 1 },
+        asSource: { isAllowed: true },
         asTarget: {},
       },
       "omitted process": { asSource: {}, asTarget: {} },
