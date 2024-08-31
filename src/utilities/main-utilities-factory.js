@@ -611,7 +611,6 @@ module.exports = function () {
 
   mainUtilities.convertSbmlToJson = function(data, urlParams) {
     var converted2 = sbmlToJson.convert(data, urlParams);
-    console.log("converted2",converted2) 
     return converted2;
   };
 
@@ -682,11 +681,9 @@ mainUtilities.getMapProperties = function() {
     else if( elementUtilities.fileFormat == 'sbml' )
       return sbmlToJson.mapPropertiesToObj();
     else{
-      console.log( "File format mismatched!")
       return
     }
   }else{
-    console.log( "File format is not defined!")
     return;
   }
  };

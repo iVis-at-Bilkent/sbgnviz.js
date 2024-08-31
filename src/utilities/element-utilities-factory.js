@@ -1954,7 +1954,6 @@ module.exports = function () {
       return null;
     }
 
-    //console.log("pure sbgn", elementUtilities.getSbgnClass( ele ).replace( ' multimer', '' ).replace( 'active ', '' ).replace('hypothetical ', ''))
     return elementUtilities
       .getSbgnClass(ele)
       .replace(" multimer", "")
@@ -2020,7 +2019,6 @@ module.exports = function () {
     }
 
     var getVal = function (index) {
-      //console.log("elements[index][dataOrCss](propertyName)",elements[index] )
       var val = isFunction
         ? propertyName(elements[index])
         : elements[index][dataOrCss](propertyName);
@@ -4816,7 +4814,6 @@ module.exports = function () {
     var pureClass = elementUtilities.getPureSbgnClass(sbgnclass);
 
     // init default properties for the class if not initialized yet
-    //console.log('defaultProperties[ pureClass ] ', defaultProperties[ pureClass ] )
     if (defaultProperties[pureClass] == null) {
       defaultProperties[pureClass] = {};
     }

@@ -1389,13 +1389,7 @@ module.exports = function () {
       if(shouldDisablePorts){      
       graphUtilities.disablePorts();
     }
-    //getDefaultProperties
-    //elementUtilities.nodeTypes.forEach(function(type){
-    //  console.log(elementUtilities.getDefaultProperties(type));
-    //});
-    
-    //console.log(cytoscapeJsGraph);
-    //console.log( elementUtilities.nodeTypes);
+
     return cytoscapeJsGraph;
   };
   

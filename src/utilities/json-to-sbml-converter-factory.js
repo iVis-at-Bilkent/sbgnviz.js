@@ -455,7 +455,6 @@ module.exports = function () {
             var edgeId = reducedProcessArray.edge.id().replace(/-/g, '_');
             var sourceId = reducedProcessArray.source.id().replace(/-/g, '_');
             var targetId = reducedProcessArray.target.id().replace(/-/g, '_');
-            console.log(reducedProcessArray.target);
             const rxn = model.createReaction()
             rxn.setId('reduced_'+ edgeId);
             rxn.setSBOTerm(reducedNotationEdge[reducedProcessArray.edge.data('class')])

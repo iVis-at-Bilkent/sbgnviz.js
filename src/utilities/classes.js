@@ -275,10 +275,6 @@ AuxiliaryUnit.getAbsoluteCoord = function(mainObj, cy) {
       
     }
 
-  //console.log('mainObj', mainObj)
-  //console.log('mainObj.bbox.y',mainObj.bbox.y)
-  //console.log("parent.outerHeight()", parent.outerHeight())
-  //console.log("position.y",position.y)
   // due to corner of barrel shaped compartment shift absX to right
  /*  if (parent.data("class") == "compartment"){
       absX += parent.outerWidth() * 0.1;
@@ -456,7 +452,6 @@ AuxiliaryUnit.addToParent = function (mainObj, cy, parentNode, location, positio
     case "right": mainObj.bbox.x = 100; break;
   }
   // add stateVar to layout, precomputing of relative coords will be triggered accordingly
-  //console.log("mainObj.bbox.x in addParent",mainObj)
   var insertedPosition = AuxUnitLayout.addAuxUnit(layout, cy, mainObj, position);
   return insertedPosition;
 }
@@ -713,7 +708,6 @@ ns.StateVariable = StateVariable;
     bindingRegion.id = id;
    }
    // link to layout
-   //console.log('bindingRegion.anchorSide',  bindingRegion.anchorSide).
    position = BindingRegion.addToParent(bindingRegion, cy, parentNode, "left", position, index);
    return {
      index: BindingRegion.getParent(bindingRegion, cy).data('statesandinfos').indexOf(bindingRegion),
@@ -802,7 +796,6 @@ UnitOfInformation.create = function (parentNode, cy, value, bbox, location, posi
     unit.id = id;
   }
 
-  //console.log("will insert on", location, position);
   position = UnitOfInformation.addToParent(unit, cy, parentNode, location, position, index);
 
   return {
@@ -816,7 +809,6 @@ UnitOfInformation.remove = function (mainObj, cy) {
   var position = UnitOfInformation.getPositionIndex(mainObj, cy);
   var index = UnitOfInformation.getParent(mainObj, cy).data('statesandinfos').indexOf(mainObj);
   UnitOfInformation.removeFromParent(mainObj, cy);
-  //console.log("after remove", this.parent.data('auxunitlayouts'), this.parent.data('statesandinfos'));
   return {
     clazz: "unit of information",
     label: {
@@ -931,7 +923,6 @@ StateVariableDefinition.matchStateVariable = function(mainObj, stateVar) {
     if(matchStateVar.parent === stateVar.parent) {
       continue;
     }
-    //console.log("try", [matchStateVar.value, matchStateVar.variable], [stateVar.value, stateVar.variable]);
     // normal sure case. Example:
     // P T134 - undefined T134
     // P undef - P undef
@@ -1020,7 +1011,6 @@ AuxUnitLayout.update = function(mainObj, cy) {
 
 AuxUnitLayout.addAuxUnit = function(mainObj, cy, unit, position, preComputed) {
   if(typeof position != "undefined") {
-    //console.log("add unit at positiion", position);
     mainObj.units.splice(position, 0, unit);
   }
   else {
@@ -1149,7 +1139,6 @@ AuxUnitLayout.reorderFromPositions = function(mainObj, cy) {
     }
     return 0;
   });
-  //console.log("units after reoarder", this.units);
   /*AuxUnitLayout.updateLengthCache(mainObj, cy);
   AuxUnitLayout.update(mainObj, cy, true);*/
 };

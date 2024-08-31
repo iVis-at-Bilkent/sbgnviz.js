@@ -62,7 +62,6 @@ module.exports = function () {
     
     var id = [];
     var i = 0;
-    //console.log("this.nodes",this.nodes)
     this.nodes.forEach(node => ()=>{
       id[i] = node._private.data.id;
       i++;
@@ -101,7 +100,6 @@ module.exports = function () {
       versionNo = version;
     }
     //var versionNo = (version === "plain") ? "0.2" : version;
-    console.log("Version number", versionNo)
     var sbgn = new libsbgnjs.Sbgn({xmlns: 'http://sbgn.org/libsbgn/' + versionNo});
 
     var map;
@@ -313,7 +311,6 @@ module.exports = function () {
   };
 
   jsonToSbgnml.getGlyphSbgnml = function(node, version, visible = true){
-    console.log("Saving With the changes");
     var self = this;
     var nodeClass = node._private.data.class;
     var glyphList = [];

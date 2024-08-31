@@ -280,7 +280,6 @@ module.exports = function () {
  */
  fileUtilities.loadFile = function(file, convertFcn, callback1, callback2, callback3, callback4) {
    var self = this;
-   console.log("loadFile spinner")
    uiUtilities.startSpinner("load-file-spinner");
 
    var textType = /text.*/;
@@ -441,7 +440,6 @@ module.exports = function () {
 
  fileUtilities.saveAsSbml = function(filename, errorCallback){
   uiUtilities.startSpinner("load-spinner");
-  console.log("HERE");
   var sbgnml = this.convertSbgn();
   this.convertSbgnmlToSbml(sbgnml, function(data){
     if (!data.result) {
@@ -520,7 +518,6 @@ fileUtilities.hasLayoutSBML = function(file) {
   };
   let layoutFound = await fileUtilities.hasLayoutSBML(file);
   if (layoutFound){
-    console.log("Layout found in SBML file");
     fileUtilities.loadFile( file, convert, callback1, callback2, fileUtilities.collapseMarkedNodes, undefined);
   }
   else{
@@ -625,7 +622,6 @@ fileUtilities.createJsonFromSBML = function(){
 
   var sbgnmlText = jsonToSbgnml.createSbgnml(); //SBML
   var converted_ = sbmlToJson.convert(textToXmlObject(sbgnmlText));
-  console.log("converted_",converted_)
   return converted_;
 };
 
