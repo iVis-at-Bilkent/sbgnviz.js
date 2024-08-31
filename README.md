@@ -275,15 +275,15 @@ Converts the given gpml text to sbgnml format.
 
 `instance.exportLayoutData(filename, byName)`
 
-
 `instance.convertSbgnmlTextToJson(sbgnmlText)`
 
+`instance.convertSbmlTextToJson(sbmlText)`
 
 `instance.convertSifTextToJson(sifText)`
 
-
 `instance.createJsonFromSBGN()`
 
+`instance.createJsonFromSBML()`
 
 `instance.createJsonFromSif()`
 
