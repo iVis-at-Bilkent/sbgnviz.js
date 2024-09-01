@@ -1,8 +1,8 @@
 # SBGNViz
 
-SBGNViz is a web based library developed to visualize pathway models represented by process description (PD) and activity flow (AF) languages of [SBGN](http://sbgn.org) or in [simple interaction format (SIF)](https://www.pathwaycommons.org/pc/sif_interaction_rules.do).
-It accepts the pathway models represented in [SBGN-ML](https://github.com/sbgn/sbgn/wiki/LibSBGN) format as well as import facilities from various formats from SIF to SBML to CellDesigner.
-The library also supports overlay of experiment data on maps.
+SBGNViz is a web based library developed to visualize pathway models represented by process description (PD) and activity flow (AF) languages of [SBGN](http://sbgn.org), a language based on [SBML](https://sbml.org/) or in [simple interaction format (SIF)](https://www.pathwaycommons.org/pc/sif_interaction_rules.do).
+In addition to the native .nwt format, it accepts the pathway models represented in [SBGN-ML](https://github.com/sbgn/sbgn/wiki/LibSBGN) format as well as providing import facilities from various formats from SIF, SBML, [CellDesigner](http://www.celldesigner.org/) and [GPML](https://pathvisio.org/documentation/GPML).
+The library also supports the overlay of experiment data on maps.
 
 ## Software
 
