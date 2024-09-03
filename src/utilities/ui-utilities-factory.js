@@ -17,7 +17,7 @@ module.exports = function () {
  }
 
  uiUtilities.startSpinner = function (className) {
-   if (!className) {
+    if (!className) {
      className = 'default-class';
    }
 
@@ -36,12 +36,17 @@ module.exports = function () {
    $("."+className+'-text').fadeIn(0)
  }
 
- uiUtilities.endSpinner = function (className) {
-   if (!className) {
-     className = 'default-class';
-   }
+ uiUtilities.showSpinnerText = function(className)
+ {
+   $("."+className+'-text').fadeIn(0)
+ }
 
-   if ($('.' + className + '-wrapper').length > 0) {
+ uiUtilities.endSpinner = function (className) {
+  if (!className) {
+    className = 'default-class';
+  }
+
+  if ($('.' + className + '-wrapper').length > 0) {
     $('.' + className + '-wrapper').remove();
   }
  };
