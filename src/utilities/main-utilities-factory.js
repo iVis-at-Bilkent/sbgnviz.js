@@ -8,15 +8,17 @@ var libs = libUtilities.getLibs();
 var jQuery = $ = libs.jQuery;
 
 module.exports = function () {
-  var elementUtilities, jsonToSbgnml, sbgnmlToJson, tdToJson, nwtToJson,
+  var elementUtilities, jsonToSbgnml, sbgnmlToJson, sbmlToJson, tdToJson, nwtToJson,
       sifToJson, optionUtilities, graphUtilities, layoutLoader, jsonToNwt;
   var cy, options;
 
   function mainUtilities (param) {
     elementUtilities = param.elementUtilities;
     jsonToSbgnml = param.jsonToSbgnmlConverter;
+    jsonToSbml = param.jsonToSbmlConverter;
     jsonToNwt = param.jsonToNwtConverter;
     sbgnmlToJson = param.sbgnmlToJsonConverter;
+    sbmlToJson = param.sbmlToJsonConverter;
     nwtToJson = param.nwtToJsonConverter;
     tdToJson = param.tdToJsonConverter;
     sifToJson = param.sifToJsonConverter;
@@ -42,8 +44,13 @@ module.exports = function () {
     for(var i = 0; i < edges.length; i++){
       var edge = edges[i];
       edge.removeClass('edgebendediting-hasbendpoints');
+      edge.removeClass('edgecontrolediting-hascontrolpoints');
+      edge.removeClass('edgebendediting-hasmultiplebendpoints');
+      edge.removeClass('edgecontrolediting-hasmultiplecontrolpoints');
       edge.data('cyedgebendeditingDistances', []);
       edge.data('cyedgebendeditingWeights', []);
+      edge.data('cyedgecontroleditingDistances', []);	
+      edge.data('cyedgecontroleditingWeights', []);
     }
 
     parents.removeData('minWidth');
@@ -218,6 +225,38 @@ module.exports = function () {
     });
     eles.removeData("thickBorder");
     return eles;
+  }
+
+  mainUtilities.hideElesSimple = function(eles) {
+    var viewUtilities = cy.viewUtilities('get');
+
+    if (eles.length === 0) {
+      return;
+    }
+
+    if(options.undoable) {
+
+      var ur = cy.undoRedo();
+      ur.action("thickenBorder", mainUtilities.thickenBorder, mainUtilities.thinBorder);
+      ur.action("thinBorder", mainUtilities.thinBorder, mainUtilities.thickenBorder);
+
+      // Batching
+      var actions = [];
+      var nodesWithHiddenNeighbor = cy.edges(":hidden").connectedNodes().intersection(eles);
+      actions.push({name: "thinBorder", param: nodesWithHiddenNeighbor});
+      actions.push({name: "hide", param: eles});
+      nodesWithHiddenNeighbor = eles.neighborhood(":visible")
+              .nodes().difference(eles).difference(cy.nodes("[thickBorder]"));
+      actions.push({name: "thickenBorder", param: nodesWithHiddenNeighbor});
+      cy.undoRedo().do("batch", actions);
+    }
+    else {
+      var nodesWithHiddenNeighbor = cy.edges(":hidden").connectedNodes(':visible');
+      mainUtilities.thinBorder(nodesWithHiddenNeighbor);
+      viewUtilities.hide(eles);
+      var nodesWithHiddenNeighbor = cy.edges(":hidden").connectedNodes(':visible');
+      mainUtilities.thickenBorder(nodesWithHiddenNeighbor);
+    }
   }
 
   // Extends the given nodes list in a smart way to leave the map intact and hides the resulting list.
@@ -536,7 +575,6 @@ module.exports = function () {
   // Performs layout by given layoutOptions. Considers 'undoable' option. However, by setting notUndoable parameter
   // to a truthy value you can force an undable layout operation independant of 'undoable' option.
   mainUtilities.performLayout = function(layoutOptions, notUndoable) {
-    
     if (!options.undoable || notUndoable) { // 'notUndoable' flag can be used to have composite actions in undo/redo stack
       // Things to do before performing layout
       mainUtilities.beforePerformLayout();
@@ -569,6 +607,11 @@ module.exports = function () {
   // (http://js.cytoscape.org/#notation/elements-json) and returns it.
   mainUtilities.convertSbgnmlToJson = function(data, urlParams) {
     return sbgnmlToJson.convert(data, urlParams);
+  };
+
+  mainUtilities.convertSbmlToJson = function(data, urlParams) {
+    var converted2 = sbmlToJson.convert(data, urlParams);
+    return converted2;
   };
 
   mainUtilities.convertNwtToJson = function(data) {
@@ -625,20 +668,22 @@ module.exports = function () {
    */
 mainUtilities.getMapProperties = function() {
   if( elementUtilities.fileFormat !== undefined){
-    if( elementUtilities.fileFormat == 'sbgnml')
+    if( elementUtilities.fileFormat == 'sbgnml'){
+      //this.showNodesSmart
       return sbgnmlToJson.mapPropertiesToObj();
+    }
     else if( elementUtilities.fileFormat == 'nwt' )
       return nwtToJson.mapPropertiesToObj();
     else if( elementUtilities.fileFormat == 'td')
       return tdToJson.mapPropertiesToObj();
     else if( elementUtilities.fileFormat == 'sif' )
       return sifToJson.mapPropertiesToObj();
+    else if( elementUtilities.fileFormat == 'sbml' )
+      return sbmlToJson.mapPropertiesToObj();
     else{
-      console.log( "File format mismatched!")
       return
     }
   }else{
-    console.log( "File format is not defined!")
     return;
   }
  };

@@ -75,15 +75,17 @@ module.exports = function () {
  }
  // Helper functions End
 
- var sbgnmlToJson, jsonToSbgnml, jsonToNwt, uiUtilities, tdToJson,
-     sifToJson, graphUtilities, layoutToText, nwtToJson, jsonToSif,sbgnmlToCd,cdToSbgnml,sbgnmlToSbml,sbmlToSbgnml,gpmlToSbgnml,sbgnmlToGpml;
+ var sbgnmlToJson, sbmlToJson, jsonToSbgnml, jsonToSbml, jsonToNwt, uiUtilities, tdToJson,
+     sifToJson, graphUtilities, layoutToText, nwtToJson, jsonToSif,sbgnmlToCd,cdToSbgnml,sbgnmlToSbml,sbmlToSbgnml;
  var updateGraph;
  var options, cy;
 
  function fileUtilities (param) {
    sbgnmlToJson = param.sbgnmlToJsonConverter;
+   sbmlToJson = param.sbmlToJsonConverter;
    nwtToJson = param.nwtToJsonConverter;
    jsonToSbgnml = param.jsonToSbgnmlConverter;
+   jsonToSbml = param.jsonToSbmlConverter;
    jsonToNwt = param.jsonToNwtConverter;
    jsonToSif = param.jsonToSifConverter;
    uiUtilities = param.uiUtilities;
@@ -104,38 +106,70 @@ module.exports = function () {
 
  fileUtilities.loadXMLDoc = loadXMLDoc;
 
- fileUtilities.saveAsPng = function(filename) {
-   var pngContent = cy.png({scale: 3, full: true});
+ fileUtilities.textToXmlObject = textToXmlObject;
+
+ fileUtilities.saveAsPng = function(filename, scale, bg, maxWidth, maxHeight) {
+   if(maxWidth || maxHeight) {
+     var pngContent = cy.png({
+       full: true, bg: bg, 
+       maxWidth: maxWidth, maxHeight: maxHeight
+     });
+   }
+   else {
+     var pngContent = cy.png({
+       scale: scale || 3, full: true, bg: bg
+     });
+   }
 
    // this is to remove the beginning of the pngContent: data:img/png;base64,
    var b64data = pngContent.substr(pngContent.indexOf(",") + 1);
 
    // lower quality when response is empty
    if(!b64data || b64data === ""){
-     pngContent = cy.png({maxWidth: 15000, maxHeight: 15000, full: true});
+     pngContent = cy.png({maxWidth: 15000, maxHeight: 15000, full: true, bg: bg});
      b64data = pngContent.substr(pngContent.indexOf(",") + 1);
    }
 
    saveAs(b64toBlob(b64data, "image/png"), filename || "network.png");
  };
 
- fileUtilities.saveAsJpg = function(filename) {
-   var jpgContent = cy.jpg({scale: 3, full: true});
-
+ fileUtilities.saveAsJpg = function(filename, scale, bg, maxWidth, maxHeight, quality) {
+   if(maxWidth || maxHeight) {
+     var jpgContent = cy.jpg({
+       full: true, bg: bg, 
+       maxWidth: maxWidth, maxHeight: maxHeight, 
+       quality: quality
+     });
+   }
+   else {
+     var jpgContent = cy.jpg({
+       scale: scale || 3, full: true, bg: bg, 
+       quality: quality
+     });
+   }
+   
    // this is to remove the beginning of the pngContent: data:img/png;base64,
    var b64data = jpgContent.substr(jpgContent.indexOf(",") + 1);
 
    // lower quality when response is empty
    if(!b64data || b64data === ""){
-     jpgContent = cy.jpg({maxWidth: 15000, maxHeight: 15000, full: true});
+     jpgContent = cy.jpg({maxWidth: 15000, maxHeight: 15000, full: true, bg: bg});
      b64data = jpgContent.substr(jpgContent.indexOf(",") + 1);
    }
 
    saveAs(b64toBlob(b64data, "image/jpg"), filename || "network.jpg");
  };
 
- fileUtilities.saveAsSvg = function(filename) {
-   var svgContent = cy.svg({scale: 1, full: true});
+ fileUtilities.saveAsSvg = function(filename, scale, bg, maxWidth, maxHeight) {
+   if (maxWidth || maxHeight) {
+     var svgContent = cy.svg({
+       full: true, bg: bg, 
+       maxWidth: maxWidth, maxHeight: maxHeight
+     });
+   }
+   else {
+     var svgContent = cy.svg({scale: scale || 1, full: true, bg: bg});
+   }
    saveAs(new Blob([svgContent], {type:"image/svg+xml;charset=utf-8"}), filename || "network.svg");
  };
 
@@ -318,11 +352,18 @@ module.exports = function () {
 
  fileUtilities.loadSBGNMLText = async function(textData, tileInfoBoxes, filename, cy, urlParams){
   await updateGraph(sbgnmlToJson.convert(textToXmlObject(textData), urlParams), undefined, undefined, tileInfoBoxes);
-   await $(document).trigger("sbgnvizLoadFileEnd",  [filename, cy]);
-         uiUtilities.endSpinner("load-file-spinner");
+  await $(document).trigger("sbgnvizLoadFileEnd",  [filename, cy]);
+        uiUtilities.endSpinner("load-file-spinner");
 
 
  };
+
+ fileUtilities.loadSBMLText = async function(textData, tileInfoBoxes, filename, cy, urlParams){
+  await updateGraph(sbmlToJson.convert(textToXmlObject(textData), urlParams), undefined, undefined, tileInfoBoxes);
+   await $(document).trigger("sbgnvizLoadFileEnd",  [filename, cy]);
+   uiUtilities.endSpinner("load-file-spinner");
+
+};
 
  // supported versions are either 0.2 or 0.3
  fileUtilities.saveAsSbgnml = function(filename, version, renderInfo, mapProperties, nodes, edges) {
@@ -332,6 +373,25 @@ module.exports = function () {
    });
    saveAs(blob, filename);
  };
+
+ fileUtilities.saveAsSbgnmlForSBML = function(filename, errorCallback){
+  // We have sbml map typed nodes and edges in the cytoscape graph and we want to export to sbgnml
+  // Create sbml file first, then get the sbgnml from the Minerva conversion service
+  uiUtilities.startSpinner("load-file-spinner");
+  var sbgnText = jsonToSbml.createSbml(filename);
+  //convert sbml to sbgnml
+  this.convertSbmlToSbgnml(sbgnText, function(data){
+    if(!data.result){
+      errorCallback();
+    }else{
+      var blob = new Blob([data.message], {
+        type: "text/plain;charset=utf-8;",
+      });
+      saveAs(blob, filename);
+    }
+    uiUtilities.endSpinner("load-file-spinner");
+  }.bind(this));
+}
 
  // supported versions are either 0.2 or 0.3
  fileUtilities.saveAsNwt = function(filename, version, renderInfo, mapProperties, nodes, edges) {
@@ -364,7 +424,8 @@ module.exports = function () {
 
   reader.onload = function (e) { 
   
-    this.convertCDToSbgnml(e.target.result, function(data){
+    // this.convertCDToSbgnml(e.target.result, function(data){
+    cdToSbgnml.convert(e.target.result, function(data){
       uiUtilities.endSpinner("load-spinner");
       if(data == null){
         errorCallback();
@@ -377,33 +438,97 @@ module.exports = function () {
   reader.readAsText(file);
  };
 
- fileUtilities.saveAsSbml = function(filename,errorCallback){
+ fileUtilities.saveAsSbml = function(filename, errorCallback){
   uiUtilities.startSpinner("load-spinner");
   var sbgnml = this.convertSbgn();
-  
   this.convertSbgnmlToSbml(sbgnml, function(data){
-    
-    if(!data.result){
-      errorCallback(sbgnml,data.error);
-    }else if( data.message.indexOf("Internal server error") !== -1)
-    {
-      errorCallback(sbgnml,data.message);
-    }else{    
+    if (!data.result) {
+      errorCallback(sbgnml, data.error);
+    } else if (data.message.indexOf("Internal server error") !== -1) {
+      errorCallback(sbgnml, data.message);
+    } else {
       var blob = new Blob([data.message], {
         type: "text/plain;charset=utf-8;",
       });
-      saveAs(blob, filename); 
+      saveAs(blob, filename);
     }
     uiUtilities.endSpinner("load-spinner");
   });
- };
+ }
 
+  fileUtilities.saveSbmlForSBML = function(filename, errorCallback){
+    uiUtilities.startSpinner("load-spinner");
+    try {
+      var sbgnText = jsonToSbml.createSbml(filename);
+      var blob = new Blob([sbgnText], {
+        type: "text/plain;charset=utf-8;",
+      });
+      saveAs(blob, filename);
+    }
+    catch(err) {
+      errorCallback();
+    }
+    uiUtilities.endSpinner("load-spinner");
+}
+fileUtilities.hasLayoutSBML = function(file) {
+  return new Promise((resolve, reject) => {
+    var reader = new FileReader();
+    var layoutFound = false;
+
+    reader.onload = function(e) {
+      var text = this.result;
+      var matchResult = text.match(/<[^>]*listOfLayouts[^>]*>[\s\S]*<\/[^>]*listOfLayouts[^>]*>/);
+      if (matchResult != null) {
+        layoutFound = true;
+      }
+      resolve(layoutFound);
+    };
+
+    reader.onerror = function() {
+      reject(new Error("Failed to read the file"));
+    };
+
+    reader.readAsText(file);
+  });
+};
+
+ fileUtilities.loadSbmlForSBML = async function(file, callback1, callback2, layoutBy)
+ {
+  var convert = function( text ) {
+    var converted = sbmlToJson.convert(text)
+    return converted;
+  };
+
+  var runLayout = function() {
+    if ( layoutBy ) {
+      if ( typeof layoutBy === 'function' ) {
+        layoutBy();
+      }
+      else {
+        var layout = cy.layout( layoutBy );
+
+        // for backward compatibility need to make this if check
+        if ( layout && layout.run ) {
+          layout.run();
+        }
+      }
+    }
+
+    cy.fit( cy.elements(":visible"), 20 );
+  };
+  let layoutFound = await fileUtilities.hasLayoutSBML(file);
+  if (layoutFound){
+    fileUtilities.loadFile( file, convert, callback1, callback2, fileUtilities.collapseMarkedNodes, undefined);
+  }
+  else{
+    fileUtilities.loadFile( file, convert, callback1, callback2, fileUtilities.collapseMarkedNodes, runLayout);
+  }
+ }
  fileUtilities.loadSbml = function(file, successCallback, errorCallback){
   var reader = new FileReader();
-
   reader.onload = function (e) { 
     
-    this.convertSbmlToSbgnml(e.target.result, function(data){
+      this.convertSbmlToSbgnml(e.target.result, function(data){
       if(data == null){
         errorCallback();
       }else{
@@ -440,7 +565,7 @@ module.exports = function () {
   var reader = new FileReader();
   reader.onload = function (e) { 
     
-      this.convertGpmlToSbgnml(e.target.result, function(data){
+    gpmlToSbgnml.convert(e.target.result, function(data){
       if(data == null){
         errorCallback();
       }else{
@@ -452,9 +577,8 @@ module.exports = function () {
 
  }; 
 
- fileUtilities.convertSbgn= function(filename, version, renderInfo, mapProperties, nodes, edges) {
-  var sbgnmlText = jsonToSbgnml.createSbgnml(filename, "plain", renderInfo, mapProperties, nodes, edges);
- 
+ fileUtilities.convertSbgn= function(filename, version, renderInfo, mapProperties, nodes, edges, hidden = false) {
+  var sbgnmlText = jsonToSbgnml.createSbgnml(filename, version, renderInfo, mapProperties, nodes, edges, hidden);
   return sbgnmlText;
 };
 
@@ -479,6 +603,9 @@ module.exports = function () {
  fileUtilities.convertSbgnmlTextToJson = function(sbgnmlText){
      return sbgnmlToJson.convert(textToXmlObject(sbgnmlText));
  };
+ fileUtilities.convertSbmlTextToJson = function(sbgnmlText){
+  return sbmlToJson.convert(textToXmlObject(sbgnmlText));
+};
 
  fileUtilities.convertSifTextToJson = function(sifText){
         return sifToJson.convert(sifText);
@@ -489,6 +616,13 @@ fileUtilities.createJsonFromSBGN = function(){
 
     var sbgnmlText = jsonToSbgnml.createSbgnml();
     return sbgnmlToJson.convert(textToXmlObject(sbgnmlText));
+};
+
+fileUtilities.createJsonFromSBML = function(){
+
+  var sbgnmlText = jsonToSbgnml.createSbgnml(); //SBML
+  var converted_ = sbmlToJson.convert(textToXmlObject(sbgnmlText));
+  return converted_;
 };
 
 fileUtilities.createJsonFromSif = function(){

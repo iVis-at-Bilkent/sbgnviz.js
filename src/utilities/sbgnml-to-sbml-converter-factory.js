@@ -15,7 +15,7 @@ module.exports = function () {
         return $.ajax({
             type: 'post',
             url: conversionApiUrl,
-            contentType: "text/xml; charset=UTF-8",
+            contentType: "text/plain; charset=UTF-8",
             data: xml,
             dataType: "text",
             success: function (data, textStatus, xhr) {

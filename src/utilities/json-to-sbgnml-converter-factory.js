@@ -6,8 +6,8 @@ var pkgVersion = require('../../package.json').version; // need info about sbgnv
 var pkgName = require('../../package.json').name;
 var prettyprint = require('pretty-data').pd;
 var xml2js = require('xml2js');
-var mapPropertiesBuilder = new xml2js.Builder({rootName: "mapProperties"});
-var compoundExtensionBuilder = new xml2js.Builder({rootName: "extraInfo"});
+var mapPropertiesBuilder = new xml2js.Builder({rootName: "nwt:mapProperties"});
+var compoundExtensionBuilder = new xml2js.Builder({rootName: "nwt:extraInfo"});
 var textUtilities = require('./text-utilities');
 
 module.exports = function () {
@@ -50,7 +50,7 @@ module.exports = function () {
    Serious changes occur between the format version for submaps content. Those changes are not implemented yet.
    TODO implement 0.3 changes when submap support is fully there.
    */
-  jsonToSbgnml.buildJsObj = function(filename, version, renderInfo, mapProperties, nodes, edges){
+  jsonToSbgnml.buildJsObj = function(filename, version, renderInfo, mapProperties, nodes, edges, hidden = false){
     var self = this;
     var mapID = textUtilities.getXMLValidId(filename);
     var hasExtension = false;
@@ -58,6 +58,14 @@ module.exports = function () {
     var mapType = ( mapProperties && mapProperties.mapType ) || elementUtilities.mapType;
     this.nodes = nodes || cy.nodes();
     this.edges = edges || cy.edges();
+
+    
+    var id = [];
+    var i = 0;
+    this.nodes.forEach(node => ()=>{
+      id[i] = node._private.data.id;
+      i++;
+    });
 
     var collapsedChildren = elementUtilities.getAllCollapsedChildrenRecursively(this.nodes);
     this.allCollapsedNodes = collapsedChildren.filter("node");
@@ -109,14 +117,17 @@ module.exports = function () {
        }
        map.setExtension(extension);
        if (mapProperties) {
-           delete mapProperties.experimentDescription;
-           var xml = mapPropertiesBuilder.buildObject(mapProperties);
-           map.extension.add(xml);
+          delete mapProperties.experimentDescription;
+          mapProperties.$ = { "xmlns:nwt": "https://newteditor.org/" };
+          var xml = mapPropertiesBuilder.buildObject(mapProperties);
+          map.extension.add(xml);
        }
 
     } else if (mapProperties) {
-       map.setExtension(new libsbgnjs.Extension());
-       map.extension.add(mapPropertiesBuilder.buildObject(mapProperties));
+      map.setExtension(new libsbgnjs.Extension());
+      mapProperties.$ = { "xmlns:nwt": "https://newteditor.org/" };
+      var xml = mapPropertiesBuilder.buildObject(mapProperties);
+      map.extension.add(xml);
     }
 
     // get all glyphs
@@ -125,16 +136,22 @@ module.exports = function () {
     // in the getGlyphSbgnml function. If not set accordingly, discrepancies will occur.
     var self = this;
     this.nodes.each(function(ele, i){
-       if(typeof ele === "number") {
-         ele = i;
-       }
-       if(jsonToSbgnml.childOfNone(ele, self.nodes))
-           glyphList = glyphList.concat(self.getGlyphSbgnml(ele)); // returns potentially more than 1 glyph
+      if(typeof ele === "number") {
+        ele = i;
+      }
+       if(jsonToSbgnml.childOfNone(ele, self.nodes)){
+        var vis = true;
+        if(hidden)
+          vis = id.includes(ele._private.data.id);
+        glyphList = glyphList.concat(self.getGlyphSbgnml(ele, version, vis)); // returns potentially more than 1 glyph
+      }
     });
     // add them to the map
     for(var i=0; i<glyphList.length; i++) {
-       if (version === "plain" || version ==="plain3")
+      
+       if (version === "plain" && (!hidden ))
          glyphList[i].extension = null;
+      if(glyphList[i] != undefined)
        map.addGlyph(glyphList[i]);
     }
     // get all arcs
@@ -143,10 +160,11 @@ module.exports = function () {
        if(typeof ele === "number") {
          ele = i;
        }
-       var arc = self.getArcSbgnml(ele);
-       if (version === "plain" || version ==="plain3")
+
+       var arc = self.getArcSbgnml(ele, version, hidden);
+       if (version === "plain" && (!hidden || (hidden && ele.visible())))
          arc.extension = null;
-       map.addArc(self.getArcSbgnml(ele));
+       map.addArc(arc);
     });
 
     sbgn.addMap(map);
@@ -154,8 +172,8 @@ module.exports = function () {
     return sbgn.buildJsObj();
   };
 
-  jsonToSbgnml.createSbgnml = function(filename, version, renderInfo, mapProperties, nodes, edges) {
-    var jsObj = jsonToSbgnml.buildJsObj(filename, version, renderInfo, mapProperties, nodes, edges);
+  jsonToSbgnml.createSbgnml = function(filename, version, renderInfo, mapProperties, nodes, edges, hidden = false) {
+    var jsObj = jsonToSbgnml.buildJsObj(filename, version, renderInfo, mapProperties, nodes, edges, hidden);
     return jsonToSbgnml.buildString({sbgn: jsObj});
   }
 
@@ -217,60 +235,52 @@ module.exports = function () {
 
   // see createSbgnml for info on the structure of renderInfo
   jsonToSbgnml.getRenderExtensionSbgnml = function(renderInfo) {
-      // initialize the main container
-      var renderInformation = new renderExtension.RenderInformation({ id: 'renderInformation',
-                                                                      backgroundColor: renderInfo.background,
-                                                                      programName: pkgName,
-                                                                      programVersion: pkgVersion });
+    // initialize the main container
+    var renderInformation = new renderExtension.RenderInformation({
+        id: 'renderInformation',
+        backgroundColor: renderInfo.background,
+        programName: pkgName,
+        programVersion: pkgVersion
+    });
 
-      // populate list of colors
-      var listOfColorDefinitions = new renderExtension.ListOfColorDefinitions();
-      for (var color in renderInfo.colors) {
-          var colorDefinition = new renderExtension.ColorDefinition({id: renderInfo.colors[color], value: color});
-          listOfColorDefinitions.addColorDefinition(colorDefinition);
-      }
-      renderInformation.setListOfColorDefinitions(listOfColorDefinitions);
-      
-        // populate list of background images
-        var listOfBackgroundImages = new renderExtension.ListOfBackgroundImages();
-        if(!(Object.keys(experimentalDataOverlay.getParsedDataMap()).length > 0)){
-          for (var img in renderInfo.images) {
-              var backgroundImage = new renderExtension.BackgroundImage({id: renderInfo.images[img], value: img});
-              listOfBackgroundImages.addBackgroundImage(backgroundImage);
-          }
+    // populate list of colors
+    var listOfColorDefinitions = new renderExtension.ListOfColorDefinitions();
+    for (var color in renderInfo.colors) {
+        var colorDefinition = new renderExtension.ColorDefinition({ id: renderInfo.colors[color], value: color });
+        listOfColorDefinitions.addColorDefinition(colorDefinition);
+    }
+    renderInformation.setListOfColorDefinitions(listOfColorDefinitions);
+
+    // populate list of background images
+    var listOfBackgroundImages = new renderExtension.ListOfBackgroundImages();
+    if (!(Object.keys(experimentalDataOverlay.getParsedDataMap()).length > 0)) {
+        for (var img in renderInfo.images) {
+            var backgroundImage = new renderExtension.BackgroundImage({ id: renderInfo.images[img], value: img });
+            listOfBackgroundImages.addBackgroundImage(backgroundImage);
         }
-        renderInformation.setListOfBackgroundImages(listOfBackgroundImages);
+    }
+    renderInformation.setListOfBackgroundImages(listOfBackgroundImages);
 
-      // populates styles
-      var listOfStyles = new renderExtension.ListOfStyles();
-      for (var key in renderInfo.styles) {
-          var style = renderInfo.styles[key];
-          var xmlStyle = new renderExtension.Style({id: textUtilities.getXMLValidId(key), idList: style.idList.join(' ')});
-          var g = new renderExtension.RenderGroup({
-              fontSize: style.properties.fontSize,
-              fontFamily: style.properties.fontFamily,
-              fontWeight: style.properties.fontWeight,
-              fontStyle: style.properties.fontStyle,
-              fontColor: style.properties.fontColor,
-              fill: style.properties.fill, // fill color
-              stroke: style.properties.stroke, // stroke color
-              strokeWidth: style.properties.strokeWidth,
-              backgroundImage: style.properties.backgroundImage,
-              backgroundFit: style.properties.backgroundFit,
-              backgroundPosX: style.properties.backgroundPosX,
-              backgroundPosY: style.properties.backgroundPosY,
-              backgroundWidth: style.properties.backgroundWidth,
-              backgroundHeight: style.properties.backgroundHeight,
-              backgroundImageOpacity: style.properties.backgroundImageOpacity,
-              backgroundOpacity: style.properties.backgroundOpacity
-          });
-          xmlStyle.setRenderGroup(g);
-          listOfStyles.addStyle(xmlStyle);
-      }
-      renderInformation.setListOfStyles(listOfStyles);
+    // populates styles
+    var listOfStyles = new renderExtension.ListOfStyles();
+    for (var key in renderInfo.styles) {
+        var style = renderInfo.styles[key];
+        var properties = {};
 
-      return renderInformation;
-  };
+        for (var prop in style.properties) {
+            if (style.properties[prop] !== '') {
+                properties[prop] = style.properties[prop];
+            }
+        }
+
+        var xmlStyle = new renderExtension.Style({ id: textUtilities.getXMLValidId(key), idList: style.idList.join(' ') });
+        var g = new renderExtension.RenderGroup(properties);
+        xmlStyle.setRenderGroup(g);
+        listOfStyles.addStyle(xmlStyle);
+    }
+    renderInformation.setListOfStyles(listOfStyles);
+    return renderInformation;
+};
 
   jsonToSbgnml.getAnnotationExtension = function(cyElement) {
       var annotations = cyElement.data('annotations');
@@ -300,13 +310,20 @@ module.exports = function () {
       return annotExt;
   };
 
-  jsonToSbgnml.getGlyphSbgnml = function(node){
+  jsonToSbgnml.getGlyphSbgnml = function(node, version, visible = true){
     var self = this;
     var nodeClass = node._private.data.class;
     var glyphList = [];
-
+    if(!visible && !node.visible())
+      return; 
     if( nodeClass.startsWith('BA')) {
        nodeClass = "biological activity";
+    }
+
+    // Workaround: In application we use 'empty set' class but SBGN-ML files 
+    // use 'source and sink' so we read and write as 'source and sink'
+    if (nodeClass === "empty set") {
+      nodeClass = "source and sink";
     }
 
     var glyph = new libsbgnjs.Glyph({id: node._private.data.id, class_: nodeClass});
@@ -319,7 +336,7 @@ module.exports = function () {
        }
        else {
            var parent = node.parent()[0];
-           if(parent._private.data.class == "compartment")
+           if(parent._private.data.class == "compartment" || parent._private.data.class ==='complex sbml')
                glyph.compartmentRef = parent._private.data.id;
        }
     }
@@ -345,8 +362,9 @@ module.exports = function () {
       extraInfo.HTBias = Number(node.css("min-height-bias-top").replace("px",""));
       extraInfo.HBBias = Number(node.css("min-height-bias-bottom").replace("px",""));
       glyph.setExtension(new libsbgnjs.Extension());
-      glyph.extension.add(compoundExtensionBuilder.buildObject(extraInfo));
-
+      extraInfo.$ = { "xmlns:nwt": "https://newteditor.org/" };
+      var extraInfoXml = compoundExtensionBuilder.buildObject(extraInfo);
+      glyph.extension.add(extraInfoXml);
     }
    
     //add port information
@@ -372,15 +390,21 @@ module.exports = function () {
        else if(boxGlyph.clazz === "unit of information"){
            glyph.addGlyphMember(this.addInfoBoxGlyph(boxGlyph, statesandinfosId, node));
        }
+       else if(boxGlyph.clazz === "residue variable"){
+        glyph.addGlyphMember(this.addResidueBoxGlyph(boxGlyph, statesandinfosId, node));
+      }
+      else if(boxGlyph.clazz === "binding region"){
+        glyph.addGlyphMember(this.addBindingBoxGlyph(boxGlyph, statesandinfosId, node));
+    }
     }
     // check for annotations
-    if (node.data('annotations') && !$.isEmptyObject(node.data('annotations'))) {
-       var extension = self.getOrCreateExtension(glyph);
-       var annotExt = self.getAnnotationExtension(node);
-       extension.add(annotExt);
+    if (version !== "plain" && node.data('annotations') && !$.isEmptyObject(node.data('annotations'))) {
+      var extension = self.getOrCreateExtension(glyph);
+      var annotExt = self.getAnnotationExtension(node);
+      extension.add(annotExt);
     }
     // add glyph members that are not state variables or unit of info: subunits
-    if(nodeClass === "complex" || nodeClass === "complex multimer" || nodeClass === "submap"){
+    if(nodeClass === "complex" || nodeClass === "complex multimer" || nodeClass === "submap" || nodeClass === "topology group" || nodeClass == "active protein"){
        var children = node.children();
        children = children.union(this.allCollapsedNodes);
        if(node.data('collapsedChildren')) {
@@ -393,7 +417,7 @@ module.exports = function () {
            if(typeof ele === "number") {
              ele = i;
            }
-           var glyphMemberList = self.getGlyphSbgnml(ele);
+           var glyphMemberList = self.getGlyphSbgnml(ele, version, visible);
            for (var i=0; i < glyphMemberList.length; i++) {
                glyph.addGlyphMember(glyphMemberList[i]);
            }
@@ -432,7 +456,7 @@ module.exports = function () {
     glyphList.push(glyph);
 
     // keep going with all the included glyphs
-    if(nodeClass === "compartment"){
+    if(nodeClass === "compartment"||nodeClass==='complex sbml'){
        var children = node.children();
        children = children.union(this.allCollapsedNodes);
        children = children.filter("[parent = '"+ node.id() + "']")
@@ -440,7 +464,7 @@ module.exports = function () {
            if(typeof ele === "number") {
              ele = i;
            }
-           glyphList = glyphList.concat(self.getGlyphSbgnml(ele));
+           glyphList = glyphList.concat(self.getGlyphSbgnml(ele, version, visible));
        });
     }
 
@@ -460,12 +484,13 @@ module.exports = function () {
       return extension;
   };
 
-  jsonToSbgnml.getArcSbgnml = function(edge){
+  jsonToSbgnml.getArcSbgnml = function(edge, version, hidden = false){
     var self = this;
     //Temporary hack to resolve "undefined" arc source and targets
     var arcTarget = edge._private.data.porttarget;
     var arcSource = edge._private.data.portsource;
-
+    if(hidden && !edge.visible())
+      return;
     if (arcSource == null || arcSource.length === 0)
        arcSource = edge._private.data.source;
 
@@ -477,15 +502,15 @@ module.exports = function () {
 
     arc.setStart(new libsbgnjs.StartType({x: edge._private.rscratch.startX, y: edge._private.rscratch.startY}));
 
-    // Export bend points if edgeBendEditingExtension is registered
+    // Export anchor points if edgeEditingExtension is registered
     if (cy.edgeEditing && cy.edgeEditing('initialized')) {
-     var segpts = cy.edgeEditing('get').getSegmentPoints(edge);
+     var segpts = cy.edgeEditing('get').getAnchorsAsArray(edge);
      if(typeof segpts !== 'undefined'){
        if(segpts.length > 0){
         for(var i = 0; segpts && i < segpts.length; i = i + 2){
-          var bendX = segpts[i];
-          var bendY = segpts[i + 1];
-          arc.addNext(new libsbgnjs.NextType({x: bendX, y: bendY}));
+          var anchorX = segpts[i];
+          var anchorY = segpts[i + 1];
+          arc.addNext(new libsbgnjs.NextType({x: anchorX, y: anchorY}));
         }
        }
 
@@ -515,6 +540,18 @@ module.exports = function () {
     if(edge.hidden()) {
        var extension = self.getOrCreateExtension(arc);
        extension.add("<sbgnviz><hidden/></sbgnviz>");
+    }
+
+    // add info about edge type
+    // since curve style is not standard we shouldn't have it for either version
+    if (edge.css('curve-style') && version !== "plain" && version !== "plain3") {
+      var extension = self.getOrCreateExtension(arc);
+      extension.add("<curveStyle>" + edge.css('curve-style') + "</curveStyle>");
+    }
+    
+    if (edge.data('sif-meta') && version !== "plain" && version !== "plain3") {
+      var extension = self.getOrCreateExtension(arc);
+      extension.add("<sifMetaEdge>true</sifMetaEdge>");
     }
 
     return arc;
@@ -580,6 +617,28 @@ module.exports = function () {
 
       return glyph;
   };
+  jsonToSbgnml.addBindingBoxGlyph = function(node, id, mainGlyph){
+
+    var glyph = new libsbgnjs.Glyph({id: id, class_: 'binding region'});
+    var label = new libsbgnjs.Label();
+    if(typeof node.region.variable != 'undefined')
+        label.text = node.region.variable;
+    glyph.setLabel(label);
+    glyph.setBbox(this.addStateAndInfoBbox(mainGlyph, node));
+
+    return glyph;
+  };
+  jsonToSbgnml.addResidueBoxGlyph = function(node, id, mainGlyph){
+
+      var glyph = new libsbgnjs.Glyph({id: id, class_: 'residue variable'});
+      var label = new libsbgnjs.Label();
+      if(typeof node.residue.variable != 'undefined')
+          label.text = node.residue.variable;
+      glyph.setLabel(label);
+      glyph.setBbox(this.addStateAndInfoBbox(mainGlyph, node));
+
+      return glyph;
+};
 
   jsonToSbgnml.addInfoBoxGlyph = function (node, id, mainGlyph) {
       var glyph = new libsbgnjs.Glyph({id: id, class_: 'unit of information'});

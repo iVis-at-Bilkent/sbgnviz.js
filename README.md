@@ -1,8 +1,8 @@
 # SBGNViz
 
-SBGNViz is a web based library developed to visualize pathway models represented by process description (PD) and activity flow (AF) languages of [SBGN](http://sbgn.org) or in [simple interaction format (SIF)](https://www.pathwaycommons.org/pc/sif_interaction_rules.do).
-It accepts the pathway models represented in [SBGN-ML](https://github.com/sbgn/sbgn/wiki/LibSBGN) format as well as import facilities from various formats from SIF to SBML to CellDesigner.
-The library also supports overlay of experiment data on maps.
+SBGNViz is a web based library developed to visualize pathway models represented by process description (PD) and activity flow (AF) languages of [SBGN](http://sbgn.org), a language based on [SBML](https://sbml.org/) or in [simple interaction format (SIF)](https://www.pathwaycommons.org/pc/sif_interaction_rules.do).
+In addition to the native .nwt format, it accepts the pathway models represented in [SBGN-ML](https://github.com/sbgn/sbgn/wiki/LibSBGN) format as well as providing import facilities from various formats from SIF, SBML, [CellDesigner](http://www.celldesigner.org/) and [GPML](https://pathvisio.org/documentation/GPML).
+The library also supports the overlay of experiment data on maps.
 
 ## Software
 
@@ -90,8 +90,11 @@ edge.data('portsource');
 // The following is set if the edge is connected to its target node by a specific port of that node.
 edge.data('porttarget');
 // Bend point positions of an edge. Includes x and y coordinates. This data is to be passed to
-// edgeBendEditing extension.
+// edgeEditing extension.
 edge.data('bendPointPositions');
+// Control point positions of an edge. Includes x and y coordinates. This data is to be passed to
+// edgeEditing extension.
+edge.data('controlPointPositions');
 ```
 
 ## API
@@ -128,6 +131,9 @@ Collapse the nodes whose collapse data field is set
 
 `instance.expandAll()`
 Expands all nodes in the graph recursively. Requires expandCollapse extension and considers undoable option.
+
+`instance.hideElesSimple(eles)`
+Hides the given collection of elements.
 
 `instance.hideNodesSmart(nodes)`
 Extends the given nodes list in a smart way to leave the map intact and hides the resulting list. Requires viewUtilities extension and considers 'undoable' option.
@@ -190,17 +196,18 @@ As this percentadge takes the given paddingPercent or compoundPadding option.
 `instance.recalculatePaddings()`
 Recalculates/refreshes the compound paddings. Aliases `instance.refreshPaddings()`.
 
-`instance.saveAsPng(filename)`
+`instance.saveAsPng(filename, scale, bg, maxWidth, maxHeight)`
 Exports the current graph to a png file. The name of the file is determined by the filename parameter which is
-'network.png' by default.
+'network.png' by default. If maxWidth/maxHeight parameter is defined, then scale is ignored. bg is background color. 
 
-`instance.saveAsJpg(filename)`
+`instance.saveAsJpg(filename, scale, bg, maxWidth, maxHeight, quality)`
 Exports the current graph to a jpg file. The name of the file is determined by the filename parameter which is
-'network.jpg' by default.
+'network.jpg' by default. If maxWidth/maxHeight parameter is defined, then scale is ignored. bg is background color. 
+quality specifies the quality of the image from 0 to 1.
 
-`instance.saveAsSVG(filename)`
+`instance.saveAsSVG(filename, scale, bg, maxWidth, maxHeight)`
 Exports the current graph to a svg file. The name of the file is determined by the filename parameter which is
-'network.svg' by default.
+'network.svg' by default. If maxWidth/maxHeight parameter is defined, then scale is ignored. bg is background color.
 
 `instance.loadFile(file, convertFcn, callback1, callback2, callback3, callback4)`
 
@@ -268,15 +275,15 @@ Converts the given gpml text to sbgnml format.
 
 `instance.exportLayoutData(filename, byName)`
 
-
 `instance.convertSbgnmlTextToJson(sbgnmlText)`
 
+`instance.convertSbmlTextToJson(sbmlText)`
 
 `instance.convertSifTextToJson(sifText)`
 
-
 `instance.createJsonFromSBGN()`
 
+`instance.createJsonFromSBML()`
 
 `instance.createJsonFromSif()`
 
@@ -404,7 +411,7 @@ library of sbgnviz. Most users will not need to use this. It includes the follow
 * `getSbgnClass(ele)`  Returns sbgnclass of the given element. If the parameter is a string return it by assuming that it is the sbgnclass itself. 
 * `getPureSbgnClass(ele)` Returns sbgn class omitting the multimer information.
 * `canHaveUnitOfInformation(ele)` Returns whether the give element have unit of information.
-* `isEmptySetClass(ele)` Returns wether the given element or string is of the special empty set/source and sink class.
+* `isEmptySetClass(ele)` Returns wether the given element or string is of the special empty set class.
 * `isModulationArcClass(ele)` Returns whether the class of given element is a modulation arc as defined in PD specs.
 * `convertToRenderedPosition(modelPos, pan, zoom)` Returns rendered position of a given model position.
 * `getArrayLineStyle(ele)` Returns whether the line style is dashed or solid.
@@ -538,7 +545,7 @@ for exact versions of dependencies refer to [package.json](https://github.com/iV
 The following extensions are used by this library if they are registered.
  * cytoscape-undo-redo
  * cytoscape-expand-collapse
- * cytoscape-edge-bend-editing
+ * cytoscape-edge-editing
  * cytoscape-view-utilities
 
  for exact versions of dependencies refer to [package.json](https://github.com/iVis-at-Bilkent/sbgnviz.js/blob/master/package.json)
@@ -579,10 +586,14 @@ In plain JS you do not need to require the libraries you just need to register s
 
 ## Publishing instructions
 
-This project is set up to automatically be published to npm.  To publish:
+This project is set up to automatically be published to npm and bower.  To publish:
 
-1. Set the version number environment variable: `export VERSION=1.2.3`
-2. Publish: `gulp publish`
+1. Build : `npm run build`
+1. Commit the build : `git commit -am "Build for release"`
+1. Bump the version number and tag: `npm version major|minor|patch`
+1. Push to origin: `git push && git push --tags`
+1. Publish to npm: `npm publish .`
+1. If publishing to bower for the first time, you'll need to run `bower register sbgnviz https://github.com/iVis-at-Bilkent/sbgnviz.js.git`
 
 ## Credits
 

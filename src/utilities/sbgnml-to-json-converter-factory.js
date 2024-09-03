@@ -76,7 +76,8 @@ module.exports = function () {
     ele.bboxCalculated = true;
     var childNodes = ele.glyphMembers;
     //exclude state variables and units of information from child members
-    childNodes = childNodes.filter(function(child){ return child.class_ != "state variable" && child.class_ != "unit of information"});
+    childNodes = childNodes.filter(function(child){ return child.class_ != "state variable" && child.class_ != "unit of information"
+    && child.class_ != "binding region" && child.class_ != "residue variable"} );
     var bbox = {};
     bbox.x = ele.bbox.x;
     bbox.y = ele.bbox.y;
@@ -88,12 +89,20 @@ module.exports = function () {
       bbox.y = parseFloat(bbox.y) + parseFloat(bbox.h) / 2;
      
       return bbox;
-    }else if (ele.extension && ele.extension.has('extraInfo')) {// if newt file then extrainfo on the compound node exists
-        var xml = ele.extension.get('extraInfo');
+    }else if (ele.extension && ele.extension.has('nwt:extraInfo')) {// if newt file then extrainfo on the compound node exists
+        
+        if (ele.extension.has('nwt:extraInfo')){
+          var extensionString = 'nwt:extraInfo';
+        }
+        else if (ele.extension.has('extraInfo')){
+          var extensionString = 'extraInfo';
+        }
+        var xml = ele.extension.get(extensionString);
         var extraInfo;
         parseString(xml, function (err, result) {
-           extraInfo = result.extraInfo;
+           extraInfo = result[extensionString];
         });
+
         ele.originalW= bbox.w;
         ele.originalH = bbox.h;
         bbox.x = parseFloat(bbox.x) + parseFloat(bbox.w) / 2;
@@ -150,7 +159,8 @@ module.exports = function () {
         var right = childNodeBbox.x + childNodeBbox.w/2 + childPadding;
         var top = childNodeBbox.y  - childNodeBbox.h/2 - childPadding;
         var bottom = childNodeBbox.y + childNodeBbox.h/2 + childPadding;
-        var stateAndInfos = childNode.glyphMembers.filter(function(child){ return child.class_ == "state variable" || child.class_ == "unit of information"});
+        var stateAndInfos = childNode.glyphMembers.filter(function(child){ return child.class_ == "state variable" || child.class_ == "unit of information"
+        || child.class_ == "binding region" || child.class_ == "residue variable" } );
         if(stateAndInfos.length > 0){
             for(var k = 0 ; k<stateAndInfos.length; k++){
                 var stateBbox = stateAndInfos[k].bbox;
@@ -301,7 +311,8 @@ module.exports = function () {
      
       var childNodes = ele.glyphMembers;
     //exclude state variables and units of information from child members
-      childNodes = childNodes.filter(function(child){ return child.class_ != "state variable" && child.class_ != "unit of information"});
+      childNodes = childNodes.filter(function(child){ return child.class_ != "state variable" && child.class_ != "unit of information"
+      && child.class_ != "binding region" && child.class_ != "residue variable"});
       if(childNodes.length <= 0 ) return 0;
       var compoundPadding = typeof options.compoundPadding === 'function' ? options.compoundPadding.call() : options.compoundPadding;
      // } 
@@ -310,7 +321,8 @@ module.exports = function () {
         var extraComplexPadding = typeof options.extraComplexPadding === 'function' ? options.extraComplexPadding.call() : options.extraComplexPadding;
         complexPadding = compoundPadding < 5 ? 5 : compoundPadding;       
 
-        var stateAndInfos = ele.glyphMembers.filter(function(child){ return child.class_ == "state variable" || child.class_ == "unit of information"});
+        var stateAndInfos = ele.glyphMembers.filter(function(child){ return child.class_ == "state variable" || child.class_ == "unit of information"
+        || child.class_ == "binding region" || child.class_ == "residue variable"});
             
         if(ele.label != undefined && ele.label.text != undefined && ele.label.text.length > 0){ 
          
@@ -372,7 +384,8 @@ module.exports = function () {
     for (var i = 0; i < childGlyphs.length; i++) {
       var glyph = childGlyphs[i];
 
-      if (glyph.class_ !== 'unit of information' && glyph.class_ !== 'state variable') {
+      if (glyph.class_ !== 'unit of information' && glyph.class_ !== 'state variable'
+      && glyph.class_ !== 'residue variable' && glyph.class_ !== 'binding region') {
         continue;
       }
 
@@ -403,6 +416,17 @@ module.exports = function () {
         infobox.state.value = (state && state.value) || undefined;
         infobox.state.variable = (state && state.variable) || undefined;
       }
+      
+      else if (glyph.class_ === 'residue variable') {
+        infobox = classes.ResidueVariable.construct(undefined, undefined, infoboxId);
+        infobox.residue.variable =  (glyph.label && glyph.label.text) || undefined
+      
+    }
+    else if (glyph.class_ === 'binding region') {
+      infobox = classes.BindingRegion.construct(undefined, undefined, infoboxId);
+      infobox.region.variable =  (glyph.label && glyph.label.text) || undefined
+    }
+    
       //var bboxAndAnchorResult = getAuxUnitClass(infobox).setAnchorSideAndBbox();
 
       infobox.bbox = self.stateAndInfoBboxProp(glyph, parentBbox);
@@ -482,7 +506,12 @@ module.exports = function () {
     }
 
     // add class information
-    nodeObj.class = ele.class_;
+    if (ele.class_ === "source and sink" || ele.class_ === "emptyset") {
+      nodeObj.class = "empty set";
+    }
+    else {
+      nodeObj.class = ele.class_;
+    }
     // add label information
     nodeObj.label = (ele.label && ele.label.text) || undefined;
     if(nodeObj.label != undefined){
@@ -496,7 +525,7 @@ module.exports = function () {
 
     // add language info, this will always be the mapType if not hybrid
     var mapType = elementUtilities.mapType;
-    if(mapType == 'PD' || mapType == 'AF' || mapType == 'SIF'){
+    if(mapType == 'PD' || mapType == 'AF' || mapType == 'SIF' || mapType == 'SBML'){
       nodeObj.language = elementUtilities.mapType;
     }else if(mapType == 'HybridSbgn'){
       if(nodeObj.class == 'delay' || nodeObj.class.startsWith("BA")){
@@ -510,7 +539,7 @@ module.exports = function () {
       }else if(nodeObj.class == 'delay' || nodeObj.class.startsWith("BA")){
         nodeObj.language = 'AF';
       }else{
-        nodeObj.language = 'PD';
+        nodeObj.language = 'PD'; //Need to add SBML here
       }
     }
    
@@ -538,6 +567,14 @@ module.exports = function () {
 
       relativeXPos = relativeXPos / parseFloat(nodeObj.bbox.w) * 100;
       relativeYPos = relativeYPos / parseFloat(nodeObj.bbox.h) * 100;
+      
+      // In case port position is not vertically/horizontally aligned with the node center, decide a direction
+      if(Math.abs(relativeXPos) > 0 && Math.abs(relativeYPos) > 0) {
+        if(Math.abs(relativeXPos) >= Math.abs(relativeYPos))
+          relativeYPos = 0;
+        else
+          relativeXPos = 0;
+      }
 
       // We assume that ports are not inside the node shape.
       // Therefore, abs. value of their relative x and y coordinates (relative to node center) should be bigger than 50.
@@ -552,6 +589,15 @@ module.exports = function () {
       if (relativeXPos === 0 && relativeYPos === 0) {
         continue;
       }
+      
+      // If port length is longer than the node size (for example, some sbgn files generated from Reactome database has very long ports),
+      // set the port length to 70 which is default in sbgnviz
+      if(Math.abs(relativeXPos) > 150 || Math.abs(relativeYPos) > 150) {
+        if(Math.abs(relativeXPos) > 150)
+          relativeXPos = relativeXPos / Math.abs(relativeXPos) * 70;
+        else
+          relativeYPos = relativeYPos / Math.abs(relativeYPos) * 70;
+      }      
 
       ports.push({
         id: id,
@@ -658,7 +704,10 @@ module.exports = function () {
 
   sbgnmlToJson.traverseNodes = function (ele, jsonArray, parent, compartments) {
     var elId = ele.id; 
-    if (!handledElements[ele.class_]) {
+
+    // Workaround: In application we use class 'empty set' but on read write we use 'source and sink'
+    // SBGN-ML files can also have 'emptyset' class  
+    if (!handledElements[ele.class_] && ele.class_ !== "source and sink" && ele.class_ !== "emptyset") {
       return;
     }
     this.insertedNodes[elId] = true;
@@ -667,14 +716,15 @@ module.exports = function () {
 
     var eleClass = ele.class_;
 
-    if (eleClass === 'complex' || eleClass === 'complex multimer' || eleClass === 'submap') {
+    if (eleClass === 'complex' || eleClass === 'complex multimer' || eleClass === 'submap' || eleClass === 'topology group') {
       self.addCytoscapeJsNode(ele, jsonArray, parent, compartments);
 
       var childGlyphs = ele.glyphMembers;
       for (var i = 0; i < childGlyphs.length; i++) {
         var glyph = childGlyphs[i];
         var glyphClass = glyph.class_;
-        if (glyphClass !== 'state variable' && glyphClass !== 'unit of information') {
+        if (glyphClass !== 'state variable' && glyphClass !== 'unit of information'
+        && glyphClass !== 'residue variable' && glyphClass !== 'binding region') {
           if (glyph.compartmentRef && glyph.compartmentRef != elId && eleClass == 'submap') {
             self.traverseNodes(glyph, jsonArray, glyph.compartmentRef, compartments);
           }
@@ -785,8 +835,8 @@ module.exports = function () {
     return {'source': sourceNodeId, 'target': targetNodeId};
   };
 
-  sbgnmlToJson.getArcBendPointPositions = function (ele) {
-    var bendPointPositions = [];
+  sbgnmlToJson.getArcAnchorPointPositions = function (ele) {
+    var anchorPointPositions = [];
 
     var children = ele.nexts;
 
@@ -794,20 +844,19 @@ module.exports = function () {
       var posX = children[i].x;
       var posY = children[i].y;
 
-      bendPointPositions.push({
+      anchorPointPositions.push({
         x: posX,
         y: posY
       });
     }
 
-    return bendPointPositions;
+    return anchorPointPositions;
   };
 
   sbgnmlToJson.addCytoscapeJsEdge = function (ele, jsonArray, xmlObject) {
     if (!handledElements[ele.class_]) {
       return;
     }
-
     var self = this;
     var sourceAndTarget = self.getArcSourceAndTarget(ele, xmlObject);
 
@@ -817,22 +866,44 @@ module.exports = function () {
 
     var edgeObj = {};
     var styleObj = {};
-    var bendPointPositions = [];
+    var anchorPointPositions = [];
     if (sourceAndTarget.source !== sourceAndTarget.target) {
-      bendPointPositions = self.getArcBendPointPositions(ele);
+      anchorPointPositions = self.getArcAnchorPointPositions(ele);
     }
 
     edgeObj.id = ele.id || undefined;
     edgeObj.class = ele.class_;
-    edgeObj.bendPointPositions = bendPointPositions;
 
+    // bezier edge is the default edge style
+    // change if the file being loaded has curveStyle field
+    var curveStyle = "bezier";
+    if (ele.extension && ele.extension.has("curveStyle")) {
+      parseString(ele.extension.get("curveStyle"), function (err, result) {
+        curveStyle = result.curveStyle;
+      })
+    }
+    if (curveStyle == "unbundled-bezier") {
+      edgeObj.controlPointPositions = anchorPointPositions;
+    }
+    else {
+      edgeObj.bendPointPositions = anchorPointPositions;
+    }
 
+    var isSifMetaEdge;
+    if (ele.extension && ele.extension.has("sifMetaEdge")) {
+      parseString(ele.extension.get("sifMetaEdge"), function (err, result) {
+        isSifMetaEdge = result.sifMetaEdge;
+      });
+    }
+    if (isSifMetaEdge) {
+      edgeObj["sif-meta"] = true;
+    }
 
     // add language info, this will always be the mapType if not hybrid
     var PdEdges = ["consumption","production","modulation","stimulation","catalysis","inhibition","necessary stimulation","logic arc","equivalence arc"];
     var AfEdges = ["positive influence","negative influence","unknown influence"];  
     var mapType = elementUtilities.mapType;
-    if(mapType == 'PD' || mapType == 'AF' || mapType == 'SIF'){
+    if(mapType == 'PD' || mapType == 'AF' || mapType == 'SIF' || mapType == 'SBML'){
       edgeObj.language = elementUtilities.mapType;
     }else if(mapType == 'HybridSbgn'){
       if(PdEdges.indexOf(edgeObj.class) > -1){
@@ -846,13 +917,9 @@ module.exports = function () {
       }else if(AfEdges.indexOf(edgeObj.class) > -1){
         edgeObj.language = 'AF';
       }else{
-        edgeObj.language = 'SIF';
+        edgeObj.language = 'SIF'; // Need to add SBML
       }
     }
-
-
-    
-    
 
     elementUtilities.extendEdgeDataWithClassDefaults( edgeObj, edgeObj.class );
 
@@ -1049,7 +1116,7 @@ module.exports = function () {
         Object.keys( propMap ).forEach( function( propName ) {
           var fieldName = propMap[ propName ];
           var fieldVal = memberStyle[ fieldName ];
-          if ( fieldVal ) {
+          if ( fieldVal !== undefined && fieldVal !== null ) {
             var details = propDetails && propDetails[ propName ];
             if ( details ) {
               if ( details[ 'converter' ] ) {
@@ -1077,8 +1144,16 @@ module.exports = function () {
   };
 
   sbgnmlToJson.mapPropertiesToObj = function() {
-    if (this.map.extension && this.map.extension.has('mapProperties')) { // render extension was found
-       var xml = this.map.extension.get('mapProperties');
+    if (this.map.extension) { // render extension was found
+      let extensionName;
+      if (this.map.extension.has('nwt:mapProperties')) {
+        extensionName = 'nwt:mapProperties';
+      }
+      else if (this.map.extension.has('mapProperties')) {
+      extensionName = 'mapProperties';
+      }
+
+      var xml = this.map.extension.get(extensionName);
        var obj;
        parseString(xml, function (err, result) {
           obj = result;
@@ -1148,23 +1223,29 @@ module.exports = function () {
         compartmentChildrenMap[compartmentRef].push(glyph);
       }
     }
-    
+
     var minDistanceToChildren = Number.MAX_SAFE_INTEGER;
 
     if(urlParams && urlParams.compoundPadding) {
-      mainUtilities.setCompoundPadding(Number(urlParams.compoundPadding)); 
+      mainUtilities.setCompoundPadding(Number(urlParams.compoundPadding));
     }
     else if (!map.extension) {
       for (var i = 0; i < glyphs.length; i++) {
         var glyph = glyphs[i];
-       // if(glyph.class_ == "complex")continue;
-        childNodes = glyph.glyphMembers.filter(function(child){ return child.class_ != "state variable" && child.class_ != "unit of information"});
+
+        childNodes = glyph.glyphMembers.filter(function(child){ return child.class_ != "state variable" && child.class_ != "unit of information"
+        && child.class_ != "residue variable" && child.class_ != "binding region"});
         if(childNodes.length > 0){ // compound node
           var hasMin = false;
           for (var j = 0; j < childNodes.length; j++) {           
             var childNode = childNodes[j];
-            var borderWidth = elementUtilities.getDefaultProperties(childNode.class_)["border-width"];
-            var stateAndInfos = childNode.glyphMembers.filter(function(child){ return child.class_ == "state variable" || child.class_ == "unit of information"});
+            var childClass = childNode.class_;
+            if (childClass === "source and sink" || childClass === "emptyset") {
+              childClass = "empty set";
+            }
+            var borderWidth = elementUtilities.getDefaultProperties(childClass)["border-width"];
+            var stateAndInfos = childNode.glyphMembers.filter(function(child){ return child.class_ == "state variable" || child.class_ == "unit of information"
+            || child.class_ == "residue variable" || child.class_ == "binding region"});
             if(stateAndInfos.length > 0){
               for(var k = 0 ; k<stateAndInfos.length; k++){
                 var stateBbox = stateAndInfos[k].bbox;
@@ -1215,7 +1296,8 @@ module.exports = function () {
 
           if(hasMin){
             if(glyph.class_ == "complex"){
-              var stateAndInfos = glyph.glyphMembers.filter(function(child){ return child.class_ == "state variable" || child.class_ == "unit of information"});
+              var stateAndInfos = glyph.glyphMembers.filter(function(child){ return child.class_ == "state variable" || child.class_ == "unit of information"
+              || child.class_ == "residue variable" || child.class_ == "binding region"});
               var extraComplexPadding = typeof options.extraComplexPadding === 'function' ? options.extraComplexPadding.call() : options.extraComplexPadding;
               if(glyph.label != undefined && glyph.label.text != undefined && glyph.label.text.length > 0){
                
@@ -1256,11 +1338,18 @@ module.exports = function () {
       
      
     }else{
-      mainUtilities.setCompoundPadding(Number(self.mapPropertiesToObj().mapProperties.compoundPadding));
+      var compoundPadding = 10;
+      //check if self.mapPropertiesToObj() has the 'nwt:mapProperties' field
+      if(this.map.extension.has('nwt:mapProperties')){
+        compoundPadding = Number(self.mapPropertiesToObj()['nwt:mapProperties'].compoundPadding);
+      }
+      else if (this.map.extension.has('mapProperties')){
+        compoundPadding = Number(self.mapPropertiesToObj()['mapProperties'].compoundPadding);
+      }
+      mainUtilities.setCompoundPadding(compoundPadding);
     }
 
     
-
     for (i = 0; i < glyphs.length; i++) {
       var glyph = glyphs[i];
       self.traverseNodes(glyph, cytoscapeJsNodes, '', compartments,minDistanceToChildren);
@@ -1300,13 +1389,7 @@ module.exports = function () {
       if(shouldDisablePorts){      
       graphUtilities.disablePorts();
     }
-    //getDefaultProperties
-    //elementUtilities.nodeTypes.forEach(function(type){
-    //  console.log(elementUtilities.getDefaultProperties(type));
-    //});
-    
-    //console.log(cytoscapeJsGraph);
-    //console.log( elementUtilities.nodeTypes);
+
     return cytoscapeJsGraph;
   };
   

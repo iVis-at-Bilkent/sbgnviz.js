@@ -10,7 +10,7 @@ module.exports = function() {
 
 
   gpmlToSbgnml.convert = function (xml, callback) {
-      var conversionApiUrl = "https://minerva-service.lcsb.uni.lu/minerva/api/convert/GPML:SBGN-ML";
+      var conversionApiUrl = "https://minerva-dev.lcsb.uni.lu/minerva/api/convert/GPML:SBGN-ML";
 
       return $.ajax({
           type: 'post',
