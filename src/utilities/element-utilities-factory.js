@@ -182,7 +182,7 @@ module.exports = function () {
       "omitted process": { asSource: {}, asTarget: { isAllowed: true } },
       "uncertain process": { asSource: {}, asTarget: { isAllowed: true } },
       phenotype: { asSource: {}, asTarget: { isAllowed: true } },
-      association: { asSource: {}, asTarget: {} },
+      association: { asSource: {}, asTarget: {isAllowed:true} },
       dissociation: { asSource: {}, asTarget: {} },
       and: {
         asSource: { isAllowed: true, maxEdge: 1, maxTotal: 1 },
