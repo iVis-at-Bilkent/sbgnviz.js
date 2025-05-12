@@ -1987,6 +1987,10 @@ module.exports = function () {
         elementUtilities.mapType == "HybridAny" ||
         elementUtilities.mapType == "HybridSbgn")
     ) {
+      if(elementUtilities.mapType == "SBML"){
+        //in SBML, potential members of complex should be added here
+        return nodeClass == "receptor" || nodeClass == "protein";
+      }
       // When map type is unknown, allow complexes to include EPNs with edges
       return elementUtilities.isEPNClass(nodeClass);
     }
