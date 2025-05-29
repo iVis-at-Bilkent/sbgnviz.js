@@ -1988,8 +1988,9 @@ module.exports = function () {
         elementUtilities.mapType == "HybridSbgn")
     ) {
       if(elementUtilities.mapType == "SBML"){
-        //in SBML, potential members of complex should be added here
-        return nodeClass == "receptor" || nodeClass == "protein";
+        
+        return elementUtilities.isSBMLNode(nodeClass) 
+        && nodeClass != "phenotype sbml" && nodeClass != "complex sbml" && nodeClass != "degradation";
       }
       // When map type is unknown, allow complexes to include EPNs with edges
       return elementUtilities.isEPNClass(nodeClass);
@@ -2452,6 +2453,12 @@ module.exports = function () {
 
   elementUtilities.isDirectedEdge = function (ele) {
     return !elementUtilities.isUndirectedEdge(ele);
+  };
+
+  elementUtilities.isSBMLNode = function (ele) {
+    var sbgnclass = elementUtilities.getPureSbgnClass(ele);
+
+    return inArray(sbgnclass, elementUtilities.sbmlType);
   };
 
   // Returns whether the given element is an EPN
