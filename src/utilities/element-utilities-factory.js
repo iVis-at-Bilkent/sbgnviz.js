@@ -1990,7 +1990,7 @@ module.exports = function () {
       if(elementUtilities.mapType == "SBML"){
         
         return elementUtilities.isSBMLNode(nodeClass) 
-        && nodeClass != "phenotype sbml" && nodeClass != "complex sbml" && nodeClass != "degradation";
+        && nodeClass != "phenotype sbml" && nodeClass != "degradation";
       }
       // When map type is unknown, allow complexes to include EPNs with edges
       return elementUtilities.isEPNClass(nodeClass);
