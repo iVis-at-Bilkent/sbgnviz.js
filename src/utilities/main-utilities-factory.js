@@ -580,10 +580,25 @@ module.exports = function () {
       mainUtilities.beforePerformLayout();
       
       var layout = cy.elements().filter(':visible').layout(layoutOptions);
-
       // Check this for cytoscape.js backward compatibility
       if (layout && layout.run) {
         layout.run();
+        cy.one('layoutstop', function() {
+          // Things to do after performing layout
+          cy.animate(
+            {
+            fit:{
+              padding:20,
+            }
+            },
+            {
+              duration: 2000,
+              complete: function() {
+                cy.style().update();
+              }
+            }
+        );
+        });
       }
     }
     else {
