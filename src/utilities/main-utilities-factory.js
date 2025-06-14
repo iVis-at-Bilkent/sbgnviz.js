@@ -584,7 +584,6 @@ module.exports = function () {
       if (layout && layout.run) {
         layout.run();
         cy.one('layoutstop', function() {
-          // Things to do after performing layout
           cy.animate(
             {
             fit:{
