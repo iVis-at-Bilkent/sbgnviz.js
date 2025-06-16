@@ -96,8 +96,11 @@ module.exports = function () {
       }
     });
 
+    // infer nesting on load is actually a function that returns a boolean
+    var inferNestingOnLoad = typeof options.inferNestingOnLoad === "function" ? options.inferNestingOnLoad() : options.inferNestingOnLoad;
+    
     // change parent of PNClass nodes based on neighbor majority if inferNestingOnLoad is enabled and node has no parent
-    if (options.inferNestingOnLoad) {
+    if (inferNestingOnLoad) {
       cy.nodes().forEach(function (node) {
         if (elementUtilities.isPNClass(node) && node.parent().length == 0) {
           var processParentMap = new Map();
