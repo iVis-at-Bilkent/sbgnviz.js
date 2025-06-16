@@ -674,6 +674,7 @@ module.exports = function () {
       gene: { asSource: { isAllowed: true }, asTarget: {} },
       compartment: { asSource: {}, asTarget: {} },
       rna: { asSource: { isAllowed: true }, asTarget: {} },
+      "antisense rna": { asSource: { isAllowed: true }, asTarget: {} },
       degradation: { asSource: { isAllowed: true }, asTarget: {} },
       drug: { asSource: { isAllowed: true }, asTarget: {} },
       "truncated protein": { asSource: { isAllowed: true }, asTarget: {} },
@@ -718,6 +719,7 @@ module.exports = function () {
       gene: { asSource: {}, asTarget: { isAllowed: true } },
       compartment: { asSource: {}, asTarget: {} },
       rna: { asSource: {}, asTarget: { isAllowed: true } },
+      "antisense rna": { asSource: {}, asTarget: { isAllowed: true } },
       degradation: { asSource: {}, asTarget: { isAllowed: true } },
       drug: { asSource: {}, asTarget: { isAllowed: true } },
       "truncated protein": { asSource: {}, asTarget: { isAllowed: true } },
@@ -762,6 +764,7 @@ module.exports = function () {
       gene: { asSource: { isAllowed: true }, asTarget: {} },
       compartment: { asSource: {}, asTarget: {} },
       rna: { asSource: { isAllowed: true }, asTarget: {} },
+      "antisense rna": { asSource: { isAllowed: true }, asTarget: {} },
       degradation: { asSource: { isAllowed: true }, asTarget: {} },
       drug: { asSource: { isAllowed: true }, asTarget: {} },
       "truncated protein": { asSource: { isAllowed: true }, asTarget: {} },
@@ -791,6 +794,7 @@ module.exports = function () {
       gene: { asSource: { isAllowed: true }, asTarget: {} },
       compartment: { asSource: {}, asTarget: {} },
       rna: { asSource: { isAllowed: true }, asTarget: {} },
+      "antisense rna": { asSource: { isAllowed: true }, asTarget: {} },
       degradation: { asSource: { isAllowed: true }, asTarget: {} },
       drug: { asSource: { isAllowed: true }, asTarget: {} },
       "truncated protein": { asSource: { isAllowed: true }, asTarget: {} },
@@ -820,6 +824,7 @@ module.exports = function () {
       gene: { asSource: { isAllowed: true }, asTarget: {} },
       compartment: { asSource: {}, asTarget: {} },
       rna: { asSource: { isAllowed: true }, asTarget: {} },
+      "antisense rna": { asSource: { isAllowed: true }, asTarget: {} },
       degradation: { asSource: { isAllowed: true }, asTarget: {} },
       drug: { asSource: { isAllowed: true }, asTarget: {} },
       "truncated protein": { asSource: { isAllowed: true }, asTarget: {} },
@@ -849,6 +854,7 @@ module.exports = function () {
       gene: { asSource: { isAllowed: true }, asTarget: {} },
       compartment: { asSource: {}, asTarget: {} },
       rna: { asSource: { isAllowed: true }, asTarget: {} },
+      "antisense rna": { asSource: { isAllowed: true }, asTarget: {} },
       degradation: { asSource: { isAllowed: true }, asTarget: {} },
       drug: { asSource: { isAllowed: true }, asTarget: {} },
       "truncated protein": { asSource: { isAllowed: true }, asTarget: {} },
@@ -878,6 +884,7 @@ module.exports = function () {
       gene: { asSource: { isAllowed: true }, asTarget: {} },
       compartment: { asSource: {}, asTarget: {} },
       rna: { asSource: { isAllowed: true }, asTarget: {} },
+      "antisense rna": { asSource: { isAllowed: true }, asTarget: {} },
       degradation: { asSource: { isAllowed: true }, asTarget: {} },
       drug: { asSource: { isAllowed: true }, asTarget: {} },
       "truncated protein": { asSource: { isAllowed: true }, asTarget: {} },
@@ -907,6 +914,7 @@ module.exports = function () {
       gene: { asSource: {}, asTarget: { isAllowed: true } },
       compartment: { asSource: {}, asTarget: {} },
       rna: { asSource: {}, asTarget: { isAllowed: true } },
+      "antisense rna": { asSource: {}, asTarget: { isAllowed: true } },
       degradation: { asSource: {}, asTarget: { isAllowed: true } },
       drug: { asSource: {}, asTarget: { isAllowed: true } },
       "truncated protein": { asSource: {}, asTarget: { isAllowed: true } },
@@ -936,6 +944,7 @@ module.exports = function () {
       gene: { asSource: {isAllowed: true}, asTarget: {} },
       compartment: { asSource: {}, asTarget: {} },
       rna: { asSource: {isAllowed: true}, asTarget: {} },
+      "antisense rna": { asSource: {isAllowed: true}, asTarget: {} },
       degradation: { asSource: {isAllowed: true}, asTarget: {} },
       drug: { asSource: {isAllowed: true}, asTarget: {} },
       "truncated protein": { asSource: {isAllowed: true}, asTarget: {} },
@@ -974,6 +983,7 @@ module.exports = function () {
       gene: { asSource: { isAllowed: true }, asTarget: {} },
       compartment: { asSource: {}, asTarget: {} },
       rna: { asSource: { isAllowed: true }, asTarget: {} },
+      "antisense rna": { asSource: { isAllowed: true }, asTarget: {} },
       degradation: { asSource: { isAllowed: true }, asTarget: {} },
       drug: { asSource: { isAllowed: true }, asTarget: {} },
       "truncated protein": { asSource: { isAllowed: true }, asTarget: {} },
@@ -1003,6 +1013,7 @@ module.exports = function () {
       gene: { asSource: { isAllowed: true }, asTarget: {} },
       compartment: { asSource: {}, asTarget: {} },
       rna: { asSource: { isAllowed: true }, asTarget: {} },
+      "antisense rna": { asSource: { isAllowed: true }, asTarget: {} },
       degradation: { asSource: { isAllowed: true }, asTarget: {} },
       drug: { asSource: { isAllowed: true }, asTarget: {} },
       "truncated protein": { asSource: { isAllowed: true }, asTarget: {} },
@@ -1032,6 +1043,7 @@ module.exports = function () {
       gene: { asSource: { isAllowed: true }, asTarget: {} },
       compartment: { asSource: {}, asTarget: {} },
       rna: { asSource: { isAllowed: true }, asTarget: {} },
+      "antisense rna": { asSource: { isAllowed: true }, asTarget: {} },
       degradation: { asSource: { isAllowed: true }, asTarget: {} },
       drug: { asSource: { isAllowed: true }, asTarget: {} },
       "truncated protein": { asSource: { isAllowed: true }, asTarget: {} },
@@ -1072,6 +1084,7 @@ module.exports = function () {
       gene: { asSource: {}, asTarget: { isAllowed: true } },
       compartment: { asSource: {}, asTarget: {} },
       rna: { asSource: {}, asTarget: { isAllowed: true } },
+      "antisense rna": { asSource: {}, asTarget: { isAllowed: true } },
       degradation: { asSource: {}, asTarget: { isAllowed: true } },
       drug: { asSource: {}, asTarget: { isAllowed: true } },
       "truncated protein": { asSource: {}, asTarget: { isAllowed: true } },
@@ -1107,6 +1120,7 @@ module.exports = function () {
       gene: { asSource: { isAllowed: true }, asTarget: {} },
       compartment: { asSource: {}, asTarget: {} },
       rna: { asSource: { isAllowed: true }, asTarget: {} },
+      "antisense rna": { asSource: { isAllowed: true }, asTarget: {} },
       degradation: { asSource: { isAllowed: true }, asTarget: {} },
       drug: { asSource: { isAllowed: true }, asTarget: {} },
       "truncated protein": { asSource: { isAllowed: true }, asTarget: {} },
@@ -1145,6 +1159,7 @@ module.exports = function () {
       gene: { asSource: {}, asTarget: { isAllowed: true } },
       compartment: { asSource: {}, asTarget: {} },
       rna: { asSource: {}, asTarget: { isAllowed: true } },
+      "antisense rna": { asSource: {}, asTarget: { isAllowed: true } },
       degradation: { asSource: {}, asTarget: { isAllowed: true } },
       drug: { asSource: {}, asTarget: { isAllowed: true } },
       "truncated protein": { asSource: {}, asTarget: { isAllowed: true } },
@@ -1189,6 +1204,7 @@ module.exports = function () {
       gene: { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
       compartment: { asSource: {}, asTarget: {} },
       rna: { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
+      "antisense rna": { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
       degradation: {
         asSource: { isAllowed: true },
         asTarget: { isAllowed: true },
@@ -1239,6 +1255,7 @@ module.exports = function () {
       gene: { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
       compartment: { asSource: {}, asTarget: {} },
       rna: { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
+      "antisense rna": { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
       degradation: {
         asSource: { isAllowed: true },
         asTarget: { isAllowed: true },
@@ -1289,6 +1306,7 @@ module.exports = function () {
       gene: { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
       compartment: { asSource: {}, asTarget: {} },
       rna: { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
+      "antisense rna": { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
       degradation: {
         asSource: { isAllowed: true },
         asTarget: { isAllowed: true },
@@ -1339,6 +1357,7 @@ module.exports = function () {
       gene: { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
       compartment: { asSource: {}, asTarget: {} },
       rna: { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
+      "antisense rna": { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
       degradation: {
         asSource: { isAllowed: true },
         asTarget: { isAllowed: true },
@@ -1389,6 +1408,7 @@ module.exports = function () {
       gene: { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
       compartment: { asSource: {}, asTarget: {} },
       rna: { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
+      "antisense rna": { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
       degradation: {
         asSource: { isAllowed: true },
         asTarget: { isAllowed: true },
@@ -1439,6 +1459,7 @@ module.exports = function () {
       gene: { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
       compartment: { asSource: {}, asTarget: {} },
       rna: { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
+      "antisense rna": { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
       degradation: {
         asSource: { isAllowed: true },
         asTarget: { isAllowed: true },
@@ -1489,6 +1510,7 @@ module.exports = function () {
       gene: { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
       compartment: { asSource: {}, asTarget: {} },
       rna: { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
+      "antisense rna": { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
       degradation: {
         asSource: { isAllowed: true },
         asTarget: { isAllowed: true },
@@ -1539,6 +1561,7 @@ module.exports = function () {
       gene: { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
       compartment: { asSource: {}, asTarget: {} },
       rna: { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
+      "antisense rna": { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
       degradation: {
         asSource: { isAllowed: true },
         asTarget: { isAllowed: true },
@@ -1589,6 +1612,7 @@ module.exports = function () {
       gene: { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
       compartment: { asSource: {}, asTarget: {} },
       rna: { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
+      "antisense rna": { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
       degradation: {
         asSource: { isAllowed: true },
         asTarget: { isAllowed: true },
@@ -1639,6 +1663,7 @@ module.exports = function () {
       gene: { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
       compartment: { asSource: {}, asTarget: {} },
       rna: { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
+      "antisense rna": { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
       degradation: {
         asSource: { isAllowed: true },
         asTarget: { isAllowed: true },
@@ -1724,6 +1749,7 @@ module.exports = function () {
   elementUtilities.sbmlType = [
     "gene",
     "rna",
+    "antisense rna",
     "simple molecule",
     "unknown molecule",
     "drug",
@@ -1740,6 +1766,7 @@ module.exports = function () {
   elementUtilities.sbmlTypeMultimer = [
     "gene multimer",
     "rna multimer",
+    "antisense rna multimer",
     "ion channel multimer",
     "receptor multimer",
     "truncated protein multimer",
@@ -1767,6 +1794,7 @@ module.exports = function () {
     "hypothetical ion channel",
     "hypothetical gene",
     "hypothetical rna",
+    "hypothetical antisense rna",
     "hypothetical phenotype sbml",
     "hypothetical ion",
     "hypothetical uknown molecule",
@@ -1795,6 +1823,7 @@ module.exports = function () {
     "hypothetical ion channel multimer",
     "hypothetical gene multimer",
     "hypothetical rna multimer",
+    "hypothetical antisense rna multimer",
     "hypothetical phenotype sbml multimer",
     "hypothetical ion multimer",
     "hypothetical uknown molecule multimer",
@@ -2141,6 +2170,10 @@ module.exports = function () {
       sbgnclass == "rna multimer" ||
       sbgnclass == "hypothetical rna" ||
       sbgnclass == "hypothetical rna multimer" ||
+      sbgnclass == "antisense rna" ||
+      sbgnclass == "antisense rna multimer" ||
+      sbgnclass == "hypothetical antisense rna" ||
+      sbgnclass == "hypothetical antisense rna multimer" ||
       sbgnclass == "phenotype sbml" ||
       sbgnclass == "phenotype sbml multimer" ||
       sbgnclass == "hypothetical phenotype sbml" ||
@@ -2177,6 +2210,7 @@ module.exports = function () {
     if (
       sbgnclass == "gene" ||
       sbgnclass == "rna" ||
+      sbgnclass == "antisense rna" ||
       sbgnclass == "simple molecule" ||
       sbgnclass == "unknown molecule" ||
       sbgnclass == "phenotype sbml" ||
@@ -2200,6 +2234,7 @@ module.exports = function () {
     if (
       sbgnclass == "gene" ||
       sbgnclass == "rna" ||
+      sbgnclass == "antisense rna" ||
       sbgnclass == "simple molecule" ||
       sbgnclass == "unknown molecule" ||
       sbgnclass == "phenotype sbml" ||
@@ -2377,6 +2412,7 @@ module.exports = function () {
       "truncated protein": true,
       gene: true,
       rna: true,
+      "antisense rna": true,
       ion: true,
       "simple molecule": true,
       "unknown molecule": true,
@@ -2416,6 +2452,7 @@ module.exports = function () {
       "truncated protein": true,
       gene: true,
       rna: true,
+      "antisense rna": true,
       "phenotype sbml": true,
       ion: true,
       "simple molecule": true,
@@ -2921,6 +2958,7 @@ module.exports = function () {
       _class == "truncated protein" ||
       _class == "ion channel" ||
       _class == "rna" ||
+      _class == "antisense rna" ||
       _class == "simple molecule" ||
       _class == "phenotype sbml" ||
       _class == "receptor" ||
@@ -3076,6 +3114,7 @@ module.exports = function () {
       _class == "complex sbml" ||
       _class == "gene" ||
       _class == "rna" ||
+      _class == "antisense rna" ||
       _class == "simple molecule" ||
       _class == "unknown molecule" ||
       _class == "phenotype sbml" ||
@@ -4535,6 +4574,10 @@ module.exports = function () {
       height: 30,
     },
     rna: {
+      width: 50,
+      height: 44,
+    },
+    "antisense rna": {
       width: 50,
       height: 44,
     },
