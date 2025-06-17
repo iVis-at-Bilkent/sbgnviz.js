@@ -28,6 +28,7 @@ module.exports = function () {
 
   var sboToNodeClass = {
     278: "rna",
+    334: "antisense rna",
     253: "complex sbml",
     289: "hypothetical complex",
     291: "degradation",
