@@ -2254,7 +2254,8 @@ module.exports = function () {
       sbgnclass == "protein" ||
       sbgnclass == "receptor" ||
       sbgnclass == "ion channel" ||
-      sbgnclass == "truncated protein"
+      sbgnclass == "truncated protein" ||
+      sbgnclass == "antisense rna" 
     ) {
       return true;
     }
