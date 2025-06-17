@@ -16,6 +16,7 @@ module.exports = function () {
     var nodesToSbo = 
     {
         "rna": 278,
+        "antisense rna": 334,
         "complex sbml": 253,
         "hypothetical complex": 289,
         "degradation": 291,
