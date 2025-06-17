@@ -2174,10 +2174,6 @@ module.exports = function () {
       sbgnclass == "antisense rna multimer" ||
       sbgnclass == "hypothetical antisense rna" ||
       sbgnclass == "hypothetical antisense rna multimer" ||
-      sbgnclass == "phenotype sbml" ||
-      sbgnclass == "phenotype sbml multimer" ||
-      sbgnclass == "hypothetical phenotype sbml" ||
-      sbgnclass == "hypothetical phenotype sbml multimer" ||
       sbgnclass == "ion" ||
       sbgnclass == "ion multimer" ||
       sbgnclass == "hypothetical ion" ||
@@ -2186,18 +2182,10 @@ module.exports = function () {
       sbgnclass == "simple molecule multimer" ||
       sbgnclass == "hypothetical simple molecule" ||
       sbgnclass == "hypothetical simple molecule multimer" ||
-      sbgnclass == "unknown molecule" ||
-      sbgnclass == "unknown molecule multimer" ||
-      sbgnclass == "hypothetical unknown molecule" ||
-      sbgnclass == "hypothetical unknown molecule multimer" ||
       sbgnclass == "drug" ||
       sbgnclass == "drug multimer" ||
       sbgnclass == "hypothetical drug" ||
-      sbgnclass == "hypothetical drug multimer" ||
-      sbgnclass == "degradation" ||
-      sbgnclass == "degradation multimer" ||
-      sbgnclass == "hypothetical degradation" ||
-      sbgnclass == "hypothetical degradation multimer"
+      sbgnclass == "hypothetical drug multimer" 
     ) {
       return true;
     }
@@ -2236,15 +2224,12 @@ module.exports = function () {
       sbgnclass == "rna" ||
       sbgnclass == "antisense rna" ||
       sbgnclass == "simple molecule" ||
-      sbgnclass == "unknown molecule" ||
-      sbgnclass == "phenotype sbml" ||
       sbgnclass == "drug" ||
       sbgnclass == "protein" ||
       sbgnclass == "truncated protein" ||
       sbgnclass == "ion channel" ||
       sbgnclass == "receptor" ||
       sbgnclass == "ion" ||
-      sbgnclass == "degradation" ||
       sbgnclass == "complex sbml"
     ) {
       return true;
@@ -2262,7 +2247,15 @@ module.exports = function () {
       sbgnclass == "complex" ||
       sbgnclass == "macromolecule multimer" ||
       sbgnclass == "nucleic acid feature multimer" ||
-      sbgnclass == "complex multimer"
+      sbgnclass == "complex multimer" ||
+      sbgnclass == "gene" ||
+      sbgnclass == "rna" ||
+      sbgnclass == "complex sbml" ||
+      sbgnclass == "protein" ||
+      sbgnclass == "receptor" ||
+      sbgnclass == "ion channel" ||
+      sbgnclass == "truncated protein" ||
+      sbgnclass == "antisense rna" 
     ) {
       return true;
     }
@@ -2272,39 +2265,8 @@ module.exports = function () {
   elementUtilities.canHaveResidueVariable = function (ele) {
     var sbgnclass = elementUtilities.getPureSbgnClass(ele);
 
-    if (
-      sbgnclass == "protein" ||
-      sbgnclass == "protein multimer" ||
-      sbgnclass == "active protein" ||
-      sbgnclass == "hypothetical protein" ||
-      sbgnclass == "active protein multimer" ||
-      sbgnclass == "hypothetical protein multimer" ||
-      sbgnclass == "active hypothetical protein" ||
-      sbgnclass == "active hypothetical protein multimer" ||
-      sbgnclass == "receptor" ||
-      sbgnclass == "receptor multimer" ||
-      sbgnclass == "active receptor" ||
-      sbgnclass == "hypothetical receptor" ||
-      sbgnclass == "active receptor multimer" ||
-      sbgnclass == "hypothetical receptor multimer" ||
-      sbgnclass == "active hypothetical receptor" ||
-      sbgnclass == "active hypothetical receptor multimer" ||
-      sbgnclass == "ion channel" ||
-      sbgnclass == "ion channel multimer" ||
-      sbgnclass == "active ion channel" ||
-      sbgnclass == "hypothetical ion channel" ||
-      sbgnclass == "active ion channel multimer" ||
-      sbgnclass == "hypothetical ion channel multimer" ||
-      sbgnclass == "active hypothetical ion channel" ||
-      sbgnclass == "active hypothetical ion channel multimer" ||
-      sbgnclass == "truncated protein" ||
-      sbgnclass == "truncated protein multimer" ||
-      sbgnclass == "active truncated protein" ||
-      sbgnclass == "hypothetical truncated protein" ||
-      sbgnclass == "active truncated protein multimer" ||
-      sbgnclass == "hypothetical truncated protein multimer" ||
-      sbgnclass == "active hypothetical truncated protein" ||
-      sbgnclass == "active hypothetical truncated protein multimer"
+    if (false
+      //classes that have residue variable can be added here
     ) {
       return true;
     }
@@ -2314,39 +2276,8 @@ module.exports = function () {
   elementUtilities.canHaveBindingRegion = function (ele) {
     var sbgnclass = elementUtilities.getPureSbgnClass(ele);
 
-    if (
-      sbgnclass == "protein" ||
-      sbgnclass == "protein multimer" ||
-      sbgnclass == "active protein" ||
-      sbgnclass == "hypothetical protein" ||
-      sbgnclass == "active protein multimer" ||
-      sbgnclass == "hypothetical protein multimer" ||
-      sbgnclass == "active hypothetical protein" ||
-      sbgnclass == "active hypothetical protein multimer" ||
-      sbgnclass == "receptor" ||
-      sbgnclass == "receptor multimer" ||
-      sbgnclass == "active receptor" ||
-      sbgnclass == "hypothetical receptor" ||
-      sbgnclass == "active receptor multimer" ||
-      sbgnclass == "hypothetical receptor multimer" ||
-      sbgnclass == "active hypothetical receptor" ||
-      sbgnclass == "active hypothetical receptor multimer" ||
-      sbgnclass == "ion channel" ||
-      sbgnclass == "ion channel multimer" ||
-      sbgnclass == "active ion channel" ||
-      sbgnclass == "hypothetical ion channel" ||
-      sbgnclass == "active ion channel multimer" ||
-      sbgnclass == "hypothetical ion channel multimer" ||
-      sbgnclass == "active hypothetical ion channel" ||
-      sbgnclass == "active hypothetical ion channel multimer" ||
-      sbgnclass == "truncated protein" ||
-      sbgnclass == "truncated protein multimer" ||
-      sbgnclass == "active truncated protein" ||
-      sbgnclass == "hypothetical truncated protein" ||
-      sbgnclass == "active truncated protein multimer" ||
-      sbgnclass == "hypothetical truncated protein multimer" ||
-      sbgnclass == "active hypothetical truncated protein" ||
-      sbgnclass == "active hypothetical truncated protein multimer"
+    if (false
+      //classes that have binding regions can be added here
     ) {
       return true;
     }
