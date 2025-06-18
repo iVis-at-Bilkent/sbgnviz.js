@@ -4542,7 +4542,7 @@ module.exports = function () {
     },
     "ion channel": {
       width: 60,
-      height: 40,
+      height: 30,
     },
     receptor: {
       width: 60,
