@@ -147,6 +147,8 @@ AuxiliaryUnit.copy = function (mainObj, cy, existingInstance, newParent, newId) 
   newUnit.anchorSide = mainObj.anchorSide;
   newUnit.isDisplayed = mainObj.isDisplayed;
   newUnit.style = mainObj.style;
+  newUnit.visible = mainObj.visible;
+  
   return newUnit;
 };
 
