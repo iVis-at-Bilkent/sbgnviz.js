@@ -431,7 +431,10 @@ module.exports = function () {
 
       infobox.bbox = self.stateAndInfoBboxProp(glyph, parentBbox);
       infobox.style = self.getDefaultStateAndInfoStyle(glyph, parent.class);
-      var visibleString = glyph.extension.list.visible;
+      var visibleString = "";
+      if(glyph.extension && glyph.extension.list && glyph.extension.list.visible){
+        visibleString = glyph.extension.list.visible;
+      }
       infobox.visible = !visibleString.includes("false");
       //classes.StateVariable.setAnchorSide(infobox);
       stateAndInfoArray.push(infobox);
