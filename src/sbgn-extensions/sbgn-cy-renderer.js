@@ -660,12 +660,12 @@ module.exports = function () {
 
   $$.sbgn.generateRNAShapePoints = function (width, height) {
 
-    return [-1, 0.8,   0.5, 0.8 ,   1, -0.8,   -0.5 , -0.8 ];
+    return [-0.333, -1,   1, -1,   0.333, 1,   -1, 1];
   };
 
   $$.sbgn.generateAntisenseRNAShapePoints = function (width, height) {
 
-    return [0, -1,   1, 0,   0, 1,   -1, 0 ];
+    return [-1, -1,   0.333, -1,   1, 1,   -0.333, 1];
   };
 
   $$.sbgn.generateReceptorShapePoints = function (width, height) {

@@ -4501,19 +4501,19 @@ module.exports = function () {
       height: 44,
     },
     gene: {
-      width: 50,
+      width: 60,
       height: 30,
     },
     rna: {
-      width: 50,
-      height: 44,
+      width: 70,
+      height: 30,
     },
     "antisense rna": {
-      width: 50,
-      height: 44,
+      width: 70,
+      height: 30,
     },
     "simple-molecule": {
-      width: 30,
+      width: 60,
       height: 30,
     },
     "unknown molecule": {
@@ -4526,27 +4526,27 @@ module.exports = function () {
     },
     drug: {
       width: 60,
-      height: 40,
+      height: 30,
     },
     // phenotype: {
     //   width: 30,
     //   height: 30,
     // },
     "simple molecule": {
-      width: 50,
-      height: 40,
+      width: 60,
+      height: 30,
     },
     "truncated protein": {
       width: 60,
-      height: 40,
+      height: 30,
     },
     "ion channel": {
       width: 60,
-      height: 40,
+      height: 30,
     },
     receptor: {
       width: 60,
-      height: 40,
+      height: 30,
     },
     "phenotype sbml": {
       width: 50,
