@@ -470,7 +470,7 @@ module.exports = function () {
       and: { asSource: {}, asTarget: { isAllowed: true } },
       or: { asSource: {}, asTarget: { isAllowed: true } },
       not: {
-        asSource: {},
+        asSource: { isAllowed: true, maxEdge: 1, maxTotal: 1 },
         asTarget: { isAllowed: true, maxEdge: 1, maxTotal: 1 },
       },
       delay: {
