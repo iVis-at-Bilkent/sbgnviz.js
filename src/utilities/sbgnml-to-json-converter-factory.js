@@ -650,6 +650,15 @@ module.exports = function () {
       });
     }
 
+    if (nodeObj.class === "tag") {
+      if (ele.orientation) {
+        nodeObj.orientation = ele.orientation;
+      }
+      else if (ele.extension && ele.extension.has("orientation")) {
+        nodeObj.orientation = ele.extension.get("orientation");
+      }
+    }
+
     var cytoscapeJsNode = {data: nodeObj, style: styleObj};
     jsonArray.push(cytoscapeJsNode);
   };
