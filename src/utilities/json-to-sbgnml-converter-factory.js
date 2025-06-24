@@ -1,4 +1,3 @@
-
 var libsbgnjs = require('libsbgn.js');
 var renderExtension = libsbgnjs.render;
 var annot = libsbgnjs.annot;
@@ -465,6 +464,10 @@ module.exports = function () {
            }
            glyphList = glyphList.concat(self.getGlyphSbgnml(ele, version, visible));
        });
+    }
+
+    if (nodeClass === "tag" && node._private.data.orientation) {
+      glyph.orientation = node._private.data.orientation;
     }
 
     return  glyphList;
