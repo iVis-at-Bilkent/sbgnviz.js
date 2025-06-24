@@ -933,9 +933,20 @@ module.exports = function () {
       })
       .selector("node[class='tag']")
       .css({
-        "shape-polygon-points":
-          "-1, -1,   0.25, -1,   1, 0,    0.25, 1,    -1, 1",
+        "shape-polygon-points": function (ele) {
+          const orientation = ele.data("orientation") || "right";
+          if (orientation === "left") {
+            return "1, -1,   -0.25, -1,   -1, 0,    -0.25, 1,    1, 1";
+          } else if (orientation === "up") {
+            return "-1, 1,   -1, -0.25,   0, -1,    1, -0.25,    1, 1";
+          } else if (orientation === "down") {
+            return "-1, -1,   -1, 0.25,   0, 1,    1, 0.25,    1, -1";
+          }
+          // default: "right"
+          return "-1, -1,   0.25, -1,   1, 0,    0.25, 1,    -1, 1";
+        },
       })
+
       .selector("node:parent[class^='complex']") // start with complex
       .css({
         "text-valign": "bottom",
