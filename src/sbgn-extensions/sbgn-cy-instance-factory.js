@@ -891,7 +891,7 @@ module.exports = function () {
         },
       })
       .selector(
-        "node[class='association'],[class='dissociation'],[class='and'],[class='or'],[class='not'],[class='process'],[class='omitted process'],[class='uncertain process'],[class='truncated process'],[class='unknown logical operator']"
+        "node[class='association'],[class='dissociation'],[class='and'],[class='or'],[class='delay'],[class='not'],[class='process'],[class='omitted process'],[class='uncertain process'],[class='truncated process'],[class='unknown logical operator']"
       )
       .css({
         "shape-polygon-points": function (ele) {

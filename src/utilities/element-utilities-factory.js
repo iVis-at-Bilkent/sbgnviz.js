@@ -2526,7 +2526,6 @@ module.exports = function () {
     var sbgnclass = elementUtilities.getPureSbgnClass(ele);
     return (
       sbgnclass != "phenotype" &&
-      sbgnclass != "delay" &&
       (elementUtilities.isLogicalOperator(sbgnclass) ||
         elementUtilities.isPNClass(sbgnclass))
     );
