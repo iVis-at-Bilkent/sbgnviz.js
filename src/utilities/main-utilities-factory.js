@@ -583,21 +583,6 @@ module.exports = function () {
       // Check this for cytoscape.js backward compatibility
       if (layout && layout.run) {
         layout.run();
-        cy.one('layoutstop', function() {
-          cy.animate(
-            {
-            fit:{
-              padding:20,
-            }
-            },
-            {
-              duration: 2000,
-              complete: function() {
-                cy.style().update();
-              }
-            }
-        );
-        });
       }
     }
     else {
