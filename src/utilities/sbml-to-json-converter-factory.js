@@ -97,6 +97,7 @@ module.exports = function () {
 
 
   sbmlToJson.convert = function (xmlString, urlParams) {
+    console.log("geri convert");
     var self = this;
     var cytoscapeJsGraph = {};
     var cytoscapeJsNodes = [];
@@ -214,14 +215,38 @@ sbmlToJson.addJSCompartments = function(compartmentMap, resultJson, cytoscapeJsN
 
 // add species nodes
 sbmlToJson.addSpecies = function(model, cytoscapeJsNodes, compartmentBoundingBoxes, containerNodeMap) {
+  console.log("speciesleri yukle");
 
   for(let i = 0; i < model.getNumSpecies(); i++){
     let species = model.getSpecies(i);
     let active = false, hypothetical = false, multimer = false;
-    let bindingRegion = [], residueVariable = [], unitOfInfo = [];
+    let bindingRegion = [], residueVariable = [], unitOfInfo = [], stateVariable = [];
+
+    let styleAttributes = {
+      "background-color": "",
+      "background-fit": "",
+      "background-height": "",
+      "background-image": "",
+      "background-image-opacity": "",
+      "background-opacity": "",
+      "background-position-x": "",
+      "background-position-y": "",
+      "background-width": ""
+    };
+
     parseString(species.getAnnotationString(), function(err, result){
       if(!result || !result.annotation["nwt:extension"])
         return;
+
+      let info = result.annotation["nwt:extension"][0]["nwt:info"][0];
+      let attrs = info.$;
+
+      for (let key in styleAttributes) {
+          const nwtAttr = `nwt:${key}`;
+          styleAttributes[key] = attrs[nwtAttr] || "";
+        }
+      console.log(styleAttributes);
+
       var stateBooleans = result.annotation["nwt:extension"][0]["nwt:info"][0].$;
       active = stateBooleans["nwt:active"] == "true" ? true : false;
       hypothetical = stateBooleans["nwt:hypothetical"] == "true" ? true : false;
@@ -229,13 +254,21 @@ sbmlToJson.addSpecies = function(model, cytoscapeJsNodes, compartmentBoundingBox
       bindingRegion = result.annotation["nwt:extension"][0]["nwt:info"][0]["nwt:bindingregion"] || [];
       residueVariable = result.annotation["nwt:extension"][0]["nwt:info"][0]["nwt:residuevariable"] || [];
       unitOfInfo = result.annotation["nwt:extension"][0]["nwt:info"][0]["nwt:unitinfo"] || [];
+      stateVariable = result.annotation["nwt:extension"][0]["nwt:info"][0]["nwt:statevariable"] || [];
     })
     speciesCompartmentMap.set(species.getId(), species.getCompartment());
     var sboTerm = species.getSBOTerm();
     let speciesData = {"id": species.getId(), "label": species.getName() || " ", 
                       "parent": species.getCompartment(), "sboTerm": species.getSBOTerm(),
                       "active": active, "multimer": multimer, "hypothetical": hypothetical,
-                      "bindingRegion": bindingRegion, "residueVariable": residueVariable, "unitOfInfo": unitOfInfo};
+                      "bindingRegion": bindingRegion, "residueVariable": residueVariable, "unitOfInfo": unitOfInfo, "stateVariable": stateVariable};
+
+    for (let key in styleAttributes) {
+      speciesData[key] = styleAttributes[key];
+    }
+
+    console.log(speciesData);
+
     resultJson.push({"data": speciesData, "group": "nodes", "classes": "species"});
   }
   let speciesGlyphIdSpeciesIdMap = new Map();
@@ -335,6 +368,17 @@ sbmlToJson.addJSNodes = function(resultJson,cytoscapeJsNodes, speciesGlyphIdSpec
       nodeObj.statesandinfos.push(infoBox);
     }
 
+    var stateVariable = resultJson[i].data.stateVariable;
+    for(let stateVar of stateVariable){
+      let infoBox = classes.StateVariable.construct(undefined, resultJson[i].data.id, undefined);
+      infoBox.state.variable = stateVar._;
+      infoBox.state.value = stateVar.$['nwt:value'];
+      infoBox.style = elementUtilities.getDefaultInfoboxStyle(nodeObj.class, "state variable");
+      infoBox.bbox = {'x': parseFloat(stateVar.$['nwt:x']), 'y': parseFloat(stateVar.$['nwt:y']), 
+                      'w': parseFloat(stateVar.$['nwt:w']), 'h': parseFloat(stateVar.$['nwt:h'])};
+      nodeObj.statesandinfos.push(infoBox);
+    }
+
     // Add status info
     if(resultJson[i].data.hypothetical)
       nodeObj.class = "hypothetical " + nodeObj.class;
@@ -343,7 +387,23 @@ sbmlToJson.addJSNodes = function(resultJson,cytoscapeJsNodes, speciesGlyphIdSpec
     if(resultJson[i].data.multimer)
       nodeObj.class = nodeObj.class + " multimer";
 
+    const styleKeys = [
+      "background-color", "background-fit", "background-height", "background-image",
+      "background-image-opacity", "background-opacity", "background-position-x",
+      "background-position-y", "background-width"
+    ];
+
+    for (let key of styleKeys) {
+      if (resultJson[i].data[key] && resultJson[i].data[key] !== "") {
+        console.log(resultJson[i].data[key]);
+        nodeObj[key] = resultJson[i].data[key];
+      }
+    }
+
+    console.log(nodeObj);
+
     var cytoscapeJsNode = {data: nodeObj, style: styleObj};
+    console.log(cytoscapeJsNode);
     elementUtilities.extendNodeDataWithClassDefaults( nodeObj, nodeObj.class );
     cytoscapeJsNodes.push(cytoscapeJsNode);
   }

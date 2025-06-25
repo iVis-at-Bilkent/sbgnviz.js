@@ -50,6 +50,7 @@ module.exports = function () {
    TODO implement 0.3 changes when submap support is fully there.
    */
   jsonToSbgnml.buildJsObj = function(filename, version, renderInfo, mapProperties, nodes, edges, hidden = false){
+    console.log("bura mıydı");
     var self = this;
     var mapID = textUtilities.getXMLValidId(filename);
     var hasExtension = false;
@@ -111,6 +112,7 @@ module.exports = function () {
     if (hasExtension) { // extension is there
        var extension = new libsbgnjs.Extension();
        if (hasRenderExtension) {
+          console.log(renderInfo);
            extension.add(self.getRenderExtensionSbgnml(renderInfo));
        }
        map.setExtension(extension);

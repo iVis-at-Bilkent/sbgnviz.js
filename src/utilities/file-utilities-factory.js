@@ -472,6 +472,7 @@ module.exports = function () {
     uiUtilities.startSpinner("load-spinner");
     try {
       var sbgnText = jsonToSbml.createSbml(filename);
+      console.log(sbgnText);
       var blob = new Blob([sbgnText], {
         type: "text/plain;charset=utf-8;",
       });

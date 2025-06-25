@@ -90,6 +90,7 @@ module.exports = function () {
     */
     
     jsonToSbml.buildJsObj = function(filename){
+        console.log("devamm");
         var edges = cy.edges();
         var nodes = cy.nodes();
         var sbmlDoc =  new libsbmlInstance.SBMLDocument(3, 2);
@@ -113,6 +114,7 @@ module.exports = function () {
             if( nodeClass !== "compartment")
                 continue;
 
+            console.log(nodes[i]);
             const comp = model.createCompartment()
             const compId = nodes[i]._private.data.id.replace(/-/g, "_");
             comp.setId(compId)
@@ -157,6 +159,7 @@ module.exports = function () {
             if(!jsonToSbml.isSpecies(nodeClass))
                 continue;
 
+            console.log(nodes[i]._private);
             var newSpecies = model.createSpecies();
             if(nodesToSbo[nodeClass])
             {
@@ -199,32 +202,53 @@ module.exports = function () {
             bb.setX(box.x - box.w / 2); bb.setY(box.y - box.h / 2);
             bb.width = box.w; bb.height = box.h;
 
-            // Add State Info for Species as Annotation
-            if(!active && !hypothetical && !multimer && nodes[i].data('statesandinfos').length == 0)
-                continue;
-            
+            let data = nodes[i]._private.data;
+
+            console.log("başla");
+
             let annotationString = '<nwt:extension xmlns:nwt="https://newteditor.org/">';
-            annotationString += '<nwt:info nwt:multimer="' + multimer + '" nwt:active="' + active + 
+            annotationString += '<nwt:info '
+            + 'nwt:background-color="' + (data['background-color'] || '') + '" '
+            + 'nwt:background-fit="' + (data['background-fit'] || '') + '" '
+            + 'nwt:background-height="' + (data['background-height'] || '') + '" '
+            + 'nwt:background-image="' + (data['background-image'] || '') + '" '
+            + 'nwt:background-image-opacity="' + (data['background-image-opacity'] || '') + '" '
+            + 'nwt:background-opacity="' + (data['background-opacity'] || '') + '" '
+            + 'nwt:background-position-x="' + (data['background-position-x'] || '') + '" '
+            + 'nwt:background-position-y="' + (data['background-position-y'] || '') + '" '
+            + 'nwt:background-width="' + (data['background-width'] || '') + '"';
+
+            // Add State Info for Species as Annotation
+            if(!(!active && !hypothetical && !multimer && nodes[i].data('statesandinfos').length == 0)){
+                annotationString += ' nwt:multimer="' + multimer + '" nwt:active="' + active + 
                                     '" nwt:hypothetical="' + hypothetical + '" nwt:infoid="info_' + infoId +
                                     '" nwt:id="' + newSpecies.getId() + '">';
-            for(let item of nodes[i].data('statesandinfos')){
-                let boundingBox = item.bbox;
-                let absoluteCoords = classes.AuxiliaryUnit.getAbsoluteCoord(item, cy);
-                let boundingBoxStr =  'nwt:x="' + (absoluteCoords.x - boundingBox.w / 2) + '" nwt:y="' + (absoluteCoords.y - boundingBox.h / 2) + 
-                                    '" nwt:w="' + boundingBox.w + '" nwt:h="' + boundingBox.h + '"';
-                if(item.clazz == "residue variable"){
-                    annotationString += '<nwt:residuevariable ' + boundingBoxStr + '>' + item.residue.variable + '</nwt:residuevariable>';
-                }
-                else if(item.clazz == "binding region"){
-                    annotationString += '<nwt:bindingregion ' + boundingBoxStr + '>' + item.region.variable + '</nwt:bindingregion>';
-                }
-                else if(item.clazz == "unit of information"){
-                    annotationString += '<nwt:unitinfo ' + boundingBoxStr + '>' + item.label.text + '</nwt:unitinfo>';
+                for(let item of nodes[i].data('statesandinfos')){
+                    let boundingBox = item.bbox;
+                    let absoluteCoords = classes.AuxiliaryUnit.getAbsoluteCoord(item, cy);
+                    let boundingBoxStr =  'nwt:x="' + (absoluteCoords.x - boundingBox.w / 2) + '" nwt:y="' + (absoluteCoords.y - boundingBox.h / 2) + 
+                                        '" nwt:w="' + boundingBox.w + '" nwt:h="' + boundingBox.h + '"';
+                    if(item.clazz == "residue variable"){
+                        annotationString += '<nwt:residuevariable ' + boundingBoxStr + '>' + item.residue.variable + '</nwt:residuevariable>';
+                    }
+                    else if(item.clazz == "binding region"){
+                        annotationString += '<nwt:bindingregion ' + boundingBoxStr + '>' + item.region.variable + '</nwt:bindingregion>';
+                    }
+                    else if(item.clazz == "unit of information"){
+                        annotationString += '<nwt:unitinfo ' + boundingBoxStr + '>' + item.label.text + '</nwt:unitinfo>';
+                    }
+                    else if(item.clazz == "state variable"){
+                        annotationString += '<nwt:statevariable ' + boundingBoxStr + ' nwt:value="' + item.state.value + '">' + item.state.variable + '</nwt:statevariable>';
+                    }
                 }
             }
-            annotationString += '</nwt:info>'
-            annotationString += '</nwt:extension>'
+            else{
+                annotationString += ' nwt:id="' + newSpecies.getId() + '">';
+            }
             infoId += 1;
+            annotationString += '</nwt:info>';
+            annotationString += '</nwt:extension>';
+            
             newSpecies.setAnnotation(annotationString);
         }
 
@@ -242,6 +266,7 @@ module.exports = function () {
             if(!jsonToSbml.isProcessNode(eleClass))
                 return;
 
+            console.log(ele.data);
             var connectedEdges = ele.connectedEdges();
             let sources = [], targets = [], modifiers = [];
             let eleId = ele.id();
