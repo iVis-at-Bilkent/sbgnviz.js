@@ -3116,6 +3116,10 @@ module.exports = function () {
         coeff = 1.5;
       }
 
+      if (_class === "delay") {
+        return this.getDynamicLabelTextSize(ele, 2);
+      }
+
       var ports = ele.data("ports");
 
       if (graphUtilities.portsEnabled === true && ports.length === 2) {
@@ -3131,10 +3135,6 @@ module.exports = function () {
       }
 
       return this.getDynamicLabelTextSize(ele, coeff);
-    }
-
-    if (_class === "delay") {
-      return this.getDynamicLabelTextSize(ele, 2);
     }
 
     return this.getDynamicLabelTextSize(ele);
@@ -3692,6 +3692,7 @@ module.exports = function () {
         ele.data("class") === "and" ||
         ele.data("class") === "or" ||
         ele.data("class") === "not" ||
+        ele.data("class") === "delay" ||
         ele.data("class") === "unknown logical operator"
       ) {
         if (ele.data("ports").length === 2) {
@@ -3783,6 +3784,7 @@ module.exports = function () {
       ele.data("class") === "and" ||
       ele.data("class") === "or" ||
       ele.data("class") === "not" ||
+      ele.data("class") === "delay" ||
       ele.data("class") === "unknown logical operator"
     ) {
       targetingEdges.forEach(function (edge) {
@@ -3970,6 +3972,7 @@ module.exports = function () {
       ele.data("class") === "and" ||
       ele.data("class") === "or" ||
       ele.data("class") === "not" ||
+      ele.data("class") === "delay" ||
       ele.data("class") === "unknown logical operator"
     ) {
       targetingEdges.forEach(function (edge) {
