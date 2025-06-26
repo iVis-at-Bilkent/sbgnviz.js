@@ -97,7 +97,6 @@ module.exports = function () {
 
 
   sbmlToJson.convert = function (xmlString, urlParams) {
-    console.log("geri convert");
     var self = this;
     var cytoscapeJsGraph = {};
     var cytoscapeJsNodes = [];
@@ -158,6 +157,36 @@ sbmlToJson.addCompartments = function (model,cytoscapeJsNodes, compartmentBoundi
     compartmentMap.set(compartment.getId(), i);
     if(compartment.getId() !== "default") {
     let compartmentData = {"id": compartment.getId(), "label": compartment.getName(), "class": "compartment"};
+
+    let styleAttributes = {
+      "background-color": "",
+      "background-fit": "",
+      "background-height": "",
+      "background-image": "",
+      "background-image-opacity": "",
+      "background-opacity": "",
+      "background-position-x": "",
+      "background-position-y": "",
+      "background-width": ""
+    };
+
+    parseString(compartment.getAnnotationString(), function(err, result){
+      if(!result || !result.annotation["nwt:extension"])
+        return;
+
+      let info = result.annotation["nwt:extension"][0]["nwt:info"][0];
+      let attrs = info.$;
+
+      for (let key in styleAttributes) {
+          const nwtAttr = `nwt:${key}`;
+          styleAttributes[key] = attrs[nwtAttr] || "";
+        }
+    })
+
+    for (let key in styleAttributes) {
+      compartmentData[key] = styleAttributes[key];
+    }
+
       resultJson.push({"data": compartmentData, "group": "nodes", "classes": "compartment"});
     }
     if(!compartmentBoundingBoxes.has(compartment.getId())){
@@ -208,6 +237,18 @@ sbmlToJson.addJSCompartments = function(compartmentMap, resultJson, cytoscapeJsN
         area: nodeObj.bbox.w * nodeObj.bbox.h});
       var cytoscapeJsNode = {data: nodeObj, style: styleObj};
       elementUtilities.extendNodeDataWithClassDefaults( nodeObj, nodeObj.class );
+
+      const styleKeys = [
+      "background-color", "background-fit", "background-height", "background-image",
+      "background-image-opacity", "background-opacity", "background-position-x",
+      "background-position-y", "background-width"];
+
+      for (let key of styleKeys) {
+      if (resultJson[i].data[key] && resultJson[i].data[key] !== "") {
+        nodeObj[key] = resultJson[i].data[key];
+      }
+      }
+
       cytoscapeJsNodes.push(cytoscapeJsNode)
     }
   }
@@ -215,7 +256,6 @@ sbmlToJson.addJSCompartments = function(compartmentMap, resultJson, cytoscapeJsN
 
 // add species nodes
 sbmlToJson.addSpecies = function(model, cytoscapeJsNodes, compartmentBoundingBoxes, containerNodeMap) {
-  console.log("speciesleri yukle");
 
   for(let i = 0; i < model.getNumSpecies(); i++){
     let species = model.getSpecies(i);
@@ -245,7 +285,6 @@ sbmlToJson.addSpecies = function(model, cytoscapeJsNodes, compartmentBoundingBox
           const nwtAttr = `nwt:${key}`;
           styleAttributes[key] = attrs[nwtAttr] || "";
         }
-      console.log(styleAttributes);
 
       var stateBooleans = result.annotation["nwt:extension"][0]["nwt:info"][0].$;
       active = stateBooleans["nwt:active"] == "true" ? true : false;
@@ -266,8 +305,6 @@ sbmlToJson.addSpecies = function(model, cytoscapeJsNodes, compartmentBoundingBox
     for (let key in styleAttributes) {
       speciesData[key] = styleAttributes[key];
     }
-
-    console.log(speciesData);
 
     resultJson.push({"data": speciesData, "group": "nodes", "classes": "species"});
   }
@@ -393,18 +430,13 @@ sbmlToJson.addJSNodes = function(resultJson,cytoscapeJsNodes, speciesGlyphIdSpec
       "background-position-y", "background-width"
     ];
 
-    for (let key of styleKeys) {
+    var cytoscapeJsNode = {data: nodeObj, style: styleObj};
+    elementUtilities.extendNodeDataWithClassDefaults( nodeObj, nodeObj.class );
+      for (let key of styleKeys) {
       if (resultJson[i].data[key] && resultJson[i].data[key] !== "") {
-        console.log(resultJson[i].data[key]);
         nodeObj[key] = resultJson[i].data[key];
       }
     }
-
-    console.log(nodeObj);
-
-    var cytoscapeJsNode = {data: nodeObj, style: styleObj};
-    console.log(cytoscapeJsNode);
-    elementUtilities.extendNodeDataWithClassDefaults( nodeObj, nodeObj.class );
     cytoscapeJsNodes.push(cytoscapeJsNode);
   }
 };

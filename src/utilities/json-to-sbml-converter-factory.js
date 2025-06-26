@@ -90,7 +90,6 @@ module.exports = function () {
     */
     
     jsonToSbml.buildJsObj = function(filename){
-        console.log("devamm");
         var edges = cy.edges();
         var nodes = cy.nodes();
         var sbmlDoc =  new libsbmlInstance.SBMLDocument(3, 2);
@@ -114,7 +113,6 @@ module.exports = function () {
             if( nodeClass !== "compartment")
                 continue;
 
-            console.log(nodes[i]);
             const comp = model.createCompartment()
             const compId = nodes[i]._private.data.id.replace(/-/g, "_");
             comp.setId(compId)
@@ -133,6 +131,27 @@ module.exports = function () {
             let bb = glyph.getBoundingBox();
             bb.setX(box.x - box.w / 2); bb.setY(box.y - box.h / 2);
             bb.width = box.w; bb.height = box.h;
+
+
+            let data = nodes[i]._private.data;
+
+            let annotationString = '<nwt:extension xmlns:nwt="https://newteditor.org/">';
+            annotationString += '<nwt:info '
+            + 'nwt:background-color="' + (data['background-color'] || '') + '" '
+            + 'nwt:background-fit="' + (data['background-fit'] || '') + '" '
+            + 'nwt:background-height="' + (data['background-height'] || '') + '" '
+            + 'nwt:background-image="' + (data['background-image'] || '') + '" '
+            + 'nwt:background-image-opacity="' + (data['background-image-opacity'] || '') + '" '
+            + 'nwt:background-opacity="' + (data['background-opacity'] || '') + '" '
+            + 'nwt:background-position-x="' + (data['background-position-x'] || '') + '" '
+            + 'nwt:background-position-y="' + (data['background-position-y'] || '') + '" '
+            + 'nwt:background-width="' + (data['background-width'] || '') + '"'
+            + ' nwt:id="' + compId + '">';
+
+            annotationString += '</nwt:info>';
+            annotationString += '</nwt:extension>';
+            
+            comp.setAnnotation(annotationString);
         }
 
         // Set species
@@ -159,7 +178,6 @@ module.exports = function () {
             if(!jsonToSbml.isSpecies(nodeClass))
                 continue;
 
-            console.log(nodes[i]._private);
             var newSpecies = model.createSpecies();
             if(nodesToSbo[nodeClass])
             {
@@ -203,8 +221,6 @@ module.exports = function () {
             bb.width = box.w; bb.height = box.h;
 
             let data = nodes[i]._private.data;
-
-            console.log("başla");
 
             let annotationString = '<nwt:extension xmlns:nwt="https://newteditor.org/">';
             annotationString += '<nwt:info '
@@ -266,7 +282,6 @@ module.exports = function () {
             if(!jsonToSbml.isProcessNode(eleClass))
                 return;
 
-            console.log(ele.data);
             var connectedEdges = ele.connectedEdges();
             let sources = [], targets = [], modifiers = [];
             let eleId = ele.id();
