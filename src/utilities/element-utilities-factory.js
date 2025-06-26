@@ -474,7 +474,7 @@ module.exports = function () {
         asTarget: { isAllowed: true, maxEdge: 1, maxTotal: 1 },
       },
       delay: {
-        asSource: {},
+        asSource: { isAllowed: true, maxEdge: 1, maxTotal: 1 },
         asTarget: { isAllowed: true, maxEdge: 1, maxTotal: 1 },
       },
       compartment: { asSource: {}, asTarget: {} },
