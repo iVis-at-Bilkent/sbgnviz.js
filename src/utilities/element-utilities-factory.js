@@ -467,8 +467,14 @@ module.exports = function () {
       phenotype: { asSource: {}, asTarget: {} },
       tag: { asSource: {}, asTarget: {} },
       submap: { asSource: {}, asTarget: {} },
-      and: { asSource: {}, asTarget: { isAllowed: true } },
-      or: { asSource: {}, asTarget: { isAllowed: true } },
+      and: { 
+        asSource: { isAllowed: true, maxEdge: 1, maxTotal: 1 }, 
+        asTarget: { isAllowed: true, maxEdge: 1, maxTotal: 1 } 
+      },
+      or: { 
+        asSource: { isAllowed: true, maxEdge: 1, maxTotal: 1 }, 
+        asTarget: { isAllowed: true, maxEdge: 1, maxTotal: 1 } 
+      },
       not: {
         asSource: { isAllowed: true, maxEdge: 1, maxTotal: 1 },
         asTarget: { isAllowed: true, maxEdge: 1, maxTotal: 1 },
@@ -3116,9 +3122,6 @@ module.exports = function () {
         coeff = 1.5;
       }
 
-      if (_class === "delay") {
-        return this.getDynamicLabelTextSize(ele, 2);
-      }
 
       var ports = ele.data("ports");
 
@@ -3132,6 +3135,9 @@ module.exports = function () {
             ? Math.abs(port.y) / 50
             : Math.abs(port.x) / 50;
         coeff /= ratio; // Divide the coeff by ratio to fit into the bbox of the actual shape (discluding ports)
+      }
+      if (_class === "delay") {
+        coeff *= 1.4;
       }
 
       return this.getDynamicLabelTextSize(ele, coeff);
