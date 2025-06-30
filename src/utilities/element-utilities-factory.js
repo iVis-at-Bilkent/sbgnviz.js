@@ -469,11 +469,11 @@ module.exports = function () {
       submap: { asSource: {}, asTarget: {} },
       and: { 
         asSource: { isAllowed: true, maxEdge: 1, maxTotal: 1 }, 
-        asTarget: { isAllowed: true, maxEdge: 1, maxTotal: 1 } 
+        asTarget: { isAllowed: true } 
       },
       or: { 
         asSource: { isAllowed: true, maxEdge: 1, maxTotal: 1 }, 
-        asTarget: { isAllowed: true, maxEdge: 1, maxTotal: 1 } 
+        asTarget: { isAllowed: true } 
       },
       not: {
         asSource: { isAllowed: true, maxEdge: 1, maxTotal: 1 },
@@ -3092,7 +3092,7 @@ module.exports = function () {
     } else if (_class == "dissociation") {
       content = "o";
     } else if (_class == "delay") {
-      content = "\u03C4"; // tau
+      content = "\u03A4"; // tau
     }
 
     var textWidth = ele.outerWidth() || ele.data("bbox").w;
