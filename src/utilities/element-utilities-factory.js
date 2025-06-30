@@ -3092,7 +3092,7 @@ module.exports = function () {
     } else if (_class == "dissociation") {
       content = "o";
     } else if (_class == "delay") {
-      content = "\u03A4"; // tau
+      content = "\u03C4"; // tau
     }
 
     var textWidth = ele.outerWidth() || ele.data("bbox").w;
