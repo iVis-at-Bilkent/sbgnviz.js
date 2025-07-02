@@ -467,14 +467,20 @@ module.exports = function () {
       phenotype: { asSource: {}, asTarget: {} },
       tag: { asSource: {}, asTarget: {} },
       submap: { asSource: {}, asTarget: {} },
-      and: { asSource: {}, asTarget: { isAllowed: true } },
-      or: { asSource: {}, asTarget: { isAllowed: true } },
+      and: { 
+        asSource: { isAllowed: true, maxEdge: 1, maxTotal: 1 }, 
+        asTarget: { isAllowed: true } 
+      },
+      or: { 
+        asSource: { isAllowed: true, maxEdge: 1, maxTotal: 1 }, 
+        asTarget: { isAllowed: true } 
+      },
       not: {
         asSource: { isAllowed: true, maxEdge: 1, maxTotal: 1 },
         asTarget: { isAllowed: true, maxEdge: 1, maxTotal: 1 },
       },
       delay: {
-        asSource: {},
+        asSource: { isAllowed: true, maxEdge: 1, maxTotal: 1 },
         asTarget: { isAllowed: true, maxEdge: 1, maxTotal: 1 },
       },
       compartment: { asSource: {}, asTarget: {} },
@@ -2526,7 +2532,6 @@ module.exports = function () {
     var sbgnclass = elementUtilities.getPureSbgnClass(ele);
     return (
       sbgnclass != "phenotype" &&
-      sbgnclass != "delay" &&
       (elementUtilities.isLogicalOperator(sbgnclass) ||
         elementUtilities.isPNClass(sbgnclass))
     );
@@ -3117,6 +3122,7 @@ module.exports = function () {
         coeff = 1.5;
       }
 
+
       var ports = ele.data("ports");
 
       if (graphUtilities.portsEnabled === true && ports.length === 2) {
@@ -3130,12 +3136,11 @@ module.exports = function () {
             : Math.abs(port.x) / 50;
         coeff /= ratio; // Divide the coeff by ratio to fit into the bbox of the actual shape (discluding ports)
       }
+      if (_class === "delay") {
+        coeff *= 1.4;
+      }
 
       return this.getDynamicLabelTextSize(ele, coeff);
-    }
-
-    if (_class === "delay") {
-      return this.getDynamicLabelTextSize(ele, 2);
     }
 
     return this.getDynamicLabelTextSize(ele);
@@ -3693,6 +3698,7 @@ module.exports = function () {
         ele.data("class") === "and" ||
         ele.data("class") === "or" ||
         ele.data("class") === "not" ||
+        ele.data("class") === "delay" ||
         ele.data("class") === "unknown logical operator"
       ) {
         if (ele.data("ports").length === 2) {
@@ -3784,6 +3790,7 @@ module.exports = function () {
       ele.data("class") === "and" ||
       ele.data("class") === "or" ||
       ele.data("class") === "not" ||
+      ele.data("class") === "delay" ||
       ele.data("class") === "unknown logical operator"
     ) {
       targetingEdges.forEach(function (edge) {
@@ -3971,6 +3978,7 @@ module.exports = function () {
       ele.data("class") === "and" ||
       ele.data("class") === "or" ||
       ele.data("class") === "not" ||
+      ele.data("class") === "delay" ||
       ele.data("class") === "unknown logical operator"
     ) {
       targetingEdges.forEach(function (edge) {
