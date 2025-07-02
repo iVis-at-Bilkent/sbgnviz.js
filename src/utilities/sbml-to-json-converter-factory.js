@@ -111,6 +111,8 @@ module.exports = function () {
     let doc = reader.readSBMLFromString(xmlString);
     model = doc.getModel();
 
+    sbmlToJson.addMultiFeatures(xmlString,model);
+
     let plugin;
     try {
       plugin = model.findPlugin('layout');
@@ -148,6 +150,102 @@ module.exports = function () {
     return cytoscapeJsGraph;
   };
 
+  sbmlToJson.addMultiFeatures = function(xmlString,model){
+
+    if (!xmlString || typeof xmlString !== 'string' || !xmlString.trim().startsWith('<')) {
+      return;
+    }
+    
+    parseString(xmlString, function(err, result) {
+      if (err) {
+        console.error("Parse error:", err);
+        return;
+      }
+
+      if(!result.sbml.model[0]["multi:listOfSpeciesTypes"]){
+        return;
+      }
+      const suffixIdNameMap = {};
+      const structuralStateIdNameMap = {};
+      const speciesList = result.sbml.model[0].listOfSpecies[0].species;
+      const speciesTypes = result.sbml.model[0]["multi:listOfSpeciesTypes"]?.[0]["multi:speciesType"] || [];
+
+      for(const type of speciesTypes){
+        const featureTypes = type["multi:listOfSpeciesFeatureTypes"][0]["multi:speciesFeatureType"];
+        for (const ftype of featureTypes)
+        {
+            const id = ftype.$["multi:id"];
+
+            if (id.includes("minerva_state_suffix")) {
+              const possibleValues = ftype["multi:listOfPossibleSpeciesFeatureValues"]?.[0]["multi:possibleSpeciesFeatureValue"] || [];
+
+              for (const value of possibleValues) {
+                const valueId = value.$["multi:id"];
+                const name = value.$["multi:name"];
+                suffixIdNameMap[valueId] = name;
+              }
+            }
+            if(id.includes("minerva_structural_state") || id.includes("Residue_null")){
+                const possibleValues = ftype["multi:listOfPossibleSpeciesFeatureValues"]?.[0]["multi:possibleSpeciesFeatureValue"] || [];
+
+              for (const value of possibleValues) {
+                const valueId = value.$["multi:id"];
+                const name = value.$["multi:name"];
+                structuralStateIdNameMap[valueId] = name;
+              }
+            }
+        }
+      }
+
+      for (let i = 0; i < model.getNumSpecies(); i++) {
+        const xmlSpecies = speciesList[i];
+        const speciesId = xmlSpecies.$.id;
+        const sbmlSpecies = model.getSpecies(i);
+
+        if (!sbmlSpecies) continue;
+
+        let annotation = `<nwt:extension xmlns:nwt="https://newteditor.org/">\n`;
+        annotation += `<nwt:info nwt:multimer="false" nwt:active="false" nwt:hypothetical="false" nwt:infoid="info_${i + 1}" nwt:id="${speciesId}">\n`;
+
+        const featureList = xmlSpecies["multi:listOfSpeciesFeatures"]?.[0]?.["multi:speciesFeature"] || [];
+
+        for (const feature of featureList) {
+          const featureType = feature.$["multi:speciesFeatureType"];
+          const values = feature["multi:listOfSpeciesFeatureValues"]?.[0]?.["multi:speciesFeatureValue"] || [];
+
+          for (const value of values) {
+
+            const infoboxText = value.$["multi:value"] || "unknown";
+            const fakeX = 50+i;
+            const fakeY = 50+i;
+            const w = 40;
+            const h = 12;
+
+            if (featureType.includes("state_suffix")) {
+              let infoText = suffixIdNameMap[infoboxText]? suffixIdNameMap[infoboxText] : "";
+              annotation += `<nwt:unitinfo nwt:x="${fakeX}" nwt:y="${fakeY}" nwt:w="${w}" nwt:h="${h}">${infoText}</nwt:unitinfo>\n`;
+            } else if (featureType.includes("structural_state") ||featureType.includes("Residue_null")) {
+              let mainStateText = structuralStateIdNameMap[infoboxText]? structuralStateIdNameMap[infoboxText] : "";
+              let valueText = "";
+              if (mainStateText.includes("@")) {
+                const parts = mainStateText.split("@");
+                valueText = parts[0];
+                mainStateText = parts[1];
+              }
+              annotation += `<nwt:statevariable nwt:x="${fakeX}" nwt:y="${fakeY}" nwt:w="${w}" nwt:h="${h}" nwt:value="${valueText}">${mainStateText}</nwt:statevariable>\n`;
+            }
+          }
+        }
+
+        annotation += `</nwt:info>\n</nwt:extension>`;
+        try {
+          sbmlSpecies.setAnnotation(annotation);
+        } catch (e) {
+          console.error(`Annotation set failed for ${speciesId}:`, e);
+        }
+      }
+    });
+  }
 
 // add compartment nodes
 sbmlToJson.addCompartments = function (model,cytoscapeJsNodes, compartmentBoundingBoxes, containerNodeMap) {
