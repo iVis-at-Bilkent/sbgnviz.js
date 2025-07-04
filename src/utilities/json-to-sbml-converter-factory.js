@@ -222,6 +222,22 @@ module.exports = function () {
 
             let data = nodes[i]._private.data;
 
+            var annotations = data['annotations'];
+            var annots = [];
+            for (var annotID in annotations) {
+                var currentAnnot = annotations[annotID];
+                // check validity of annotation
+                if(currentAnnot.status != 'validated' || !currentAnnot.selectedDB || !currentAnnot.annotationValue) {
+                    continue;
+                }
+                var annotInfo = {};
+                annotInfo.annotationValue = currentAnnot.annotationValue;
+                annotInfo.selectedDB = currentAnnot.selectedDB;
+                annotInfo.selectedRelation = currentAnnot.selectedRelation;
+                
+                annots.push(annotInfo);
+            }
+
             let annotationString = '<nwt:extension xmlns:nwt="https://newteditor.org/">';
             annotationString += '<nwt:info '
             + 'nwt:background-color="' + (data['background-color'] || '') + '" '
@@ -235,7 +251,7 @@ module.exports = function () {
             + 'nwt:background-width="' + (data['background-width'] || '') + '"';
 
             // Add State Info for Species as Annotation
-            if(!(!active && !hypothetical && !multimer && nodes[i].data('statesandinfos').length == 0)){
+            if(!(!active && !hypothetical && !multimer && nodes[i].data('statesandinfos').length == 0 &&annots.length == 0)){
                 annotationString += ' nwt:multimer="' + multimer + '" nwt:active="' + active + 
                                     '" nwt:hypothetical="' + hypothetical + '" nwt:infoid="info_' + infoId +
                                     '" nwt:id="' + newSpecies.getId() + '">';
@@ -256,6 +272,14 @@ module.exports = function () {
                     else if(item.clazz == "state variable"){
                         annotationString += '<nwt:statevariable ' + boundingBoxStr + ' nwt:value="' + item.state.value + '">' + item.state.variable + '</nwt:statevariable>';
                     }
+                }
+
+                for(let item of annots){
+                    annotationString += '<nwt:customproperty' +
+                      ' nwt:value="' + item.annotationValue + '"' +
+                      ' nwt:DB="' + item.selectedDB + '"' +
+                      ' nwt:relation="' + item.selectedRelation + '">' +
+                      '</nwt:customproperty>';
                 }
             }
             else{

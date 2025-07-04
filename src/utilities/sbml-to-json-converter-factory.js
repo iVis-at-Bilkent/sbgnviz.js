@@ -204,8 +204,36 @@ module.exports = function () {
 
         if (!sbmlSpecies) continue;
 
+        let rdf; 
+
+        const rdfDescription = xmlSpecies['annotation']?.[0]['rdf:RDF']?.[0]['rdf:Description'][0];
+
+        if (rdfDescription) {
+            for (const key in rdfDescription) {
+                if (rdfDescription[key]) {
+                    const relationObject = rdfDescription[key][0];
+                    const rdfBag = relationObject?.['rdf:Bag'];
+                    if (rdfBag) {
+                        const rdfLi = rdfBag[0]?.['rdf:li'];
+                        if (rdfLi) {
+                            let resource = rdfLi[0].$?.['rdf:resource'];
+                            resource = resource.substring("urn:miriam:".length).replace(/:/g, '/');;
+                            resource = `http://identifiers.org/${resource}`;
+                            if (resource) {
+                                var regexp = /^http:\/\/identifiers.org\/(.+?)\/.+$/;
+                                var db =  resource.replace(regexp, '$1');
+                                rdf = {key,resource,db};
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         let annotation = `<nwt:extension xmlns:nwt="https://newteditor.org/">\n`;
         annotation += `<nwt:info nwt:multimer="false" nwt:active="false" nwt:hypothetical="false" nwt:infoid="info_${i + 1}" nwt:id="${speciesId}">\n`;
+
+        let isMultimer = false;
 
         const featureList = xmlSpecies["multi:listOfSpeciesFeatures"]?.[0]?.["multi:speciesFeature"] || [];
 
@@ -220,6 +248,10 @@ module.exports = function () {
             const fakeY = 50+i;
             const w = 40;
             const h = 12;
+
+            if(featureType.includes("minerva_dimer")){
+              isMultimer = true;
+            }
 
             if (featureType.includes("state_suffix")) {
               let infoText = suffixIdNameMap[infoboxText]? suffixIdNameMap[infoboxText] : "";
@@ -236,8 +268,16 @@ module.exports = function () {
             }
           }
         }
+        if(rdf){
+          annotation += '<nwt:customproperty' +
+                      ' nwt:value="' + rdf.resource + '"' +
+                      ' nwt:DB="' + rdf.db + '"' +
+                      ' nwt:relation="' + rdf.key + '">' +
+                      '</nwt:customproperty>';
+        }
 
         annotation += `</nwt:info>\n</nwt:extension>`;
+        annotation = annotation.replace('nwt:multimer="false"','nwt:multimer="'+isMultimer +'"');
         try {
           sbmlSpecies.setAnnotation(annotation);
         } catch (e) {
@@ -359,6 +399,7 @@ sbmlToJson.addSpecies = function(model, cytoscapeJsNodes, compartmentBoundingBox
     let species = model.getSpecies(i);
     let active = false, hypothetical = false, multimer = false;
     let bindingRegion = [], residueVariable = [], unitOfInfo = [], stateVariable = [];
+    let customProperties = [];
 
     let styleAttributes = {
       "background-color": "",
@@ -392,13 +433,16 @@ sbmlToJson.addSpecies = function(model, cytoscapeJsNodes, compartmentBoundingBox
       residueVariable = result.annotation["nwt:extension"][0]["nwt:info"][0]["nwt:residuevariable"] || [];
       unitOfInfo = result.annotation["nwt:extension"][0]["nwt:info"][0]["nwt:unitinfo"] || [];
       stateVariable = result.annotation["nwt:extension"][0]["nwt:info"][0]["nwt:statevariable"] || [];
+      customProperties = result.annotation["nwt:extension"][0]["nwt:info"][0]["nwt:customproperty"] || [];
     })
+
     speciesCompartmentMap.set(species.getId(), species.getCompartment());
     var sboTerm = species.getSBOTerm();
     let speciesData = {"id": species.getId(), "label": species.getName() || " ", 
                       "parent": species.getCompartment(), "sboTerm": species.getSBOTerm(),
                       "active": active, "multimer": multimer, "hypothetical": hypothetical,
-                      "bindingRegion": bindingRegion, "residueVariable": residueVariable, "unitOfInfo": unitOfInfo, "stateVariable": stateVariable};
+                      "bindingRegion": bindingRegion, "residueVariable": residueVariable, "unitOfInfo": unitOfInfo, "stateVariable": stateVariable,
+                      "customproperty": customProperties};
 
     for (let key in styleAttributes) {
       speciesData[key] = styleAttributes[key];
@@ -521,6 +565,23 @@ sbmlToJson.addJSNodes = function(resultJson,cytoscapeJsNodes, speciesGlyphIdSpec
       nodeObj.class = "active " + nodeObj.class;
     if(resultJson[i].data.multimer)
       nodeObj.class = nodeObj.class + " multimer";
+
+    var customProperties = resultJson[i].data.customproperty;
+    let annotIndex = 0;
+    if(!nodeObj.annotations) {
+        nodeObj.annotations = {};
+      }
+    for(let property of customProperties){
+      var annotId = nodeObj.id+"-annot-"+annotIndex;
+
+      nodeObj.annotations[annotId] = {
+        status: "validated",
+        selectedDB: property.$['nwt:DB'],
+        selectedRelation: property.$['nwt:relation'],
+        annotationValue: property.$['nwt:value']
+      };
+      annotIndex++;
+    }
 
     const styleKeys = [
       "background-color", "background-fit", "background-height", "background-image",
