@@ -185,7 +185,7 @@ module.exports = function () {
                 suffixIdNameMap[valueId] = name;
               }
             }
-            if(id.includes("minerva_structural_state") || id.includes("Residue_null")){
+            if(id.includes("minerva_structural_state") || id.includes("Residue")){
                 const possibleValues = ftype["multi:listOfPossibleSpeciesFeatureValues"]?.[0]["multi:possibleSpeciesFeatureValue"] || [];
 
               for (const value of possibleValues) {
@@ -256,13 +256,20 @@ module.exports = function () {
             if (featureType.includes("state_suffix")) {
               let infoText = suffixIdNameMap[infoboxText]? suffixIdNameMap[infoboxText] : "";
               annotation += `<nwt:unitinfo nwt:x="${fakeX}" nwt:y="${fakeY}" nwt:w="${w}" nwt:h="${h}">${infoText}</nwt:unitinfo>\n`;
-            } else if (featureType.includes("structural_state") ||featureType.includes("Residue_null")) {
+            } else if (featureType.includes("structural_state") ||featureType.includes("Residue")) {
               let mainStateText = structuralStateIdNameMap[infoboxText]? structuralStateIdNameMap[infoboxText] : "";
               let valueText = "";
               if (mainStateText.includes("@")) {
                 const parts = mainStateText.split("@");
                 valueText = parts[0];
                 mainStateText = parts[1];
+              }
+              else if(!featureType.includes("Residue")){
+                valueText = mainStateText;
+                mainStateText = "";
+              }
+              else if(featureType.includes("Residue_PHOSPHORYLATED")){
+                valueText = "P";
               }
               annotation += `<nwt:statevariable nwt:x="${fakeX}" nwt:y="${fakeY}" nwt:w="${w}" nwt:h="${h}" nwt:value="${valueText}">${mainStateText}</nwt:statevariable>\n`;
             }
