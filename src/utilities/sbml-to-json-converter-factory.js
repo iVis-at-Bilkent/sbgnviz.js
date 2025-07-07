@@ -220,7 +220,7 @@ module.exports = function () {
                             resource = resource.substring("urn:miriam:".length).replace(/:/g, '/');;
                             resource = `http://identifiers.org/${resource}`;
                             if (resource) {
-                                var regexp = /^http:\/\/identifiers.org\/(.+?)\/.+$/;
+                                var regexp = /^http:\/\/identifiers.org\/([^/:_]+).*$/;
                                 var db =  resource.replace(regexp, '$1');
                                 rdf = {key,resource,db};
                             }

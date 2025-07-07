@@ -669,7 +669,7 @@ module.exports = function () {
   sbgnmlToJson.handleAnnotations = function(cyObject, rdfElement) {
     // local utility function
     function dbFromUrl(url) {
-      var regexp = /^http:\/\/identifiers.org\/(.+?)\/.+$/;
+      var regexp = /^http:\/\/identifiers.org\/([^/:_]+).*$/;
       return url.replace(regexp, '$1');
     }
 
