@@ -121,7 +121,7 @@ module.exports = function() {
     } );
   }
 
-  jsonToNwt.buildJsObj = function(filename, version, renderInfo, mapProperties, nodes, edges) {
+  jsonToNwt.buildJsObj = function(filename, version, renderInfo, mapProperties, nodes, edges, annotationLayersData) {
     var jsObj = jsonToSbgnml.buildJsObj(filename, version, renderInfo, mapProperties, nodes, edges);
 
     if ( elementUtilities.mapType !== 'PD' && elementUtilities.mapType !== 'AF'  && elementUtilities.mapType !== 'HybridSbgn' && elementUtilities.mapType !== 'SBML') {
@@ -139,11 +139,26 @@ module.exports = function() {
       extendStylesData(jsObjStyles, appStyles);
     }
 
+    // Add annotation layers data to extension if provided
+    if (annotationLayersData && jsObj.map[0].extension) {
+      var annotationLayersExtension = {
+        'nwt:annotationLayers': {
+          '$': { 'xmlns:nwt': 'https://newteditor.org/' },
+          'layerCount': [annotationLayersData.layerCount || 0],
+          'layers': [JSON.stringify(annotationLayersData.layers || [])]
+        }
+      };
+      
+      if (!jsObj.map[0].extension['nwt:annotationLayers']) {
+        jsObj.map[0].extension['nwt:annotationLayers'] = annotationLayersExtension['nwt:annotationLayers'];
+      }
+    }
+
     return jsObj;
   };
 
-  jsonToNwt.createNwt = function(filename, version, renderInfo, mapProperties, nodes, edges) {
-    var jsObj = jsonToNwt.buildJsObj(filename, version, renderInfo, mapProperties, nodes, edges);
+  jsonToNwt.createNwt = function(filename, version, renderInfo, mapProperties, nodes, edges, annotationLayersData) {
+    var jsObj = jsonToNwt.buildJsObj(filename, version, renderInfo, mapProperties, nodes, edges, annotationLayersData);
     return jsonToSbgnml.buildString({sbgn: jsObj});
   };
 

@@ -154,6 +154,21 @@ module.exports = function() {
       applyExtraStylesData( graphData, xmlObject );      
     }
 
+    // Extract annotation layers extension from XML
+    var annotationLayersElement = xmlObject.querySelector('nwt\\:annotationLayers, annotationLayers');
+    if (annotationLayersElement) {
+      var layerCountElement = annotationLayersElement.querySelector('layerCount');
+      var layersElement = annotationLayersElement.querySelector('layers');
+      
+      var annotationLayersData = {
+        layerCount: layerCountElement ? parseInt(layerCountElement.textContent) : 0,
+        layers: layersElement ? JSON.parse(layersElement.textContent || '[]') : []
+      };
+      graphData.annotationLayers = annotationLayersData;
+    } else {
+      console.log('No annotation layers extension found in NWT file');
+    }
+
     return graphData;
   };
 
