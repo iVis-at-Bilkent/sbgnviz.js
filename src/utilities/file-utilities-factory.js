@@ -372,7 +372,7 @@ module.exports = function () {
  };
 
  fileUtilities.loadSBMLText = async function(textData, tileInfoBoxes, filename, cy, urlParams){
-  await updateGraph(sbmlToJson.convert(textToXmlObject(textData), urlParams), undefined, undefined, tileInfoBoxes);
+  await updateGraph(sbmlToJson.convert(textData, urlParams), undefined, undefined, tileInfoBoxes);
    await $(document).trigger("sbgnvizLoadFileEnd",  [filename, cy]);
    uiUtilities.endSpinner("load-file-spinner");
 
