@@ -3002,7 +3002,7 @@ module.exports = function () {
         return "triangle";
       case "positive influence sbml":
       case "unknown positive influence":
-        return "vee";
+        return "chevron";
       case "modulation":
       case "unknown influence":
       case "reduced modulation":
