@@ -182,7 +182,7 @@ module.exports = function () {
       "omitted process": { asSource: {}, asTarget: { isAllowed: true } },
       "uncertain process": { asSource: {}, asTarget: { isAllowed: true } },
       phenotype: { asSource: {}, asTarget: { isAllowed: true } },
-      association: { asSource: {}, asTarget: {} },
+      association: { asSource: {}, asTarget: {isAllowed:true} },
       dissociation: { asSource: {}, asTarget: {} },
       and: {
         asSource: { isAllowed: true, maxEdge: 1, maxTotal: 1 },
@@ -467,14 +467,20 @@ module.exports = function () {
       phenotype: { asSource: {}, asTarget: {} },
       tag: { asSource: {}, asTarget: {} },
       submap: { asSource: {}, asTarget: {} },
-      and: { asSource: {}, asTarget: { isAllowed: true } },
-      or: { asSource: {}, asTarget: { isAllowed: true } },
+      and: { 
+        asSource: { isAllowed: true, maxEdge: 1, maxTotal: 1 }, 
+        asTarget: { isAllowed: true } 
+      },
+      or: { 
+        asSource: { isAllowed: true, maxEdge: 1, maxTotal: 1 }, 
+        asTarget: { isAllowed: true } 
+      },
       not: {
-        asSource: {},
+        asSource: { isAllowed: true, maxEdge: 1, maxTotal: 1 },
         asTarget: { isAllowed: true, maxEdge: 1, maxTotal: 1 },
       },
       delay: {
-        asSource: {},
+        asSource: { isAllowed: true, maxEdge: 1, maxTotal: 1 },
         asTarget: { isAllowed: true, maxEdge: 1, maxTotal: 1 },
       },
       compartment: { asSource: {}, asTarget: {} },
@@ -674,6 +680,7 @@ module.exports = function () {
       gene: { asSource: { isAllowed: true }, asTarget: {} },
       compartment: { asSource: {}, asTarget: {} },
       rna: { asSource: { isAllowed: true }, asTarget: {} },
+      "antisense rna": { asSource: { isAllowed: true }, asTarget: {} },
       degradation: { asSource: { isAllowed: true }, asTarget: {} },
       drug: { asSource: { isAllowed: true }, asTarget: {} },
       "truncated protein": { asSource: { isAllowed: true }, asTarget: {} },
@@ -718,6 +725,7 @@ module.exports = function () {
       gene: { asSource: {}, asTarget: { isAllowed: true } },
       compartment: { asSource: {}, asTarget: {} },
       rna: { asSource: {}, asTarget: { isAllowed: true } },
+      "antisense rna": { asSource: {}, asTarget: { isAllowed: true } },
       degradation: { asSource: {}, asTarget: { isAllowed: true } },
       drug: { asSource: {}, asTarget: { isAllowed: true } },
       "truncated protein": { asSource: {}, asTarget: { isAllowed: true } },
@@ -762,6 +770,7 @@ module.exports = function () {
       gene: { asSource: { isAllowed: true }, asTarget: {} },
       compartment: { asSource: {}, asTarget: {} },
       rna: { asSource: { isAllowed: true }, asTarget: {} },
+      "antisense rna": { asSource: { isAllowed: true }, asTarget: {} },
       degradation: { asSource: { isAllowed: true }, asTarget: {} },
       drug: { asSource: { isAllowed: true }, asTarget: {} },
       "truncated protein": { asSource: { isAllowed: true }, asTarget: {} },
@@ -791,6 +800,7 @@ module.exports = function () {
       gene: { asSource: { isAllowed: true }, asTarget: {} },
       compartment: { asSource: {}, asTarget: {} },
       rna: { asSource: { isAllowed: true }, asTarget: {} },
+      "antisense rna": { asSource: { isAllowed: true }, asTarget: {} },
       degradation: { asSource: { isAllowed: true }, asTarget: {} },
       drug: { asSource: { isAllowed: true }, asTarget: {} },
       "truncated protein": { asSource: { isAllowed: true }, asTarget: {} },
@@ -820,6 +830,7 @@ module.exports = function () {
       gene: { asSource: { isAllowed: true }, asTarget: {} },
       compartment: { asSource: {}, asTarget: {} },
       rna: { asSource: { isAllowed: true }, asTarget: {} },
+      "antisense rna": { asSource: { isAllowed: true }, asTarget: {} },
       degradation: { asSource: { isAllowed: true }, asTarget: {} },
       drug: { asSource: { isAllowed: true }, asTarget: {} },
       "truncated protein": { asSource: { isAllowed: true }, asTarget: {} },
@@ -849,6 +860,7 @@ module.exports = function () {
       gene: { asSource: { isAllowed: true }, asTarget: {} },
       compartment: { asSource: {}, asTarget: {} },
       rna: { asSource: { isAllowed: true }, asTarget: {} },
+      "antisense rna": { asSource: { isAllowed: true }, asTarget: {} },
       degradation: { asSource: { isAllowed: true }, asTarget: {} },
       drug: { asSource: { isAllowed: true }, asTarget: {} },
       "truncated protein": { asSource: { isAllowed: true }, asTarget: {} },
@@ -878,6 +890,7 @@ module.exports = function () {
       gene: { asSource: { isAllowed: true }, asTarget: {} },
       compartment: { asSource: {}, asTarget: {} },
       rna: { asSource: { isAllowed: true }, asTarget: {} },
+      "antisense rna": { asSource: { isAllowed: true }, asTarget: {} },
       degradation: { asSource: { isAllowed: true }, asTarget: {} },
       drug: { asSource: { isAllowed: true }, asTarget: {} },
       "truncated protein": { asSource: { isAllowed: true }, asTarget: {} },
@@ -907,6 +920,7 @@ module.exports = function () {
       gene: { asSource: {}, asTarget: { isAllowed: true } },
       compartment: { asSource: {}, asTarget: {} },
       rna: { asSource: {}, asTarget: { isAllowed: true } },
+      "antisense rna": { asSource: {}, asTarget: { isAllowed: true } },
       degradation: { asSource: {}, asTarget: { isAllowed: true } },
       drug: { asSource: {}, asTarget: { isAllowed: true } },
       "truncated protein": { asSource: {}, asTarget: { isAllowed: true } },
@@ -936,6 +950,7 @@ module.exports = function () {
       gene: { asSource: {isAllowed: true}, asTarget: {} },
       compartment: { asSource: {}, asTarget: {} },
       rna: { asSource: {isAllowed: true}, asTarget: {} },
+      "antisense rna": { asSource: {isAllowed: true}, asTarget: {} },
       degradation: { asSource: {isAllowed: true}, asTarget: {} },
       drug: { asSource: {isAllowed: true}, asTarget: {} },
       "truncated protein": { asSource: {isAllowed: true}, asTarget: {} },
@@ -974,6 +989,7 @@ module.exports = function () {
       gene: { asSource: { isAllowed: true }, asTarget: {} },
       compartment: { asSource: {}, asTarget: {} },
       rna: { asSource: { isAllowed: true }, asTarget: {} },
+      "antisense rna": { asSource: { isAllowed: true }, asTarget: {} },
       degradation: { asSource: { isAllowed: true }, asTarget: {} },
       drug: { asSource: { isAllowed: true }, asTarget: {} },
       "truncated protein": { asSource: { isAllowed: true }, asTarget: {} },
@@ -1003,6 +1019,7 @@ module.exports = function () {
       gene: { asSource: { isAllowed: true }, asTarget: {} },
       compartment: { asSource: {}, asTarget: {} },
       rna: { asSource: { isAllowed: true }, asTarget: {} },
+      "antisense rna": { asSource: { isAllowed: true }, asTarget: {} },
       degradation: { asSource: { isAllowed: true }, asTarget: {} },
       drug: { asSource: { isAllowed: true }, asTarget: {} },
       "truncated protein": { asSource: { isAllowed: true }, asTarget: {} },
@@ -1032,6 +1049,7 @@ module.exports = function () {
       gene: { asSource: { isAllowed: true }, asTarget: {} },
       compartment: { asSource: {}, asTarget: {} },
       rna: { asSource: { isAllowed: true }, asTarget: {} },
+      "antisense rna": { asSource: { isAllowed: true }, asTarget: {} },
       degradation: { asSource: { isAllowed: true }, asTarget: {} },
       drug: { asSource: { isAllowed: true }, asTarget: {} },
       "truncated protein": { asSource: { isAllowed: true }, asTarget: {} },
@@ -1072,6 +1090,7 @@ module.exports = function () {
       gene: { asSource: {}, asTarget: { isAllowed: true } },
       compartment: { asSource: {}, asTarget: {} },
       rna: { asSource: {}, asTarget: { isAllowed: true } },
+      "antisense rna": { asSource: {}, asTarget: { isAllowed: true } },
       degradation: { asSource: {}, asTarget: { isAllowed: true } },
       drug: { asSource: {}, asTarget: { isAllowed: true } },
       "truncated protein": { asSource: {}, asTarget: { isAllowed: true } },
@@ -1107,6 +1126,7 @@ module.exports = function () {
       gene: { asSource: { isAllowed: true }, asTarget: {} },
       compartment: { asSource: {}, asTarget: {} },
       rna: { asSource: { isAllowed: true }, asTarget: {} },
+      "antisense rna": { asSource: { isAllowed: true }, asTarget: {} },
       degradation: { asSource: { isAllowed: true }, asTarget: {} },
       drug: { asSource: { isAllowed: true }, asTarget: {} },
       "truncated protein": { asSource: { isAllowed: true }, asTarget: {} },
@@ -1145,6 +1165,7 @@ module.exports = function () {
       gene: { asSource: {}, asTarget: { isAllowed: true } },
       compartment: { asSource: {}, asTarget: {} },
       rna: { asSource: {}, asTarget: { isAllowed: true } },
+      "antisense rna": { asSource: {}, asTarget: { isAllowed: true } },
       degradation: { asSource: {}, asTarget: { isAllowed: true } },
       drug: { asSource: {}, asTarget: { isAllowed: true } },
       "truncated protein": { asSource: {}, asTarget: { isAllowed: true } },
@@ -1189,6 +1210,7 @@ module.exports = function () {
       gene: { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
       compartment: { asSource: {}, asTarget: {} },
       rna: { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
+      "antisense rna": { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
       degradation: {
         asSource: { isAllowed: true },
         asTarget: { isAllowed: true },
@@ -1239,6 +1261,7 @@ module.exports = function () {
       gene: { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
       compartment: { asSource: {}, asTarget: {} },
       rna: { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
+      "antisense rna": { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
       degradation: {
         asSource: { isAllowed: true },
         asTarget: { isAllowed: true },
@@ -1289,6 +1312,7 @@ module.exports = function () {
       gene: { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
       compartment: { asSource: {}, asTarget: {} },
       rna: { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
+      "antisense rna": { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
       degradation: {
         asSource: { isAllowed: true },
         asTarget: { isAllowed: true },
@@ -1339,6 +1363,7 @@ module.exports = function () {
       gene: { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
       compartment: { asSource: {}, asTarget: {} },
       rna: { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
+      "antisense rna": { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
       degradation: {
         asSource: { isAllowed: true },
         asTarget: { isAllowed: true },
@@ -1389,6 +1414,7 @@ module.exports = function () {
       gene: { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
       compartment: { asSource: {}, asTarget: {} },
       rna: { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
+      "antisense rna": { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
       degradation: {
         asSource: { isAllowed: true },
         asTarget: { isAllowed: true },
@@ -1439,6 +1465,7 @@ module.exports = function () {
       gene: { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
       compartment: { asSource: {}, asTarget: {} },
       rna: { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
+      "antisense rna": { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
       degradation: {
         asSource: { isAllowed: true },
         asTarget: { isAllowed: true },
@@ -1489,6 +1516,7 @@ module.exports = function () {
       gene: { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
       compartment: { asSource: {}, asTarget: {} },
       rna: { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
+      "antisense rna": { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
       degradation: {
         asSource: { isAllowed: true },
         asTarget: { isAllowed: true },
@@ -1539,6 +1567,7 @@ module.exports = function () {
       gene: { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
       compartment: { asSource: {}, asTarget: {} },
       rna: { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
+      "antisense rna": { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
       degradation: {
         asSource: { isAllowed: true },
         asTarget: { isAllowed: true },
@@ -1589,6 +1618,7 @@ module.exports = function () {
       gene: { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
       compartment: { asSource: {}, asTarget: {} },
       rna: { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
+      "antisense rna": { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
       degradation: {
         asSource: { isAllowed: true },
         asTarget: { isAllowed: true },
@@ -1639,6 +1669,7 @@ module.exports = function () {
       gene: { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
       compartment: { asSource: {}, asTarget: {} },
       rna: { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
+      "antisense rna": { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
       degradation: {
         asSource: { isAllowed: true },
         asTarget: { isAllowed: true },
@@ -1724,6 +1755,7 @@ module.exports = function () {
   elementUtilities.sbmlType = [
     "gene",
     "rna",
+    "antisense rna",
     "simple molecule",
     "unknown molecule",
     "drug",
@@ -1740,6 +1772,7 @@ module.exports = function () {
   elementUtilities.sbmlTypeMultimer = [
     "gene multimer",
     "rna multimer",
+    "antisense rna multimer",
     "ion channel multimer",
     "receptor multimer",
     "truncated protein multimer",
@@ -1767,6 +1800,7 @@ module.exports = function () {
     "hypothetical ion channel",
     "hypothetical gene",
     "hypothetical rna",
+    "hypothetical antisense rna",
     "hypothetical phenotype sbml",
     "hypothetical ion",
     "hypothetical uknown molecule",
@@ -1795,6 +1829,7 @@ module.exports = function () {
     "hypothetical ion channel multimer",
     "hypothetical gene multimer",
     "hypothetical rna multimer",
+    "hypothetical antisense rna multimer",
     "hypothetical phenotype sbml multimer",
     "hypothetical ion multimer",
     "hypothetical uknown molecule multimer",
@@ -1987,6 +2022,11 @@ module.exports = function () {
         elementUtilities.mapType == "HybridAny" ||
         elementUtilities.mapType == "HybridSbgn")
     ) {
+      if(elementUtilities.mapType == "SBML"){
+        
+        return elementUtilities.isSBMLNode(nodeClass) 
+        && nodeClass != "phenotype sbml" && nodeClass != "degradation";
+      }
       // When map type is unknown, allow complexes to include EPNs with edges
       return elementUtilities.isEPNClass(nodeClass);
     }
@@ -2136,10 +2176,10 @@ module.exports = function () {
       sbgnclass == "rna multimer" ||
       sbgnclass == "hypothetical rna" ||
       sbgnclass == "hypothetical rna multimer" ||
-      sbgnclass == "phenotype sbml" ||
-      sbgnclass == "phenotype sbml multimer" ||
-      sbgnclass == "hypothetical phenotype sbml" ||
-      sbgnclass == "hypothetical phenotype sbml multimer" ||
+      sbgnclass == "antisense rna" ||
+      sbgnclass == "antisense rna multimer" ||
+      sbgnclass == "hypothetical antisense rna" ||
+      sbgnclass == "hypothetical antisense rna multimer" ||
       sbgnclass == "ion" ||
       sbgnclass == "ion multimer" ||
       sbgnclass == "hypothetical ion" ||
@@ -2148,18 +2188,10 @@ module.exports = function () {
       sbgnclass == "simple molecule multimer" ||
       sbgnclass == "hypothetical simple molecule" ||
       sbgnclass == "hypothetical simple molecule multimer" ||
-      sbgnclass == "unknown molecule" ||
-      sbgnclass == "unknown molecule multimer" ||
-      sbgnclass == "hypothetical unknown molecule" ||
-      sbgnclass == "hypothetical unknown molecule multimer" ||
       sbgnclass == "drug" ||
       sbgnclass == "drug multimer" ||
       sbgnclass == "hypothetical drug" ||
-      sbgnclass == "hypothetical drug multimer" ||
-      sbgnclass == "degradation" ||
-      sbgnclass == "degradation multimer" ||
-      sbgnclass == "hypothetical degradation" ||
-      sbgnclass == "hypothetical degradation multimer"
+      sbgnclass == "hypothetical drug multimer" 
     ) {
       return true;
     }
@@ -2172,6 +2204,7 @@ module.exports = function () {
     if (
       sbgnclass == "gene" ||
       sbgnclass == "rna" ||
+      sbgnclass == "antisense rna" ||
       sbgnclass == "simple molecule" ||
       sbgnclass == "unknown molecule" ||
       sbgnclass == "phenotype sbml" ||
@@ -2195,16 +2228,14 @@ module.exports = function () {
     if (
       sbgnclass == "gene" ||
       sbgnclass == "rna" ||
+      sbgnclass == "antisense rna" ||
       sbgnclass == "simple molecule" ||
-      sbgnclass == "unknown molecule" ||
-      sbgnclass == "phenotype sbml" ||
       sbgnclass == "drug" ||
       sbgnclass == "protein" ||
       sbgnclass == "truncated protein" ||
       sbgnclass == "ion channel" ||
       sbgnclass == "receptor" ||
       sbgnclass == "ion" ||
-      sbgnclass == "degradation" ||
       sbgnclass == "complex sbml"
     ) {
       return true;
@@ -2222,7 +2253,15 @@ module.exports = function () {
       sbgnclass == "complex" ||
       sbgnclass == "macromolecule multimer" ||
       sbgnclass == "nucleic acid feature multimer" ||
-      sbgnclass == "complex multimer"
+      sbgnclass == "complex multimer" ||
+      sbgnclass == "gene" ||
+      sbgnclass == "rna" ||
+      sbgnclass == "complex sbml" ||
+      sbgnclass == "protein" ||
+      sbgnclass == "receptor" ||
+      sbgnclass == "ion channel" ||
+      sbgnclass == "truncated protein" ||
+      sbgnclass == "antisense rna" 
     ) {
       return true;
     }
@@ -2232,39 +2271,8 @@ module.exports = function () {
   elementUtilities.canHaveResidueVariable = function (ele) {
     var sbgnclass = elementUtilities.getPureSbgnClass(ele);
 
-    if (
-      sbgnclass == "protein" ||
-      sbgnclass == "protein multimer" ||
-      sbgnclass == "active protein" ||
-      sbgnclass == "hypothetical protein" ||
-      sbgnclass == "active protein multimer" ||
-      sbgnclass == "hypothetical protein multimer" ||
-      sbgnclass == "active hypothetical protein" ||
-      sbgnclass == "active hypothetical protein multimer" ||
-      sbgnclass == "receptor" ||
-      sbgnclass == "receptor multimer" ||
-      sbgnclass == "active receptor" ||
-      sbgnclass == "hypothetical receptor" ||
-      sbgnclass == "active receptor multimer" ||
-      sbgnclass == "hypothetical receptor multimer" ||
-      sbgnclass == "active hypothetical receptor" ||
-      sbgnclass == "active hypothetical receptor multimer" ||
-      sbgnclass == "ion channel" ||
-      sbgnclass == "ion channel multimer" ||
-      sbgnclass == "active ion channel" ||
-      sbgnclass == "hypothetical ion channel" ||
-      sbgnclass == "active ion channel multimer" ||
-      sbgnclass == "hypothetical ion channel multimer" ||
-      sbgnclass == "active hypothetical ion channel" ||
-      sbgnclass == "active hypothetical ion channel multimer" ||
-      sbgnclass == "truncated protein" ||
-      sbgnclass == "truncated protein multimer" ||
-      sbgnclass == "active truncated protein" ||
-      sbgnclass == "hypothetical truncated protein" ||
-      sbgnclass == "active truncated protein multimer" ||
-      sbgnclass == "hypothetical truncated protein multimer" ||
-      sbgnclass == "active hypothetical truncated protein" ||
-      sbgnclass == "active hypothetical truncated protein multimer"
+    if (false
+      //classes that have residue variable can be added here
     ) {
       return true;
     }
@@ -2274,39 +2282,8 @@ module.exports = function () {
   elementUtilities.canHaveBindingRegion = function (ele) {
     var sbgnclass = elementUtilities.getPureSbgnClass(ele);
 
-    if (
-      sbgnclass == "protein" ||
-      sbgnclass == "protein multimer" ||
-      sbgnclass == "active protein" ||
-      sbgnclass == "hypothetical protein" ||
-      sbgnclass == "active protein multimer" ||
-      sbgnclass == "hypothetical protein multimer" ||
-      sbgnclass == "active hypothetical protein" ||
-      sbgnclass == "active hypothetical protein multimer" ||
-      sbgnclass == "receptor" ||
-      sbgnclass == "receptor multimer" ||
-      sbgnclass == "active receptor" ||
-      sbgnclass == "hypothetical receptor" ||
-      sbgnclass == "active receptor multimer" ||
-      sbgnclass == "hypothetical receptor multimer" ||
-      sbgnclass == "active hypothetical receptor" ||
-      sbgnclass == "active hypothetical receptor multimer" ||
-      sbgnclass == "ion channel" ||
-      sbgnclass == "ion channel multimer" ||
-      sbgnclass == "active ion channel" ||
-      sbgnclass == "hypothetical ion channel" ||
-      sbgnclass == "active ion channel multimer" ||
-      sbgnclass == "hypothetical ion channel multimer" ||
-      sbgnclass == "active hypothetical ion channel" ||
-      sbgnclass == "active hypothetical ion channel multimer" ||
-      sbgnclass == "truncated protein" ||
-      sbgnclass == "truncated protein multimer" ||
-      sbgnclass == "active truncated protein" ||
-      sbgnclass == "hypothetical truncated protein" ||
-      sbgnclass == "active truncated protein multimer" ||
-      sbgnclass == "hypothetical truncated protein multimer" ||
-      sbgnclass == "active hypothetical truncated protein" ||
-      sbgnclass == "active hypothetical truncated protein multimer"
+    if (false
+      //classes that have binding regions can be added here
     ) {
       return true;
     }
@@ -2372,6 +2349,7 @@ module.exports = function () {
       "truncated protein": true,
       gene: true,
       rna: true,
+      "antisense rna": true,
       ion: true,
       "simple molecule": true,
       "unknown molecule": true,
@@ -2411,6 +2389,7 @@ module.exports = function () {
       "truncated protein": true,
       gene: true,
       rna: true,
+      "antisense rna": true,
       "phenotype sbml": true,
       ion: true,
       "simple molecule": true,
@@ -2448,6 +2427,12 @@ module.exports = function () {
 
   elementUtilities.isDirectedEdge = function (ele) {
     return !elementUtilities.isUndirectedEdge(ele);
+  };
+
+  elementUtilities.isSBMLNode = function (ele) {
+    var sbgnclass = elementUtilities.getPureSbgnClass(ele);
+
+    return inArray(sbgnclass, elementUtilities.sbmlType);
   };
 
   // Returns whether the given element is an EPN
@@ -2547,7 +2532,6 @@ module.exports = function () {
     var sbgnclass = elementUtilities.getPureSbgnClass(ele);
     return (
       sbgnclass != "phenotype" &&
-      sbgnclass != "delay" &&
       (elementUtilities.isLogicalOperator(sbgnclass) ||
         elementUtilities.isPNClass(sbgnclass))
     );
@@ -2910,6 +2894,7 @@ module.exports = function () {
       _class == "truncated protein" ||
       _class == "ion channel" ||
       _class == "rna" ||
+      _class == "antisense rna" ||
       _class == "simple molecule" ||
       _class == "phenotype sbml" ||
       _class == "receptor" ||
@@ -3017,7 +3002,7 @@ module.exports = function () {
         return "triangle";
       case "positive influence sbml":
       case "unknown positive influence":
-        return "vee";
+        return "chevron";
       case "modulation":
       case "unknown influence":
       case "reduced modulation":
@@ -3065,6 +3050,7 @@ module.exports = function () {
       _class == "complex sbml" ||
       _class == "gene" ||
       _class == "rna" ||
+      _class == "antisense rna" ||
       _class == "simple molecule" ||
       _class == "unknown molecule" ||
       _class == "phenotype sbml" ||
@@ -3136,6 +3122,7 @@ module.exports = function () {
         coeff = 1.5;
       }
 
+
       var ports = ele.data("ports");
 
       if (graphUtilities.portsEnabled === true && ports.length === 2) {
@@ -3149,12 +3136,11 @@ module.exports = function () {
             : Math.abs(port.x) / 50;
         coeff /= ratio; // Divide the coeff by ratio to fit into the bbox of the actual shape (discluding ports)
       }
+      if (_class === "delay") {
+        coeff *= 1.4;
+      }
 
       return this.getDynamicLabelTextSize(ele, coeff);
-    }
-
-    if (_class === "delay") {
-      return this.getDynamicLabelTextSize(ele, 2);
     }
 
     return this.getDynamicLabelTextSize(ele);
@@ -3712,6 +3698,7 @@ module.exports = function () {
         ele.data("class") === "and" ||
         ele.data("class") === "or" ||
         ele.data("class") === "not" ||
+        ele.data("class") === "delay" ||
         ele.data("class") === "unknown logical operator"
       ) {
         if (ele.data("ports").length === 2) {
@@ -3803,6 +3790,7 @@ module.exports = function () {
       ele.data("class") === "and" ||
       ele.data("class") === "or" ||
       ele.data("class") === "not" ||
+      ele.data("class") === "delay" ||
       ele.data("class") === "unknown logical operator"
     ) {
       targetingEdges.forEach(function (edge) {
@@ -3990,6 +3978,7 @@ module.exports = function () {
       ele.data("class") === "and" ||
       ele.data("class") === "or" ||
       ele.data("class") === "not" ||
+      ele.data("class") === "delay" ||
       ele.data("class") === "unknown logical operator"
     ) {
       targetingEdges.forEach(function (edge) {
@@ -4520,15 +4509,19 @@ module.exports = function () {
       height: 44,
     },
     gene: {
-      width: 50,
+      width: 60,
       height: 30,
     },
     rna: {
-      width: 50,
-      height: 44,
+      width: 70,
+      height: 30,
+    },
+    "antisense rna": {
+      width: 70,
+      height: 30,
     },
     "simple-molecule": {
-      width: 30,
+      width: 60,
       height: 30,
     },
     "unknown molecule": {
@@ -4541,27 +4534,27 @@ module.exports = function () {
     },
     drug: {
       width: 60,
-      height: 40,
+      height: 30,
     },
     // phenotype: {
     //   width: 30,
     //   height: 30,
     // },
     "simple molecule": {
-      width: 50,
-      height: 40,
+      width: 60,
+      height: 30,
     },
     "truncated protein": {
       width: 60,
-      height: 40,
+      height: 30,
     },
     "ion channel": {
       width: 60,
-      height: 40,
+      height: 30,
     },
     receptor: {
       width: 60,
-      height: 40,
+      height: 30,
     },
     "phenotype sbml": {
       width: 50,

@@ -580,7 +580,6 @@ module.exports = function () {
       mainUtilities.beforePerformLayout();
       
       var layout = cy.elements().filter(':visible').layout(layoutOptions);
-
       // Check this for cytoscape.js backward compatibility
       if (layout && layout.run) {
         layout.run();

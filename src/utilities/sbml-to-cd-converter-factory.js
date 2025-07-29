@@ -1,18 +1,16 @@
-
-
 module.exports = function() {
 
     var jsonToSbml, elementUtilities, cy;
   
-    function cdToSbgnml(param) {
+    function sbmlToCd(param) {
       jsonToSbml = param.jsonToSbmlConverter;
       elementUtilities = param.elementUtilities;
       cy = param.sbgnCyInstance.getCy();
     }
   
  
-    cdToSbgnml.convert = function (xml, callback) {
-        var conversionApiUrl = "https://minerva-service.lcsb.uni.lu/minerva/api/convert/CellDesigner_SBML:SBML";
+    sbmlToCd.convert = function (xml, callback) {
+        var conversionApiUrl = "https://minerva-service.lcsb.uni.lu/minerva/api/convert/SBML:CellDesigner_SBML";
 
         return $.ajax({
             type: 'post',
@@ -36,7 +34,7 @@ module.exports = function() {
         })
     }
 
-    return cdToSbgnml;
+    return sbmlToCd;
   
   }
   

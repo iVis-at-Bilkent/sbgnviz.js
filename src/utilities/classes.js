@@ -67,6 +67,7 @@ AuxiliaryUnit.construct = function(parent) {
   obj.anchorSide = null;
   obj.isDisplayed = false;
   obj.style = null;
+  obj.visible = true;
   return obj;
 };
 
@@ -146,6 +147,8 @@ AuxiliaryUnit.copy = function (mainObj, cy, existingInstance, newParent, newId) 
   newUnit.anchorSide = mainObj.anchorSide;
   newUnit.isDisplayed = mainObj.isDisplayed;
   newUnit.style = mainObj.style;
+  newUnit.visible = mainObj.visible;
+  
   return newUnit;
 };
 
@@ -154,12 +157,18 @@ AuxiliaryUnit.draw = function(mainObj, cy, context) {
   var unitClass = getAuxUnitClass(mainObj);
   var coords = unitClass.getAbsoluteCoord(mainObj, cy);
 
-  unitClass.drawShape(mainObj, cy, context, coords.x, coords.y);
-  if (unitClass.hasText(mainObj, cy)) {
-    unitClass.drawText(mainObj, cy, context, coords.x, coords.y);
+  if(mainObj.visible){
+    unitClass.drawShape(mainObj, cy, context, coords.x, coords.y);
+    if (unitClass.hasText(mainObj, cy)) {
+      unitClass.drawText(mainObj, cy, context, coords.x, coords.y);
+    }
+    mainObj.isDisplayed = true;
   }
-  mainObj.isDisplayed = true;
-};
+  else{
+    mainObj.isDisplayed = false;
+  }
+  }
+  
 
 // to be implemented by children
 AuxiliaryUnit.getText = function(mainObj, cy) {

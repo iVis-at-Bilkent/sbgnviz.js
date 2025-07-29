@@ -431,6 +431,11 @@ module.exports = function () {
 
       infobox.bbox = self.stateAndInfoBboxProp(glyph, parentBbox);
       infobox.style = self.getDefaultStateAndInfoStyle(glyph, parent.class);
+      var visibleString = "";
+      if(glyph.extension && glyph.extension.list && glyph.extension.list.visible){
+        visibleString = glyph.extension.list.visible;
+      }
+      infobox.visible = !visibleString.includes("false");
       //classes.StateVariable.setAnchorSide(infobox);
       stateAndInfoArray.push(infobox);
     }
@@ -645,6 +650,15 @@ module.exports = function () {
       });
     }
 
+    if (nodeObj.class === "tag") {
+      if (ele.orientation) {
+        nodeObj.orientation = ele.orientation;
+      }
+      else if (ele.extension && ele.extension.has("orientation")) {
+        nodeObj.orientation = ele.extension.get("orientation");
+      }
+    }
+
     var cytoscapeJsNode = {data: nodeObj, style: styleObj};
     jsonArray.push(cytoscapeJsNode);
   };
@@ -655,7 +669,7 @@ module.exports = function () {
   sbgnmlToJson.handleAnnotations = function(cyObject, rdfElement) {
     // local utility function
     function dbFromUrl(url) {
-      var regexp = /^http:\/\/identifiers.org\/(.+?)\/.+$/;
+      var regexp = /^http:\/\/identifiers.org\/([^/:_]+).*$/;
       return url.replace(regexp, '$1');
     }
 

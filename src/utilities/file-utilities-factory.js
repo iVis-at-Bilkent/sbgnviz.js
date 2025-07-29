@@ -76,7 +76,7 @@ module.exports = function () {
  // Helper functions End
 
  var sbgnmlToJson, sbmlToJson, jsonToSbgnml, jsonToSbml, jsonToNwt, uiUtilities, tdToJson,
-     sifToJson, graphUtilities, layoutToText, nwtToJson, jsonToSif,sbgnmlToCd,cdToSbgnml,sbgnmlToSbml,sbmlToSbgnml;
+     sifToJson, graphUtilities, layoutToText, nwtToJson, jsonToSif,sbgnmlToCd,cdToSbgnml,sbmlToCd,sbgnmlToSbml,sbmlToSbgnml;
  var updateGraph;
  var options, cy;
 
@@ -98,6 +98,7 @@ module.exports = function () {
    cy = param.sbgnCyInstance.getCy();
    sbgnmlToCd = param.sbgnmlToCdConverter;
    cdToSbgnml = param.cdToSbgnmlConverter;
+   sbmlToCd = param.cdToSbmlConverter;
    sbgnmlToSbml = param.sbgnmlToSbmlConverter;
    sbmlToSbgnml = param.sbmlToSbgnmlConverter;
    gpmlToSbgnml = param.gpmlToSbgnmlConverter;
@@ -258,12 +259,15 @@ module.exports = function () {
     fileUtilities.loadFile( file, convert, callback1, callback2, fileUtilities.collapseMarkedNodes,undefined,callback3);
  };
 
- fileUtilities.loadNwtFile = function(file, callback1, callback2, urlParams) {
+ fileUtilities.loadNwtFile = function(file, callback1, callback2, callback3, callback4, urlParams) {
    var convert = function( text ) {
      return nwtToJson.convert(textToXmlObject(text), urlParams);
    };
 
-   fileUtilities.loadFile( file, convert, callback1, callback2, fileUtilities.collapseMarkedNodes );
+   // Use internal collapseMarkedNodes if callback3 is not provided
+   var collapseCallback = callback3 || fileUtilities.collapseMarkedNodes;
+
+   fileUtilities.loadFile( file, convert, callback1, callback2, fileUtilities.collapseMarkedNodes, callback4 );
  };
 
  // collapse the nodes whose collapse data field is set
@@ -350,10 +354,15 @@ module.exports = function () {
          callback3();
        }
 
+       // Handle annotation layers data if present
+       if (cyGraph && cyGraph.annotationLayers && typeof callback4 !== 'undefined') {
+         callback4(cyGraph.annotationLayers);
+       }
+
        uiUtilities.endSpinner("load-file-spinner");
        $(document).trigger( "sbgnvizLoadFileEnd", [ file.name, cy ] ); // Trigger an event signaling that a file is loaded
 
-       if (typeof callback4 !== 'undefined') {
+       if (typeof callback4 !== 'undefined' && (!cyGraph || !cyGraph.annotationLayers)) {
          callback4();
        }
      }, 0);
@@ -371,7 +380,7 @@ module.exports = function () {
  };
 
  fileUtilities.loadSBMLText = async function(textData, tileInfoBoxes, filename, cy, urlParams){
-  await updateGraph(sbmlToJson.convert(textToXmlObject(textData), urlParams), undefined, undefined, tileInfoBoxes);
+  await updateGraph(sbmlToJson.convert(textData, urlParams), undefined, undefined, tileInfoBoxes);
    await $(document).trigger("sbgnvizLoadFileEnd",  [filename, cy]);
    uiUtilities.endSpinner("load-file-spinner");
 
@@ -406,8 +415,8 @@ module.exports = function () {
 }
 
  // supported versions are either 0.2 or 0.3
- fileUtilities.saveAsNwt = function(filename, version, renderInfo, mapProperties, nodes, edges) {
-   var sbgnmlText = jsonToNwt.createNwt(filename, version, renderInfo, mapProperties, nodes, edges);
+ fileUtilities.saveAsNwt = function(filename, version, renderInfo, mapProperties, nodes, edges, annotationLayersData) {
+   var sbgnmlText = jsonToNwt.createNwt(filename, version, renderInfo, mapProperties, nodes, edges, annotationLayersData);
    var blob = new Blob([sbgnmlText], {
      type: "text/plain;charset=utf-8;",
    });
@@ -431,6 +440,23 @@ module.exports = function () {
   });
  };
 
+  fileUtilities.saveAsCellDesignerFromSbml = function(filename, errorCallback){
+  uiUtilities.startSpinner("load-spinner");
+  var sbml = jsonToSbml.createSbml(); 
+  this.convertSbmlToCD(sbml, function(data){
+    if(data == null){
+      errorCallback();
+    }else{
+      var blob = new Blob([data.message], {
+        type: "text/plain;charset=utf-8;",
+      });
+      saveAs(blob, filename); 
+    }
+    uiUtilities.endSpinner("load-spinner");
+    
+  });
+ };
+
  fileUtilities.loadCellDesigner = function(file, successCallback, errorCallback){
   var reader = new FileReader();
 
@@ -442,7 +468,7 @@ module.exports = function () {
       if(data == null){
         errorCallback();
       }else{
-        successCallback(data);
+        successCallback(data.message);
       }
     });
   }.bind(this);
@@ -645,6 +671,10 @@ fileUtilities.createJsonFromSif = function(){
 fileUtilities.convertSbgnmlToCD = function(sbgnml, callback){
    
   return sbgnmlToCd.convert(sbgnml,callback);
+};
+
+fileUtilities.convertSbmlToCD = function(sbml, callback){
+  return sbmlToCd.convert(sbml,callback);
 };
 
 fileUtilities.convertCDToSbgnml = function(xml,callback){

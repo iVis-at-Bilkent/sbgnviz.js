@@ -244,6 +244,7 @@ module.exports = function () {
     'compartment': true,
     'gene': true,
     'rna': true,
+    'antisense rna': true,
     'simple molecule': true,
     'unknown molecule': true,
     'drug': true,
@@ -267,6 +268,7 @@ module.exports = function () {
     'protein':true,
     'gene':true,
     'rna':true,
+    'antisense rna':true,
     'receptor': true,
     'ion channel': true,
     'truncated protein': true,
@@ -292,6 +294,7 @@ module.exports = function () {
     'complex sbml': true,
     'gene': true,
     'rna': true,
+    'antisense rna': true,
     'simple molecule': true,
     'unknown molecule': true,
     'phenotype sbml': true,
@@ -310,6 +313,7 @@ module.exports = function () {
     'truncated protein': true,
     'gene': true,
     'rna': true,
+    'antisense rna': true,
     'phenotype': true,
     'ion': true,
     'simple molecule': true,
@@ -336,6 +340,7 @@ module.exports = function () {
     'truncated protein': true,
     'gene': true,
     'rna': true,
+    'antisense rna': true,
     'phenotype sbml': true,
     'ion': true,
     'simple molecule': true,
@@ -655,7 +660,12 @@ module.exports = function () {
 
   $$.sbgn.generateRNAShapePoints = function (width, height) {
 
-    return [-1, 0.8,   0.5, 0.8 ,   1, -0.8,   -0.5 , -0.8 ];
+    return [-0.333, -1,   1, -1,   0.333, 1,   -1, 1];
+  };
+
+  $$.sbgn.generateAntisenseRNAShapePoints = function (width, height) {
+
+    return [-1, -1,   0.333, -1,   1, 1,   -0.333, 1];
   };
 
   $$.sbgn.generateReceptorShapePoints = function (width, height) {
@@ -687,7 +697,7 @@ module.exports = function () {
   cyStyleProperties.types.nodeShape.enums.push(
     'empty set', 'nucleic acid feature', 'complex', 'macromolecule',
     'simple chemical', 'biological activity', 'compartment', 'gene', 'simple molecule', 'unknown molecule', 'drug', 
-    'truncated protein', 'ion', 'ion channel', 'rna', 'phenotype sbml', 'receptor', 'complex sbml', 'protein', 'degradation'
+    'truncated protein', 'ion', 'ion channel', 'rna', 'antisense rna', 'phenotype sbml', 'receptor', 'complex sbml', 'protein', 'degradation'
   );
 
   $$.sbgn.registerSbgnNodeShapes = function () {
@@ -951,7 +961,7 @@ module.exports = function () {
     var shapeNames = [ "simple chemical", "macromolecule", "complex",
       "nucleic acid feature", "empty set", "biological activity",
       "compartment", "oldCompartment", "gene", "simple molecule", 'receptor', 'complex sbml',
-      "unknown molecule", "drug", "ion", "truncated protein", "ion channel", "rna", "phenotype sbml", "protein", "degradation"
+      "unknown molecule", "drug", "ion", "truncated protein", "ion channel", "rna", "antisense rna", "phenotype sbml", "protein", "degradation"
     ];
 
     shapeNames.forEach( function( shapeName ) {
@@ -1132,6 +1142,12 @@ module.exports = function () {
     context.fill();
   };
 
+  $$.sbgn.drawAntisenseRNA = function( context, x, y, width, height ) {
+    cyBaseNodeShapes['rhomboid'].draw(context, x, y, width, height);
+    context.fill();
+    
+  };
+
   $$.sbgn.drawPhenotype = function( context, x, y, width, height ) {
     cyBaseNodeShapes['hexagon'].draw(context, x, y, width, height);
     context.fill();
@@ -1211,6 +1227,7 @@ module.exports = function () {
     "oldCompartment": $$.sbgn.drawRoundRectangle,
     "gene":  $$.sbgn.drawGene,
     "rna": $$.sbgn.drawRNA,
+    "antisense rna": $$.sbgn.drawAntisenseRNA,
     "simple molecule": $$.sbgn.drawEllipse,
     "unknown molecule": $$.sbgn.drawEllipse,
     "drug": $$.sbgn.drawRoundedDrug,
@@ -1284,6 +1301,9 @@ module.exports = function () {
       return cyMath.polygonIntersectLine(
         x, y, points, centerX, centerY, width / 2, height / 2, padding
       );
+    },
+    "antisense rna": function( centerX, centerY, width, height, x, y, padding ) {
+      return cyBaseNodeShapes["rhomboid"].intersectLine( centerX, centerY, width, height, x, y, padding );
     },
     "receptor": function( centerX, centerY, width, height, x, y, padding ) {
       var points = $$.sbgn.generateReceptorShapePoints(  width, height );
@@ -1446,6 +1466,9 @@ module.exports = function () {
     return cyBaseNodeShapes["roundrectangle"].checkPoint( x, y, padding, width, height, centerX, centerY );
    },
    "rna": function( x, y, padding, width, height, centerX, centerY ) {
+    return cyBaseNodeShapes["roundrectangle"].checkPoint( x, y, padding, width, height, centerX, centerY );
+   },
+   "antisense rna": function( x, y, padding, width, height, centerX, centerY ) {
     return cyBaseNodeShapes["roundrectangle"].checkPoint( x, y, padding, width, height, centerX, centerY );
    },
    "phenotype sbml": function( x, y, padding, width, height, centerX, centerY ) {

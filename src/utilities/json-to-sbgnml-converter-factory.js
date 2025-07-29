@@ -1,4 +1,3 @@
-
 var libsbgnjs = require('libsbgn.js');
 var renderExtension = libsbgnjs.render;
 var annot = libsbgnjs.annot;
@@ -467,6 +466,10 @@ module.exports = function () {
        });
     }
 
+    if (nodeClass === "tag" && node._private.data.orientation) {
+      glyph.orientation = node._private.data.orientation;
+    }
+
     return  glyphList;
   };
 
@@ -613,6 +616,9 @@ module.exports = function () {
           state.variable = node.state.variable;
       glyph.setState(state);
       glyph.setBbox(this.addStateAndInfoBbox(mainGlyph, node));
+      glyph.setExtension(new libsbgnjs.Extension());
+      var xmlext = "<visible>" + node.visible +"</visible>";
+      glyph.extension.add(xmlext);
 
       return glyph;
   };
@@ -624,6 +630,9 @@ module.exports = function () {
         label.text = node.region.variable;
     glyph.setLabel(label);
     glyph.setBbox(this.addStateAndInfoBbox(mainGlyph, node));
+    glyph.setExtension(new libsbgnjs.Extension());
+      var xmlext = "<visible>" + node.visible +"</visible>";
+      glyph.extension.add(xmlext);
 
     return glyph;
   };
@@ -635,6 +644,9 @@ module.exports = function () {
           label.text = node.residue.variable;
       glyph.setLabel(label);
       glyph.setBbox(this.addStateAndInfoBbox(mainGlyph, node));
+      glyph.setExtension(new libsbgnjs.Extension());
+      var xmlext = "<visible>" + node.visible +"</visible>";
+      glyph.extension.add(xmlext);
 
       return glyph;
 };
@@ -646,6 +658,9 @@ module.exports = function () {
           label.text = node.label.text;
       glyph.setLabel(label);
       glyph.setBbox(this.addStateAndInfoBbox(mainGlyph, node));
+      glyph.setExtension(new libsbgnjs.Extension());
+      var xmlext = "<visible>" + node.visible +"</visible>";
+      glyph.extension.add(xmlext);
 
       // assign correct entity tag for AF case
       var entityName = null;

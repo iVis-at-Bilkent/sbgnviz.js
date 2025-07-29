@@ -29,6 +29,7 @@ module.exports = function () {
 
   var sboToNodeClass = {
     278: "rna",
+    334: "antisense rna",
     253: "complex sbml",
     289: "hypothetical complex",
     291: "degradation",
@@ -111,6 +112,8 @@ module.exports = function () {
     let doc = reader.readSBMLFromString(xmlString);
     model = doc.getModel();
 
+    sbmlToJson.addMultiFeatures(xmlString,model);
+
     let plugin;
     try {
       plugin = model.findPlugin('layout');
@@ -149,23 +152,167 @@ module.exports = function () {
     return cytoscapeJsGraph;
   };
 
-// add parameters TODO: implement units
-sbmlToJson.addParameters = function(model) {
-  for(let i = 0; i < model.getNumParameters(); i++){
-    let parameter = model.getParameter(i);
-    var paramId = parameter.getId();
-    var paramName = paramId;
-    if (parameter.isSetName())
-      paramName = parameter.getName();
-    paramValue = 0.0;
-    if (parameter.isSetValue())
-      paramValue = parameter.getValue();
-    paramConstant = true;
-    if (parameter.isSetConstant())
-      paramConstant = parameter.getConstant();
-    sbmlSimulationUtilities.addParameterWithId(paramId, paramName, paramValue, "", paramConstant);
+  // add parameters TODO: implement units
+  sbmlToJson.addParameters = function(model) {
+    for(let i = 0; i < model.getNumParameters(); i++){
+      let parameter = model.getParameter(i);
+      var paramId = parameter.getId();
+      var paramName = paramId;
+      if (parameter.isSetName())
+        paramName = parameter.getName();
+      paramValue = 0.0;
+      if (parameter.isSetValue())
+        paramValue = parameter.getValue();
+      paramConstant = true;
+      if (parameter.isSetConstant())
+        paramConstant = parameter.getConstant();
+      sbmlSimulationUtilities.addParameterWithId(paramId, paramName, paramValue, "", paramConstant);
+    }
   }
-}
+
+  sbmlToJson.addMultiFeatures = function(xmlString,model){
+
+    if (!xmlString || typeof xmlString !== 'string' || !xmlString.trim().startsWith('<')) {
+      return;
+    }
+    
+    parseString(xmlString, function(err, result) {
+      if (err) {
+        console.error("Parse error:", err);
+        return;
+      }
+
+      if(!result.sbml.model[0]["multi:listOfSpeciesTypes"]){
+        return;
+      }
+      const suffixIdNameMap = {};
+      const structuralStateIdNameMap = {};
+      const speciesList = result.sbml.model[0].listOfSpecies[0].species;
+      const speciesTypes = result.sbml.model[0]["multi:listOfSpeciesTypes"]?.[0]["multi:speciesType"] || [];
+
+      for(const type of speciesTypes){
+        const featureTypes = type["multi:listOfSpeciesFeatureTypes"][0]["multi:speciesFeatureType"];
+        for (const ftype of featureTypes)
+        {
+            const id = ftype.$["multi:id"];
+
+            if (id.includes("minerva_state_suffix")) {
+              const possibleValues = ftype["multi:listOfPossibleSpeciesFeatureValues"]?.[0]["multi:possibleSpeciesFeatureValue"] || [];
+
+              for (const value of possibleValues) {
+                const valueId = value.$["multi:id"];
+                const name = value.$["multi:name"];
+                suffixIdNameMap[valueId] = name;
+              }
+            }
+            if(id.includes("minerva_structural_state") || id.includes("Residue")){
+                const possibleValues = ftype["multi:listOfPossibleSpeciesFeatureValues"]?.[0]["multi:possibleSpeciesFeatureValue"] || [];
+
+              for (const value of possibleValues) {
+                const valueId = value.$["multi:id"];
+                const name = value.$["multi:name"];
+                structuralStateIdNameMap[valueId] = name;
+              }
+            }
+        }
+      }
+
+      for (let i = 0; i < model.getNumSpecies(); i++) {
+        const xmlSpecies = speciesList[i];
+        const speciesId = xmlSpecies.$.id;
+        const sbmlSpecies = model.getSpecies(i);
+
+        if (!sbmlSpecies) continue;
+
+        let rdf; 
+
+        const rdfDescription = xmlSpecies['annotation']?.[0]['rdf:RDF']?.[0]['rdf:Description'][0];
+
+        if (rdfDescription) {
+            for (const key in rdfDescription) {
+                if (rdfDescription[key]) {
+                    const relationObject = rdfDescription[key][0];
+                    const rdfBag = relationObject?.['rdf:Bag'];
+                    if (rdfBag) {
+                        const rdfLi = rdfBag[0]?.['rdf:li'];
+                        if (rdfLi) {
+                            let resource = rdfLi[0].$?.['rdf:resource'];
+                            resource = resource.substring("urn:miriam:".length).replace(/:/g, '/');;
+                            resource = `http://identifiers.org/${resource}`;
+                            if (resource) {
+                                var regexp = /^http:\/\/identifiers.org\/([^/:_]+).*$/;
+                                var db =  resource.replace(regexp, '$1');
+                                rdf = {key,resource,db};
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        let annotation = `<nwt:extension xmlns:nwt="https://newteditor.org/">\n`;
+        annotation += `<nwt:info nwt:multimer="false" nwt:active="false" nwt:hypothetical="false" nwt:infoid="info_${i + 1}" nwt:id="${speciesId}">\n`;
+
+        let isMultimer = false;
+
+        const featureList = xmlSpecies["multi:listOfSpeciesFeatures"]?.[0]?.["multi:speciesFeature"] || [];
+
+        for (const feature of featureList) {
+          const featureType = feature.$["multi:speciesFeatureType"];
+          const values = feature["multi:listOfSpeciesFeatureValues"]?.[0]?.["multi:speciesFeatureValue"] || [];
+
+          for (const value of values) {
+
+            const infoboxText = value.$["multi:value"] || "unknown";
+            const fakeX = 50+i;
+            const fakeY = 50+i;
+            const w = 40;
+            const h = 12;
+
+            if(featureType.includes("minerva_dimer")){
+              isMultimer = true;
+            }
+
+            if (featureType.includes("state_suffix")) {
+              let infoText = suffixIdNameMap[infoboxText]? suffixIdNameMap[infoboxText] : "";
+              annotation += `<nwt:unitinfo nwt:x="${fakeX}" nwt:y="${fakeY}" nwt:w="${w}" nwt:h="${h}">${infoText}</nwt:unitinfo>\n`;
+            } else if (featureType.includes("structural_state") ||featureType.includes("Residue")) {
+              let mainStateText = structuralStateIdNameMap[infoboxText]? structuralStateIdNameMap[infoboxText] : "";
+              let valueText = "";
+              if (mainStateText.includes("@")) {
+                const parts = mainStateText.split("@");
+                valueText = parts[0];
+                mainStateText = parts[1];
+              }
+              else if(!featureType.includes("Residue")){
+                valueText = mainStateText;
+                mainStateText = "";
+              }
+              else if(featureType.includes("Residue_PHOSPHORYLATED")){
+                valueText = "P";
+              }
+              annotation += `<nwt:statevariable nwt:x="${fakeX}" nwt:y="${fakeY}" nwt:w="${w}" nwt:h="${h}" nwt:value="${valueText}">${mainStateText}</nwt:statevariable>\n`;
+            }
+          }
+        }
+        if(rdf){
+          annotation += '<nwt:customproperty' +
+                      ' nwt:value="' + rdf.resource + '"' +
+                      ' nwt:DB="' + rdf.db + '"' +
+                      ' nwt:relation="' + rdf.key + '">' +
+                      '</nwt:customproperty>';
+        }
+
+        annotation += `</nwt:info>\n</nwt:extension>`;
+        annotation = annotation.replace('nwt:multimer="false"','nwt:multimer="'+isMultimer +'"');
+        try {
+          sbmlSpecies.setAnnotation(annotation);
+        } catch (e) {
+          console.error(`Annotation set failed for ${speciesId}:`, e);
+        }
+      }
+    });
+  }
 
 // add compartment nodes
 sbmlToJson.addCompartments = function (model,cytoscapeJsNodes, compartmentBoundingBoxes, containerNodeMap) {
@@ -176,12 +323,43 @@ sbmlToJson.addCompartments = function (model,cytoscapeJsNodes, compartmentBoundi
     if(compartment.getId() !== "default") {
       let compartmentData = {"id": compartment.getId(), "label": compartment.getName(), "class": "compartment"};
       let simulationData = {};
+      
       if(compartment.isSetSpatialDimensions())
         simulationData.spatialDimensions = compartment.getSpatialDimensions();
       if(compartment.isSetVolume())
         simulationData.size = compartment.getVolume();
       if(compartment.isSetConstant())
         simulationData.constant = compartment.getConstant();
+      
+      let styleAttributes = {
+        "background-color": "",
+        "background-fit": "",
+        "background-height": "",
+        "background-image": "",
+        "background-image-opacity": "",
+        "background-opacity": "",
+        "background-position-x": "",
+        "background-position-y": "",
+        "background-width": ""
+      };
+
+      parseString(compartment.getAnnotationString(), function(err, result){
+        if(!result || !result.annotation["nwt:extension"])
+          return;
+
+        let info = result.annotation["nwt:extension"][0]["nwt:info"][0];
+        let attrs = info.$;
+
+        for (let key in styleAttributes) {
+          const nwtAttr = `nwt:${key}`;
+          styleAttributes[key] = attrs[nwtAttr] || "";
+        }
+      })
+
+      for (let key in styleAttributes) {
+        compartmentData[key] = styleAttributes[key];
+      }
+
       resultJson.push({"data": compartmentData, "simulation": simulationData, "group": "nodes", "classes": "compartment"});
     }
     if(!compartmentBoundingBoxes.has(compartment.getId())){
@@ -234,6 +412,18 @@ sbmlToJson.addJSCompartments = function(compartmentMap, resultJson, cytoscapeJsN
         area: nodeObj.bbox.w * nodeObj.bbox.h});
       var cytoscapeJsNode = {data: nodeObj, style: styleObj};
       elementUtilities.extendNodeDataWithClassDefaults( nodeObj, nodeObj.class );
+
+      const styleKeys = [
+      "background-color", "background-fit", "background-height", "background-image",
+      "background-image-opacity", "background-opacity", "background-position-x",
+      "background-position-y", "background-width"];
+
+      for (let key of styleKeys) {
+      if (resultJson[i].data[key] && resultJson[i].data[key] !== "") {
+        nodeObj[key] = resultJson[i].data[key];
+      }
+      }
+
       cytoscapeJsNodes.push(cytoscapeJsNode)
     }
   }
@@ -245,10 +435,33 @@ sbmlToJson.addSpecies = function(model, cytoscapeJsNodes, compartmentBoundingBox
   for(let i = 0; i < model.getNumSpecies(); i++){
     let species = model.getSpecies(i);
     let active = false, hypothetical = false, multimer = false;
-    let bindingRegion = [], residueVariable = [], unitOfInfo = [];
+    let bindingRegion = [], residueVariable = [], unitOfInfo = [], stateVariable = [];
+    let customProperties = [];
+
+    let styleAttributes = {
+      "background-color": "",
+      "background-fit": "",
+      "background-height": "",
+      "background-image": "",
+      "background-image-opacity": "",
+      "background-opacity": "",
+      "background-position-x": "",
+      "background-position-y": "",
+      "background-width": ""
+    };
+
     parseString(species.getAnnotationString(), function(err, result){
       if(!result || !result.annotation["nwt:extension"])
         return;
+
+      let info = result.annotation["nwt:extension"][0]["nwt:info"][0];
+      let attrs = info.$;
+
+      for (let key in styleAttributes) {
+          const nwtAttr = `nwt:${key}`;
+          styleAttributes[key] = attrs[nwtAttr] || "";
+        }
+
       var stateBooleans = result.annotation["nwt:extension"][0]["nwt:info"][0].$;
       active = stateBooleans["nwt:active"] == "true" ? true : false;
       hypothetical = stateBooleans["nwt:hypothetical"] == "true" ? true : false;
@@ -256,13 +469,18 @@ sbmlToJson.addSpecies = function(model, cytoscapeJsNodes, compartmentBoundingBox
       bindingRegion = result.annotation["nwt:extension"][0]["nwt:info"][0]["nwt:bindingregion"] || [];
       residueVariable = result.annotation["nwt:extension"][0]["nwt:info"][0]["nwt:residuevariable"] || [];
       unitOfInfo = result.annotation["nwt:extension"][0]["nwt:info"][0]["nwt:unitinfo"] || [];
+      stateVariable = result.annotation["nwt:extension"][0]["nwt:info"][0]["nwt:statevariable"] || [];
+      customProperties = result.annotation["nwt:extension"][0]["nwt:info"][0]["nwt:customproperty"] || [];
     })
+
     speciesCompartmentMap.set(species.getId(), species.getCompartment());
     var sboTerm = species.getSBOTerm();
     let speciesData = {"id": species.getId(), "label": species.getName() || species.getId(), 
                       "parent": species.getCompartment(), "sboTerm": species.getSBOTerm(),
                       "active": active, "multimer": multimer, "hypothetical": hypothetical,
-                      "bindingRegion": bindingRegion, "residueVariable": residueVariable, "unitOfInfo": unitOfInfo};
+                      "bindingRegion": bindingRegion, "residueVariable": residueVariable, "unitOfInfo": unitOfInfo, "stateVariable": stateVariable,
+                      "customproperty": customProperties};
+    
     // TODO: Substance Units!
     let simulationData = {};
     if(species.isSetInitialAmount()){
@@ -283,6 +501,11 @@ sbmlToJson.addSpecies = function(model, cytoscapeJsNodes, compartmentBoundingBox
       simulationData.boundaryCondition = species.getBoundaryCondition();
     if(species.isSetConversionFactor())
       simulationData.conversionFactor = species.getConversionFactor();
+
+    for (let key in styleAttributes) {
+      speciesData[key] = styleAttributes[key];
+    }
+
     resultJson.push({"data": speciesData, "simulation": simulationData, "group": "nodes", "classes": "species"});
   }
   let speciesGlyphIdSpeciesIdMap = new Map();
@@ -384,6 +607,17 @@ sbmlToJson.addJSNodes = function(resultJson,cytoscapeJsNodes, speciesGlyphIdSpec
       nodeObj.statesandinfos.push(infoBox);
     }
 
+    var stateVariable = resultJson[i].data.stateVariable;
+    for(let stateVar of stateVariable){
+      let infoBox = classes.StateVariable.construct(undefined, resultJson[i].data.id, undefined);
+      infoBox.state.variable = stateVar._;
+      infoBox.state.value = stateVar.$['nwt:value'];
+      infoBox.style = elementUtilities.getDefaultInfoboxStyle(nodeObj.class, "state variable");
+      infoBox.bbox = {'x': parseFloat(stateVar.$['nwt:x']), 'y': parseFloat(stateVar.$['nwt:y']), 
+                      'w': parseFloat(stateVar.$['nwt:w']), 'h': parseFloat(stateVar.$['nwt:h'])};
+      nodeObj.statesandinfos.push(infoBox);
+    }
+
     // Add status info
     if(resultJson[i].data.hypothetical)
       nodeObj.class = "hypothetical " + nodeObj.class;
@@ -392,8 +626,36 @@ sbmlToJson.addJSNodes = function(resultJson,cytoscapeJsNodes, speciesGlyphIdSpec
     if(resultJson[i].data.multimer)
       nodeObj.class = nodeObj.class + " multimer";
 
+    var customProperties = resultJson[i].data.customproperty;
+    let annotIndex = 0;
+    if(!nodeObj.annotations) {
+        nodeObj.annotations = {};
+      }
+    for(let property of customProperties){
+      var annotId = nodeObj.id+"-annot-"+annotIndex;
+
+      nodeObj.annotations[annotId] = {
+        status: "validated",
+        selectedDB: property.$['nwt:DB'],
+        selectedRelation: property.$['nwt:relation'],
+        annotationValue: property.$['nwt:value']
+      };
+      annotIndex++;
+    }
+
+    const styleKeys = [
+      "background-color", "background-fit", "background-height", "background-image",
+      "background-image-opacity", "background-opacity", "background-position-x",
+      "background-position-y", "background-width"
+    ];
+
     var cytoscapeJsNode = {data: nodeObj, style: styleObj};
     elementUtilities.extendNodeDataWithClassDefaults( nodeObj, nodeObj.class );
+      for (let key of styleKeys) {
+      if (resultJson[i].data[key] && resultJson[i].data[key] !== "") {
+        nodeObj[key] = resultJson[i].data[key];
+      }
+    }
     cytoscapeJsNodes.push(cytoscapeJsNode);
   }
 };
