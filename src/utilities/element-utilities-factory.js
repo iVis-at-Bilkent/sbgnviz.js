@@ -47,7 +47,7 @@ module.exports = function () {
     ) {
       d += performance.now(); //use high-precision timer if available
     }
-    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(
+    return "xxxxxxxx_xxxx_4xxx_yxxx_xxxxxxxxxxxx".replace(
       /[xy]/g,
       function (c) {
         var r = (d + Math.random() * 16) % 16 | 0;
@@ -4746,7 +4746,6 @@ module.exports = function () {
     if (!className) {
       return;
     }
-
     var defaultProps = elementUtilities.getDefaultProperties(className);
 
     Object.keys(defaultProps).forEach(function (name) {
@@ -4754,6 +4753,49 @@ module.exports = function () {
         data[name] = getProp(defaultProps, name);
       }
     });
+    if(data.language && data.language == 'SBML') {
+      var defaultSimulationProps = elementUtilities.getSBMLSimulationDefaults(className);
+      if(!data['simulation']){
+        data['simulation'] = defaultSimulationProps;
+        return;
+      }
+      Object.keys(defaultSimulationProps).forEach(function (name) {
+        if( !Object.hasOwn(data['simulation'], name) )
+          data['simulation'][name] = defaultSimulationProps[name];
+      });
+    }
+  }
+
+  elementUtilities.getSBMLSimulationDefaults = function (className) {
+    var pureClass = elementUtilities.getPureSbgnClass(className);
+    if(pureClass == 'compartment'){
+      return {
+        'spatialDimensions': 3,
+        'size': 1,
+        'units': "",
+        'constant': true
+      };
+    } else if (elementUtilities.processTypes.includes(pureClass)) {  // SBML Process
+      return {
+        'localParameters': [],  // {name: , value: , unit: }
+        'kineticLaw': "0"
+      };
+    } else if (elementUtilities.edgeTypes.includes(pureClass)) {  // SBML Edge
+      return {
+        'stoichiometry': 1,
+        'constant': true
+      }
+    } else {    // SBML Species
+      return {
+        'initialAmount': 0.0,
+        'initialConcentration': 0.0,
+        'substanceUnits': "",
+        'hasOnlySubstanceUnits': true, // true for amount, false for density
+        'constant': false,
+        'boundaryCondition': false,
+        'conversionFactor': 1
+      };
+    }
   }
 
   elementUtilities.extendNodeDataWithClassDefaults = function (

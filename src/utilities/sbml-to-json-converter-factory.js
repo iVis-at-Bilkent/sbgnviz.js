@@ -6,7 +6,7 @@ var jQuery = ($ = libs.jQuery);
 var classes = require("./classes");
 
 module.exports = function () {
-  var elementUtilities, graphUtilities, handledElements, mainUtilities, libsbmlInstance;
+  var elementUtilities, graphUtilities, handledElements, mainUtilities, sbmlSimulationUtilities, libsbmlInstance;
   let resultJson = [];
   let speciesCompartmentMap = new Map;
   let layout;
@@ -17,6 +17,7 @@ module.exports = function () {
     elementUtilities = param.elementUtilities;
     graphUtilities = param.graphUtilities;
     mainUtilities = param.mainUtilities;
+    sbmlSimulationUtilities = param.sbmlSimulationUtilities;
     libsbmlInstance = param.libsbmlInstance;
 
     handledElements = {};
@@ -131,6 +132,7 @@ module.exports = function () {
     let compartmentBoundingBoxes = new Map;
     let containerNodeMap = new Map;
 
+    sbmlToJson.addParameters(model);
     sbmlToJson.addCompartments(model, cytoscapeJsNodes, compartmentBoundingBoxes, containerNodeMap);
     sbmlToJson.addSpecies(model, cytoscapeJsNodes, compartmentBoundingBoxes, containerNodeMap);
     sbmlToJson.addReactions(model, cytoscapeJsEdges,cytoscapeJsNodes);
@@ -149,6 +151,24 @@ module.exports = function () {
     speciesCompartmentMap = new Map;
     return cytoscapeJsGraph;
   };
+
+  // add parameters TODO: implement units
+  sbmlToJson.addParameters = function(model) {
+    for(let i = 0; i < model.getNumParameters(); i++){
+      let parameter = model.getParameter(i);
+      var paramId = parameter.getId();
+      var paramName = paramId;
+      if (parameter.isSetName())
+        paramName = parameter.getName();
+      paramValue = 0.0;
+      if (parameter.isSetValue())
+        paramValue = parameter.getValue();
+      paramConstant = true;
+      if (parameter.isSetConstant())
+        paramConstant = parameter.getConstant();
+      sbmlSimulationUtilities.addParameterWithId(paramId, paramName, paramValue, "", paramConstant);
+    }
+  }
 
   sbmlToJson.addMultiFeatures = function(xmlString,model){
 
@@ -301,38 +321,46 @@ sbmlToJson.addCompartments = function (model,cytoscapeJsNodes, compartmentBoundi
     let compartment = model.getCompartment(i);
     compartmentMap.set(compartment.getId(), i);
     if(compartment.getId() !== "default") {
-    let compartmentData = {"id": compartment.getId(), "label": compartment.getName(), "class": "compartment"};
+      let compartmentData = {"id": compartment.getId(), "label": compartment.getName(), "class": "compartment"};
+      let simulationData = {};
+      
+      if(compartment.isSetSpatialDimensions())
+        simulationData.spatialDimensions = compartment.getSpatialDimensions();
+      if(compartment.isSetVolume())
+        simulationData.size = compartment.getVolume();
+      if(compartment.isSetConstant())
+        simulationData.constant = compartment.getConstant();
+      
+      let styleAttributes = {
+        "background-color": "",
+        "background-fit": "",
+        "background-height": "",
+        "background-image": "",
+        "background-image-opacity": "",
+        "background-opacity": "",
+        "background-position-x": "",
+        "background-position-y": "",
+        "background-width": ""
+      };
 
-    let styleAttributes = {
-      "background-color": "",
-      "background-fit": "",
-      "background-height": "",
-      "background-image": "",
-      "background-image-opacity": "",
-      "background-opacity": "",
-      "background-position-x": "",
-      "background-position-y": "",
-      "background-width": ""
-    };
+      parseString(compartment.getAnnotationString(), function(err, result){
+        if(!result || !result.annotation["nwt:extension"])
+          return;
 
-    parseString(compartment.getAnnotationString(), function(err, result){
-      if(!result || !result.annotation["nwt:extension"])
-        return;
+        let info = result.annotation["nwt:extension"][0]["nwt:info"][0];
+        let attrs = info.$;
 
-      let info = result.annotation["nwt:extension"][0]["nwt:info"][0];
-      let attrs = info.$;
-
-      for (let key in styleAttributes) {
+        for (let key in styleAttributes) {
           const nwtAttr = `nwt:${key}`;
           styleAttributes[key] = attrs[nwtAttr] || "";
         }
-    })
+      })
 
-    for (let key in styleAttributes) {
-      compartmentData[key] = styleAttributes[key];
-    }
+      for (let key in styleAttributes) {
+        compartmentData[key] = styleAttributes[key];
+      }
 
-      resultJson.push({"data": compartmentData, "group": "nodes", "classes": "compartment"});
+      resultJson.push({"data": compartmentData, "simulation": simulationData, "group": "nodes", "classes": "compartment"});
     }
     if(!compartmentBoundingBoxes.has(compartment.getId())){
       compartmentBoundingBoxes.set(compartment.getId(), {x1: 0, y1: 0, x2: 0, y2: 0});
@@ -374,6 +402,8 @@ sbmlToJson.addJSCompartments = function(compartmentMap, resultJson, cytoscapeJsN
       nodeObj.label = resultJson[i].data.label;
       nodeObj.statesandinfos = [];
       nodeObj.ports = [];
+      nodeObj.language = 'SBML';
+      nodeObj.simulation = resultJson[i].simulation;
       if(resultJson[i].data.parent)
         nodeObj.parent = resultJson[i].data.parent;
       containerNodeMap.set(nodeObj.id, 
@@ -445,17 +475,38 @@ sbmlToJson.addSpecies = function(model, cytoscapeJsNodes, compartmentBoundingBox
 
     speciesCompartmentMap.set(species.getId(), species.getCompartment());
     var sboTerm = species.getSBOTerm();
-    let speciesData = {"id": species.getId(), "label": species.getName() || " ", 
+    let speciesData = {"id": species.getId(), "label": species.getName() || species.getId(), 
                       "parent": species.getCompartment(), "sboTerm": species.getSBOTerm(),
                       "active": active, "multimer": multimer, "hypothetical": hypothetical,
                       "bindingRegion": bindingRegion, "residueVariable": residueVariable, "unitOfInfo": unitOfInfo, "stateVariable": stateVariable,
                       "customproperty": customProperties};
+    
+    // TODO: Substance Units!
+    let simulationData = {};
+    if(species.isSetInitialAmount()){
+      simulationData.initialAmount = species.getInitialAmount();
+      if(!species.isSetInitialConcentration())
+        simulationData.initialConcentration = species.getInitialAmount();
+    }
+    if(species.isSetInitialConcentration()){
+      simulationData.initialConcentration = species.getInitialConcentration();
+      if(!species.isSetInitialAmount())
+        simulationData.initialAmount = species.getInitialConcentration();
+    }
+    if(species.isSetHasOnlySubstanceUnits())
+      simulationData.hasOnlySubstanceUnits = species.getHasOnlySubstanceUnits();
+    if(species.isSetConstant())
+      simulationData.constant = species.getConstant();
+    if(species.isSetBoundaryCondition())
+      simulationData.boundaryCondition = species.getBoundaryCondition();
+    if(species.isSetConversionFactor())
+      simulationData.conversionFactor = species.getConversionFactor();
 
     for (let key in styleAttributes) {
       speciesData[key] = styleAttributes[key];
     }
 
-    resultJson.push({"data": speciesData, "group": "nodes", "classes": "species"});
+    resultJson.push({"data": speciesData, "simulation": simulationData, "group": "nodes", "classes": "species"});
   }
   let speciesGlyphIdSpeciesIdMap = new Map();
   if (layout) {
@@ -514,6 +565,8 @@ sbmlToJson.addJSNodes = function(resultJson,cytoscapeJsNodes, speciesGlyphIdSpec
     nodeObj.statesandinfos = [];
     nodeObj.ports = [];
     nodeObj.parent = resultJson[i].data.parent;
+    nodeObj.language = 'SBML';
+    nodeObj.simulation = resultJson[i].simulation;
 
     if(sboTerm == 253)
       containerNodeMap.set(nodeObj.id, 
@@ -841,13 +894,17 @@ sbmlToJson.addReactions = function(model, cytoscapeJsEdges, cytoscapeJsNodes) {
 
     }
   
-    // add reactant->reaction edges
     for(let j = 0; j < reaction.getNumReactants(); j++){
       let reactant = reaction.getReactant(j);
       let reactantEdgeData = {"id": reactant.getSpecies() + '_' + reaction.getId(), "source": reactant.getSpecies(), "target": reaction.getId()};
       if (edgeClass1) 
         reactantEdgeData.class = edgeClass1;
-      resultJson.push({"data": reactantEdgeData, "group": "edges", "classes": "reactantEdge"});
+      let simulationDataReactant = {};
+      if(reactant.isSetStoichiometry())
+        simulationDataReactant.stoichiometry = reactant.getStoichiometry();
+      if(reactant.isSetConstant())
+        simulationDataReactant.constant = reactant.getConstant();
+      resultJson.push({"data": reactantEdgeData, "simulation": simulationDataReactant, "group": "edges", "classes": "reactantEdge"});
 
       // collect possible parent info
       let speciesCompartment = speciesCompartmentMap.get(reactant.getSpecies());
@@ -865,7 +922,12 @@ sbmlToJson.addReactions = function(model, cytoscapeJsEdges, cytoscapeJsNodes) {
         productEdgeData.class = edgeClass2;
       if(sboTermReaction == 231)
         productEdgeData.class = "trigger";
-      resultJson.push({"data": productEdgeData, "group": "edges", "classes": "productEdge"});
+      let simulationDataProduct = {};
+      if(product.isSetStoichiometry())
+        simulationDataProduct.stoichiometry = product.getStoichiometry();
+      if(product.isSetConstant())
+        simulationDataProduct.constant = product.getConstant();
+      resultJson.push({"data": productEdgeData, "simulation": simulationDataProduct, "group": "edges", "classes": "productEdge"});
 
       // collect possible parent info
       let speciesCompartment = speciesCompartmentMap.get(product.getSpecies());
@@ -884,6 +946,13 @@ sbmlToJson.addReactions = function(model, cytoscapeJsEdges, cytoscapeJsNodes) {
     if(nodeClass){
       reactionData.class = nodeClass
     }
+
+    // TODO: Implement Local Parameters
+    let simulationData = {};
+    if(reaction.isSetKineticLaw()){
+      simulationData.kineticLaw = reaction.getKineticLaw().getFormula();
+    }
+    reactionData.simulation = simulationData;
     resultJson.push({"data": reactionData, "group": "nodes", "classes": "reaction"}); 
     
     // add modifier->reaction edges
@@ -1050,7 +1119,8 @@ sbmlToJson.addJSEdges= function(resultJson, cytoscapeJsNodes, cytoscapeJsEdges,r
         {
           edgeObj.porttarget = edgeObj.target + ".2"
         }
-
+        edgeObj.language = 'SBML';
+        edgeObj.simulation = resultJson[i].simulation;
 
         elementUtilities.extendEdgeDataWithClassDefaults( edgeObj, edgeObj.class );
         var cytoscapeJsEdge1 = {data: edgeObj, style: styleObj};
@@ -1096,6 +1166,8 @@ sbmlToJson.addNodes = function( cytoscapeJsNodes, data) {
     
     nodeObj.ports = data.ports;
     nodeObj.parent = data.parent;
+    nodeObj.language = 'SBML';
+    nodeObj.simulation = data.simulation;
 
     var cytoscapeJsNode = {data: nodeObj, style: styleObj};
     elementUtilities.extendNodeDataWithClassDefaults( nodeObj, nodeObj.class );
@@ -1152,5 +1224,3 @@ sbmlToJson.updateCompartmentBox = function(compartmentBoundingBoxes, compartment
 
 return sbmlToJson;
 };
-
-

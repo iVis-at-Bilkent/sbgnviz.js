@@ -10,7 +10,7 @@ var textUtilities = require('./text-utilities');
 var classes = require('./classes');
 
 module.exports = function () {
-    var elementUtilities, graphUtilities, experimentalDataOverlay;
+    var elementUtilities, graphUtilities, experimentalDataOverlay, sbmlSimulationUtilities;
     var cy;
 
     var nodesToSbo = 
@@ -75,6 +75,7 @@ module.exports = function () {
         elementUtilities = param.elementUtilities;
         graphUtilities = param.graphUtilities;
         experimentalDataOverlay = param.experimentalDataOverlay;
+        sbmlSimulationUtilities = param.sbmlSimulationUtilities;
         cy = param.sbgnCyInstance.getCy();
       }
 
@@ -106,6 +107,16 @@ module.exports = function () {
         const box = cy.elements().boundingBox();
         dim.setWidth(box.w); dim.setHeight(box.h);
 
+        // Create Parameters
+        var parameters = sbmlSimulationUtilities.getParameters();
+        for (var p of parameters) {
+            const param = model.createParameter();
+            param.setId(p.id);
+            param.setName(p.name);
+            param.setValue(p.value);
+            param.setConstant(p.constant);
+        }
+
         // Create compartment
         for (let i = 0; i < nodes.length; i++)
         {
@@ -116,8 +127,16 @@ module.exports = function () {
             const comp = model.createCompartment()
             const compId = nodes[i]._private.data.id.replace(/-/g, "_");
             comp.setId(compId)
-            comp.setSize(1)
-            comp.setConstant(true)
+            // TODO: Implement Units
+            var simulationData = nodes[i].data("simulation");
+            if(simulationData){
+                if(simulationData["size"])
+                    comp.setSize(simulationData["size"]);
+                if(simulationData["constant"] !== null)
+                    comp.setConstant(simulationData["constant"]);
+                if(simulationData["spatialDimensions"] !== null)
+                    comp.setSpatialDimensions(simulationData["spatialDimensions"]);
+            }
             if(nodes[i]._private.data.label)
                 comp.setName(nodes[i]._private.data.label)
 
@@ -197,9 +216,19 @@ module.exports = function () {
                 newSpecies.setCompartment('default');
             }
 
-            newSpecies.setHasOnlySubstanceUnits(false);
-            newSpecies.setConstant(true);
-            newSpecies.setBoundaryCondition(true);
+            var simulationData = nodes[i].data("simulation");
+            if(simulationData){
+                if(simulationData["hasOnlySubstanceUnits"] !== null)
+                    newSpecies.setHasOnlySubstanceUnits(simulationData["hasOnlySubstanceUnits"]);
+                if(simulationData["initialAmount"] !== null && simulationData["hasOnlySubstanceUnits"])
+                    newSpecies.setInitialAmount(simulationData["initialAmount"]);
+                if(simulationData["initialConcentration"] !== null && !simulationData["hasOnlySubstanceUnits"])
+                    newSpecies.setInitialConcentration(simulationData["initialConcentration"]);
+                if(simulationData["boundaryCondition"] !== null)
+                    newSpecies.setBoundaryCondition(simulationData["boundaryCondition"]);
+                if(simulationData["constant"] !== null)
+                    newSpecies.setConstant(simulationData["constant"]);
+            }
 
             const new_id = nodes[i].id();
             var newStr = new_id.replace(/-/g, "_"); //Replacing - with _ because libsml doesn't allow - in id
@@ -351,6 +380,7 @@ module.exports = function () {
                 let sourceId = sourceEdge.source().id().replace(/-/g, '_');
                 const spr1 = rxn.createReactant();
                 spr1.setSpecies(sourceId);
+                spr1.setStoichiometry( (sourceEdge.data("simulation")["stoichiometry"] || "") );
                 spr1.setConstant(true);
             }
             
@@ -358,6 +388,7 @@ module.exports = function () {
                 let targetId = targetEdge.target().id().replace(/-/g, '_');
                 const spr2 = rxn.createProduct();
                 spr2.setSpecies(targetId);
+                spr2.setStoichiometry( (targetEdge.data("simulation")["stoichiometry"] || "") );
                 spr2.setConstant(true);
             }
             
@@ -401,7 +432,16 @@ module.exports = function () {
                 rxn.setSBOTerm(185);
             else
                 rxn.setSBOTerm(176);
-
+            
+            const k1 = rxn.createKineticLaw();
+            for(var lp of process.data("simulation")["localParameters"]){
+                var localp = k1.createLocalParameter();
+                localp.setValue(lp.quantity);
+                localp.setName(lp.name.replace(/-/g, '_'));
+            }
+            const parser = new libsbmlInstance.SBMLFormulaParser();
+            const kmath = parser.parseL3Formula( (process.data("simulation")["kineticLaw"] || "") );
+            k1.setMath(kmath);
             // Add Layout Info for Processes
             const glyph = layout.createReactionGlyph();
             glyph.setId("process_" + (i+1));
