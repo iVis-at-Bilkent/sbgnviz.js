@@ -3,7 +3,7 @@ module.exports = function () {
   
   var cy;
   var sbmlSimulationUtilities = function (param) {
-      cy = param.sbgnCyInstance.getCy();
+    cy = param.sbgnCyInstance.getCy();
   };
 
   sbmlSimulationUtilities.generateUUID = function () {
@@ -62,6 +62,10 @@ module.exports = function () {
 
   sbmlSimulationUtilities.setParameter = function (id, field, value) {
     parameters[id][field] = value;
+  }
+
+  sbmlSimulationUtilities.resetParameters = function () {
+    parameters = {};
   }
 
   return sbmlSimulationUtilities;
