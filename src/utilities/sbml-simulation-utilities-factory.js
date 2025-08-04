@@ -107,12 +107,19 @@ module.exports = function () {
     functionDefinitions = {};
   }
 
-  sbmlSimulationUtilities.convertNamesToIdsInFormula = function(formula) {
+
+  // General utilities not associated with any specific SBML simulation feature.
+  sbmlSimulationUtilities.convertNamesToIdsInFormula = function (formula) {
 
   }
 
-  sbmlSimulationUtilities.convertIdsToNamesInFormula = function(formula) {
+  sbmlSimulationUtilities.convertIdsToNamesInFormula = function (formula) {
 
+  }
+
+  sbmlSimulationUtilities.resetAll = function () {
+    sbmlSimulationUtilities.resetParameters();
+    sbmlSimulationUtilities.resetFunctionDefinitions();
   }
 
   return sbmlSimulationUtilities;

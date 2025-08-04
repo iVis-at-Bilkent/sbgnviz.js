@@ -179,7 +179,7 @@ module.exports = function () {
    var file = (folderpath || 'sample-app/samples/') + filename;
 
    uiUtilities.startSpinner("load-spinner");
-   sbmlSimulationUtilities.resetParameters();   // Reset already existing parameters.
+   sbmlSimulationUtilities.resetAll();   // Reset already existing parameters.
    // Users may want to do customized things while a sample is being loaded
    // Trigger an event for this purpose and specify the 'filename' as an event parameter
    $(document).trigger( "sbgnvizLoadSample", [ filename, cy ] ); // Aliases for sbgnvizLoadSampleStart
@@ -295,7 +295,7 @@ module.exports = function () {
  fileUtilities.loadFile = function(file, convertFcn, callback1, callback2, callback3, callback4,toLocalorGraph) {
    var self = this;
    uiUtilities.startSpinner("load-file-spinner");
-   sbmlSimulationUtilities.resetParameters();
+   sbmlSimulationUtilities.resetAll();
 
    var textType = /text.*/;
 
@@ -375,7 +375,7 @@ module.exports = function () {
  };
 
  fileUtilities.loadSBGNMLText = async function(textData, tileInfoBoxes, filename, cy, urlParams){
-  sbmlSimulationUtilities.resetParameters();
+  sbmlSimulationUtilities.resetAll();
   await updateGraph(sbgnmlToJson.convert(textToXmlObject(textData), urlParams), undefined, undefined, tileInfoBoxes);
   await $(document).trigger("sbgnvizLoadFileEnd",  [filename, cy]);
         uiUtilities.endSpinner("load-file-spinner");
@@ -385,7 +385,7 @@ module.exports = function () {
 
   // This should only be used when your SBML is coming in text format. Use loadSbmlforSBML for file loading.
   fileUtilities.loadSBMLText = async function(textData, tileInfoBoxes, filename, cy, urlParams){
-    sbmlSimulationUtilities.resetParameters();
+    sbmlSimulationUtilities.resetAll();
     await updateGraph(sbmlToJson.convert(textData, urlParams), undefined, undefined, tileInfoBoxes);
     await $(document).trigger("sbgnvizLoadFileEnd",  [filename, cy]);
     uiUtilities.endSpinner("load-file-spinner");
