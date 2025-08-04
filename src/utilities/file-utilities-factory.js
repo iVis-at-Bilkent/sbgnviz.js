@@ -383,13 +383,13 @@ module.exports = function () {
 
  };
 
- fileUtilities.loadSBMLText = async function(textData, tileInfoBoxes, filename, cy, urlParams){
-  sbmlSimulationUtilities.resetParameters();
-  await updateGraph(sbmlToJson.convert(textData, urlParams), undefined, undefined, tileInfoBoxes);
-   await $(document).trigger("sbgnvizLoadFileEnd",  [filename, cy]);
-   uiUtilities.endSpinner("load-file-spinner");
-
-};
+  // This should only be used when your SBML is coming in text format. Use loadSbmlforSBML for file loading.
+  fileUtilities.loadSBMLText = async function(textData, tileInfoBoxes, filename, cy, urlParams){
+    sbmlSimulationUtilities.resetParameters();
+    await updateGraph(sbmlToJson.convert(textData, urlParams), undefined, undefined, tileInfoBoxes);
+    await $(document).trigger("sbgnvizLoadFileEnd",  [filename, cy]);
+    uiUtilities.endSpinner("load-file-spinner");
+  };
 
  // supported versions are either 0.2 or 0.3
  fileUtilities.saveAsSbgnml = function(filename, version, renderInfo, mapProperties, nodes, edges) {
@@ -535,7 +535,7 @@ fileUtilities.hasLayoutSBML = function(file) {
   });
 };
 
- fileUtilities.loadSbmlForSBML = async function(file, callback1, callback2, layoutBy)
+ fileUtilities.loadSbmlForSBML = async function(file, errorCallback, layoutBy)
  {
   var convert = function( text ) {
     var converted = sbmlToJson.convert(text)
@@ -561,10 +561,10 @@ fileUtilities.hasLayoutSBML = function(file) {
   };
   let layoutFound = await fileUtilities.hasLayoutSBML(file);
   if (layoutFound){
-    fileUtilities.loadFile( file, convert, callback1, callback2, fileUtilities.collapseMarkedNodes, undefined);
+    fileUtilities.loadFile( file, convert, undefined, errorCallback, fileUtilities.collapseMarkedNodes, undefined);
   }
   else{
-    fileUtilities.loadFile( file, convert, callback1, callback2, fileUtilities.collapseMarkedNodes, runLayout);
+    fileUtilities.loadFile( file, convert, undefined, errorCallback, fileUtilities.collapseMarkedNodes, runLayout);
   }
  }
  fileUtilities.loadSbml = function(file, successCallback, errorCallback){

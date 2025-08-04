@@ -107,6 +107,22 @@ module.exports = function () {
         const box = cy.elements().boundingBox();
         dim.setWidth(box.w); dim.setHeight(box.h);
 
+
+        // Add Function Definitions
+        var functionDefinitions = sbmlSimulationUtilities.getFunctionDefinitions();
+        for (var fd of functionDefinitions) {
+            const funcd = model.createFunctionDefinition();
+            funcd.setId(fd.id);
+            funcd.setName(fd.name);
+            var formulaToParse = "lambda(";
+            for (var arg of fd.args) {
+                formulaToParse += (arg + ", "); 
+            }
+            formulaToParse += (fd.body + ")");
+            var parsedFormula = new libsbmlInstance.SBMLFormulaParser().parseL3Formula(formulaToParse);
+            funcd.setMath(parsedFormula);
+        }
+
         // Create Parameters
         var parameters = sbmlSimulationUtilities.getParameters();
         for (var p of parameters) {

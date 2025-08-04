@@ -133,6 +133,7 @@ module.exports = function () {
     let containerNodeMap = new Map;
 
     sbmlToJson.addParameters(model);
+    sbmlToJson.addFunctionDefinitions(model);
     sbmlToJson.addCompartments(model, cytoscapeJsNodes, compartmentBoundingBoxes, containerNodeMap);
     sbmlToJson.addSpecies(model, cytoscapeJsNodes, compartmentBoundingBoxes, containerNodeMap);
     sbmlToJson.addReactions(model, cytoscapeJsEdges,cytoscapeJsNodes);
@@ -151,6 +152,24 @@ module.exports = function () {
     speciesCompartmentMap = new Map;
     return cytoscapeJsGraph;
   };
+
+  sbmlToJson.addFunctionDefinitions = function(model) {
+    for(let i = 0; i < model.getNumFunctionDefinitions() ; i++) {
+      let fd = model.getFunctionDefinition(i);
+      let fdId = fd.getId();
+      let args = [];
+      for(let j = 0; j < fd.getNumArguments(); j++){
+        args.push(fd.getArgument(j).getName());
+      }
+      let formulaBody = "";
+      if(fd.isSetBody())
+        formulaBody = new libsbmlInstance.SBMLFormulaParser().formulaToL3String(fd.getBody());
+      let fdName = fdId;
+      if(fd.isSetName())
+        fdName = fd.getName();
+      sbmlSimulationUtilities.addFunctionDefinitionWithId(fdId, fdName, args, formulaBody);
+    }
+  }
 
   // add parameters TODO: implement units
   sbmlToJson.addParameters = function(model) {

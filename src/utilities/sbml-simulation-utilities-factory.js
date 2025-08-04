@@ -1,5 +1,6 @@
 module.exports = function () {
-  var parameters = {}; // { id = str: { name = str, value = float, unit = str, constant = bool } }, 
+  var parameters = {}; // { id = str: { name = str, value = float, unit = str, constant = bool } },
+  var functionDefinitions = {}; // { id = str: { name = str, args = list[str], body: str } }, 
   
   var cy;
   var sbmlSimulationUtilities = function (param) {
@@ -25,12 +26,12 @@ module.exports = function () {
     );
   };
 
-  sbmlSimulationUtilities.generateParameterID = function() {
-    return "param_" + sbmlSimulationUtilities.generateUUID();
+  sbmlSimulationUtilities.generateSpecializedID = function(namespace) {
+    return namespace + "_" + sbmlSimulationUtilities.generateUUID();
   }
 
   sbmlSimulationUtilities.addParameter = function (name, value, unit, constant) {
-    var id = sbmlSimulationUtilities.generateParameterID();
+    var id = sbmlSimulationUtilities.generateSpecializedID("param");
     parameters[id] = {
       name: name,
       value: value,
@@ -66,6 +67,52 @@ module.exports = function () {
 
   sbmlSimulationUtilities.resetParameters = function () {
     parameters = {};
+  }
+
+  sbmlSimulationUtilities.addFunctionDefinition = function (name, args, body) {
+    var id = sbmlSimulationUtilities.generateSpecializedID("function");
+    functionDefinitions[id] = {
+      name: name,
+      args: args,
+      body: body
+    }
+  }
+
+  // Should only be used while importing, not really anything else
+  // Consider using sbmlSimulationUtilities.addParameter(name, args, body)
+  sbmlSimulationUtilities.addFunctionDefinitionWithId = function (id, name, args, body) {
+    functionDefinitions[id] = {
+      id: id,
+      name: name,
+      args: args,
+      body: body
+    }
+  }
+
+  sbmlSimulationUtilities.removeFunctionDefinition = function (id) {
+    delete functionDefinitions[id];
+  }
+
+  sbmlSimulationUtilities.getFunctionDefinitions = function () {
+    return Object.entries(functionDefinitions).map( ([id, {name, args, body}]) => ({
+      id, name, args, body
+    }));
+  }
+
+  sbmlSimulationUtilities.setFunctionDefinition = function (id, field, value) {
+    functionDefinitions[id][field] = value;
+  }
+
+  sbmlSimulationUtilities.resetFunctionDefinitions = function () {
+    functionDefinitions = {};
+  }
+
+  sbmlSimulationUtilities.convertNamesToIdsInFormula = function(formula) {
+
+  }
+
+  sbmlSimulationUtilities.convertIdsToNamesInFormula = function(formula) {
+
   }
 
   return sbmlSimulationUtilities;
