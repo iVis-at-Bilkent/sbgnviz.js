@@ -1,6 +1,7 @@
 module.exports = function () {
   var parameters = {}; // { id = str: { name = str, value = float, unit = str, constant = bool } },
   var functionDefinitions = {}; // { id = str: { name = str, args = list[str], body: str } }, 
+  var initialAssignments = {} // { id = str: { symbol = str, math: str } },     symbol corresponds to the target of IA.
   
   var cy;
   var sbmlSimulationUtilities = function (param) {
@@ -107,6 +108,41 @@ module.exports = function () {
     functionDefinitions = {};
   }
 
+  sbmlSimulationUtilities.addInitialAssignment = function (symbol, math) {
+    var id = sbmlSimulationUtilities.generateSpecializedID("initial");
+    initialAssignments[id] = {
+      symbol: symbol,
+      math: math
+    }
+  }
+
+  // Should only be used while importing, not really anything else
+  // Consider using sbmlSimulationUtilities.addParameter(symbol, body)
+  sbmlSimulationUtilities.addInitialAssignmentWithId = function (id, symbol, math) {
+    initialAssignments[id] = {
+      id: id,
+      symbol: symbol,
+      math: math
+    }
+  }
+
+  sbmlSimulationUtilities.removeInitialAssignment = function (id) {
+    delete initialAssignments[id];
+  }
+
+  sbmlSimulationUtilities.getInitialAssignments = function () {
+    return Object.entries(initialAssignments).map( ([id, {symbol, math}]) => ({
+      id, symbol, math
+    }));
+  }
+
+  sbmlSimulationUtilities.setInitialAssignment = function (id, field, value) {
+    initialAssignments[id][field] = value;
+  }
+
+  sbmlSimulationUtilities.resetInitialAssignments = function () {
+    initialAssignments = {};
+  }
 
   // General utilities not associated with any specific SBML simulation feature.
   sbmlSimulationUtilities.convertNamesToIdsInFormula = function (formula) {
@@ -120,6 +156,7 @@ module.exports = function () {
   sbmlSimulationUtilities.resetAll = function () {
     sbmlSimulationUtilities.resetParameters();
     sbmlSimulationUtilities.resetFunctionDefinitions();
+    sbmlSimulationUtilities.resetInitialAssignments();
   }
 
   return sbmlSimulationUtilities;

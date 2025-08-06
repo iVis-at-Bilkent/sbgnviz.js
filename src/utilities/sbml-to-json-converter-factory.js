@@ -137,6 +137,7 @@ module.exports = function () {
     sbmlToJson.addCompartments(model, cytoscapeJsNodes, compartmentBoundingBoxes, containerNodeMap);
     sbmlToJson.addSpecies(model, cytoscapeJsNodes, compartmentBoundingBoxes, containerNodeMap);
     sbmlToJson.addReactions(model, cytoscapeJsEdges,cytoscapeJsNodes);
+    sbmlToJson.addInitialAssignments(model);
     sbmlToJson.fixCompartmentBiases(model, cytoscapeJsNodes, compartmentBoundingBoxes);
 
     var inferNestingOnLoad = options.inferNestingOnLoad;
@@ -152,6 +153,20 @@ module.exports = function () {
     speciesCompartmentMap = new Map;
     return cytoscapeJsGraph;
   };
+
+  sbmlToJson.addInitialAssignments = function(model) {
+    for(let i = 0; i < model.getNumInitialAssignments() ; i++) {
+      let ia = model.getInitialAssignment(i);
+      let iaId = ia.getId();
+      let iaSymbol = "";
+      if(ia.isSetSymbol())
+        iaSymbol = ia.getSymbol();
+      let iaMath = "";
+      if(ia.isSetMath())
+        iaMath = new libsbmlInstance.SBMLFormulaParser().formulaToL3String(ia.getMath());
+      sbmlSimulationUtilities.addInitialAssignmentWithId(iaId, iaSymbol, iaMath);
+    }
+  }
 
   sbmlToJson.addFunctionDefinitions = function(model) {
     for(let i = 0; i < model.getNumFunctionDefinitions() ; i++) {

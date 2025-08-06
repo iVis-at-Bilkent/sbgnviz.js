@@ -110,15 +110,15 @@ module.exports = function () {
 
         // Add Function Definitions
         var functionDefinitions = sbmlSimulationUtilities.getFunctionDefinitions();
-        for (var fd of functionDefinitions) {
+        for (var ia of functionDefinitions) {
             const funcd = model.createFunctionDefinition();
-            funcd.setId(fd.id);
-            funcd.setName(fd.name);
+            funcd.setId(ia.id);
+            funcd.setName(ia.name);
             var formulaToParse = "lambda(";
-            for (var arg of fd.args) {
+            for (var arg of ia.args) {
                 formulaToParse += (arg + ", "); 
             }
-            formulaToParse += (fd.body + ")");
+            formulaToParse += (ia.body + ")");
             var parsedFormula = new libsbmlInstance.SBMLFormulaParser().parseL3Formula(formulaToParse);
             funcd.setMath(parsedFormula);
         }
@@ -608,6 +608,17 @@ module.exports = function () {
             referenceGlyph2.setSpeciesGlyphId(  + '_glyph');
             referenceGlyph2.setRole(5);
             referenceGlyph2.setId("reduced_product_" + (i+1));
+        }
+
+
+        // Add InitialAssignments
+        var functionDefinitions = sbmlSimulationUtilities.getInitialAssignments();
+        for (var ia of initialAssignments) {
+            const initA = model.createInitialAssignment();
+            initA.setId(ia.id);
+            initA.setSymbol(ia.symbol);
+            var parsedFormula = new libsbmlInstance.SBMLFormulaParser().parseL3Formula(ia.math);
+            initA.setMath(parsedFormula);
         }
 
         const writer = new libsbmlInstance.SBMLWriter()
