@@ -611,8 +611,8 @@ module.exports = function () {
         }
 
 
-        // Add InitialAssignments
-        var functionDefinitions = sbmlSimulationUtilities.getInitialAssignments();
+        // Add Initial Assignments
+        var initialAssignments = sbmlSimulationUtilities.getInitialAssignments();
         for (var ia of initialAssignments) {
             const initA = model.createInitialAssignment();
             initA.setId(ia.id);
