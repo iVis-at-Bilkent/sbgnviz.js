@@ -167,7 +167,7 @@ module.exports = function () {
   }
 
   sbmlSimulationUtilities.getRules = function () {
-    return Object.entries(Rules).map( ([id, {type, target, math}]) => ({
+    return Object.entries(rules).map( ([id, {type, target, math}]) => ({
       id, type, target, math
     }));
   }
