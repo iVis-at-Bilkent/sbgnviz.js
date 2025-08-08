@@ -138,6 +138,7 @@ module.exports = function () {
     sbmlToJson.addSpecies(model, cytoscapeJsNodes, compartmentBoundingBoxes, containerNodeMap);
     sbmlToJson.addReactions(model, cytoscapeJsEdges,cytoscapeJsNodes);
     sbmlToJson.addInitialAssignments(model);
+    sbmlToJson.addRules(model);
     sbmlToJson.fixCompartmentBiases(model, cytoscapeJsNodes, compartmentBoundingBoxes);
 
     var inferNestingOnLoad = options.inferNestingOnLoad;
@@ -165,6 +166,37 @@ module.exports = function () {
       if(ia.isSetMath())
         iaMath = new libsbmlInstance.SBMLFormulaParser().formulaToL3String(ia.getMath());
       sbmlSimulationUtilities.addInitialAssignmentWithId(iaId, iaSymbol, iaMath);
+    }
+  }
+
+  sbmlToJson.addRules = function(model) {
+    for (let i = 0; i < model.getNumRules(); i++) {
+      const rule = model.getRule(i);
+      if (rule.isAlgebraic()) continue;
+
+      let type = null;
+      if (rule.isAssignment()) type = 'assignment';
+      else if (rule.isRate()) type = 'rate';
+      else continue;
+
+      let ruleId;
+      if (rule.isSetIdAttribute()) {
+        ruleId = rule.getId();
+      }
+      let target = '';
+      if (rule.isSetVariable()) {
+        target = rule.getVariable();
+      }
+      let math = '';
+      if (rule.isSetFormula()) {
+        math = rule.getFormula();
+      }
+
+      if (ruleId) {
+        sbmlSimulationUtilities.addRuleWithId(ruleId, type, target, math);
+      } else {
+        sbmlSimulationUtilities.addRule(type, target, math);
+      }
     }
   }
 
