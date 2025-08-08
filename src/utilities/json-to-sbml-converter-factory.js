@@ -375,7 +375,7 @@ module.exports = function () {
             let processId = process.id().replace(/-/g, '_');
             
             var rxn = model.createReaction();
-            rxn.setId('process_'+ processId);
+            rxn.setId(processId);
             rxn.setReversible(false);
 
             // Parent Info
@@ -608,6 +608,27 @@ module.exports = function () {
             referenceGlyph2.setSpeciesGlyphId(  + '_glyph');
             referenceGlyph2.setRole(5);
             referenceGlyph2.setId("reduced_product_" + (i+1));
+        }
+
+
+        // Add Rules (Assignment and Rate)
+        var rules = sbmlSimulationUtilities.getRules();
+        for (var r of rules) {
+            let rule;
+            if (r.type === 'assignment') {
+                rule = model.createAssignmentRule();
+            } else if (r.type === 'rate') {
+                rule = model.createRateRule();
+            } else {
+                continue;
+            }
+            if (r.id) rule.setId(r.id);
+            if (r.target) rule.setVariable(r.target);
+            if (r.math !== undefined && r.math !== null) {
+                const parser = new libsbmlInstance.SBMLFormulaParser();
+                const kmath = parser.parseL3Formula(r.math);
+                rule.setMath(kmath);
+            }
         }
 
 
