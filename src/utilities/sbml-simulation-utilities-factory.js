@@ -2,6 +2,7 @@ module.exports = function () {
   var parameters = {}; // { id = str: { name = str, value = float, unit = str, constant = bool } },
   var functionDefinitions = {}; // { id = str: { name = str, args = list[str], body: str } }, 
   var initialAssignments = {} // { id = str: { symbol = str, math: str } },     symbol corresponds to the target of IA.
+  var rules = {} // { id = str: { type = str, target = str, math: str } },
   
   var cy;
   var sbmlSimulationUtilities = function (param) {
@@ -83,7 +84,6 @@ module.exports = function () {
   // Consider using sbmlSimulationUtilities.addParameter(name, args, body)
   sbmlSimulationUtilities.addFunctionDefinitionWithId = function (id, name, args, body) {
     functionDefinitions[id] = {
-      id: id,
       name: name,
       args: args,
       body: body
@@ -117,10 +117,9 @@ module.exports = function () {
   }
 
   // Should only be used while importing, not really anything else
-  // Consider using sbmlSimulationUtilities.addParameter(symbol, body)
+  // Consider using sbmlSimulationUtilities.addInitialAssignment(symbol, math)
   sbmlSimulationUtilities.addInitialAssignmentWithId = function (id, symbol, math) {
     initialAssignments[id] = {
-      id: id,
       symbol: symbol,
       math: math
     }
@@ -144,6 +143,43 @@ module.exports = function () {
     initialAssignments = {};
   }
 
+  sbmlSimulationUtilities.addRule = function (type, target, math) {
+    var id = sbmlSimulationUtilities.generateSpecializedID("rule");
+    rules[id] = {
+      type: type,
+      target: target,
+      math: math
+    }
+  }
+
+  // Should only be used while importing, not really anything else
+  // Consider using sbmlSimulationUtilities.addParameter(symbol, body)
+  sbmlSimulationUtilities.addRuleWithId = function (id, type, target, math) {
+    rules[id] = {
+      type: type,
+      target: target,
+      math: math
+    }
+  }
+
+  sbmlSimulationUtilities.removeRule = function (id) {
+    delete rules[id];
+  }
+
+  sbmlSimulationUtilities.getRules = function () {
+    return Object.entries(Rules).map( ([id, {type, target, math}]) => ({
+      id, type, target, math
+    }));
+  }
+
+  sbmlSimulationUtilities.setRule = function (id, field, value) {
+    rules[id][field] = value;
+  }
+
+  sbmlSimulationUtilities.resetRules = function () {
+    rules = {};
+  }
+
   // General utilities not associated with any specific SBML simulation feature.
   sbmlSimulationUtilities.convertNamesToIdsInFormula = function (formula) {
 
@@ -157,6 +193,7 @@ module.exports = function () {
     sbmlSimulationUtilities.resetParameters();
     sbmlSimulationUtilities.resetFunctionDefinitions();
     sbmlSimulationUtilities.resetInitialAssignments();
+    sbmlSimulationUtilities.resetRules();
   }
 
   return sbmlSimulationUtilities;
