@@ -3,6 +3,7 @@ module.exports = function () {
   var functionDefinitions = {}; // { id = str: { name = str, args = list[str], body: str } }, 
   var initialAssignments = {} // { id = str: { symbol = str, math: str } },     symbol corresponds to the target of IA.
   var rules = {} // { id = str: { type = str, target = str, math: str } },
+  var events = {} // { id = str: { useValuesFromTriggerTime: bool, trigger: { initialValue: bool, persistent: bool, math: str }, priority: str, delay: str, assignments: [{ target: str, math: str }] } }
   
   var cy;
   var sbmlSimulationUtilities = function (param) {
@@ -64,6 +65,7 @@ module.exports = function () {
   }
 
   sbmlSimulationUtilities.setParameter = function (id, field, value) {
+    if (!parameters[id]) return;
     parameters[id][field] = value;
   }
 
@@ -101,6 +103,7 @@ module.exports = function () {
   }
 
   sbmlSimulationUtilities.setFunctionDefinition = function (id, field, value) {
+    if (!functionDefinitions[id]) return;
     functionDefinitions[id][field] = value;
   }
 
@@ -136,6 +139,7 @@ module.exports = function () {
   }
 
   sbmlSimulationUtilities.setInitialAssignment = function (id, field, value) {
+    if (!initialAssignments[id]) return;
     initialAssignments[id][field] = value;
   }
 
@@ -173,11 +177,93 @@ module.exports = function () {
   }
 
   sbmlSimulationUtilities.setRule = function (id, field, value) {
+    if (!rules[id]) return;
     rules[id][field] = value;
   }
 
   sbmlSimulationUtilities.resetRules = function () {
     rules = {};
+  }
+
+  // Events
+  sbmlSimulationUtilities.addEvent = function (useValuesFromTriggerTime, triggerInitialValue, triggerPersistent, triggerMath, priority, delay, assignments) {
+    var id = sbmlSimulationUtilities.generateSpecializedID("event");
+    events[id] = {
+      useValuesFromTriggerTime: !!useValuesFromTriggerTime,
+      trigger: {
+        initialValue: !!triggerInitialValue,
+        persistent: !!triggerPersistent,
+        math: triggerMath || ""
+      },
+      priority: priority || "",
+      delay: delay || "",
+      assignments: Array.isArray(assignments) ? assignments.map(function (a) { return { target: a.target || "", math: a.math || "" }; }) : []
+    };
+  }
+
+  sbmlSimulationUtilities.addEventWithId = function (id, useValuesFromTriggerTime, triggerInitialValue, triggerPersistent, triggerMath, priority, delay, assignments) {
+    events[id] = {
+      useValuesFromTriggerTime: !!useValuesFromTriggerTime,
+      trigger: {
+        initialValue: !!triggerInitialValue,
+        persistent: !!triggerPersistent,
+        math: triggerMath || ""
+      },
+      priority: priority || "",
+      delay: delay || "",
+      assignments: Array.isArray(assignments) ? assignments.map(function (a) { return { target: a.target || "", math: a.math || "" }; }) : []
+    };
+  }
+
+  sbmlSimulationUtilities.removeEvent = function (id) {
+    delete events[id];
+  }
+
+  sbmlSimulationUtilities.getEvents = function () {
+    return Object.entries(events).map(function (_ref) {
+      var id = _ref[0], value = _ref[1];
+      return {
+        id: id,
+        useValuesFromTriggerTime: value.useValuesFromTriggerTime,
+        trigger: {
+          initialValue: value.trigger.initialValue,
+          persistent: value.trigger.persistent,
+          math: value.trigger.math
+        },
+        priority: value.priority,
+        delay: value.delay,
+        assignments: (value.assignments || []).map(function (a) { return { target: a.target, math: a.math }; })
+      };
+    });
+  }
+
+  sbmlSimulationUtilities.setEvent = function (id, field, value) {
+    if (!events[id]) return;
+    events[id][field] = value;
+  }
+
+  // Set a nested field on the trigger object of an event
+  sbmlSimulationUtilities.setEventTrigger = function (id, field, value) {
+    if (!events[id]) return;
+    events[id].trigger[field] = value;
+  }
+
+  // Add an assignment to the event
+  sbmlSimulationUtilities.addEventAssignment = function (id, target, math) {
+    if (!events[id]) return;
+    if (!Array.isArray(events[id].assignments)) events[id].assignments = [];
+    events[id].assignments.push({ target: target || "", math: math || "" });
+  }
+
+  // Remove an assignment at a given index from the event
+  sbmlSimulationUtilities.removeEventAssignment = function (id, index) {
+    if (!events[id] || !Array.isArray(events[id].assignments)) return;
+    if (index < 0 || index >= events[id].assignments.length) return;
+    events[id].assignments.splice(index, 1);
+  }
+
+  sbmlSimulationUtilities.resetEvents = function () {
+    events = {};
   }
 
   // General utilities not associated with any specific SBML simulation feature.
@@ -194,6 +280,7 @@ module.exports = function () {
     sbmlSimulationUtilities.resetFunctionDefinitions();
     sbmlSimulationUtilities.resetInitialAssignments();
     sbmlSimulationUtilities.resetRules();
+    sbmlSimulationUtilities.resetEvents();
   }
 
   return sbmlSimulationUtilities;
