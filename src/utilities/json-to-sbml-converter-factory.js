@@ -632,6 +632,58 @@ module.exports = function () {
         }
 
 
+        // Add Events
+        var events = sbmlSimulationUtilities.getEvents();
+        for (var e of events) {
+            const evt = model.createEvent();
+            if (e.id) evt.setId(e.id);
+            if (typeof e.useValuesFromTriggerTime === 'boolean') {
+                evt.setUseValuesFromTriggerTime(e.useValuesFromTriggerTime);
+            }
+
+            // Trigger
+            const trig = evt.createTrigger();
+            if (e.trigger) {
+                if (typeof e.trigger.initialValue === 'boolean') {
+                    trig.setInitialValue(e.trigger.initialValue);
+                }
+                if (typeof e.trigger.persistent === 'boolean') {
+                    trig.setPersistent(e.trigger.persistent);
+                }
+                if (e.trigger.math !== undefined && e.trigger.math !== null) {
+                    const parser = new libsbmlInstance.SBMLFormulaParser();
+                    const tmath = parser.parseL3Formula(e.trigger.math);
+                    trig.setMath(tmath);
+                }
+            }
+
+            // Priority (optional)
+            if (e.priority !== undefined && e.priority !== null && e.priority !== "") {
+                const parser = new libsbmlInstance.SBMLFormulaParser();
+                const pmath = parser.parseL3Formula(e.priority);
+                const pr = evt.createPriority();
+                pr.setMath(pmath);
+            }
+
+            // Delay (optional)
+            if (e.delay !== undefined && e.delay !== null && e.delay !== "") {
+                const parser = new libsbmlInstance.SBMLFormulaParser();
+                const dmath = parser.parseL3Formula(e.delay);
+                const del = evt.createDelay();
+                del.setMath(dmath);
+            }
+
+            // Event Assignments
+            var evAssignments = Array.isArray(e.assignments) ? e.assignments : [];
+            for (var a of evAssignments) {
+                const ea = evt.createEventAssignment();
+                if (a.target) ea.setVariable(a.target);
+                const parser = new libsbmlInstance.SBMLFormulaParser();
+                const amath = parser.parseL3Formula(a.math || "");
+                ea.setMath(amath);
+            }
+        }
+
         // Add Initial Assignments
         var initialAssignments = sbmlSimulationUtilities.getInitialAssignments();
         for (var ia of initialAssignments) {
