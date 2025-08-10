@@ -74,6 +74,12 @@ module.exports = function () {
     }));
   }
 
+  sbmlSimulationUtilities.getParameterById = function (id) {
+    if (!parameters[id]) return null;
+    var p = parameters[id];
+    return { id: id, name: p.name, value: p.value, unit: p.unit, constant: p.constant };
+  }
+
   sbmlSimulationUtilities.setParameter = function (id, field, value) {
     if (!parameters[id]) return;
     parameters[id][field] = value;
@@ -112,6 +118,12 @@ module.exports = function () {
     }));
   }
 
+  sbmlSimulationUtilities.getFunctionDefinitionById = function (id) {
+    if (!functionDefinitions[id]) return null;
+    var f = functionDefinitions[id];
+    return { id: id, name: f.name, args: (f.args || []).slice(), body: f.body };
+  }
+
   sbmlSimulationUtilities.setFunctionDefinition = function (id, field, value) {
     if (!functionDefinitions[id]) return;
     functionDefinitions[id][field] = value;
@@ -146,6 +158,12 @@ module.exports = function () {
     return Object.entries(initialAssignments).map( ([id, {symbol, math}]) => ({
       id, symbol, math
     }));
+  }
+
+  sbmlSimulationUtilities.getInitialAssignmentById = function (id) {
+    if (!initialAssignments[id]) return null;
+    var ia = initialAssignments[id];
+    return { id: id, symbol: ia.symbol, math: ia.math };
   }
 
   sbmlSimulationUtilities.setInitialAssignment = function (id, field, value) {
@@ -184,6 +202,12 @@ module.exports = function () {
     return Object.entries(rules).map( ([id, {type, target, math}]) => ({
       id, type, target, math
     }));
+  }
+
+  sbmlSimulationUtilities.getRuleById = function (id) {
+    if (!rules[id]) return null;
+    var r = rules[id];
+    return { id: id, type: r.type, target: r.target, math: r.math };
   }
 
   sbmlSimulationUtilities.setRule = function (id, field, value) {
@@ -245,6 +269,19 @@ module.exports = function () {
         assignments: (value.assignments || []).map(function (a) { return { target: a.target, math: a.math }; })
       };
     });
+  }
+
+  sbmlSimulationUtilities.getEventById = function (id) {
+    if (!events[id]) return null;
+    var e = events[id];
+    return {
+      id: id,
+      useValuesFromTriggerTime: e.useValuesFromTriggerTime,
+      trigger: { initialValue: e.trigger.initialValue, persistent: e.trigger.persistent, math: e.trigger.math },
+      priority: e.priority,
+      delay: e.delay,
+      assignments: (e.assignments || []).map(function (a) { return { target: a.target, math: a.math }; })
+    };
   }
 
   sbmlSimulationUtilities.setEvent = function (id, field, value) {
@@ -317,6 +354,12 @@ module.exports = function () {
     });
   }
 
+  sbmlSimulationUtilities.getUnitDefinitionById = function (id) {
+    if (!customUnits[id]) return null;
+    var u = customUnits[id];
+    return { id: id, name: u.name, units: (u.units || []).map(function (x) { return { kind: x.kind, exponent: x.exponent, scale: x.scale, multiplier: x.multiplier }; }) };
+  }
+
   sbmlSimulationUtilities.setUnitDefinition = function (id, field, value) {
     if (!customUnits[id]) return;
     customUnits[id][field] = value;
@@ -330,7 +373,6 @@ module.exports = function () {
     return baseUnitKinds.slice();
   }
 
-  // Add a single unit entry to a unit definition (append only)
   sbmlSimulationUtilities.addUnitToDefinition = function (id, kind, exponent, scale, multiplier) {
     if (!customUnits[id]) return;
     var normalized = {
