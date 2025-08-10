@@ -43,23 +43,23 @@ module.exports = function () {
     return namespace + "_" + sbmlSimulationUtilities.generateUUID();
   }
 
-  sbmlSimulationUtilities.addParameter = function (name, value, unit, constant) {
+  sbmlSimulationUtilities.addParameter = function (name, value, units, constant) {
     var id = sbmlSimulationUtilities.generateSpecializedID("param");
     parameters[id] = {
       name: name,
       value: value,
-      unit: unit,
+      units: units,
       constant: constant
     }
   }
 
   // Should only be used while importing, not really anything else
-  // Consider using sbmlSimulationUtilities.addParameter(name, value, unit, constant)
-  sbmlSimulationUtilities.addParameterWithId = function(id, name, value, unit, constant){
+  // Consider using sbmlSimulationUtilities.addParameter(name, value, units, constant)
+  sbmlSimulationUtilities.addParameterWithId = function(id, name, value, units, constant){
     parameters[id] = {
       name: name,
       value: value,
-      unit: unit,
+      units: units,
       constant: constant
     }
   }
@@ -69,15 +69,15 @@ module.exports = function () {
   }
 
   sbmlSimulationUtilities.getParameters = function () {
-    return Object.entries(parameters).map( ([id, {name, value, unit, constant}]) => ({
-      id, name, value, unit, constant
+    return Object.entries(parameters).map( ([id, {name, value, units, constant}]) => ({
+      id, name, value, units, constant
     }));
   }
 
   sbmlSimulationUtilities.getParameterById = function (id) {
     if (!parameters[id]) return null;
     var p = parameters[id];
-    return { id: id, name: p.name, value: p.value, unit: p.unit, constant: p.constant };
+    return { id: id, name: p.name, value: p.value, units: p.units, constant: p.constant };
   }
 
   sbmlSimulationUtilities.setParameter = function (id, field, value) {

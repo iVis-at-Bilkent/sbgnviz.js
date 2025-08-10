@@ -382,7 +382,9 @@ module.exports = function () {
       paramConstant = true;
       if (parameter.isSetConstant())
         paramConstant = parameter.getConstant();
-      sbmlSimulationUtilities.addParameterWithId(paramId, paramName, paramValue, "", paramConstant);
+      let paramUnits = "";
+      if (parameter.isSetUnits()) paramUnits = parameter.getUnits();
+      sbmlSimulationUtilities.addParameterWithId(paramId, paramName, paramValue, paramUnits, paramConstant);
     }
   }
 
