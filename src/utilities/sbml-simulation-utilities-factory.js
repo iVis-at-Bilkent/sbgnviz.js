@@ -280,7 +280,7 @@ module.exports = function () {
   sbmlSimulationUtilities.addUnitDefinition = function (name, units) {
     var id = sbmlSimulationUtilities.generateSpecializedID('unit');
     customUnits[id] = {
-      name: name || id,
+      name: name,
       units: Array.isArray(units) ? units.map(function(u){
         return {
           kind: u.kind || '',
@@ -294,7 +294,7 @@ module.exports = function () {
 
   sbmlSimulationUtilities.addUnitDefinitionWithId = function (id, name, units) {
     customUnits[id] = {
-      name: name || id,
+      name: name,
       units: Array.isArray(units) ? units.map(function(u){
         return {
           kind: u.kind || '',
