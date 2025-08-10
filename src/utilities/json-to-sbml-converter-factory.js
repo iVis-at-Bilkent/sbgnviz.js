@@ -134,6 +134,8 @@ module.exports = function () {
             if (p.units) {
                 param.setUnits(p.units);
             }
+
+            console.log(p);
         }
 
         // Create UnitDefinitions (custom units)
