@@ -546,6 +546,8 @@ sbmlToJson.addCompartments = function (model,cytoscapeJsNodes, compartmentBoundi
         simulationData.size = compartment.getVolume();
       if(compartment.isSetConstant())
         simulationData.constant = compartment.getConstant();
+      if(compartment.isSetUnits())
+        simulationData.units = compartment.getUnits();
       
       let styleAttributes = {
         "background-color": "",
@@ -711,6 +713,8 @@ sbmlToJson.addSpecies = function(model, cytoscapeJsNodes, compartmentBoundingBox
     }
     if(species.isSetHasOnlySubstanceUnits())
       simulationData.hasOnlySubstanceUnits = species.getHasOnlySubstanceUnits();
+    if(species.isSetSubstanceUnits())
+      simulationData.substanceUnits = species.getSubstanceUnits();
     if(species.isSetConstant())
       simulationData.constant = species.getConstant();
     if(species.isSetBoundaryCondition())

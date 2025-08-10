@@ -169,6 +169,9 @@ module.exports = function () {
                     comp.setConstant(simulationData["constant"]);
                 if(simulationData["spatialDimensions"] !== null)
                     comp.setSpatialDimensions(simulationData["spatialDimensions"]);
+                if(simulationData["units"]) {
+                    comp.setUnits(simulationData["units"]);
+                }
             }
             if(nodes[i]._private.data.label)
                 comp.setName(nodes[i]._private.data.label)
@@ -257,6 +260,9 @@ module.exports = function () {
                     newSpecies.setInitialAmount(simulationData["initialAmount"]);
                 if(simulationData["initialConcentration"] !== null && !simulationData["hasOnlySubstanceUnits"])
                     newSpecies.setInitialConcentration(simulationData["initialConcentration"]);
+                if(simulationData["substanceUnits"]) {
+                    newSpecies.setSubstanceUnits(simulationData["substanceUnits"]);
+                }
                 if(simulationData["boundaryCondition"] !== null)
                     newSpecies.setBoundaryCondition(simulationData["boundaryCondition"]);
                 if(simulationData["constant"] !== null)
