@@ -5,7 +5,7 @@ module.exports = function () {
   var rules = {} // { id = str: { type = str, target = str, math: str } },
   var events = {} // { id = str: { useValuesFromTriggerTime: bool, trigger: { initialValue: bool, persistent: bool, math: str }, priority: str, delay: str, assignments: [{ target: str, math: str }] } }
   // Custom unit definitions; base unit kinds are always available separately
-  var customUnits = {} // { id = str: { units: [{ kind: str, exponent: int, scale: int, multiplier: number }] } }
+  var customUnits = {} // { id = str: { name: str, units: [{ kind: str, exponent: int, scale: int, multiplier: number }] } }
 
   // Built-in SBML unit kinds (always available)
   var baseUnitKinds = [
@@ -277,9 +277,10 @@ module.exports = function () {
   }
 
   // Unit Definitions (custom)
-  sbmlSimulationUtilities.addUnitDefinition = function (units) {
+  sbmlSimulationUtilities.addUnitDefinition = function (name, units) {
     var id = sbmlSimulationUtilities.generateSpecializedID('unit');
     customUnits[id] = {
+      name: name || id,
       units: Array.isArray(units) ? units.map(function(u){
         return {
           kind: u.kind || '',
@@ -291,8 +292,9 @@ module.exports = function () {
     };
   }
 
-  sbmlSimulationUtilities.addUnitDefinitionWithId = function (id, units) {
+  sbmlSimulationUtilities.addUnitDefinitionWithId = function (id, name, units) {
     customUnits[id] = {
+      name: name || id,
       units: Array.isArray(units) ? units.map(function(u){
         return {
           kind: u.kind || '',
@@ -311,23 +313,13 @@ module.exports = function () {
   sbmlSimulationUtilities.getUnitDefinitions = function () {
     return Object.entries(customUnits).map(function(_ref){
       var id = _ref[0], value = _ref[1];
-      return { id: id, units: value.units.slice() };
+      return { id: id, name: value.name, units: value.units.slice() };
     });
   }
 
   sbmlSimulationUtilities.setUnitDefinition = function (id, field, value) {
     if (!customUnits[id]) return;
     customUnits[id][field] = value;
-  }
-
-  // Rename a unit definition id (name == id)
-  sbmlSimulationUtilities.setUnitDefinitionId = function (id, newId) {
-    if (!customUnits[id]) return;
-    if (!newId || id === newId) return;
-    if (customUnits[newId]) return; // avoid clobbering existing entry
-    var value = customUnits[id];
-    delete customUnits[id];
-    customUnits[newId] = value;
   }
 
   sbmlSimulationUtilities.resetUnitDefinitions = function () {

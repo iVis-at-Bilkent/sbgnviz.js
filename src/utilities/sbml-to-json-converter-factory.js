@@ -340,7 +340,9 @@ module.exports = function () {
 
       const udId = ud.isSetIdAttribute() ? ud.getId() : undefined;
       if (!udId) continue;
-      sbmlSimulationUtilities.addUnitDefinitionWithId(udId, []);
+      // name fallback to id if not set
+      let udName = ud.isSetName() ? ud.getName() : udId;
+      sbmlSimulationUtilities.addUnitDefinitionWithId(udId, udName, []);
 
       const xmlUnits = udIdToXmlUnits.get(udId) || [];
       for (let j = 0; j < ud.getNumUnits(); j++) {

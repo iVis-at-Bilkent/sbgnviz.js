@@ -138,6 +138,7 @@ module.exports = function () {
         for (var ud of unitDefs) {
             const udObj = model.createUnitDefinition();
             udObj.setId(ud.id);
+            if (ud.name) udObj.setName(ud.name);
             for (var u of (ud.units || [])) {
                 const unit = udObj.createUnit();
                 const ukc = new libsbmlInstance.UnitKindConstructor();
