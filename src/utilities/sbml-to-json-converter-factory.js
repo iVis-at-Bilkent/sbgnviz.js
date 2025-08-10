@@ -221,6 +221,7 @@ module.exports = function () {
 
     sbmlToJson.addParameters(model);
     sbmlToJson.addFunctionDefinitions(model);
+    sbmlToJson.addUnitDefinitions(xmlString, model);
     sbmlToJson.addCompartments(model, cytoscapeJsNodes, compartmentBoundingBoxes, containerNodeMap);
     sbmlToJson.addSpecies(model, cytoscapeJsNodes, compartmentBoundingBoxes, containerNodeMap);
     sbmlToJson.addReactions(model, cytoscapeJsEdges,cytoscapeJsNodes);
@@ -303,6 +304,65 @@ module.exports = function () {
       if(fd.isSetName())
         fdName = fd.getName();
       sbmlSimulationUtilities.addFunctionDefinitionWithId(fdId, fdName, args, formulaBody);
+    }
+  }
+
+  // Import UnitDefinitions (custom units) with multiplier from XML parsing (libsbmljs lacks getMultiplier)
+  sbmlToJson.addUnitDefinitions = function(xmlString, model) {
+    // Build quick lookup: UnitDefinition id -> list of unit attrs from XML
+    let udIdToXmlUnits = new Map();
+    try {
+      parseString(xmlString, function(err, res){
+        if (err || !res || !res.sbml || !res.sbml.model) return;
+        const list = res.sbml.model[0].listOfUnitDefinitions || [];
+        if (list.length === 0) return;
+        const uds = list[0].unitDefinition || [];
+        for (const ud of uds) {
+          const udId = ud.$?.id;
+          if (!udId) continue;
+          const ulist = (ud.listOfUnits && ud.listOfUnits[0] && ud.listOfUnits[0].unit) || [];
+          const xmlUnits = ulist.map(function(u){
+            return {
+              kind: u.$?.kind,
+              exponent: (u.$ && (u.$.exponent !== undefined)) ? Number(u.$.exponent) : undefined,
+              scale: (u.$ && (u.$.scale !== undefined)) ? Number(u.$.scale) : undefined,
+              multiplier: (u.$ && (u.$.multiplier !== undefined)) ? Number(u.$.multiplier) : undefined
+            };
+          });
+          udIdToXmlUnits.set(udId, xmlUnits);
+        }
+      });
+    } catch(e) {}
+
+    for (let i = 0; i < model.getNumUnitDefinitions(); i++) {
+      const ud = model.getUnitDefinition(i);
+      if (!ud) continue;
+
+      const udId = ud.isSetIdAttribute() ? ud.getId() : undefined;
+      if (!udId) continue;
+      sbmlSimulationUtilities.addUnitDefinitionWithId(udId, []);
+
+      const xmlUnits = udIdToXmlUnits.get(udId) || [];
+      for (let j = 0; j < ud.getNumUnits(); j++) {
+        const u = ud.getUnit(j);
+        if (!u) continue;
+
+        const kindCode = u.getKind();
+        const ukc = new libsbmlInstance.UnitKindConstructor();
+        let kindStr = '';
+        const baseKinds = sbmlSimulationUtilities.getBaseUnitKinds();
+        for (let name of baseKinds) { if (ukc.fromName(name) === kindCode) { kindStr = name; break; } }
+
+        let exponent = 1; if (u.isSetExponent()) exponent = u.getExponent();
+        let scale = 0; if (u.isSetScale()) scale = u.getScale();
+        let multiplier = 1;
+        // Try to get from XML, align by index if available
+        if (xmlUnits[j] && xmlUnits[j].multiplier !== undefined) {
+          multiplier = Number(xmlUnits[j].multiplier);
+        }
+
+        sbmlSimulationUtilities.addUnitToDefinition(udId, kindStr, exponent, scale, multiplier);
+      }
     }
   }
 

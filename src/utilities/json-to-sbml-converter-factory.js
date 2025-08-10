@@ -133,6 +133,22 @@ module.exports = function () {
             param.setConstant(p.constant);
         }
 
+        // Create UnitDefinitions (custom units)
+        var unitDefs = sbmlSimulationUtilities.getUnitDefinitions();
+        for (var ud of unitDefs) {
+            const udObj = model.createUnitDefinition();
+            udObj.setId(ud.id);
+            for (var u of (ud.units || [])) {
+                const unit = udObj.createUnit();
+                const ukc = new libsbmlInstance.UnitKindConstructor();
+                const kindCode = ukc.fromName(u.kind || '');
+                unit.setKind(kindCode);
+                unit.setExponent(u.exponent);
+                unit.setScale(u.scale);
+                unit.setMultiplier(u.multiplier);
+            }
+        }
+
         // Create compartment
         for (let i = 0; i < nodes.length; i++)
         {

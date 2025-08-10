@@ -4,6 +4,16 @@ module.exports = function () {
   var initialAssignments = {} // { id = str: { symbol = str, math: str } },     symbol corresponds to the target of IA.
   var rules = {} // { id = str: { type = str, target = str, math: str } },
   var events = {} // { id = str: { useValuesFromTriggerTime: bool, trigger: { initialValue: bool, persistent: bool, math: str }, priority: str, delay: str, assignments: [{ target: str, math: str }] } }
+  // Custom unit definitions; base unit kinds are always available separately
+  var customUnits = {} // { id = str: { units: [{ kind: str, exponent: int, scale: int, multiplier: number }] } }
+
+  // Built-in SBML unit kinds (always available)
+  var baseUnitKinds = [
+    'ampere','avogadro','becquerel','candela','coulomb','dimensionless','farad','gram','gray',
+    'henry','hertz','item','joule','kelvin','kilogram','litre','lumen','lux','metre','mole',
+    'newton','ohm','pascal','radian','second','siemens','sievert','steradian','tesla','volt',
+    'watt','weber'
+  ];
   
   var cy;
   var sbmlSimulationUtilities = function (param) {
@@ -266,6 +276,87 @@ module.exports = function () {
     events = {};
   }
 
+  // Unit Definitions (custom)
+  sbmlSimulationUtilities.addUnitDefinition = function (units) {
+    var id = sbmlSimulationUtilities.generateSpecializedID('unit');
+    customUnits[id] = {
+      units: Array.isArray(units) ? units.map(function(u){
+        return {
+          kind: u.kind || '',
+          exponent: (typeof u.exponent === 'number') ? u.exponent : 1,
+          scale: (typeof u.scale === 'number') ? u.scale : 0,
+          multiplier: (typeof u.multiplier === 'number') ? u.multiplier : 1
+        };
+      }) : []
+    };
+  }
+
+  sbmlSimulationUtilities.addUnitDefinitionWithId = function (id, units) {
+    customUnits[id] = {
+      units: Array.isArray(units) ? units.map(function(u){
+        return {
+          kind: u.kind || '',
+          exponent: (typeof u.exponent === 'number') ? u.exponent : 1,
+          scale: (typeof u.scale === 'number') ? u.scale : 0,
+          multiplier: (typeof u.multiplier === 'number') ? u.multiplier : 1
+        };
+      }) : []
+    };
+  }
+
+  sbmlSimulationUtilities.removeUnitDefinition = function (id) {
+    delete customUnits[id];
+  }
+
+  sbmlSimulationUtilities.getUnitDefinitions = function () {
+    return Object.entries(customUnits).map(function(_ref){
+      var id = _ref[0], value = _ref[1];
+      return { id: id, units: value.units.slice() };
+    });
+  }
+
+  sbmlSimulationUtilities.setUnitDefinition = function (id, field, value) {
+    if (!customUnits[id]) return;
+    customUnits[id][field] = value;
+  }
+
+  // Rename a unit definition id (name == id)
+  sbmlSimulationUtilities.setUnitDefinitionId = function (id, newId) {
+    if (!customUnits[id]) return;
+    if (!newId || id === newId) return;
+    if (customUnits[newId]) return; // avoid clobbering existing entry
+    var value = customUnits[id];
+    delete customUnits[id];
+    customUnits[newId] = value;
+  }
+
+  sbmlSimulationUtilities.resetUnitDefinitions = function () {
+    customUnits = {};
+  }
+
+  sbmlSimulationUtilities.getBaseUnitKinds = function () {
+    return baseUnitKinds.slice();
+  }
+
+  // Add a single unit entry to a unit definition (append only)
+  sbmlSimulationUtilities.addUnitToDefinition = function (id, kind, exponent, scale, multiplier) {
+    if (!customUnits[id]) return;
+    var normalized = {
+      kind: kind || '',
+      exponent: (typeof exponent === 'number') ? exponent : 1,
+      scale: (typeof scale === 'number') ? scale : 0,
+      multiplier: (typeof multiplier === 'number') ? multiplier : 1
+    };
+    customUnits[id].units.push(normalized);
+  }
+
+  sbmlSimulationUtilities.removeUnitFromDefinition = function (id, index) {
+    if (!customUnits[id] || !Array.isArray(customUnits[id].units)) return;
+    if (typeof index !== 'number') return;
+    if (index < 0 || index >= customUnits[id].units.length) return;
+    customUnits[id].units.splice(index, 1);
+  }
+
   // General utilities not associated with any specific SBML simulation feature.
   sbmlSimulationUtilities.convertNamesToIdsInFormula = function (formula) {
 
@@ -281,6 +372,7 @@ module.exports = function () {
     sbmlSimulationUtilities.resetInitialAssignments();
     sbmlSimulationUtilities.resetRules();
     sbmlSimulationUtilities.resetEvents();
+    sbmlSimulationUtilities.resetUnitDefinitions();
   }
 
   return sbmlSimulationUtilities;
