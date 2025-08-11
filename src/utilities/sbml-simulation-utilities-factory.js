@@ -396,7 +396,7 @@ module.exports = function () {
     return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   }
 
-  sbmlSimulationUtilities.convertNamesToIdsInFormula = function (formula) {
+  sbmlSimulationUtilities.convertNamesToIdsInFormula = function (formula, additional = null) {
     if (!formula || typeof formula !== 'string') {
       return formula;
     }
@@ -427,9 +427,14 @@ module.exports = function () {
     }
 
     var allNameToId = Object.assign({}, paramNameToId, funcNameToId, nodeLabelToId);
+    if (additional && typeof additional === 'object') {
+      allNameToId = Object.assign({}, allNameToId, additional);
+    }
+
     if (Object.keys(allNameToId).length === 0) {
       return formula;
     }
+
     var sortedNames = Object.keys(allNameToId).sort(function (a, b) {
       return b.length - a.length;
     });
@@ -443,7 +448,7 @@ module.exports = function () {
     return result;
   };
 
-  sbmlSimulationUtilities.convertIdsToNamesInFormula = function (formula) {
+  sbmlSimulationUtilities.convertIdsToNamesInFormula = function (formula, additional = null) {
     if (!formula || typeof formula !== 'string') {
       return formula;
     }
@@ -476,6 +481,13 @@ module.exports = function () {
     }
 
     var allIdToName = Object.assign({}, paramIdToName, funcIdToName, nodeIdToLabel);
+    if (additional && typeof additional === 'object') {
+      allIdToName = Object.assign({}, allIdToName, additional);
+    }
+
+    if (Object.keys(allIdToName).length === 0) {
+      return formula;
+    }
 
     var sortedIds = Object.keys(allIdToName).sort(function(a, b) {
       return b.length - a.length;
