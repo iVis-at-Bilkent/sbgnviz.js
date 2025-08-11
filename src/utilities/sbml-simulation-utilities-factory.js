@@ -436,11 +436,10 @@ module.exports = function () {
 
     var idChar = "[A-Za-z0-9_]";
     var pattern = sortedNames.map(escapeRegExp).join("|");
-    var regex = new RegExp("(^|[^" + idChar + "])(" + pattern + ")(?=[^" + idChar + "]|$)", "g");
-    var result = formula.replace(regex, function (match, before, name) {
-      return before + allNameToId[name];
+    var regex = new RegExp("(?<!"+idChar+")(" + pattern + ")(?!"+idChar+")", "g");
+    var result = formula.replace(regex, function (match, name) {
+      return allNameToId[name];
     });
-
     return result;
   };
 
@@ -484,11 +483,10 @@ module.exports = function () {
 
     var idChar = "[A-Za-z0-9_]";
     var pattern = sortedIds.map(escapeRegExp).join("|");
-    var regex = new RegExp("(^|[^" + idChar + "])(" + pattern + ")(?=[^" + idChar + "]|$)", "g");
-    var result = formula.replace(regex, function (match, before, name) {
-      return before + allNameToId[name];
+    var regex = new RegExp("(?<!"+idChar+")(" + pattern + ")(?!"+idChar+")", "g");
+    var result = formula.replace(regex, function (match, name) {
+      return allIdToName[name];
     });
-
     return result;
   }
 
