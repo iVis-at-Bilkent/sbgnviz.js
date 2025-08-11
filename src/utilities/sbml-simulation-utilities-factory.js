@@ -392,12 +392,104 @@ module.exports = function () {
   }
 
   // General utilities not associated with any specific SBML simulation feature.
-  sbmlSimulationUtilities.convertNamesToIdsInFormula = function (formula) {
-
+  function escapeRegExp(string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   }
 
-  sbmlSimulationUtilities.convertIdsToNamesInFormula = function (formula) {
+  sbmlSimulationUtilities.convertNamesToIdsInFormula = function (formula) {
+    if (!formula || typeof formula !== 'string') {
+      return formula;
+    }
 
+    var paramNameToId = {};
+    Object.entries(parameters).forEach(function ([id, param]) {
+      if (param.name && param.name !== id) {
+        paramNameToId[param.name] = id;
+      }
+    });
+
+    var funcNameToId = {};
+    Object.entries(functionDefinitions).forEach(function ([id, func]) {
+      if (func.name && func.name !== id) {
+        funcNameToId[func.name] = id;
+      }
+    });
+
+    var nodeLabelToId = {};
+    if (cy) {
+      cy.nodes().forEach(function (node) {
+        var label = node.data('label');
+        var nodeId = node.id();
+        if (label && label !== nodeId) {
+          nodeLabelToId[label] = nodeId;
+        }
+      });
+    }
+
+    var allNameToId = Object.assign({}, paramNameToId, funcNameToId, nodeLabelToId);
+    if (Object.keys(allNameToId).length === 0) {
+      return formula;
+    }
+    var sortedNames = Object.keys(allNameToId).sort(function (a, b) {
+      return b.length - a.length;
+    });
+
+    var idChar = "[A-Za-z0-9_]";
+    var pattern = sortedNames.map(escapeRegExp).join("|");
+    var regex = new RegExp("(^|[^" + idChar + "])(" + pattern + ")(?=[^" + idChar + "]|$)", "g");
+    var result = formula.replace(regex, function (match, before, name) {
+      return before + allNameToId[name];
+    });
+
+    return result;
+  };
+
+  sbmlSimulationUtilities.convertIdsToNamesInFormula = function (formula) {
+    if (!formula || typeof formula !== 'string') {
+      return formula;
+    }
+
+    var result = formula;
+    
+    var paramIdToName = {};
+    Object.entries(parameters).forEach(function([id, param]) {
+      if (param.name && param.name !== id) {
+        paramIdToName[id] = param.name;
+      }
+    });
+
+    var funcIdToName = {};
+    Object.entries(functionDefinitions).forEach(function([id, func]) {
+      if (func.name && func.name !== id) {
+        funcIdToName[id] = func.name;
+      }
+    });
+
+    var nodeIdToLabel = {};
+    if (cy) {
+      cy.nodes().forEach(function(node) {
+        var label = node.data('label');
+        var nodeId = node.id();
+        if (label && label !== nodeId) {
+          nodeIdToLabel[nodeId] = label;
+        }
+      });
+    }
+
+    var allIdToName = Object.assign({}, paramIdToName, funcIdToName, nodeIdToLabel);
+
+    var sortedIds = Object.keys(allIdToName).sort(function(a, b) {
+      return b.length - a.length;
+    });
+
+    var idChar = "[A-Za-z0-9_]";
+    var pattern = sortedIds.map(escapeRegExp).join("|");
+    var regex = new RegExp("(^|[^" + idChar + "])(" + pattern + ")(?=[^" + idChar + "]|$)", "g");
+    var result = formula.replace(regex, function (match, before, name) {
+      return before + allNameToId[name];
+    });
+
+    return result;
   }
 
   sbmlSimulationUtilities.resetAll = function () {

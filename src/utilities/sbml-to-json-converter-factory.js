@@ -27,93 +27,6 @@ module.exports = function () {
     });
   }
 
-  // add events
-  sbmlToJson.addEvents = function(model) {
-    // Iterate over events
-    for (let i = 0; i < model.getNumEvents(); i++) {
-      const evt = model.getEvent(i);
-
-      // id
-      let evtId;
-      if (evt.isSetIdAttribute()) {
-        evtId = evt.getId();
-      }
-
-      // useValuesFromTriggerTime
-      let useValuesFromTriggerTime = false;
-      if (evt.isSetUseValuesFromTriggerTime()) {
-        useValuesFromTriggerTime = evt.getUseValuesFromTriggerTime();
-      }
-
-      // trigger fields
-      let trigInitialValue = false;
-      let trigPersistent = false;
-      let trigMath = "";
-      if (evt.isSetTrigger()) {
-        const trig = evt.getTrigger();
-        if (trig.isSetInitialValue()) trigInitialValue = trig.getInitialValue();
-        if (trig.isSetPersistent()) trigPersistent = trig.getPersistent();
-        if (trig.isSetMath()) {
-          trigMath = new libsbmlInstance.SBMLFormulaParser().formulaToL3String(trig.getMath());
-        }
-      }
-
-      // priority
-      let priority = "";
-      if (evt.isSetPriority()) {
-        const p = evt.getPriority();
-        if (p.isSetMath()) {
-          priority = new libsbmlInstance.SBMLFormulaParser().formulaToL3String(p.getMath());
-        }
-      }
-
-      // delay
-      let delay = "";
-      if (evt.isSetDelay()) {
-        const d = evt.getDelay();
-        if (d.isSetMath()) {
-          delay = new libsbmlInstance.SBMLFormulaParser().formulaToL3String(d.getMath());
-        }
-      }
-
-      // assignments
-      let assignments = [];
-      for (let j = 0; j < evt.getNumEventAssignments(); j++) {
-        const ea = evt.getEventAssignment(j);
-        let target = "";
-        if (ea.isSetVariable()) target = ea.getVariable();
-        let math = "";
-        if (ea.isSetMath()) {
-          math = new libsbmlInstance.SBMLFormulaParser().formulaToL3String(ea.getMath());
-        }
-        assignments.push({ target, math });
-      }
-
-      if (evtId) {
-        sbmlSimulationUtilities.addEventWithId(
-          evtId,
-          useValuesFromTriggerTime,
-          trigInitialValue,
-          trigPersistent,
-          trigMath,
-          priority,
-          delay,
-          assignments
-        );
-      } else {
-        sbmlSimulationUtilities.addEvent(
-          useValuesFromTriggerTime,
-          trigInitialValue,
-          trigPersistent,
-          trigMath,
-          priority,
-          delay,
-          assignments
-        );
-      }
-    }
-  }
-
   var sboToNodeClass = {
     278: "rna",
     334: "antisense rna",
@@ -243,6 +156,85 @@ module.exports = function () {
     speciesCompartmentMap = new Map;
     return cytoscapeJsGraph;
   };
+
+  sbmlToJson.addEvents = function(model) {
+    for (let i = 0; i < model.getNumEvents(); i++) {
+      const evt = model.getEvent(i);
+
+      let evtId;
+      if (evt.isSetIdAttribute()) {
+        evtId = evt.getId();
+      }
+
+      let useValuesFromTriggerTime = false;
+      if (evt.isSetUseValuesFromTriggerTime()) {
+        useValuesFromTriggerTime = evt.getUseValuesFromTriggerTime();
+      }
+
+      let trigInitialValue = false;
+      let trigPersistent = false;
+      let trigMath = "";
+      if (evt.isSetTrigger()) {
+        const trig = evt.getTrigger();
+        if (trig.isSetInitialValue()) trigInitialValue = trig.getInitialValue();
+        if (trig.isSetPersistent()) trigPersistent = trig.getPersistent();
+        if (trig.isSetMath()) {
+          trigMath = new libsbmlInstance.SBMLFormulaParser().formulaToL3String(trig.getMath());
+        }
+      }
+
+      let priority = "";
+      if (evt.isSetPriority()) {
+        const p = evt.getPriority();
+        if (p.isSetMath()) {
+          priority = new libsbmlInstance.SBMLFormulaParser().formulaToL3String(p.getMath());
+        }
+      }
+
+      let delay = "";
+      if (evt.isSetDelay()) {
+        const d = evt.getDelay();
+        if (d.isSetMath()) {
+          delay = new libsbmlInstance.SBMLFormulaParser().formulaToL3String(d.getMath());
+        }
+      }
+
+      let assignments = [];
+      for (let j = 0; j < evt.getNumEventAssignments(); j++) {
+        const ea = evt.getEventAssignment(j);
+        let target = "";
+        if (ea.isSetVariable()) target = ea.getVariable();
+        let math = "";
+        if (ea.isSetMath()) {
+          math = new libsbmlInstance.SBMLFormulaParser().formulaToL3String(ea.getMath());
+        }
+        assignments.push({ target, math });
+      }
+
+      if (evtId) {
+        sbmlSimulationUtilities.addEventWithId(
+          evtId,
+          useValuesFromTriggerTime,
+          trigInitialValue,
+          trigPersistent,
+          trigMath,
+          priority,
+          delay,
+          assignments
+        );
+      } else {
+        sbmlSimulationUtilities.addEvent(
+          useValuesFromTriggerTime,
+          trigInitialValue,
+          trigPersistent,
+          trigMath,
+          priority,
+          delay,
+          assignments
+        );
+      }
+    }
+  }
 
   sbmlToJson.addInitialAssignments = function(model) {
     for(let i = 0; i < model.getNumInitialAssignments() ; i++) {
@@ -1173,6 +1165,20 @@ sbmlToJson.addReactions = function(model, cytoscapeJsEdges, cytoscapeJsNodes) {
     let simulationData = {};
     if(reaction.isSetKineticLaw()){
       simulationData.kineticLaw = reaction.getKineticLaw().getFormula();
+      
+      // Import Local Parameters
+      let localParameters = [];
+      for(let j = 0; j < reaction.getKineticLaw().getNumLocalParameters(); j++){
+        let localParam = reaction.getKineticLaw().getLocalParameter(j);
+        let localParamData = {
+          id: localParam.getId(),
+          name: localParam.getName() || localParam.getId(),
+          quantity: localParam.getValue(),
+          units: localParam.getUnits() || ""
+        };
+        localParameters.push(localParamData);
+      }
+      simulationData.localParameters = localParameters;
     }
     reactionData.simulation = simulationData;
     resultJson.push({"data": reactionData, "group": "nodes", "classes": "reaction"}); 

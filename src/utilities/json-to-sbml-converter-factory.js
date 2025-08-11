@@ -482,6 +482,8 @@ module.exports = function () {
                 var localp = k1.createLocalParameter();
                 localp.setValue(lp.quantity);
                 localp.setName(lp.name.replace(/-/g, '_'));
+                localp.setId(lp.id.replace(/-/g, '_'));
+                localp.setUnits(lp.units);
             }
             const parser = new libsbmlInstance.SBMLFormulaParser();
             const kmath = parser.parseL3Formula( (process.data("simulation")["kineticLaw"] || "") );

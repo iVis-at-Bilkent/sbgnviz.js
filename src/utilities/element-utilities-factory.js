@@ -4777,7 +4777,7 @@ module.exports = function () {
       };
     } else if (elementUtilities.processTypes.includes(pureClass)) {  // SBML Process
       return {
-        'localParameters': [],  // {name: , value: , unit: }
+        'localParameters': [],  // {id: , name: , value: , units: }
         'kineticLaw': "0"
       };
     } else if (elementUtilities.edgeTypes.includes(pureClass)) {  // SBML Edge
