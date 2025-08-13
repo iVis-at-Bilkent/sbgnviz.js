@@ -4787,8 +4787,8 @@ module.exports = function () {
       }
     } else {    // SBML Species
       return {
-        'initialAmount': 0.0,
-        'initialConcentration': 0.0,
+        'initial': 0.0,
+        'initialType': "amount",
         'substanceUnits': "",
         'hasOnlySubstanceUnits': true, // true for amount, false for density
         'constant': false,

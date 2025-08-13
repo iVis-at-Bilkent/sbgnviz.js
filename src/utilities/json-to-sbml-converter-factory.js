@@ -258,13 +258,14 @@ module.exports = function () {
             }
 
             var simulationData = nodes[i].data("simulation");
+            console.log(simulationData);
             if(simulationData){
                 if(simulationData["hasOnlySubstanceUnits"] !== null)
                     newSpecies.setHasOnlySubstanceUnits(simulationData["hasOnlySubstanceUnits"]);
-                if(simulationData["initialAmount"] !== null && simulationData["hasOnlySubstanceUnits"])
-                    newSpecies.setInitialAmount(simulationData["initialAmount"]);
-                if(simulationData["initialConcentration"] !== null && !simulationData["hasOnlySubstanceUnits"])
-                    newSpecies.setInitialConcentration(simulationData["initialConcentration"]);
+                if(simulationData["initial"] !== null && simulationData["initialType"] === "amount")
+                    newSpecies.setInitialAmount(simulationData["initial"]);
+                if(simulationData["initial"] !== null && simulationData["initialType"] === "concentration")
+                    newSpecies.setInitialConcentration(simulationData["initial"]);
                 if(simulationData["substanceUnits"]) {
                     newSpecies.setSubstanceUnits(simulationData["substanceUnits"]);
                 }
