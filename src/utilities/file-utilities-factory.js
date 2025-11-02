@@ -292,6 +292,7 @@ module.exports = function () {
  */
 
  fileUtilities.loadFile = function(file, convertFcn, callback1, callback2, callback3, callback4,toLocalorGraph) {
+
    var self = this;
    uiUtilities.startSpinner("load-file-spinner");
    sbmlSimulationUtilities.resetAll();
@@ -351,7 +352,13 @@ module.exports = function () {
       if(toLocalorGraph===undefined){
         updateGraph(cyGraph);
       }
-      callback3(cyGraph);
+
+      if(typeof callback3 === 'object'){
+        updateGraph(cyGraph)
+      }
+      else if(callback3 !== undefined){
+        callback3(cyGraph);
+      }
 
 
        // Handle annotation layers data if present
