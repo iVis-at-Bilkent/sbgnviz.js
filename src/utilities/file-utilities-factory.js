@@ -348,7 +348,11 @@ module.exports = function () {
          return;
        }
 
-
+      console.log('Converted graph data:', cyGraph);
+      console.log('callback1:', callback1);
+      console.log('callback2:', callback2);
+      console.log('callback3:', callback3);
+      console.log('callback4:', callback4);
       if(toLocalorGraph===undefined){
         updateGraph(cyGraph);
       }
