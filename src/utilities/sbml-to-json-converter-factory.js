@@ -687,7 +687,7 @@ sbmlToJson.addSpecies = function(model, cytoscapeJsNodes, compartmentBoundingBox
 
     speciesCompartmentMap.set(species.getId(), species.getCompartment());
     var sboTerm = species.getSBOTerm();
-    let speciesData = {"id": species.getId(), "label": species.getName() || species.getId(), 
+    let speciesData = {"id": species.getId(), "label": species.getName() || " ", 
                       "parent": species.getCompartment(), "sboTerm": species.getSBOTerm(),
                       "active": active, "multimer": multimer, "hypothetical": hypothetical,
                       "bindingRegion": bindingRegion, "residueVariable": residueVariable, "unitOfInfo": unitOfInfo, "stateVariable": stateVariable,
@@ -1102,7 +1102,6 @@ sbmlToJson.addReactions = function(model, cytoscapeJsEdges, cytoscapeJsNodes) {
       let reactantEdgeData = {"id": product.getSpecies() + '_' + reaction.getId(), "source": nodeClass+"_"+reaction.getId(), "target": product.getSpecies(), "class": "reduced trigger"};
       resultJson.push({"data": reactantEdgeData, "group": "edges", "classes": "reactantEdge"});
       continue;
-
     }
   
     for(let j = 0; j < reaction.getNumReactants(); j++){
@@ -1117,7 +1116,6 @@ sbmlToJson.addReactions = function(model, cytoscapeJsEdges, cytoscapeJsNodes) {
         simulationDataReactant.constant = reactant.getConstant();
       resultJson.push({"data": reactantEdgeData, "simulation": simulationDataReactant, "group": "edges", "classes": "reactantEdge"});
 
-      // collect possible parent info
       let speciesCompartment = speciesCompartmentMap.get(reactant.getSpecies());
       if(reactionParentMap.has(speciesCompartment))
         reactionParentMap.set(speciesCompartment, reactionParentMap.get(speciesCompartment) + 1);
@@ -1148,38 +1146,6 @@ sbmlToJson.addReactions = function(model, cytoscapeJsEdges, cytoscapeJsNodes) {
         reactionParentMap.set(speciesCompartment, 1);      
     }
 
-    // add reaction node
-    let parent = reaction.getCompartment();
-
-    let reactionData = {"id": reaction.getId(), "label": reaction.getName(), "parent": parent};
-    reactionData.width = 15;
-    reactionData.height = 15;
-    if(nodeClass){
-      reactionData.class = nodeClass
-    }
-
-    // TODO: Implement Local Parameters
-    let simulationData = {};
-    if(reaction.isSetKineticLaw()){
-      simulationData.kineticLaw = reaction.getKineticLaw().getFormula();
-      
-      // Import Local Parameters
-      let localParameters = [];
-      for(let j = 0; j < reaction.getKineticLaw().getNumLocalParameters(); j++){
-        let localParam = reaction.getKineticLaw().getLocalParameter(j);
-        let localParamData = {
-          id: localParam.getId(),
-          name: localParam.getName() || localParam.getId(),
-          quantity: localParam.getValue(),
-          units: localParam.getUnits() || ""
-        };
-        localParameters.push(localParamData);
-      }
-      simulationData.localParameters = localParameters;
-    }
-    reactionData.simulation = simulationData;
-    resultJson.push({"data": reactionData, "group": "nodes", "classes": "reaction"}); 
-    
     // add modifier->reaction edges
     for(let l = 0; l < reaction.getNumModifiers(); l++){
       let modifier = reaction.getModifier(l);
@@ -1198,6 +1164,46 @@ sbmlToJson.addReactions = function(model, cytoscapeJsEdges, cytoscapeJsNodes) {
       else
         reactionParentMap.set(speciesCompartment, 1);      
     }
+
+    // add reaction node
+    let parent = reaction.getCompartment();
+    if(!parent) {
+      var max_count = 0, result = -1;
+      reactionParentMap.forEach((value, key) => {
+          if (max_count < value) {
+              result = key;
+              max_count = value;
+          }
+      });
+      parent = result;
+    }
+
+    let reactionData = {"id": reaction.getId(), "label": reaction.getName(), "parent": parent};
+    reactionData.width = 15;
+    reactionData.height = 15;
+    if(nodeClass){
+      reactionData.class = nodeClass
+    }
+
+    let simulationData = {};
+    if(reaction.isSetKineticLaw()){
+      simulationData.kineticLaw = reaction.getKineticLaw().getFormula();
+      
+      let localParameters = [];
+      for(let j = 0; j < reaction.getKineticLaw().getNumLocalParameters(); j++){
+        let localParam = reaction.getKineticLaw().getLocalParameter(j);
+        let localParamData = {
+          id: localParam.getId(),
+          name: localParam.getName() || localParam.getId(),
+          quantity: localParam.getValue(),
+          units: localParam.getUnits() || ""
+        };
+        localParameters.push(localParamData);
+      }
+      simulationData.localParameters = localParameters;
+    }
+    reactionData.simulation = simulationData;
+    resultJson.push({"data": reactionData, "group": "nodes", "classes": "reaction"}); 
   }  
 
   let reactionGlyphMap = new Map();
