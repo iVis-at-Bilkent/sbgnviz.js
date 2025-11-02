@@ -265,11 +265,10 @@ module.exports = function () {
    var convert = function( text ) {
      return nwtToJson.convert(textToXmlObject(text), urlParams);
    };
-
+   
    // Use internal collapseMarkedNodes if callback3 is not provided
    var collapseCallback = callback3 || fileUtilities.collapseMarkedNodes;
-
-   fileUtilities.loadFile( file, convert, callback1, callback2, fileUtilities.collapseMarkedNodes, callback4 );
+   fileUtilities.loadFile( file, convert, callback1, callback2, collapseCallback, callback4 ,callback3);
  };
 
  // collapse the nodes whose collapse data field is set
@@ -330,15 +329,16 @@ module.exports = function () {
 
      setTimeout(function () {
 
-       if (typeof callback1 !== 'undefined') callback1(text);
+      if (typeof callback1 !== 'undefined') callback1(text);
 
        var cyGraph;
        try {
-         cyGraph = convertFcn( text );
-         // Users may want to do customized things while an external file is being loaded
-         // Trigger an event for this purpose and specify the 'filename' as an event parameter
-         $(document).trigger( "sbgnvizLoadFile", [ file.name, cy ] ); // Aliases for sbgnvizLoadFileStart
-         $(document).trigger( "sbgnvizLoadFileStart", [ file.name, cy ] );
+        cyGraph = convertFcn( text );
+        // Users may want to do customized things while an external file is being loaded
+        // Trigger an event for this purpose and specify the 'filename' as an event parameter
+        // console.log('Loading file using convert function:', convertFcn);
+        $(document).trigger( "sbgnvizLoadFile", [ file.name, cy ] ); // Aliases for sbgnvizLoadFileStart
+        $(document).trigger( "sbgnvizLoadFileStart", [ file.name, cy ] );
        }
        catch (err) {
          uiUtilities.endSpinner("load-file-spinner");
@@ -346,28 +346,22 @@ module.exports = function () {
          if (typeof callback2 !== 'undefined') callback2();
          return;
        }
-       if(toLocalorGraph!==undefined){
-        toLocalorGraph(cyGraph);
-       }
-       else{
-         updateGraph(cyGraph);
-       }
 
-       if (typeof callback3 !== 'undefined') {
-         callback3();
-       }
+
+      if(toLocalorGraph===undefined){
+        updateGraph(cyGraph);
+      }
+      callback3(cyGraph);
+
 
        // Handle annotation layers data if present
        if (cyGraph && cyGraph.annotationLayers && typeof callback4 !== 'undefined') {
          callback4(cyGraph.annotationLayers);
        }
 
-       uiUtilities.endSpinner("load-file-spinner");
-       $(document).trigger( "sbgnvizLoadFileEnd", [ file.name, cy ] ); // Trigger an event signaling that a file is loaded
+      uiUtilities.endSpinner("load-file-spinner");
+      // $(document).trigger( "sbgnvizLoadFileEnd", [ file.name, cy ] ); // Trigger an event signaling that a file is loaded
 
-       if (typeof callback4 !== 'undefined' && (!cyGraph || !cyGraph.annotationLayers)) {
-         callback4();
-       }
      }, 0);
    };
 
