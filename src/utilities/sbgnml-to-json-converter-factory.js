@@ -990,7 +990,8 @@ module.exports = function () {
 
     // convert style list to elementId-indexed object pointing to style
     // also convert color references to color values
-    var styleList = renderInformation.listOfStyles.styles;
+    // We allow listOfStyles to not be present in renderInformation as it is a valid case in the docs
+    var styleList = renderInformation.listOfStyles ? renderInformation.listOfStyles.styles : [];
     var memberIDToStyle = {};
     for (var i=0; i < styleList.length; i++) {
       var style = styleList[i];

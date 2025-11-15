@@ -133,7 +133,7 @@ module.exports = function() {
       extendObjectsData(glyphs, elementUtilities.isSIFNode, sifNodePropHandlerMap);
 
       var jsObjStyles = ( map && map.extension && map.extension.renderInformation
-                            && map.extension.renderInformation.listOfStyles ).style;
+                            && map.extension.renderInformation.listOfStyles && map.extension.renderInformation.listOfStyles.style ) || null;
       var appStyles = renderInfo && renderInfo.styles;
 
       extendStylesData(jsObjStyles, appStyles);
