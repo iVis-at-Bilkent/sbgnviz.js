@@ -544,9 +544,16 @@ module.exports = function () {
                 referenceGlyph.setRole(1);
                 referenceGlyph.setId("substrate_" + (i+1) + "_" + (j+1));
 
-                var lineSegment = referenceGlyph.createLineSegment();
-                var lineStart = substrate.sourceEndpoint();
-                var lineEnd = substrate.targetEndpoint();
+                var lineSegment = referenceGlyph.createLineSegment();  
+                var lineStart, lineEnd;
+                if (jsonToSbml.isSpecies(cy.getElementById(substrate.data("source")).data("class"))) {
+                    lineStart = substrate.targetEndpoint();
+                    lineEnd = substrate.sourceEndpoint();
+                } else {
+                    lineStart = substrate.sourceEndpoint();
+                    lineEnd = substrate.targetEndpoint();
+                }
+
                 var start = lineSegment.getStart(); start.setX(lineStart.x); start.setY(lineStart.y);
                 var end = lineSegment.getEnd(); end.setX(lineEnd.x); end.setY(lineEnd.y);
             }
