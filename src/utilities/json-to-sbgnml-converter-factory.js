@@ -334,7 +334,7 @@ module.exports = function () {
        }
        else {
            var parent = node.parent()[0];
-           if(parent._private.data.class == "compartment" || parent._private.data.class ==='complex sbml')
+           if(parent._private.data.class == "compartment")
                glyph.compartmentRef = parent._private.data.id;
        }
     }
@@ -349,7 +349,7 @@ module.exports = function () {
     //add bbox information
     glyph.setBbox(this.addGlyphBbox(node));
 
-    if(node.isParent() || node.data().class == 'topology group' || node.data().class == 'submap' || node.data().class == 'complex' || node.data().class == 'compartment'){
+    if(node.isParent() || node.data().class == 'topology group' || node.data().class == 'submap' || node.data().class == 'complex' || node.data().class == "complex sbml" || node.data().class == 'compartment'){
       var extraInfo = {};
       extraInfo.w = node.width();
       extraInfo.h = node.height();
@@ -402,7 +402,7 @@ module.exports = function () {
       extension.add(annotExt);
     }
     // add glyph members that are not state variables or unit of info: subunits
-    if(nodeClass === "complex" || nodeClass === "complex multimer" || nodeClass === "submap" || nodeClass === "topology group" || nodeClass == "active protein"){
+    if(nodeClass === "complex" || nodeClass === "complex sbml" || nodeClass === "complex multimer" || nodeClass === "submap" || nodeClass === "topology group" || nodeClass == "active protein"){
        var children = node.children();
        children = children.union(this.allCollapsedNodes);
        if(node.data('collapsedChildren')) {

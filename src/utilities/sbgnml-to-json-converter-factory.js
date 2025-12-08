@@ -134,7 +134,7 @@ module.exports = function () {
       
      
       var padding = this.calculateElementPadding(ele);
-      if(ele.class_ == "complex"){
+      if(ele.class_ == "complex" || ele.class_ == "complex sbml"){
         ele.complexCalculatedPadding = padding;
       }
       
@@ -316,7 +316,7 @@ module.exports = function () {
       if(childNodes.length <= 0 ) return 0;
       var compoundPadding = typeof options.compoundPadding === 'function' ? options.compoundPadding.call() : options.compoundPadding;
      // } 
-      if(ele.class_ == "complex"){
+      if(ele.class_ == "complex" || ele.class_ == "complex sbml"){
         var complexPadding = 0;
         var extraComplexPadding = typeof options.extraComplexPadding === 'function' ? options.extraComplexPadding.call() : options.extraComplexPadding;
         complexPadding = compoundPadding < 5 ? 5 : compoundPadding;       
@@ -730,7 +730,7 @@ module.exports = function () {
 
     var eleClass = ele.class_;
 
-    if (eleClass === 'complex' || eleClass === 'complex multimer' || eleClass === 'submap' || eleClass === 'topology group') {
+    if (eleClass === 'complex' || eleClass === "complex sbml" || eleClass === 'complex multimer' || eleClass === 'submap' || eleClass === 'topology group') {
       self.addCytoscapeJsNode(ele, jsonArray, parent, compartments);
 
       var childGlyphs = ele.glyphMembers;
@@ -1311,7 +1311,7 @@ module.exports = function () {
           }
 
           if(hasMin){
-            if(glyph.class_ == "complex"){
+            if(glyph.class_ == "complex" || glyph.class_ == "complex sbml"){
               var stateAndInfos = glyph.glyphMembers.filter(function(child){ return child.class_ == "state variable" || child.class_ == "unit of information"
               || child.class_ == "residue variable" || child.class_ == "binding region"});
               var extraComplexPadding = typeof options.extraComplexPadding === 'function' ? options.extraComplexPadding.call() : options.extraComplexPadding;
