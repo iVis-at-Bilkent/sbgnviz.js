@@ -388,7 +388,7 @@ AuxiliaryUnit.setAnchorSide = function(mainObj, node) {
     padding = 0;
   }else{
     width = node.width();
-    padding = (node.data('class') == "complex" || node.data('class') == "complex sbml") ? Number(node.data().complexCalculatedPadding) : node.padding();
+    padding = (node.data('class') == "complex") ? Number(node.data().complexCalculatedPadding) : node.padding();
   }
 
   if(node.data("originalH")){
@@ -396,11 +396,11 @@ AuxiliaryUnit.setAnchorSide = function(mainObj, node) {
     padding = 0;
   }else{
     height = node.height();
-    padding = (node.data('class') == "complex" || node.data('class') == "complex sbml") ? Number(node.data().complexCalculatedPadding) : node.padding();
+    padding = (node.data('class') == "complex") ? Number(node.data().complexCalculatedPadding) : node.padding();
   }
   
-  var parentX = (node.data('class') == "compartment" || node.data('class') == "complex" || node.data('class') == "complex sbml") ? node.data('bbox').x : node.position().x;
-  var parentY = (node.data('class') == "compartment" || node.data('class') == "complex" || node.data('class') == "complex sbml") ? node.data('bbox').y : node.position().y;
+  var parentX = (node.data('class') == "compartment" || node.data('class') == "complex") ? node.data('bbox').x : node.position().x;
+  var parentY = (node.data('class') == "compartment" || node.data('class') == "complex") ? node.data('bbox').y : node.position().y;
   var parentX1 = Number((parentX - width / 2 - padding).toFixed(2));
   var parentX2 = Number((parentX+width/2 + padding).toFixed(2));
   var parentY1 = Number((parentY - height/ 2 - padding).toFixed(2));

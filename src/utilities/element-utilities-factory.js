@@ -4249,7 +4249,7 @@ module.exports = function () {
           var thisY = statesandinfos.bbox.y;
           var thisH = statesandinfos.bbox.h;
           var parentY =
-            ele.data("class") == "compartment" || ele.data("class") == "complex" || ele.data("class") == "complex sbml"
+            ele.data("class") == "compartment" || ele.data("class") == "complex"
               ? ele.data("bbox").y
               : ele.position().y;
           var height = ele.data("originalH")
