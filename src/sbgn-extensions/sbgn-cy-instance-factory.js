@@ -947,7 +947,7 @@ module.exports = function () {
         },
       })
 
-      .selector("node:parent[class^='complex']") // start with complex
+      .selector("node:parent[class*='complex']") // contains complex
       .css({
         "text-valign": "bottom",
         "text-halign": "center",
