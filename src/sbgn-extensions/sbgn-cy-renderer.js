@@ -1116,6 +1116,12 @@ module.exports = function () {
 
   $$.sbgn.drawComplex = function( context, x, y, width, height, isActive, cornerLength ) {
     cornerLength = cornerLength || $$.sbgn.getDefaultComplexCornerLength();
+
+    if (isActive) {
+      width += $$.sbgn.getDefaultActivePadding();
+      height += $$.sbgn.getDefaultActivePadding();
+    }
+
     var points = $$.sbgn.generateComplexShapePoints(cornerLength, width, height);
 
     drawPolygonPath(context, x, y, width, height, points);
