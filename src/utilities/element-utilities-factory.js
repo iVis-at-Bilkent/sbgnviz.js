@@ -1821,6 +1821,7 @@ module.exports = function () {
     "active ion channel multimer",
     "active truncated protein multimer",
     "active complex multimer",
+    "active complex sbml multimer",
   ];
   elementUtilities.sbmlTypeHypotheticalMultimer = [
     "hypothetical protein multimer",
@@ -1834,7 +1835,7 @@ module.exports = function () {
     "hypothetical ion multimer",
     "hypothetical uknown molecule multimer",
     "hypothetical drug multimer",
-    "hypothetical complex sbml  multimer",
+    "hypothetical complex sbml multimer",
     "hypothetical degradation  multimer",
   ];
   elementUtilities.sbmlTypeActiveHypotheticalMultimer = [
@@ -1843,6 +1844,7 @@ module.exports = function () {
     "active hypothetical ion channel multimer",
     "active hypothetical truncated protein multimer",
     "active hypothetical complex multimer",
+    "active hypothetical complex sbml multimer",
   ];
 
   //elementUtilities.sbmlTypeHypothetical = [''] //Do I need this?

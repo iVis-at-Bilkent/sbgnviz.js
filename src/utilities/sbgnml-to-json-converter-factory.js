@@ -730,7 +730,7 @@ module.exports = function () {
 
     var eleClass = ele.class_;
 
-    if (eleClass === 'complex' || eleClass === "complex sbml" || eleClass === "complex sbml multimer" || eleClass === 'complex multimer' || eleClass === 'submap' || eleClass === 'topology group') {
+    if (eleClass.includes('complex') || eleClass === 'submap' || eleClass === 'topology group') {
       self.addCytoscapeJsNode(ele, jsonArray, parent, compartments);
 
       var childGlyphs = ele.glyphMembers;
