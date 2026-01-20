@@ -1782,7 +1782,6 @@ module.exports = function () {
     "drug multimer",
     "complex multimer",
     "phenotype sbml multimer",
-    "receptor multimer",
     "complex sbml multimer",
     "protein multimer",
   ];
@@ -1803,7 +1802,8 @@ module.exports = function () {
     "hypothetical antisense rna",
     "hypothetical phenotype sbml",
     "hypothetical ion",
-    "hypothetical uknown molecule",
+    "hypothetical simple molecule",
+    "hypothetical unknown molecule",
     "hypothetical drug",
     "hypothetical complex sbml",
     "hypothetical degradation",
@@ -1812,7 +1812,7 @@ module.exports = function () {
     "active hypothetical protein",
     "active hypothetical receptor",
     "active hypothetical truncated protein",
-    "hypothetical ion channel",
+    "active hypothetical ion channel",
     "active hypothetical complex sbml",
   ];
   elementUtilities.sbmlTypeActiveMultimer = [
@@ -1820,7 +1820,6 @@ module.exports = function () {
     "active receptor multimer",
     "active ion channel multimer",
     "active truncated protein multimer",
-    "active complex multimer",
     "active complex sbml multimer",
   ];
   elementUtilities.sbmlTypeHypotheticalMultimer = [
@@ -1833,17 +1832,17 @@ module.exports = function () {
     "hypothetical antisense rna multimer",
     "hypothetical phenotype sbml multimer",
     "hypothetical ion multimer",
-    "hypothetical uknown molecule multimer",
+    "hypothetical simple molecule multimer",
+    "hypothetical unknown molecule multimer",
     "hypothetical drug multimer",
     "hypothetical complex sbml multimer",
-    "hypothetical degradation  multimer",
+    "hypothetical degradation multimer",
   ];
   elementUtilities.sbmlTypeActiveHypotheticalMultimer = [
     "active hypothetical protein multimer",
     "active hypothetical receptor multimer",
     "active hypothetical ion channel multimer",
     "active hypothetical truncated protein multimer",
-    "active hypothetical complex multimer",
     "active hypothetical complex sbml multimer",
   ];
 
