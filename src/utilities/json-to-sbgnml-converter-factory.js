@@ -454,7 +454,7 @@ module.exports = function () {
     glyphList.push(glyph);
 
     // keep going with all the included glyphs
-    if(nodeClass === "compartment"||nodeClass==='complex sbml'){
+    if(nodeClass === "compartment"){
        var children = node.children();
        children = children.union(this.allCollapsedNodes);
        children = children.filter("[parent = '"+ node.id() + "']")
