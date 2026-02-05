@@ -389,10 +389,26 @@ module.exports = function () {
  };
 
   // This should only be used when your SBML is coming in text format. Use loadSbmlforSBML for file loading.
-  fileUtilities.loadSBMLText = async function(textData, tileInfoBoxes, filename, cy, urlParams){
+  fileUtilities.loadSBMLText = async function(textData, tileInfoBoxes, filename, cy, urlParams, layoutBy){
     sbmlSimulationUtilities.resetAll();
-    await updateGraph(sbmlToJson.convert(textData, urlParams), undefined, undefined, tileInfoBoxes);
-    await $(document).trigger("sbgnvizLoadFileEnd",  [filename, cy]);
+    var convertedData = sbmlToJson.convert(textData, urlParams);
+    
+    // Check if the SBML has layout information (nodes with non-zero positions)
+    var hasLayout = convertedData && convertedData.nodes && convertedData.nodes.some(function(node) {
+      return node.data && node.data.bbox && 
+             (node.data.bbox.x !== 0 || node.data.bbox.y !== 0);
+    });
+    
+    await updateGraph(convertedData, undefined, undefined, tileInfoBoxes);
+    
+    // Apply layout if no layout was found
+    if (!hasLayout && layoutBy) {
+      if (typeof layoutBy === 'function') {
+        layoutBy();
+      }
+    }
+    
+    await $(document).trigger("sbgnvizLoadFileEnd", [filename, cy]);
     uiUtilities.endSpinner("load-file-spinner");
   };
 
@@ -564,13 +580,17 @@ fileUtilities.hasLayoutSBML = function(file) {
 
     cy.fit( cy.elements(":visible"), 20 );
   };
+  
   let layoutFound = await fileUtilities.hasLayoutSBML(file);
-  if (layoutFound){
-    fileUtilities.loadFile( file, convert, undefined, errorCallback, fileUtilities.collapseMarkedNodes, undefined);
-  }
-  else{
-    fileUtilities.loadFile( file, convert, undefined, errorCallback, fileUtilities.collapseMarkedNodes, runLayout);
-  }
+  
+  var postLoadCallback = function(cyGraph) {
+    fileUtilities.collapseMarkedNodes();
+    if (!layoutFound) {
+      runLayout();
+    }
+  };
+  
+  fileUtilities.loadFile( file, convert, undefined, errorCallback, postLoadCallback, undefined);
  }
  fileUtilities.loadSbml = function(file, successCallback, errorCallback){
   var reader = new FileReader();
