@@ -308,6 +308,18 @@ module.exports = function () {
       return annotExt;
   };
 
+  jsonToSbgnml.getGlyphsBoundaryChildren = function (node) {
+    var boundaryNodes = node.cy().nodes('[boundaryParentId="' + node.id() + '"]');
+    if (boundaryNodes.length > 0) {
+      var boundaryNodesIds = [];
+      boundaryNodes.forEach(function (ele, i) {
+      boundaryNodesIds.push(ele.id());
+      });
+      return boundaryNodesIds.join(':');
+    }
+    return ''
+  };
+
   jsonToSbgnml.getGlyphSbgnml = function(node, version, visible = true){
     var self = this;
     var nodeClass = node._private.data.class;
@@ -337,6 +349,8 @@ module.exports = function () {
            if(parent._private.data.class == "compartment")
                glyph.compartmentRef = parent._private.data.id;
        }
+    } else if (node._private.data.boundaryParentId) {
+      glyph.compartmentRef = node._private.data.boundaryParentId;
     }
 
     // misc information
@@ -359,6 +373,9 @@ module.exports = function () {
       extraInfo.WRBias = Number(node.css("min-width-bias-right").replace("px",""));
       extraInfo.HTBias = Number(node.css("min-height-bias-top").replace("px",""));
       extraInfo.HBBias = Number(node.css("min-height-bias-bottom").replace("px",""));
+      if (node.data().class === 'compartment') {
+        extraInfo.boundaryNodes = jsonToSbgnml.getGlyphsBoundaryChildren(node);
+      }
       glyph.setExtension(new libsbgnjs.Extension());
       extraInfo.$ = { "xmlns:nwt": "https://newteditor.org/" };
       var extraInfoXml = compoundExtensionBuilder.buildObject(extraInfo);

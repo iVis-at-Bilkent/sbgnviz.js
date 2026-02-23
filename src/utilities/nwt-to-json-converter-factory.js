@@ -140,6 +140,33 @@ module.exports = function() {
     } );
   }
 
+  function handleBoundaryNodes(graphData, xmlObject) {
+
+    var allBoundaryNodeIds = {};
+    var xmlGlyphs = xmlObject.querySelectorAll('glyph');
+
+    xmlGlyphs.forEach(function (glyph) {
+      if (glyph.getAttribute('class') !== 'compartment') return;
+
+      var glyphId = glyph.getAttribute('id');
+      var boundaryNodes = glyph.querySelector("boundaryNodes");
+      if (boundaryNodes && boundaryNodes.textContent && boundaryNodes.textContent.length > 0) {
+        var nodeIds = boundaryNodes.textContent.split(':');
+        nodeIds.forEach(function (bid) {
+          allBoundaryNodeIds[bid] = glyphId;
+        });
+      }
+    });
+
+    graphData.nodes.forEach(function (node) {
+      if (allBoundaryNodeIds[node.data.id]) {
+        delete node.data.parent;        
+        // node.data.parent = null;
+        node.data.boundaryParentId = allBoundaryNodeIds[node.data.id];
+      }
+    });
+  };
+
   nwtToJson.convert = function(xmlObject, urlParams) {
     var graphData = sbgnmlToJson.convert(xmlObject, urlParams);
     var mapType = elementUtilities.mapType;
@@ -167,6 +194,10 @@ module.exports = function() {
       graphData.annotationLayers = annotationLayersData;
     } else {
       console.log('No annotation layers extension found in NWT file');
+    }
+
+    if (mapType === 'PD' || mapType === 'AF') {
+      handleBoundaryNodes(graphData, xmlObject);
     }
 
     return graphData;
