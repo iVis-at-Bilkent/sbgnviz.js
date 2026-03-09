@@ -965,10 +965,8 @@ module.exports = function () {
       .selector("node:parent[class='compartment']")
       .css({
         padding: function () {
-          return (
-            graphUtilities.getCompoundPaddings() +
-            options.extraCompartmentPadding
-          );
+          var padding = graphUtilities.getCompoundPaddings() + options.extraCompartmentPadding;
+          return elementUtilities.getBoundaryPadding(ele, padding);
         },
       })
       .selector("node[class='submap']")
