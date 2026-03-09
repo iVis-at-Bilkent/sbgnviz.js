@@ -310,11 +310,23 @@ module.exports = function () {
 
   jsonToSbgnml.getGlyphsBoundaryChildren = function (node) {
     var boundaryNodes = node.cy().nodes('[boundaryParentId="' + node.id() + '"]');
-    if (boundaryNodes.length > 0) {
+    var collapsedChildren = node.data('collapsedChildren');
+    var collapsedBoundaryNodes = [];
+
+    if (collapsedChildren) {
+      collapsedChildren.forEach(function (ele) {
+        if (ele.isNode() && ele.data('boundaryParentId') === node.id()) {
+          collapsedBoundaryNodes.push(ele.id());
+        }
+      });
+    }
+
+    if (boundaryNodes.length > 0 || collapsedBoundaryNodes.length > 0) {
       var boundaryNodesIds = [];
       boundaryNodes.forEach(function (ele, i) {
       boundaryNodesIds.push(ele.id());
       });
+      boundaryNodesIds = boundaryNodesIds.concat(collapsedBoundaryNodes);
       return boundaryNodesIds.join(':');
     }
     return ''
