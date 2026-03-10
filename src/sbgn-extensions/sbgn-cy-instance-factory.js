@@ -964,7 +964,7 @@ module.exports = function () {
       })
       .selector("node:parent[class='compartment']")
       .css({
-        padding: function () {
+        padding: function (ele) {
           var padding = graphUtilities.getCompoundPaddings() + options.extraCompartmentPadding;
           return elementUtilities.getBoundaryPadding(ele, padding);
         },
