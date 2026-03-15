@@ -196,7 +196,7 @@ module.exports = function() {
       console.log('No annotation layers extension found in NWT file');
     }
 
-    if (mapType === 'PD' || mapType === 'AF') {
+    if (mapType === 'PD' || mapType === 'AF' || mapType === 'HybridSbgn' || mapType === 'SBML') {
       handleBoundaryNodes(graphData, xmlObject);
     }
 
