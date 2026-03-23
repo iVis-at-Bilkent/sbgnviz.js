@@ -588,6 +588,7 @@ fileUtilities.hasLayoutSBML = function(file) {
     if (!layoutFound) {
       runLayout();
     }
+    $(document).trigger("sbgnvizLoadFileEnd", [file.name, cy]);
   };
   
   fileUtilities.loadFile( file, convert, undefined, errorCallback, postLoadCallback, undefined);
