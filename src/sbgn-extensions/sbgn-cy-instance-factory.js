@@ -1099,7 +1099,7 @@ module.exports = function () {
         "overlay-color": selectionColor,
         "overlay-padding": "8",
       })
-      .selector("edge[cardinality > 0]")
+      .selector("edge[cardinality > 0], edge[cardinality = '?']")
       .css({
         "text-rotation": "autorotate",
         "text-background-shape": "rectangle",
@@ -1108,7 +1108,7 @@ module.exports = function () {
         "text-background-color": "white",
         "text-background-opacity": "1",
       })
-      .selector("edge[class='consumption'][cardinality > 0]")
+      .selector("edge[class='consumption'][cardinality > 0], edge[class='consumption'][cardinality = '?']")
       .css({
         "source-label": function (ele) {
           return "" + ele.data("cardinality");
@@ -1117,7 +1117,7 @@ module.exports = function () {
         "source-text-offset": "18",
         "font-size": "13",
       })
-      .selector("edge[class='production'][cardinality > 0]")
+      .selector("edge[class='production'][cardinality > 0], edge[class='production'][cardinality = '?']")
       .css({
         "target-label": function (ele) {
           return "" + ele.data("cardinality");

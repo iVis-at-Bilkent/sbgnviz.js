@@ -24,7 +24,13 @@ module.exports = function () {
     $(document).on('change', '.integer-input,.float-input', function(e){
       var min   = $(this).attr('min');
       var max   = $(this).attr('max');
-      var value = parseFloat($(this).val());
+      var valString = $(this).val();
+
+      if (valString === '?') {
+        return;
+      }
+
+      var value = parseFloat(valString);
 
       if(min != null) {
         min = parseFloat(min);
@@ -69,6 +75,10 @@ module.exports = function () {
     return e.keyCode === 109 || e.keyCode === 189;
   };
 
+  keyboardInputUtilities.isQuestionMarkKey = function (e) {
+    return (e.keyCode === 191 && e.shiftKey) || (e.key === '?');
+  };
+
   keyboardInputUtilities.isLeftKey = function(e) {
     return e.keyCode === 37;
   };
@@ -90,7 +100,7 @@ module.exports = function () {
   };
 
   keyboardInputUtilities.isIntegerFieldInput = function(value, e) {
-    return this.isCtrlOrCommandPressed(e) || this.isMinusSignKey(e) || this.isNumberKey(e)
+    return this.isCtrlOrCommandPressed(e) || this.isMinusSignKey(e) || this.isNumberKey(e) || this.isQuestionMarkKey(e)
             || this.isBackspaceKey(e) || this.isTabKey(e) || this.isLeftKey(e) || this.isRightKey(e) || this.isEnterKey(e);
   };
 
