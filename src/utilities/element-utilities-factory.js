@@ -4227,6 +4227,10 @@ module.exports = function () {
 
   // Returns the largest dimension of the boundary nodes associated with the given compartment
   elementUtilities.getBoundaryPadding = function (ele) {
+    if (!options.calculateBoundaryPadding) {
+      return 0;
+    }
+    
     var maxDim = 0;
     if (ele && ele.cy) {
       var cy = ele.cy();
