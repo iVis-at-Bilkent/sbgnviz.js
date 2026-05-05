@@ -30,6 +30,7 @@ module.exports = function () {
 
   elementUtilities.PD = {}; // namespace for all PD specific stuff
   elementUtilities.AF = {}; // namespace for all AF specific stuff
+  elementUtilities.HybridPDAF = {}; // namespace for all HybridPDAF specific stuff
   elementUtilities.SIF = {}; // namespace for all SIF specific stuff
   elementUtilities.SBML = {}; // namespace for all SIF specific stuff
 
@@ -497,6 +498,60 @@ module.exports = function () {
       compartment: { asSource: {}, asTarget: {} },
     },
   };
+  // HybridPDAF connectivity constraints are the union of PD and AF connectivity constraints, with some specificities for performance arcs
+  elementUtilities.HybridPDAF.connectivityConstraints = {};
+
+  const pd = elementUtilities.PD.connectivityConstraints;
+  const af = elementUtilities.AF.connectivityConstraints;
+
+  for (const key of new Set([...Object.keys(pd), ...Object.keys(af)])) {
+    elementUtilities.HybridPDAF.connectivityConstraints[key] = {
+      ...(pd[key] || {}),
+      ...(af[key] || {})
+    };
+  }
+  elementUtilities.HybridPDAF.connectivityConstraints["performance arc"] = {
+    macromolecule: { asSource: { isAllowed: true }, asTarget: {} },
+    "simple chemical": { asSource: { isAllowed: true }, asTarget: {} },
+    "unspecified entity": { asSource: { isAllowed: true }, asTarget: {} },
+    complex: { asSource: { isAllowed: true }, asTarget: {} },
+    "nucleic acid feature": { asSource: { isAllowed: true }, asTarget: {} },
+    compartment: { asSource: {}, asTarget: {} },
+    tag: { asSource: {}, asTarget: {} },
+    "empty set": { asSource: {}, asTarget: {} },
+    "perturbing agent": { asSource: { isAllowed: true }, asTarget: {} },
+    submap: { asSource: {}, asTarget: {} },
+    process: { asSource: {}, asTarget: {} },
+    "omitted process": { asSource: {}, asTarget: {} },
+    "uncertain process": { asSource: {}, asTarget: {} },
+    phenotype: { asSource: {}, asTarget: {} },
+    association: { asSource: {}, asTarget: {} },
+    dissociation: { asSource: {}, asTarget: {} },
+    and: { asSource: {}, asTarget: {} },
+    or: { asSource: {}, asTarget: {} },
+    not: { asSource: {}, asTarget: {} },
+    "biological activity": { asSource: {}, asTarget: { isAllowed: true } },
+    delay: { asSource: {}, asTarget: {} },
+  };
+
+  const constraint1 = { asSource: {}, asTarget: {} };
+  const constraint2 = { asSource: {}, asTarget: { isAllowed: true } };
+  const keys1 = ["consumption", "production", "modulation", "stimulation", "catalysis", "inhibition"];
+  for (const k of keys1) {
+    elementUtilities.HybridPDAF.connectivityConstraints[k]["biological activity"] = constraint1;
+    elementUtilities.HybridPDAF.connectivityConstraints[k]["delay"] = constraint1;
+  }
+  const keys2 = ["positive influence", "negative influence", "unknown influence"];
+  const PD_node_set1 = ["macromolecule", "simple chemical", "unspecified entity", "complex", "nucleic acid feature", "empty set", "perturbing agent"];
+  const PD_node_set2 = ["process", "omitted process", "uncertain process", "association", "dissociation"];
+  for (const k of keys2) {
+    for (const node_class of PD_node_set1) {
+      elementUtilities.HybridPDAF.connectivityConstraints[k][node_class] = constraint1;
+    }
+    for (const node_class of PD_node_set2) {
+      elementUtilities.HybridPDAF.connectivityConstraints[k][node_class] = constraint2;
+    }
+  }
 
   elementUtilities.SIF.connectivityConstraints = {
     "controls-state-change-of": {
@@ -1910,6 +1965,7 @@ module.exports = function () {
     "unknown influence",
     "positive influence",
     "negative influence",
+    "performance arc",
     "controls-state-change-of",
     "controls-transport-of",
     "controls-phosphorylation-of",
@@ -2021,7 +2077,7 @@ module.exports = function () {
       (!node ||
         node.connectedEdges().length == 0 || // Complexes can only include EPNs which do not have edges
         elementUtilities.mapType == "HybridAny" ||
-        elementUtilities.mapType == "HybridSbgn")
+        elementUtilities.mapType == "HybridPDAF")
     ) {
       if(elementUtilities.mapType == "SBML"){
         
@@ -2937,6 +2993,7 @@ module.exports = function () {
       _class == "inhibition" ||
       _class == "negative influence" ||
       _class == "production" ||
+      _class == "performance arc" ||
       _class == "transport" ||
       _class == "transcription production" ||
       _class == "translation production" ||
@@ -3003,6 +3060,7 @@ module.exports = function () {
         return "triangle";
       case "positive influence sbml":
       case "unknown positive influence":
+      case "performance arc":
         return "chevron";
       case "modulation":
       case "unknown influence":
@@ -4913,8 +4971,8 @@ module.exports = function () {
         return "SIF";
       case "sbml":
         return "SBML";
-      case "hybrid sbgn":
-        return "HybridSbgn";
+      case "hybrid pd-af":
+        return "HybridPDAF";
       default:
         return "HybridAny";
     }
@@ -4930,8 +4988,8 @@ module.exports = function () {
         return "sif";
       case "SBML":
         return "sbml";
-      case "HybridSbgn":
-        return "hybrid sbgn";
+      case "HybridPDAF":
+        return "hybrid pd-af";
       default:
         return "hybrid any";
     }

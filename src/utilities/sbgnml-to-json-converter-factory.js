@@ -532,7 +532,7 @@ module.exports = function () {
     var mapType = elementUtilities.mapType;
     if(mapType == 'PD' || mapType == 'AF' || mapType == 'SIF' || mapType == 'SBML'){
       nodeObj.language = elementUtilities.mapType;
-    }else if(mapType == 'HybridSbgn'){
+    }else if(mapType == 'HybridPDAF'){
       if(nodeObj.class == 'delay' || nodeObj.class.startsWith("BA")){
         nodeObj.language = 'AF';
       }else{
@@ -915,15 +915,18 @@ module.exports = function () {
 
     // add language info, this will always be the mapType if not hybrid
     var PdEdges = ["consumption","production","modulation","stimulation","catalysis","inhibition","necessary stimulation","logic arc","equivalence arc"];
-    var AfEdges = ["positive influence","negative influence","unknown influence"];  
+    var AfEdges = ["positive influence","negative influence","unknown influence"];
+    var hybridPdAfEdges = ["performance arc"]; 
     var mapType = elementUtilities.mapType;
     if(mapType == 'PD' || mapType == 'AF' || mapType == 'SIF' || mapType == 'SBML'){
       edgeObj.language = elementUtilities.mapType;
-    }else if(mapType == 'HybridSbgn'){
+    }else if(mapType == 'HybridPDAF'){
       if(PdEdges.indexOf(edgeObj.class) > -1){
         edgeObj.language = 'PD';
-      }else{
+      } else if(AfEdges.indexOf(edgeObj.class) > -1){
         edgeObj.language = 'AF';
+      } else{
+        edgeObj.language = 'HybridPDAF';
       }
     }else{//maptype == HybridAny
       if(PdEdges.indexOf(edgeObj.class) > -1){
