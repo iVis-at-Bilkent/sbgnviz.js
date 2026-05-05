@@ -698,5 +698,12 @@ mainUtilities.getMapProperties = function() {
   mainUtilities.getCompoundPadding = function() {
     return options.compoundPadding;
   }
-   return mainUtilities;
+
+  mainUtilities.setCalculateBoundaryPadding = function (enable) {
+    options.calculateBoundaryPadding = enable;
+    optionUtilities.extendOptions(options);
+    cy.style().update();
+  }
+  
+  return mainUtilities;
 };

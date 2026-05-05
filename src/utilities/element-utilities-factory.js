@@ -4283,6 +4283,30 @@ module.exports = function () {
     secondNode.position("y", tempy);
   };
 
+  // Returns the largest dimension of the boundary nodes associated with the given compartment
+  elementUtilities.getBoundaryPadding = function (ele) {
+    if (!options.calculateBoundaryPadding) {
+      return 0;
+    }
+    
+    var maxDim = 0;
+    if (ele && ele.cy) {
+      var cy = ele.cy();
+      if (cy) {
+        var bNodes = cy.nodes('[boundaryParentId="' + ele.id() + '"]');
+        if (bNodes.length > 0) {
+          bNodes.forEach(function (bNode) {
+            var w = bNode.width();
+            var h = bNode.height();
+            if (w > maxDim) maxDim = w;
+            if (h > maxDim) maxDim = h;
+          });
+        }
+      }
+    }
+    return maxDim / 2;
+  };
+
   // used for handling the variable property of complexes
   elementUtilities.getComplexPadding = function (ele) {
     // this property needs to take into account:

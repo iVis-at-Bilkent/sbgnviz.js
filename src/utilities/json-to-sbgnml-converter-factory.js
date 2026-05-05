@@ -308,6 +308,30 @@ module.exports = function () {
       return annotExt;
   };
 
+  jsonToSbgnml.getGlyphsBoundaryChildren = function (node) {
+    var boundaryNodes = node.cy().nodes('[boundaryParentId="' + node.id() + '"]');
+    var collapsedChildren = node.data('collapsedChildren');
+    var collapsedBoundaryNodes = [];
+
+    if (collapsedChildren) {
+      collapsedChildren.forEach(function (ele) {
+        if (ele.isNode() && ele.data('boundaryParentId') === node.id()) {
+          collapsedBoundaryNodes.push(ele.id());
+        }
+      });
+    }
+
+    if (boundaryNodes.length > 0 || collapsedBoundaryNodes.length > 0) {
+      var boundaryNodesIds = [];
+      boundaryNodes.forEach(function (ele, i) {
+      boundaryNodesIds.push(ele.id());
+      });
+      boundaryNodesIds = boundaryNodesIds.concat(collapsedBoundaryNodes);
+      return boundaryNodesIds.join(':');
+    }
+    return ''
+  };
+
   jsonToSbgnml.getGlyphSbgnml = function(node, version, visible = true){
     var self = this;
     var nodeClass = node._private.data.class;
@@ -337,6 +361,8 @@ module.exports = function () {
            if(parent._private.data.class == "compartment")
                glyph.compartmentRef = parent._private.data.id;
        }
+    } else if (node._private.data.boundaryParentId) {
+      glyph.compartmentRef = node._private.data.boundaryParentId;
     }
 
     // misc information
@@ -359,6 +385,9 @@ module.exports = function () {
       extraInfo.WRBias = Number(node.css("min-width-bias-right").replace("px",""));
       extraInfo.HTBias = Number(node.css("min-height-bias-top").replace("px",""));
       extraInfo.HBBias = Number(node.css("min-height-bias-bottom").replace("px",""));
+      if (node.data().class === 'compartment') {
+        extraInfo.boundaryNodes = jsonToSbgnml.getGlyphsBoundaryChildren(node);
+      }
       glyph.setExtension(new libsbgnjs.Extension());
       extraInfo.$ = { "xmlns:nwt": "https://newteditor.org/" };
       var extraInfoXml = compoundExtensionBuilder.buildObject(extraInfo);
@@ -454,7 +483,7 @@ module.exports = function () {
     glyphList.push(glyph);
 
     // keep going with all the included glyphs
-    if(nodeClass === "compartment"||nodeClass==='complex sbml'){
+    if(nodeClass === "compartment"){
        var children = node.children();
        children = children.union(this.allCollapsedNodes);
        children = children.filter("[parent = '"+ node.id() + "']")
