@@ -124,7 +124,7 @@ module.exports = function() {
   jsonToNwt.buildJsObj = function(filename, version, renderInfo, mapProperties, nodes, edges, annotationLayersData) {
     var jsObj = jsonToSbgnml.buildJsObj(filename, version, renderInfo, mapProperties, nodes, edges);
 
-    if ( elementUtilities.mapType !== 'PD' && elementUtilities.mapType !== 'AF'  && elementUtilities.mapType !== 'HybridSbgn' && elementUtilities.mapType !== 'SBML') {
+    if ( elementUtilities.mapType !== 'PD' && elementUtilities.mapType !== 'AF'  && elementUtilities.mapType !== 'HybridPDAF' && elementUtilities.mapType !== 'SBML') {
       var map = jsObj.map[0];
 
       var arcs = map.arc;
