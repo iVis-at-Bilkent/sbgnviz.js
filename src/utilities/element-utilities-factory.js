@@ -4111,7 +4111,7 @@ module.exports = function () {
       //Checks if free nodes belong to the same compound
       var firstNode = cy.getElementById(inputPortEle.id);
       var secondNode = cy.getElementById(outputPortEle.id);
-      if (firstNode.data("parent") !== secondNode.data("parent")) {
+      if (firstNode.data("parent") !== secondNode.data("parent")  || firstNode.data("boundaryParentId") !== secondNode.data("boundaryParentId")) {
         continue;
       }
       elementUtilities.swapElements(inputPortEle, outputPortEle);
@@ -4127,7 +4127,7 @@ module.exports = function () {
         //Checks if free nodes belong to the same compound
         var firstNode = cy.getElementById(effector.id);
         var secondNode = cy.getElementById(firstOutput.id);
-        if (firstNode.data("parent") !== secondNode.data("parent")) {
+        if (firstNode.data("parent") !== secondNode.data("parent") || firstNode.data("boundaryParentId") !== secondNode.data("boundaryParentId")) {
           continue;
         }
 
@@ -4145,7 +4145,7 @@ module.exports = function () {
         //Checks if free nodes belong to the same compound
         var firstNode = cy.getElementById(effector.id);
         var secondNode = cy.getElementById(firstInput.id);
-        if (firstNode.data("parent") !== secondNode.data("parent")) {
+        if (firstNode.data("parent") !== secondNode.data("parent") || firstNode.data("boundaryParentId") !== secondNode.data("boundaryParentId")) {
           continue;
         }
 
