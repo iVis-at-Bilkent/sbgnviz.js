@@ -518,7 +518,7 @@ module.exports = function () {
     function dataRectangleGenerator(x, y, w, h, percent, parentSVG, fileName) {
       let colorString = '';
       if (percent) {
-        var color = decideColor(parseInt(percent), fileName);
+        var color = decideColor(parseFloat(percent), fileName);
         colorString =
                 'rgb(' +
                 Math.round(color.r) +
@@ -694,7 +694,8 @@ module.exports = function () {
       upto = lines.length;
     }
     for (let i = 0; i < upto; i++) {
-      if (lines[i].substring(0, 7) == 'version') {
+
+      if (lines[i].substring(0, 7).toLowerCase() == 'version') {
         k++;
         const metaLines = lines[i].split('\t');
         if (metaLines[1] && metaLines[1].length > 1) {
@@ -708,7 +709,7 @@ module.exports = function () {
           return "Error";
         }
       }
-      if (lines[i].substring(0, 4) == 'name') {
+      if (lines[i].substring(0, 4).toLowerCase() == 'name') {
         k++;
         const metaLines = lines[i].split('\t');
         if (metaLines[1] && metaLines[1].length > 1) {
@@ -722,7 +723,7 @@ module.exports = function () {
           return "Error";
         }
       }
-      if (lines[i].substring(0, 11) == 'description') {
+      if (lines[i].substring(0, 11).toLowerCase() == 'description') {
         k++;
         const metaLines = lines[i].split('\t');
         if (metaLines[1] && metaLines[1].length > 1) {
@@ -737,7 +738,7 @@ module.exports = function () {
           return "Error";
         }
       }
-      if (lines[i].substring(0, 5) == 'color') {
+      if (lines[i].substring(0, 5).toLowerCase() == 'color') {
         clr = true;
         k++;
         const metaLines = lines[i].split('\t');
@@ -755,9 +756,9 @@ module.exports = function () {
             if (this.isHex(hex)) {
               colors[(metaLines[t])] = this.hexToRgb(hex);
             }
-          } else if (parseInt(metaLines[t]) != NaN) {
+          } else if (!isNaN(parseFloat(metaLines[t]))) {
             if (this.isHex(hex)) {
-              colors[parseInt(metaLines[t])] = this.hexToRgb(hex);
+              colors[parseFloat(metaLines[t])] = this.hexToRgb(hex);
             } else {
               fileTitle = fileN;
               fileDescription = fileD;

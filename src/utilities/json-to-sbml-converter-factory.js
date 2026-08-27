@@ -10,12 +10,13 @@ var textUtilities = require('./text-utilities');
 var classes = require('./classes');
 
 module.exports = function () {
-    var elementUtilities, graphUtilities, experimentalDataOverlay;
+    var elementUtilities, graphUtilities, experimentalDataOverlay, sbmlSimulationUtilities;
     var cy;
 
     var nodesToSbo = 
     {
         "rna": 278,
+        "antisense rna": 334,
         "complex sbml": 253,
         "hypothetical complex": 289,
         "degradation": 291,
@@ -74,6 +75,7 @@ module.exports = function () {
         elementUtilities = param.elementUtilities;
         graphUtilities = param.graphUtilities;
         experimentalDataOverlay = param.experimentalDataOverlay;
+        sbmlSimulationUtilities = param.sbmlSimulationUtilities;
         cy = param.sbgnCyInstance.getCy();
       }
 
@@ -105,6 +107,54 @@ module.exports = function () {
         const box = cy.elements().boundingBox();
         dim.setWidth(box.w); dim.setHeight(box.h);
 
+
+        // Add Function Definitions
+        var functionDefinitions = sbmlSimulationUtilities.getFunctionDefinitions();
+        for (var ia of functionDefinitions) {
+            const funcd = model.createFunctionDefinition();
+            funcd.setId(ia.id);
+            funcd.setName(ia.name);
+            var formulaToParse = "lambda(";
+            for (var arg of ia.args) {
+                formulaToParse += (arg + ", "); 
+            }
+            formulaToParse += (ia.body + ")");
+            var parsedFormula = new libsbmlInstance.SBMLFormulaParser().parseL3Formula(formulaToParse);
+            funcd.setMath(parsedFormula);
+        }
+
+        // Create Parameters
+        var parameters = sbmlSimulationUtilities.getParameters();
+        for (var p of parameters) {
+            const param = model.createParameter();
+            param.setId(p.id);
+            param.setName(p.name);
+            param.setValue(p.value);
+            param.setConstant(p.constant);
+            if (p.units) {
+                param.setUnits(p.units);
+            }
+
+            console.log(p);
+        }
+
+        // Create UnitDefinitions (custom units)
+        var unitDefs = sbmlSimulationUtilities.getUnitDefinitions();
+        for (var ud of unitDefs) {
+            const udObj = model.createUnitDefinition();
+            udObj.setId(ud.id);
+            if (ud.name) udObj.setName(ud.name);
+            for (var u of (ud.units || [])) {
+                const unit = udObj.createUnit();
+                const ukc = new libsbmlInstance.UnitKindConstructor();
+                const kindCode = ukc.fromName(u.kind || '');
+                unit.setKind(kindCode);
+                unit.setExponent(u.exponent);
+                unit.setScale(u.scale);
+                unit.setMultiplier(u.multiplier);
+            }
+        }
+
         // Create compartment
         for (let i = 0; i < nodes.length; i++)
         {
@@ -115,8 +165,19 @@ module.exports = function () {
             const comp = model.createCompartment()
             const compId = nodes[i]._private.data.id.replace(/-/g, "_");
             comp.setId(compId)
-            comp.setSize(1)
-            comp.setConstant(true)
+            // TODO: Implement Units
+            var simulationData = nodes[i].data("simulation");
+            if(simulationData){
+                if(simulationData["size"])
+                    comp.setSize(simulationData["size"]);
+                if(simulationData["constant"] !== null)
+                    comp.setConstant(simulationData["constant"]);
+                if(simulationData["spatialDimensions"] !== null)
+                    comp.setSpatialDimensions(simulationData["spatialDimensions"]);
+                if(simulationData["units"]) {
+                    comp.setUnits(simulationData["units"]);
+                }
+            }
             if(nodes[i]._private.data.label)
                 comp.setName(nodes[i]._private.data.label)
 
@@ -130,6 +191,27 @@ module.exports = function () {
             let bb = glyph.getBoundingBox();
             bb.setX(box.x - box.w / 2); bb.setY(box.y - box.h / 2);
             bb.width = box.w; bb.height = box.h;
+
+
+            let data = nodes[i]._private.data;
+
+            let annotationString = '<nwt:extension xmlns:nwt="https://newteditor.org/">';
+            annotationString += '<nwt:info '
+            + 'nwt:background-color="' + (data['background-color'] || '') + '" '
+            + 'nwt:background-fit="' + (data['background-fit'] || '') + '" '
+            + 'nwt:background-height="' + (data['background-height'] || '') + '" '
+            + 'nwt:background-image="' + (data['background-image'] || '') + '" '
+            + 'nwt:background-image-opacity="' + (data['background-image-opacity'] || '') + '" '
+            + 'nwt:background-opacity="' + (data['background-opacity'] || '') + '" '
+            + 'nwt:background-position-x="' + (data['background-position-x'] || '') + '" '
+            + 'nwt:background-position-y="' + (data['background-position-y'] || '') + '" '
+            + 'nwt:background-width="' + (data['background-width'] || '') + '"'
+            + ' nwt:id="' + compId + '">';
+
+            annotationString += '</nwt:info>';
+            annotationString += '</nwt:extension>';
+            
+            comp.setAnnotation(annotationString);
         }
 
         // Set species
@@ -175,9 +257,23 @@ module.exports = function () {
                 newSpecies.setCompartment('default');
             }
 
-            newSpecies.setHasOnlySubstanceUnits(false);
-            newSpecies.setConstant(true);
-            newSpecies.setBoundaryCondition(true);
+            var simulationData = nodes[i].data("simulation");
+            console.log(simulationData);
+            if(simulationData){
+                if(simulationData["hasOnlySubstanceUnits"] !== null)
+                    newSpecies.setHasOnlySubstanceUnits(simulationData["hasOnlySubstanceUnits"]);
+                if(simulationData["initial"] !== null && simulationData["initialType"] === "amount")
+                    newSpecies.setInitialAmount(simulationData["initial"]);
+                if(simulationData["initial"] !== null && simulationData["initialType"] === "concentration")
+                    newSpecies.setInitialConcentration(simulationData["initial"]);
+                if(simulationData["substanceUnits"]) {
+                    newSpecies.setSubstanceUnits(simulationData["substanceUnits"]);
+                }
+                if(simulationData["boundaryCondition"] !== null)
+                    newSpecies.setBoundaryCondition(simulationData["boundaryCondition"]);
+                if(simulationData["constant"] !== null)
+                    newSpecies.setConstant(simulationData["constant"]);
+            }
 
             const new_id = nodes[i].id();
             var newStr = new_id.replace(/-/g, "_"); //Replacing - with _ because libsml doesn't allow - in id
@@ -198,32 +294,75 @@ module.exports = function () {
             bb.setX(box.x - box.w / 2); bb.setY(box.y - box.h / 2);
             bb.width = box.w; bb.height = box.h;
 
-            // Add State Info for Species as Annotation
-            if(!active && !hypothetical && !multimer && nodes[i].data('statesandinfos').length == 0)
-                continue;
-            
+            let data = nodes[i]._private.data;
+
+            var annotations = data['annotations'];
+            var annots = [];
+            for (var annotID in annotations) {
+                var currentAnnot = annotations[annotID];
+                // check validity of annotation
+                if(currentAnnot.status != 'validated' || !currentAnnot.selectedDB || !currentAnnot.annotationValue) {
+                    continue;
+                }
+                var annotInfo = {};
+                annotInfo.annotationValue = currentAnnot.annotationValue;
+                annotInfo.selectedDB = currentAnnot.selectedDB;
+                annotInfo.selectedRelation = currentAnnot.selectedRelation;
+                
+                annots.push(annotInfo);
+            }
+
             let annotationString = '<nwt:extension xmlns:nwt="https://newteditor.org/">';
-            annotationString += '<nwt:info nwt:multimer="' + multimer + '" nwt:active="' + active + 
+            annotationString += '<nwt:info '
+            + 'nwt:background-color="' + (data['background-color'] || '') + '" '
+            + 'nwt:background-fit="' + (data['background-fit'] || '') + '" '
+            + 'nwt:background-height="' + (data['background-height'] || '') + '" '
+            + 'nwt:background-image="' + (data['background-image'] || '') + '" '
+            + 'nwt:background-image-opacity="' + (data['background-image-opacity'] || '') + '" '
+            + 'nwt:background-opacity="' + (data['background-opacity'] || '') + '" '
+            + 'nwt:background-position-x="' + (data['background-position-x'] || '') + '" '
+            + 'nwt:background-position-y="' + (data['background-position-y'] || '') + '" '
+            + 'nwt:background-width="' + (data['background-width'] || '') + '"';
+
+            // Add State Info for Species as Annotation
+            if(!(!active && !hypothetical && !multimer && nodes[i].data('statesandinfos').length == 0 &&annots.length == 0)){
+                annotationString += ' nwt:multimer="' + multimer + '" nwt:active="' + active + 
                                     '" nwt:hypothetical="' + hypothetical + '" nwt:infoid="info_' + infoId +
                                     '" nwt:id="' + newSpecies.getId() + '">';
-            for(let item of nodes[i].data('statesandinfos')){
-                let boundingBox = item.bbox;
-                let absoluteCoords = classes.AuxiliaryUnit.getAbsoluteCoord(item, cy);
-                let boundingBoxStr =  'nwt:x="' + (absoluteCoords.x - boundingBox.w / 2) + '" nwt:y="' + (absoluteCoords.y - boundingBox.h / 2) + 
-                                    '" nwt:w="' + boundingBox.w + '" nwt:h="' + boundingBox.h + '"';
-                if(item.clazz == "residue variable"){
-                    annotationString += '<nwt:residuevariable ' + boundingBoxStr + '>' + item.residue.variable + '</nwt:residuevariable>';
+                for(let item of nodes[i].data('statesandinfos')){
+                    let boundingBox = item.bbox;
+                    let absoluteCoords = classes.AuxiliaryUnit.getAbsoluteCoord(item, cy);
+                    let boundingBoxStr =  'nwt:x="' + (absoluteCoords.x - boundingBox.w / 2) + '" nwt:y="' + (absoluteCoords.y - boundingBox.h / 2) + 
+                                        '" nwt:w="' + boundingBox.w + '" nwt:h="' + boundingBox.h + '"';
+                    if(item.clazz == "residue variable"){
+                        annotationString += '<nwt:residuevariable ' + boundingBoxStr + '>' + item.residue.variable + '</nwt:residuevariable>';
+                    }
+                    else if(item.clazz == "binding region"){
+                        annotationString += '<nwt:bindingregion ' + boundingBoxStr + '>' + item.region.variable + '</nwt:bindingregion>';
+                    }
+                    else if(item.clazz == "unit of information"){
+                        annotationString += '<nwt:unitinfo ' + boundingBoxStr + '>' + item.label.text + '</nwt:unitinfo>';
+                    }
+                    else if(item.clazz == "state variable"){
+                        annotationString += '<nwt:statevariable ' + boundingBoxStr + ' nwt:value="' + item.state.value + '">' + item.state.variable + '</nwt:statevariable>';
+                    }
                 }
-                else if(item.clazz == "binding region"){
-                    annotationString += '<nwt:bindingregion ' + boundingBoxStr + '>' + item.region.variable + '</nwt:bindingregion>';
-                }
-                else if(item.clazz == "unit of information"){
-                    annotationString += '<nwt:unitinfo ' + boundingBoxStr + '>' + item.label.text + '</nwt:unitinfo>';
+
+                for(let item of annots){
+                    annotationString += '<nwt:customproperty' +
+                      ' nwt:value="' + item.annotationValue + '"' +
+                      ' nwt:DB="' + item.selectedDB + '"' +
+                      ' nwt:relation="' + item.selectedRelation + '">' +
+                      '</nwt:customproperty>';
                 }
             }
-            annotationString += '</nwt:info>'
-            annotationString += '</nwt:extension>'
+            else{
+                annotationString += ' nwt:id="' + newSpecies.getId() + '">';
+            }
             infoId += 1;
+            annotationString += '</nwt:info>';
+            annotationString += '</nwt:extension>';
+            
             newSpecies.setAnnotation(annotationString);
         }
 
@@ -265,7 +404,7 @@ module.exports = function () {
             let processId = process.id().replace(/-/g, '_');
             
             var rxn = model.createReaction();
-            rxn.setId('process_'+ processId);
+            rxn.setId(processId);
             rxn.setReversible(false);
 
             // Parent Info
@@ -286,6 +425,7 @@ module.exports = function () {
                 let sourceId = sourceEdge.source().id().replace(/-/g, '_');
                 const spr1 = rxn.createReactant();
                 spr1.setSpecies(sourceId);
+                spr1.setStoichiometry( (sourceEdge.data("simulation")["stoichiometry"] || "") );
                 spr1.setConstant(true);
             }
             
@@ -293,6 +433,7 @@ module.exports = function () {
                 let targetId = targetEdge.target().id().replace(/-/g, '_');
                 const spr2 = rxn.createProduct();
                 spr2.setSpecies(targetId);
+                spr2.setStoichiometry( (targetEdge.data("simulation")["stoichiometry"] || "") );
                 spr2.setConstant(true);
             }
             
@@ -336,7 +477,18 @@ module.exports = function () {
                 rxn.setSBOTerm(185);
             else
                 rxn.setSBOTerm(176);
-
+            
+            const k1 = rxn.createKineticLaw();
+            for(var lp of process.data("simulation")["localParameters"]){
+                var localp = k1.createLocalParameter();
+                localp.setValue(lp.quantity);
+                localp.setName(lp.name.replace(/-/g, '_'));
+                localp.setId(lp.id.replace(/-/g, '_'));
+                localp.setUnits(lp.units);
+            }
+            const parser = new libsbmlInstance.SBMLFormulaParser();
+            const kmath = parser.parseL3Formula( (process.data("simulation")["kineticLaw"] || "") );
+            k1.setMath(kmath);
             // Add Layout Info for Processes
             const glyph = layout.createReactionGlyph();
             glyph.setId("process_" + (i+1));
@@ -392,9 +544,16 @@ module.exports = function () {
                 referenceGlyph.setRole(1);
                 referenceGlyph.setId("substrate_" + (i+1) + "_" + (j+1));
 
-                var lineSegment = referenceGlyph.createLineSegment();
-                var lineStart = substrate.sourceEndpoint();
-                var lineEnd = substrate.targetEndpoint();
+                var lineSegment = referenceGlyph.createLineSegment();  
+                var lineStart, lineEnd;
+                if (jsonToSbml.isSpecies(cy.getElementById(substrate.data("source")).data("class"))) {
+                    lineStart = substrate.targetEndpoint();
+                    lineEnd = substrate.sourceEndpoint();
+                } else {
+                    lineStart = substrate.sourceEndpoint();
+                    lineEnd = substrate.targetEndpoint();
+                }
+
                 var start = lineSegment.getStart(); start.setX(lineStart.x); start.setY(lineStart.y);
                 var end = lineSegment.getEnd(); end.setX(lineEnd.x); end.setY(lineEnd.y);
             }
@@ -487,6 +646,90 @@ module.exports = function () {
             referenceGlyph2.setSpeciesGlyphId(  + '_glyph');
             referenceGlyph2.setRole(5);
             referenceGlyph2.setId("reduced_product_" + (i+1));
+        }
+
+
+        // Add Rules (Assignment and Rate)
+        var rules = sbmlSimulationUtilities.getRules();
+        for (var r of rules) {
+            let rule;
+            if (r.type === 'assignment') {
+                rule = model.createAssignmentRule();
+            } else if (r.type === 'rate') {
+                rule = model.createRateRule();
+            } else {
+                continue;
+            }
+            if (r.id) rule.setId(r.id);
+            if (r.target) rule.setVariable(r.target);
+            if (r.math !== undefined && r.math !== null) {
+                const parser = new libsbmlInstance.SBMLFormulaParser();
+                const kmath = parser.parseL3Formula(r.math);
+                rule.setMath(kmath);
+            }
+        }
+
+
+        // Add Events
+        var events = sbmlSimulationUtilities.getEvents();
+        for (var e of events) {
+            const evt = model.createEvent();
+            if (e.id) evt.setId(e.id);
+            if (typeof e.useValuesFromTriggerTime === 'boolean') {
+                evt.setUseValuesFromTriggerTime(e.useValuesFromTriggerTime);
+            }
+
+            // Trigger
+            const trig = evt.createTrigger();
+            if (e.trigger) {
+                if (typeof e.trigger.initialValue === 'boolean') {
+                    trig.setInitialValue(e.trigger.initialValue);
+                }
+                if (typeof e.trigger.persistent === 'boolean') {
+                    trig.setPersistent(e.trigger.persistent);
+                }
+                if (e.trigger.math !== undefined && e.trigger.math !== null) {
+                    const parser = new libsbmlInstance.SBMLFormulaParser();
+                    const tmath = parser.parseL3Formula(e.trigger.math);
+                    trig.setMath(tmath);
+                }
+            }
+
+            // Priority (optional)
+            if (e.priority !== undefined && e.priority !== null && e.priority !== "") {
+                const parser = new libsbmlInstance.SBMLFormulaParser();
+                const pmath = parser.parseL3Formula(e.priority);
+                const pr = evt.createPriority();
+                pr.setMath(pmath);
+            }
+
+            // Delay (optional)
+            if (e.delay !== undefined && e.delay !== null && e.delay !== "") {
+                const parser = new libsbmlInstance.SBMLFormulaParser();
+                const dmath = parser.parseL3Formula(e.delay);
+                const del = evt.createDelay();
+                del.setMath(dmath);
+            }
+
+            // Event Assignments
+            var evAssignments = Array.isArray(e.assignments) ? e.assignments : [];
+            for (var a of evAssignments) {
+                const ea = evt.createEventAssignment();
+                if (a.target) ea.setVariable(a.target);
+                const parser = new libsbmlInstance.SBMLFormulaParser();
+                const amath = parser.parseL3Formula(a.math || "");
+                ea.setMath(amath);
+            }
+        }
+
+        // Add Initial Assignments
+        var initialAssignments = sbmlSimulationUtilities.getInitialAssignments();
+        for (var ia of initialAssignments) {
+            const initA = model.createInitialAssignment();
+            initA.setId(ia.id);
+            initA.setSymbol(ia.symbol);
+            var parsedFormula = new libsbmlInstance.SBMLFormulaParser().parseL3Formula(ia.math);
+            initA.setMath(parsedFormula);
         }
 
         const writer = new libsbmlInstance.SBMLWriter()

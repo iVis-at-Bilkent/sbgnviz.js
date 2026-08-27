@@ -1,4 +1,3 @@
-
 var libsbgnjs = require('libsbgn.js');
 var renderExtension = libsbgnjs.render;
 var annot = libsbgnjs.annot;
@@ -59,7 +58,6 @@ module.exports = function () {
     this.nodes = nodes || cy.nodes();
     this.edges = edges || cy.edges();
 
-    
     var id = [];
     var i = 0;
     this.nodes.forEach(node => ()=>{
@@ -310,6 +308,30 @@ module.exports = function () {
       return annotExt;
   };
 
+  jsonToSbgnml.getGlyphsBoundaryChildren = function (node) {
+    var boundaryNodes = node.cy().nodes('[boundaryParentId="' + node.id() + '"]');
+    var collapsedChildren = node.data('collapsedChildren');
+    var collapsedBoundaryNodes = [];
+
+    if (collapsedChildren) {
+      collapsedChildren.forEach(function (ele) {
+        if (ele.isNode() && ele.data('boundaryParentId') === node.id()) {
+          collapsedBoundaryNodes.push(ele.id());
+        }
+      });
+    }
+
+    if (boundaryNodes.length > 0 || collapsedBoundaryNodes.length > 0) {
+      var boundaryNodesIds = [];
+      boundaryNodes.forEach(function (ele, i) {
+      boundaryNodesIds.push(ele.id());
+      });
+      boundaryNodesIds = boundaryNodesIds.concat(collapsedBoundaryNodes);
+      return boundaryNodesIds.join(':');
+    }
+    return ''
+  };
+
   jsonToSbgnml.getGlyphSbgnml = function(node, version, visible = true){
     var self = this;
     var nodeClass = node._private.data.class;
@@ -336,9 +358,11 @@ module.exports = function () {
        }
        else {
            var parent = node.parent()[0];
-           if(parent._private.data.class == "compartment" || parent._private.data.class ==='complex sbml')
+           if(parent._private.data.class == "compartment")
                glyph.compartmentRef = parent._private.data.id;
        }
+    } else if (node._private.data.boundaryParentId) {
+      glyph.compartmentRef = node._private.data.boundaryParentId;
     }
 
     // misc information
@@ -351,7 +375,7 @@ module.exports = function () {
     //add bbox information
     glyph.setBbox(this.addGlyphBbox(node));
 
-    if(node.isParent() || node.data().class == 'topology group' || node.data().class == 'submap' || node.data().class == 'complex' || node.data().class == 'compartment'){
+    if(node.isParent() || node.data().class == 'topology group' || node.data().class == 'submap' || node.data().class.includes('complex') || node.data().class == 'compartment'){
       var extraInfo = {};
       extraInfo.w = node.width();
       extraInfo.h = node.height();
@@ -361,6 +385,9 @@ module.exports = function () {
       extraInfo.WRBias = Number(node.css("min-width-bias-right").replace("px",""));
       extraInfo.HTBias = Number(node.css("min-height-bias-top").replace("px",""));
       extraInfo.HBBias = Number(node.css("min-height-bias-bottom").replace("px",""));
+      if (node.data().class === 'compartment') {
+        extraInfo.boundaryNodes = jsonToSbgnml.getGlyphsBoundaryChildren(node);
+      }
       glyph.setExtension(new libsbgnjs.Extension());
       extraInfo.$ = { "xmlns:nwt": "https://newteditor.org/" };
       var extraInfoXml = compoundExtensionBuilder.buildObject(extraInfo);
@@ -404,7 +431,7 @@ module.exports = function () {
       extension.add(annotExt);
     }
     // add glyph members that are not state variables or unit of info: subunits
-    if(nodeClass === "complex" || nodeClass === "complex multimer" || nodeClass === "submap" || nodeClass === "topology group" || nodeClass == "active protein"){
+    if(nodeClass.includes("complex") || nodeClass === "submap" || nodeClass === "topology group" || nodeClass == "active protein"){
        var children = node.children();
        children = children.union(this.allCollapsedNodes);
        if(node.data('collapsedChildren')) {
@@ -456,7 +483,7 @@ module.exports = function () {
     glyphList.push(glyph);
 
     // keep going with all the included glyphs
-    if(nodeClass === "compartment"||nodeClass==='complex sbml'){
+    if(nodeClass === "compartment"){
        var children = node.children();
        children = children.union(this.allCollapsedNodes);
        children = children.filter("[parent = '"+ node.id() + "']")
@@ -466,6 +493,10 @@ module.exports = function () {
            }
            glyphList = glyphList.concat(self.getGlyphSbgnml(ele, version, visible));
        });
+    }
+
+    if (nodeClass === "tag" && node._private.data.orientation) {
+      glyph.orientation = node._private.data.orientation;
     }
 
     return  glyphList;
@@ -614,6 +645,9 @@ module.exports = function () {
           state.variable = node.state.variable;
       glyph.setState(state);
       glyph.setBbox(this.addStateAndInfoBbox(mainGlyph, node));
+      glyph.setExtension(new libsbgnjs.Extension());
+      var xmlext = "<visible>" + node.visible +"</visible>";
+      glyph.extension.add(xmlext);
 
       return glyph;
   };
@@ -625,6 +659,9 @@ module.exports = function () {
         label.text = node.region.variable;
     glyph.setLabel(label);
     glyph.setBbox(this.addStateAndInfoBbox(mainGlyph, node));
+    glyph.setExtension(new libsbgnjs.Extension());
+      var xmlext = "<visible>" + node.visible +"</visible>";
+      glyph.extension.add(xmlext);
 
     return glyph;
   };
@@ -636,6 +673,9 @@ module.exports = function () {
           label.text = node.residue.variable;
       glyph.setLabel(label);
       glyph.setBbox(this.addStateAndInfoBbox(mainGlyph, node));
+      glyph.setExtension(new libsbgnjs.Extension());
+      var xmlext = "<visible>" + node.visible +"</visible>";
+      glyph.extension.add(xmlext);
 
       return glyph;
 };
@@ -647,6 +687,9 @@ module.exports = function () {
           label.text = node.label.text;
       glyph.setLabel(label);
       glyph.setBbox(this.addStateAndInfoBbox(mainGlyph, node));
+      glyph.setExtension(new libsbgnjs.Extension());
+      var xmlext = "<visible>" + node.visible +"</visible>";
+      glyph.extension.add(xmlext);
 
       // assign correct entity tag for AF case
       var entityName = null;

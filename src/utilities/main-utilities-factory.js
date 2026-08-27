@@ -580,7 +580,6 @@ module.exports = function () {
       mainUtilities.beforePerformLayout();
       
       var layout = cy.elements().filter(':visible').layout(layoutOptions);
-
       // Check this for cytoscape.js backward compatibility
       if (layout && layout.run) {
         layout.run();
@@ -699,5 +698,12 @@ mainUtilities.getMapProperties = function() {
   mainUtilities.getCompoundPadding = function() {
     return options.compoundPadding;
   }
-   return mainUtilities;
+
+  mainUtilities.setCalculateBoundaryPadding = function (enable) {
+    options.calculateBoundaryPadding = enable;
+    optionUtilities.extendOptions(options);
+    cy.style().update();
+  }
+  
+  return mainUtilities;
 };

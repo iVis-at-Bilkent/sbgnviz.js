@@ -6,7 +6,7 @@ var jQuery = ($ = libs.jQuery);
 var classes = require("./classes");
 
 module.exports = function () {
-  var elementUtilities, graphUtilities, handledElements, mainUtilities, libsbmlInstance;
+  var elementUtilities, graphUtilities, handledElements, mainUtilities, sbmlSimulationUtilities, libsbmlInstance;
   let resultJson = [];
   let speciesCompartmentMap = new Map;
   let layout;
@@ -17,6 +17,7 @@ module.exports = function () {
     elementUtilities = param.elementUtilities;
     graphUtilities = param.graphUtilities;
     mainUtilities = param.mainUtilities;
+    sbmlSimulationUtilities = param.sbmlSimulationUtilities;
     libsbmlInstance = param.libsbmlInstance;
 
     handledElements = {};
@@ -28,6 +29,7 @@ module.exports = function () {
 
   var sboToNodeClass = {
     278: "rna",
+    334: "antisense rna",
     253: "complex sbml",
     289: "hypothetical complex",
     291: "degradation",
@@ -110,6 +112,8 @@ module.exports = function () {
     let doc = reader.readSBMLFromString(xmlString);
     model = doc.getModel();
 
+    sbmlToJson.addMultiFeatures(xmlString,model);
+
     let plugin;
     try {
       plugin = model.findPlugin('layout');
@@ -128,9 +132,15 @@ module.exports = function () {
     let compartmentBoundingBoxes = new Map;
     let containerNodeMap = new Map;
 
+    sbmlToJson.addParameters(model);
+    sbmlToJson.addFunctionDefinitions(model);
+    sbmlToJson.addUnitDefinitions(xmlString, model);
     sbmlToJson.addCompartments(model, cytoscapeJsNodes, compartmentBoundingBoxes, containerNodeMap);
     sbmlToJson.addSpecies(model, cytoscapeJsNodes, compartmentBoundingBoxes, containerNodeMap);
     sbmlToJson.addReactions(model, cytoscapeJsEdges,cytoscapeJsNodes);
+    sbmlToJson.addInitialAssignments(model);
+    sbmlToJson.addRules(model);
+    sbmlToJson.addEvents(model);
     sbmlToJson.fixCompartmentBiases(model, cytoscapeJsNodes, compartmentBoundingBoxes);
 
     var inferNestingOnLoad = options.inferNestingOnLoad;
@@ -147,6 +157,372 @@ module.exports = function () {
     return cytoscapeJsGraph;
   };
 
+  sbmlToJson.addEvents = function(model) {
+    for (let i = 0; i < model.getNumEvents(); i++) {
+      const evt = model.getEvent(i);
+
+      let evtId;
+      if (evt.isSetIdAttribute()) {
+        evtId = evt.getId();
+      }
+
+      let useValuesFromTriggerTime = false;
+      if (evt.isSetUseValuesFromTriggerTime()) {
+        useValuesFromTriggerTime = evt.getUseValuesFromTriggerTime();
+      }
+
+      let trigInitialValue = false;
+      let trigPersistent = false;
+      let trigMath = "";
+      if (evt.isSetTrigger()) {
+        const trig = evt.getTrigger();
+        if (trig.isSetInitialValue()) trigInitialValue = trig.getInitialValue();
+        if (trig.isSetPersistent()) trigPersistent = trig.getPersistent();
+        if (trig.isSetMath()) {
+          trigMath = new libsbmlInstance.SBMLFormulaParser().formulaToL3String(trig.getMath());
+        }
+      }
+
+      let priority = "";
+      if (evt.isSetPriority()) {
+        const p = evt.getPriority();
+        if (p.isSetMath()) {
+          priority = new libsbmlInstance.SBMLFormulaParser().formulaToL3String(p.getMath());
+        }
+      }
+
+      let delay = "";
+      if (evt.isSetDelay()) {
+        const d = evt.getDelay();
+        if (d.isSetMath()) {
+          delay = new libsbmlInstance.SBMLFormulaParser().formulaToL3String(d.getMath());
+        }
+      }
+
+      let assignments = [];
+      for (let j = 0; j < evt.getNumEventAssignments(); j++) {
+        const ea = evt.getEventAssignment(j);
+        let target = "";
+        if (ea.isSetVariable()) target = ea.getVariable();
+        let math = "";
+        if (ea.isSetMath()) {
+          math = new libsbmlInstance.SBMLFormulaParser().formulaToL3String(ea.getMath());
+        }
+        assignments.push({ target, math });
+      }
+
+      if (evtId) {
+        sbmlSimulationUtilities.addEventWithId(
+          evtId,
+          useValuesFromTriggerTime,
+          trigInitialValue,
+          trigPersistent,
+          trigMath,
+          priority,
+          delay,
+          assignments
+        );
+      } else {
+        sbmlSimulationUtilities.addEvent(
+          useValuesFromTriggerTime,
+          trigInitialValue,
+          trigPersistent,
+          trigMath,
+          priority,
+          delay,
+          assignments
+        );
+      }
+    }
+  }
+
+  sbmlToJson.addInitialAssignments = function(model) {
+    for(let i = 0; i < model.getNumInitialAssignments() ; i++) {
+      let ia = model.getInitialAssignment(i);
+      let iaId = ia.getId();
+      let iaSymbol = "";
+      if(ia.isSetSymbol())
+        iaSymbol = ia.getSymbol();
+      let iaMath = "";
+      if(ia.isSetMath())
+        iaMath = new libsbmlInstance.SBMLFormulaParser().formulaToL3String(ia.getMath());
+      sbmlSimulationUtilities.addInitialAssignmentWithId(iaId, iaSymbol, iaMath);
+    }
+  }
+
+  sbmlToJson.addRules = function(model) {
+    for (let i = 0; i < model.getNumRules(); i++) {
+      const rule = model.getRule(i);
+      if (rule.isAlgebraic()) continue;
+
+      let type = null;
+      if (rule.isAssignment()) type = 'assignment';
+      else if (rule.isRate()) type = 'rate';
+      else continue;
+
+      let ruleId;
+      if (rule.isSetIdAttribute()) {
+        ruleId = rule.getId();
+      }
+      let target = '';
+      if (rule.isSetVariable()) {
+        target = rule.getVariable();
+      }
+      let math = '';
+      if (rule.isSetFormula()) {
+        math = rule.getFormula();
+      }
+
+      if (ruleId) {
+        sbmlSimulationUtilities.addRuleWithId(ruleId, type, target, math);
+      } else {
+        sbmlSimulationUtilities.addRule(type, target, math);
+      }
+    }
+  }
+
+  sbmlToJson.addFunctionDefinitions = function(model) {
+    for(let i = 0; i < model.getNumFunctionDefinitions() ; i++) {
+      let fd = model.getFunctionDefinition(i);
+      let fdId = fd.getId();
+      let args = [];
+      for(let j = 0; j < fd.getNumArguments(); j++){
+        args.push(fd.getArgument(j).getName());
+      }
+      let formulaBody = "";
+      if(fd.isSetBody())
+        formulaBody = new libsbmlInstance.SBMLFormulaParser().formulaToL3String(fd.getBody());
+      let fdName = fdId;
+      if(fd.isSetName())
+        fdName = fd.getName();
+      sbmlSimulationUtilities.addFunctionDefinitionWithId(fdId, fdName, args, formulaBody);
+    }
+  }
+
+  // Import UnitDefinitions (custom units) with multiplier from XML parsing (libsbmljs lacks getMultiplier)
+  sbmlToJson.addUnitDefinitions = function(xmlString, model) {
+    // Build quick lookup: UnitDefinition id -> list of unit attrs from XML
+    let udIdToXmlUnits = new Map();
+    try {
+      parseString(xmlString, function(err, res){
+        if (err || !res || !res.sbml || !res.sbml.model) return;
+        const list = res.sbml.model[0].listOfUnitDefinitions || [];
+        if (list.length === 0) return;
+        const uds = list[0].unitDefinition || [];
+        for (const ud of uds) {
+          const udId = ud.$?.id;
+          if (!udId) continue;
+          const ulist = (ud.listOfUnits && ud.listOfUnits[0] && ud.listOfUnits[0].unit) || [];
+          const xmlUnits = ulist.map(function(u){
+            return {
+              kind: u.$?.kind,
+              exponent: (u.$ && (u.$.exponent !== undefined)) ? Number(u.$.exponent) : undefined,
+              scale: (u.$ && (u.$.scale !== undefined)) ? Number(u.$.scale) : undefined,
+              multiplier: (u.$ && (u.$.multiplier !== undefined)) ? Number(u.$.multiplier) : undefined
+            };
+          });
+          udIdToXmlUnits.set(udId, xmlUnits);
+        }
+      });
+    } catch(e) {}
+
+    for (let i = 0; i < model.getNumUnitDefinitions(); i++) {
+      const ud = model.getUnitDefinition(i);
+      if (!ud) continue;
+
+      const udId = ud.isSetIdAttribute() ? ud.getId() : undefined;
+      if (!udId) continue;
+      // name fallback to id if not set
+      let udName = ud.isSetName() ? ud.getName() : udId;
+      sbmlSimulationUtilities.addUnitDefinitionWithId(udId, udName, []);
+
+      const xmlUnits = udIdToXmlUnits.get(udId) || [];
+      for (let j = 0; j < ud.getNumUnits(); j++) {
+        const u = ud.getUnit(j);
+        if (!u) continue;
+
+        const kindCode = u.getKind();
+        const ukc = new libsbmlInstance.UnitKindConstructor();
+        let kindStr = '';
+        const baseKinds = sbmlSimulationUtilities.getBaseUnitKinds();
+        for (let name of baseKinds) { if (ukc.fromName(name) === kindCode) { kindStr = name; break; } }
+
+        let exponent = 1; if (u.isSetExponent()) exponent = u.getExponent();
+        let scale = 0; if (u.isSetScale()) scale = u.getScale();
+        let multiplier = 1;
+        // Try to get from XML, align by index if available
+        if (xmlUnits[j] && xmlUnits[j].multiplier !== undefined) {
+          multiplier = Number(xmlUnits[j].multiplier);
+        }
+
+        sbmlSimulationUtilities.addUnitToDefinition(udId, kindStr, exponent, scale, multiplier);
+      }
+    }
+  }
+
+  // add parameters TODO: implement units
+  sbmlToJson.addParameters = function(model) {
+    for(let i = 0; i < model.getNumParameters(); i++){
+      let parameter = model.getParameter(i);
+      var paramId = parameter.getId();
+      var paramName = paramId;
+      if (parameter.isSetName())
+        paramName = parameter.getName();
+      paramValue = 0.0;
+      if (parameter.isSetValue())
+        paramValue = parameter.getValue();
+      paramConstant = true;
+      if (parameter.isSetConstant())
+        paramConstant = parameter.getConstant();
+      let paramUnits = "";
+      if (parameter.isSetUnits()) paramUnits = parameter.getUnits();
+      sbmlSimulationUtilities.addParameterWithId(paramId, paramName, paramValue, paramUnits, paramConstant);
+    }
+  }
+
+  sbmlToJson.addMultiFeatures = function(xmlString,model){
+
+    if (!xmlString || typeof xmlString !== 'string' || !xmlString.trim().startsWith('<')) {
+      return;
+    }
+    
+    parseString(xmlString, function(err, result) {
+      if (err) {
+        console.error("Parse error:", err);
+        return;
+      }
+
+      if(!result.sbml.model[0]["multi:listOfSpeciesTypes"]){
+        return;
+      }
+      const suffixIdNameMap = {};
+      const structuralStateIdNameMap = {};
+      const speciesList = result.sbml.model[0].listOfSpecies[0].species;
+      const speciesTypes = result.sbml.model[0]["multi:listOfSpeciesTypes"]?.[0]["multi:speciesType"] || [];
+
+      for(const type of speciesTypes){
+        const featureTypes = type["multi:listOfSpeciesFeatureTypes"][0]["multi:speciesFeatureType"];
+        for (const ftype of featureTypes)
+        {
+            const id = ftype.$["multi:id"];
+
+            if (id.includes("minerva_state_suffix")) {
+              const possibleValues = ftype["multi:listOfPossibleSpeciesFeatureValues"]?.[0]["multi:possibleSpeciesFeatureValue"] || [];
+
+              for (const value of possibleValues) {
+                const valueId = value.$["multi:id"];
+                const name = value.$["multi:name"];
+                suffixIdNameMap[valueId] = name;
+              }
+            }
+            if(id.includes("minerva_structural_state") || id.includes("Residue")){
+                const possibleValues = ftype["multi:listOfPossibleSpeciesFeatureValues"]?.[0]["multi:possibleSpeciesFeatureValue"] || [];
+
+              for (const value of possibleValues) {
+                const valueId = value.$["multi:id"];
+                const name = value.$["multi:name"];
+                structuralStateIdNameMap[valueId] = name;
+              }
+            }
+        }
+      }
+
+      for (let i = 0; i < model.getNumSpecies(); i++) {
+        const xmlSpecies = speciesList[i];
+        const speciesId = xmlSpecies.$.id;
+        const sbmlSpecies = model.getSpecies(i);
+
+        if (!sbmlSpecies) continue;
+
+        let rdf; 
+
+        const rdfDescription = xmlSpecies['annotation']?.[0]['rdf:RDF']?.[0]['rdf:Description'][0];
+
+        if (rdfDescription) {
+            for (const key in rdfDescription) {
+                if (rdfDescription[key]) {
+                    const relationObject = rdfDescription[key][0];
+                    const rdfBag = relationObject?.['rdf:Bag'];
+                    if (rdfBag) {
+                        const rdfLi = rdfBag[0]?.['rdf:li'];
+                        if (rdfLi) {
+                            let resource = rdfLi[0].$?.['rdf:resource'];
+                            resource = resource.substring("urn:miriam:".length).replace(/:/g, '/');;
+                            resource = `http://identifiers.org/${resource}`;
+                            if (resource) {
+                                var regexp = /^http:\/\/identifiers.org\/([^/:_]+).*$/;
+                                var db =  resource.replace(regexp, '$1');
+                                rdf = {key,resource,db};
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        let annotation = `<nwt:extension xmlns:nwt="https://newteditor.org/">\n`;
+        annotation += `<nwt:info nwt:multimer="false" nwt:active="false" nwt:hypothetical="false" nwt:infoid="info_${i + 1}" nwt:id="${speciesId}">\n`;
+
+        let isMultimer = false;
+
+        const featureList = xmlSpecies["multi:listOfSpeciesFeatures"]?.[0]?.["multi:speciesFeature"] || [];
+
+        for (const feature of featureList) {
+          const featureType = feature.$["multi:speciesFeatureType"];
+          const values = feature["multi:listOfSpeciesFeatureValues"]?.[0]?.["multi:speciesFeatureValue"] || [];
+
+          for (const value of values) {
+
+            const infoboxText = value.$["multi:value"] || "unknown";
+            const fakeX = 50+i;
+            const fakeY = 50+i;
+            const w = 40;
+            const h = 12;
+
+            if(featureType.includes("minerva_dimer")){
+              isMultimer = true;
+            }
+
+            if (featureType.includes("state_suffix")) {
+              let infoText = suffixIdNameMap[infoboxText]? suffixIdNameMap[infoboxText] : "";
+              annotation += `<nwt:unitinfo nwt:x="${fakeX}" nwt:y="${fakeY}" nwt:w="${w}" nwt:h="${h}">${infoText}</nwt:unitinfo>\n`;
+            } else if (featureType.includes("structural_state") ||featureType.includes("Residue")) {
+              let mainStateText = structuralStateIdNameMap[infoboxText]? structuralStateIdNameMap[infoboxText] : "";
+              let valueText = "";
+              if (mainStateText.includes("@")) {
+                const parts = mainStateText.split("@");
+                valueText = parts[0];
+                mainStateText = parts[1];
+              }
+              else if(!featureType.includes("Residue")){
+                valueText = mainStateText;
+                mainStateText = "";
+              }
+              else if(featureType.includes("Residue_PHOSPHORYLATED")){
+                valueText = "P";
+              }
+              annotation += `<nwt:statevariable nwt:x="${fakeX}" nwt:y="${fakeY}" nwt:w="${w}" nwt:h="${h}" nwt:value="${valueText}">${mainStateText}</nwt:statevariable>\n`;
+            }
+          }
+        }
+        if(rdf){
+          annotation += '<nwt:customproperty' +
+                      ' nwt:value="' + rdf.resource + '"' +
+                      ' nwt:DB="' + rdf.db + '"' +
+                      ' nwt:relation="' + rdf.key + '">' +
+                      '</nwt:customproperty>';
+        }
+
+        annotation += `</nwt:info>\n</nwt:extension>`;
+        annotation = annotation.replace('nwt:multimer="false"','nwt:multimer="'+isMultimer +'"');
+        try {
+          sbmlSpecies.setAnnotation(annotation);
+        } catch (e) {
+          console.error(`Annotation set failed for ${speciesId}:`, e);
+        }
+      }
+    });
+  }
 
 // add compartment nodes
 sbmlToJson.addCompartments = function (model,cytoscapeJsNodes, compartmentBoundingBoxes, containerNodeMap) {
@@ -155,8 +531,48 @@ sbmlToJson.addCompartments = function (model,cytoscapeJsNodes, compartmentBoundi
     let compartment = model.getCompartment(i);
     compartmentMap.set(compartment.getId(), i);
     if(compartment.getId() !== "default") {
-    let compartmentData = {"id": compartment.getId(), "label": compartment.getName(), "class": "compartment"};
-      resultJson.push({"data": compartmentData, "group": "nodes", "classes": "compartment"});
+      let compartmentData = {"id": compartment.getId(), "label": compartment.getName(), "class": "compartment"};
+      let simulationData = {};
+      
+      if(compartment.isSetSpatialDimensions())
+        simulationData.spatialDimensions = compartment.getSpatialDimensions();
+      if(compartment.isSetVolume())
+        simulationData.size = compartment.getVolume();
+      if(compartment.isSetConstant())
+        simulationData.constant = compartment.getConstant();
+      if(compartment.isSetUnits())
+        simulationData.units = compartment.getUnits();
+      
+      let styleAttributes = {
+        "background-color": "",
+        "background-fit": "",
+        "background-height": "",
+        "background-image": "",
+        "background-image-opacity": "",
+        "background-opacity": "",
+        "background-position-x": "",
+        "background-position-y": "",
+        "background-width": ""
+      };
+
+      parseString(compartment.getAnnotationString(), function(err, result){
+        if(!result || !result.annotation["nwt:extension"])
+          return;
+
+        let info = result.annotation["nwt:extension"][0]["nwt:info"][0];
+        let attrs = info.$;
+
+        for (let key in styleAttributes) {
+          const nwtAttr = `nwt:${key}`;
+          styleAttributes[key] = attrs[nwtAttr] || "";
+        }
+      })
+
+      for (let key in styleAttributes) {
+        compartmentData[key] = styleAttributes[key];
+      }
+
+      resultJson.push({"data": compartmentData, "simulation": simulationData, "group": "nodes", "classes": "compartment"});
     }
     if(!compartmentBoundingBoxes.has(compartment.getId())){
       compartmentBoundingBoxes.set(compartment.getId(), {x1: 0, y1: 0, x2: 0, y2: 0});
@@ -198,6 +614,8 @@ sbmlToJson.addJSCompartments = function(compartmentMap, resultJson, cytoscapeJsN
       nodeObj.label = resultJson[i].data.label;
       nodeObj.statesandinfos = [];
       nodeObj.ports = [];
+      nodeObj.language = 'SBML';
+      nodeObj.simulation = resultJson[i].simulation;
       if(resultJson[i].data.parent)
         nodeObj.parent = resultJson[i].data.parent;
       containerNodeMap.set(nodeObj.id, 
@@ -206,6 +624,18 @@ sbmlToJson.addJSCompartments = function(compartmentMap, resultJson, cytoscapeJsN
         area: nodeObj.bbox.w * nodeObj.bbox.h});
       var cytoscapeJsNode = {data: nodeObj, style: styleObj};
       elementUtilities.extendNodeDataWithClassDefaults( nodeObj, nodeObj.class );
+
+      const styleKeys = [
+      "background-color", "background-fit", "background-height", "background-image",
+      "background-image-opacity", "background-opacity", "background-position-x",
+      "background-position-y", "background-width"];
+
+      for (let key of styleKeys) {
+      if (resultJson[i].data[key] && resultJson[i].data[key] !== "") {
+        nodeObj[key] = resultJson[i].data[key];
+      }
+      }
+
       cytoscapeJsNodes.push(cytoscapeJsNode)
     }
   }
@@ -217,10 +647,33 @@ sbmlToJson.addSpecies = function(model, cytoscapeJsNodes, compartmentBoundingBox
   for(let i = 0; i < model.getNumSpecies(); i++){
     let species = model.getSpecies(i);
     let active = false, hypothetical = false, multimer = false;
-    let bindingRegion = [], residueVariable = [], unitOfInfo = [];
+    let bindingRegion = [], residueVariable = [], unitOfInfo = [], stateVariable = [];
+    let customProperties = [];
+
+    let styleAttributes = {
+      "background-color": "",
+      "background-fit": "",
+      "background-height": "",
+      "background-image": "",
+      "background-image-opacity": "",
+      "background-opacity": "",
+      "background-position-x": "",
+      "background-position-y": "",
+      "background-width": ""
+    };
+
     parseString(species.getAnnotationString(), function(err, result){
       if(!result || !result.annotation["nwt:extension"])
         return;
+
+      let info = result.annotation["nwt:extension"][0]["nwt:info"][0];
+      let attrs = info.$;
+
+      for (let key in styleAttributes) {
+          const nwtAttr = `nwt:${key}`;
+          styleAttributes[key] = attrs[nwtAttr] || "";
+        }
+
       var stateBooleans = result.annotation["nwt:extension"][0]["nwt:info"][0].$;
       active = stateBooleans["nwt:active"] == "true" ? true : false;
       hypothetical = stateBooleans["nwt:hypothetical"] == "true" ? true : false;
@@ -228,14 +681,43 @@ sbmlToJson.addSpecies = function(model, cytoscapeJsNodes, compartmentBoundingBox
       bindingRegion = result.annotation["nwt:extension"][0]["nwt:info"][0]["nwt:bindingregion"] || [];
       residueVariable = result.annotation["nwt:extension"][0]["nwt:info"][0]["nwt:residuevariable"] || [];
       unitOfInfo = result.annotation["nwt:extension"][0]["nwt:info"][0]["nwt:unitinfo"] || [];
+      stateVariable = result.annotation["nwt:extension"][0]["nwt:info"][0]["nwt:statevariable"] || [];
+      customProperties = result.annotation["nwt:extension"][0]["nwt:info"][0]["nwt:customproperty"] || [];
     })
+
     speciesCompartmentMap.set(species.getId(), species.getCompartment());
     var sboTerm = species.getSBOTerm();
     let speciesData = {"id": species.getId(), "label": species.getName() || " ", 
                       "parent": species.getCompartment(), "sboTerm": species.getSBOTerm(),
                       "active": active, "multimer": multimer, "hypothetical": hypothetical,
-                      "bindingRegion": bindingRegion, "residueVariable": residueVariable, "unitOfInfo": unitOfInfo};
-    resultJson.push({"data": speciesData, "group": "nodes", "classes": "species"});
+                      "bindingRegion": bindingRegion, "residueVariable": residueVariable, "unitOfInfo": unitOfInfo, "stateVariable": stateVariable,
+                      "customproperty": customProperties};
+    
+    let simulationData = {};
+    if(species.isSetInitialAmount()){
+      simulationData.initial = species.getInitialAmount();
+      simulationData.initialType = "amount";
+    }
+    if(species.isSetInitialConcentration()){
+      simulationData.initial = species.getInitialConcentration();
+      simulationData.initialType = "concentration";
+    }
+    if(species.isSetHasOnlySubstanceUnits())
+      simulationData.hasOnlySubstanceUnits = species.getHasOnlySubstanceUnits();
+    if(species.isSetSubstanceUnits())
+      simulationData.substanceUnits = species.getSubstanceUnits();
+    if(species.isSetConstant())
+      simulationData.constant = species.getConstant();
+    if(species.isSetBoundaryCondition())
+      simulationData.boundaryCondition = species.getBoundaryCondition();
+    if(species.isSetConversionFactor())
+      simulationData.conversionFactor = species.getConversionFactor();
+
+    for (let key in styleAttributes) {
+      speciesData[key] = styleAttributes[key];
+    }
+
+    resultJson.push({"data": speciesData, "simulation": simulationData, "group": "nodes", "classes": "species"});
   }
   let speciesGlyphIdSpeciesIdMap = new Map();
   if (layout) {
@@ -294,6 +776,8 @@ sbmlToJson.addJSNodes = function(resultJson,cytoscapeJsNodes, speciesGlyphIdSpec
     nodeObj.statesandinfos = [];
     nodeObj.ports = [];
     nodeObj.parent = resultJson[i].data.parent;
+    nodeObj.language = 'SBML';
+    nodeObj.simulation = resultJson[i].simulation;
 
     if(sboTerm == 253)
       containerNodeMap.set(nodeObj.id, 
@@ -334,6 +818,17 @@ sbmlToJson.addJSNodes = function(resultJson,cytoscapeJsNodes, speciesGlyphIdSpec
       nodeObj.statesandinfos.push(infoBox);
     }
 
+    var stateVariable = resultJson[i].data.stateVariable;
+    for(let stateVar of stateVariable){
+      let infoBox = classes.StateVariable.construct(undefined, resultJson[i].data.id, undefined);
+      infoBox.state.variable = stateVar._;
+      infoBox.state.value = stateVar.$['nwt:value'];
+      infoBox.style = elementUtilities.getDefaultInfoboxStyle(nodeObj.class, "state variable");
+      infoBox.bbox = {'x': parseFloat(stateVar.$['nwt:x']), 'y': parseFloat(stateVar.$['nwt:y']), 
+                      'w': parseFloat(stateVar.$['nwt:w']), 'h': parseFloat(stateVar.$['nwt:h'])};
+      nodeObj.statesandinfos.push(infoBox);
+    }
+
     // Add status info
     if(resultJson[i].data.hypothetical)
       nodeObj.class = "hypothetical " + nodeObj.class;
@@ -342,8 +837,36 @@ sbmlToJson.addJSNodes = function(resultJson,cytoscapeJsNodes, speciesGlyphIdSpec
     if(resultJson[i].data.multimer)
       nodeObj.class = nodeObj.class + " multimer";
 
+    var customProperties = resultJson[i].data.customproperty;
+    let annotIndex = 0;
+    if(!nodeObj.annotations) {
+        nodeObj.annotations = {};
+      }
+    for(let property of customProperties){
+      var annotId = nodeObj.id+"-annot-"+annotIndex;
+
+      nodeObj.annotations[annotId] = {
+        status: "validated",
+        selectedDB: property.$['nwt:DB'],
+        selectedRelation: property.$['nwt:relation'],
+        annotationValue: property.$['nwt:value']
+      };
+      annotIndex++;
+    }
+
+    const styleKeys = [
+      "background-color", "background-fit", "background-height", "background-image",
+      "background-image-opacity", "background-opacity", "background-position-x",
+      "background-position-y", "background-width"
+    ];
+
     var cytoscapeJsNode = {data: nodeObj, style: styleObj};
     elementUtilities.extendNodeDataWithClassDefaults( nodeObj, nodeObj.class );
+      for (let key of styleKeys) {
+      if (resultJson[i].data[key] && resultJson[i].data[key] !== "") {
+        nodeObj[key] = resultJson[i].data[key];
+      }
+    }
     cytoscapeJsNodes.push(cytoscapeJsNode);
   }
 };
@@ -579,18 +1102,20 @@ sbmlToJson.addReactions = function(model, cytoscapeJsEdges, cytoscapeJsNodes) {
       let reactantEdgeData = {"id": product.getSpecies() + '_' + reaction.getId(), "source": nodeClass+"_"+reaction.getId(), "target": product.getSpecies(), "class": "reduced trigger"};
       resultJson.push({"data": reactantEdgeData, "group": "edges", "classes": "reactantEdge"});
       continue;
-
     }
   
-    // add reactant->reaction edges
     for(let j = 0; j < reaction.getNumReactants(); j++){
       let reactant = reaction.getReactant(j);
       let reactantEdgeData = {"id": reactant.getSpecies() + '_' + reaction.getId(), "source": reactant.getSpecies(), "target": reaction.getId()};
       if (edgeClass1) 
         reactantEdgeData.class = edgeClass1;
-      resultJson.push({"data": reactantEdgeData, "group": "edges", "classes": "reactantEdge"});
+      let simulationDataReactant = {};
+      if(reactant.isSetStoichiometry())
+        simulationDataReactant.stoichiometry = reactant.getStoichiometry();
+      if(reactant.isSetConstant())
+        simulationDataReactant.constant = reactant.getConstant();
+      resultJson.push({"data": reactantEdgeData, "simulation": simulationDataReactant, "group": "edges", "classes": "reactantEdge"});
 
-      // collect possible parent info
       let speciesCompartment = speciesCompartmentMap.get(reactant.getSpecies());
       if(reactionParentMap.has(speciesCompartment))
         reactionParentMap.set(speciesCompartment, reactionParentMap.get(speciesCompartment) + 1);
@@ -606,7 +1131,12 @@ sbmlToJson.addReactions = function(model, cytoscapeJsEdges, cytoscapeJsNodes) {
         productEdgeData.class = edgeClass2;
       if(sboTermReaction == 231)
         productEdgeData.class = "trigger";
-      resultJson.push({"data": productEdgeData, "group": "edges", "classes": "productEdge"});
+      let simulationDataProduct = {};
+      if(product.isSetStoichiometry())
+        simulationDataProduct.stoichiometry = product.getStoichiometry();
+      if(product.isSetConstant())
+        simulationDataProduct.constant = product.getConstant();
+      resultJson.push({"data": productEdgeData, "simulation": simulationDataProduct, "group": "edges", "classes": "productEdge"});
 
       // collect possible parent info
       let speciesCompartment = speciesCompartmentMap.get(product.getSpecies());
@@ -616,17 +1146,6 @@ sbmlToJson.addReactions = function(model, cytoscapeJsEdges, cytoscapeJsNodes) {
         reactionParentMap.set(speciesCompartment, 1);      
     }
 
-    // add reaction node
-    let parent = reaction.getCompartment();
-
-    let reactionData = {"id": reaction.getId(), "label": reaction.getName(), "parent": parent};
-    reactionData.width = 15;
-    reactionData.height = 15;
-    if(nodeClass){
-      reactionData.class = nodeClass
-    }
-    resultJson.push({"data": reactionData, "group": "nodes", "classes": "reaction"}); 
-    
     // add modifier->reaction edges
     for(let l = 0; l < reaction.getNumModifiers(); l++){
       let modifier = reaction.getModifier(l);
@@ -645,6 +1164,46 @@ sbmlToJson.addReactions = function(model, cytoscapeJsEdges, cytoscapeJsNodes) {
       else
         reactionParentMap.set(speciesCompartment, 1);      
     }
+
+    // add reaction node
+    let parent = reaction.getCompartment();
+    if(!parent) {
+      var max_count = 0, result = -1;
+      reactionParentMap.forEach((value, key) => {
+          if (max_count < value) {
+              result = key;
+              max_count = value;
+          }
+      });
+      parent = result;
+    }
+
+    let reactionData = {"id": reaction.getId(), "label": reaction.getName(), "parent": parent};
+    reactionData.width = 15;
+    reactionData.height = 15;
+    if(nodeClass){
+      reactionData.class = nodeClass
+    }
+
+    let simulationData = {};
+    if(reaction.isSetKineticLaw()){
+      simulationData.kineticLaw = reaction.getKineticLaw().getFormula();
+      
+      let localParameters = [];
+      for(let j = 0; j < reaction.getKineticLaw().getNumLocalParameters(); j++){
+        let localParam = reaction.getKineticLaw().getLocalParameter(j);
+        let localParamData = {
+          id: localParam.getId(),
+          name: localParam.getName() || localParam.getId(),
+          quantity: localParam.getValue(),
+          units: localParam.getUnits() || ""
+        };
+        localParameters.push(localParamData);
+      }
+      simulationData.localParameters = localParameters;
+    }
+    reactionData.simulation = simulationData;
+    resultJson.push({"data": reactionData, "group": "nodes", "classes": "reaction"}); 
   }  
 
   let reactionGlyphMap = new Map();
@@ -791,7 +1350,8 @@ sbmlToJson.addJSEdges= function(resultJson, cytoscapeJsNodes, cytoscapeJsEdges,r
         {
           edgeObj.porttarget = edgeObj.target + ".2"
         }
-
+        edgeObj.language = 'SBML';
+        edgeObj.simulation = resultJson[i].simulation;
 
         elementUtilities.extendEdgeDataWithClassDefaults( edgeObj, edgeObj.class );
         var cytoscapeJsEdge1 = {data: edgeObj, style: styleObj};
@@ -837,6 +1397,8 @@ sbmlToJson.addNodes = function( cytoscapeJsNodes, data) {
     
     nodeObj.ports = data.ports;
     nodeObj.parent = data.parent;
+    nodeObj.language = 'SBML';
+    nodeObj.simulation = data.simulation;
 
     var cytoscapeJsNode = {data: nodeObj, style: styleObj};
     elementUtilities.extendNodeDataWithClassDefaults( nodeObj, nodeObj.class );
@@ -893,5 +1455,3 @@ sbmlToJson.updateCompartmentBox = function(compartmentBoundingBoxes, compartment
 
 return sbmlToJson;
 };
-
-

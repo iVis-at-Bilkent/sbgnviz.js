@@ -75,8 +75,8 @@ module.exports = function () {
  }
  // Helper functions End
 
- var sbgnmlToJson, sbmlToJson, jsonToSbgnml, jsonToSbml, jsonToNwt, uiUtilities, tdToJson,
-     sifToJson, graphUtilities, layoutToText, nwtToJson, jsonToSif,sbgnmlToCd,cdToSbgnml,sbgnmlToSbml,sbmlToSbgnml;
+ var sbgnmlToJson, sbmlToJson, jsonToSbgnml, jsonToSbml, jsonToNwt, uiUtilities, sbmlSimulationUtilities, tdToJson,
+     sifToJson, graphUtilities, layoutToText, nwtToJson, jsonToSif,sbgnmlToCd,cdToSbgnml,sbmlToCd,sbgnmlToSbml,sbmlToSbgnml;
  var updateGraph;
  var options, cy;
 
@@ -89,6 +89,7 @@ module.exports = function () {
    jsonToNwt = param.jsonToNwtConverter;
    jsonToSif = param.jsonToSifConverter;
    uiUtilities = param.uiUtilities;
+   sbmlSimulationUtilities = param.sbmlSimulationUtilities;
    tdToJson = param.tdToJsonConverter;
    sifToJson = param.sifToJsonConverter;
    layoutToText = param.layoutToText;
@@ -98,6 +99,7 @@ module.exports = function () {
    cy = param.sbgnCyInstance.getCy();
    sbgnmlToCd = param.sbgnmlToCdConverter;
    cdToSbgnml = param.cdToSbgnmlConverter;
+   sbmlToCd = param.cdToSbmlConverter;
    sbgnmlToSbml = param.sbgnmlToSbmlConverter;
    sbmlToSbgnml = param.sbmlToSbgnmlConverter;
    gpmlToSbgnml = param.gpmlToSbgnmlConverter;
@@ -177,6 +179,7 @@ module.exports = function () {
    var file = (folderpath || 'sample-app/samples/') + filename;
 
    uiUtilities.startSpinner("load-spinner");
+   sbmlSimulationUtilities.resetAll();   // Reset already existing parameters.
    // Users may want to do customized things while a sample is being loaded
    // Trigger an event for this purpose and specify the 'filename' as an event parameter
    $(document).trigger( "sbgnvizLoadSample", [ filename, cy ] ); // Aliases for sbgnvizLoadSampleStart
@@ -251,12 +254,21 @@ module.exports = function () {
    fileUtilities.loadFile( file, convert, callback1, callback2, fileUtilities.collapseMarkedNodes );
  };
 
- fileUtilities.loadNwtFile = function(file, callback1, callback2, urlParams) {
+ fileUtilities.loadFileToLocal=function(file,callback1, callback2,urlParams,callback3){
+    var convert = function( text ) {
+      return nwtToJson.convert(textToXmlObject(text), urlParams);
+    };
+    fileUtilities.loadFile( file, convert, callback1, callback2, fileUtilities.collapseMarkedNodes,undefined,callback3);
+ };
+
+ fileUtilities.loadNwtFile = function(file, callback1, callback2, callback3, callback4, urlParams) {
    var convert = function( text ) {
      return nwtToJson.convert(textToXmlObject(text), urlParams);
    };
-
-   fileUtilities.loadFile( file, convert, callback1, callback2, fileUtilities.collapseMarkedNodes );
+   
+   // Use internal collapseMarkedNodes if callback3 is not provided
+   var collapseCallback = callback3 || fileUtilities.collapseMarkedNodes;
+   fileUtilities.loadFile( file, convert, callback1, callback2, collapseCallback, callback4 ,callback3);
  };
 
  // collapse the nodes whose collapse data field is set
@@ -278,9 +290,12 @@ module.exports = function () {
    it is completely optional.
    signature: callback(textXml)
  */
- fileUtilities.loadFile = function(file, convertFcn, callback1, callback2, callback3, callback4) {
+
+ fileUtilities.loadFile = function(file, convertFcn, callback1, callback2, callback3, callback4,toLocalorGraph) {
+
    var self = this;
    uiUtilities.startSpinner("load-file-spinner");
+   sbmlSimulationUtilities.resetAll();
 
    var textType = /text.*/;
 
@@ -315,15 +330,16 @@ module.exports = function () {
 
      setTimeout(function () {
 
-       if (typeof callback1 !== 'undefined') callback1(text);
+      if (typeof callback1 !== 'undefined') callback1(text);
 
        var cyGraph;
        try {
-         cyGraph = convertFcn( text );
-         // Users may want to do customized things while an external file is being loaded
-         // Trigger an event for this purpose and specify the 'filename' as an event parameter
-         $(document).trigger( "sbgnvizLoadFile", [ file.name, cy ] ); // Aliases for sbgnvizLoadFileStart
-         $(document).trigger( "sbgnvizLoadFileStart", [ file.name, cy ] );
+        cyGraph = convertFcn( text );
+        // Users may want to do customized things while an external file is being loaded
+        // Trigger an event for this purpose and specify the 'filename' as an event parameter
+        // console.log('Loading file using convert function:', convertFcn);
+        $(document).trigger( "sbgnvizLoadFile", [ file.name, cy ] ); // Aliases for sbgnvizLoadFileStart
+        $(document).trigger( "sbgnvizLoadFileStart", [ file.name, cy ] );
        }
        catch (err) {
          uiUtilities.endSpinner("load-file-spinner");
@@ -332,18 +348,26 @@ module.exports = function () {
          return;
        }
 
-       updateGraph(cyGraph);
+      if(toLocalorGraph===undefined){
+        updateGraph(cyGraph);
+      }
 
-       if (typeof callback3 !== 'undefined') {
-         callback3();
+      if(typeof callback3 === 'object'){
+        updateGraph(cyGraph)
+      }
+      else if(callback3 !== undefined){
+        callback3(cyGraph);
+      }
+
+
+       // Handle annotation layers data if present
+       if (cyGraph && cyGraph.annotationLayers && typeof callback4 !== 'undefined') {
+         callback4(cyGraph.annotationLayers);
        }
 
-       uiUtilities.endSpinner("load-file-spinner");
-       $(document).trigger( "sbgnvizLoadFileEnd", [ file.name, cy ] ); // Trigger an event signaling that a file is loaded
+      uiUtilities.endSpinner("load-file-spinner");
+      $(document).trigger( "sbgnvizLoadFileEnd", [ file.name, cy ] ); // Trigger an event signaling that a file is loaded
 
-       if (typeof callback4 !== 'undefined') {
-         callback4();
-       }
      }, 0);
    };
 
@@ -351,6 +375,7 @@ module.exports = function () {
  };
 
  fileUtilities.loadSBGNMLText = async function(textData, tileInfoBoxes, filename, cy, urlParams){
+  sbmlSimulationUtilities.resetAll();
   await updateGraph(sbgnmlToJson.convert(textToXmlObject(textData), urlParams), undefined, undefined, tileInfoBoxes);
   await $(document).trigger("sbgnvizLoadFileEnd",  [filename, cy]);
         uiUtilities.endSpinner("load-file-spinner");
@@ -358,12 +383,29 @@ module.exports = function () {
 
  };
 
- fileUtilities.loadSBMLText = async function(textData, tileInfoBoxes, filename, cy, urlParams){
-  await updateGraph(sbmlToJson.convert(textToXmlObject(textData), urlParams), undefined, undefined, tileInfoBoxes);
-   await $(document).trigger("sbgnvizLoadFileEnd",  [filename, cy]);
-   uiUtilities.endSpinner("load-file-spinner");
-
-};
+  // This should only be used when your SBML is coming in text format. Use loadSbmlforSBML for file loading.
+  fileUtilities.loadSBMLText = async function(textData, tileInfoBoxes, filename, cy, urlParams, layoutBy){
+    sbmlSimulationUtilities.resetAll();
+    var convertedData = sbmlToJson.convert(textData, urlParams);
+    
+    // Check if the SBML has layout information (nodes with non-zero positions)
+    var hasLayout = convertedData && convertedData.nodes && convertedData.nodes.some(function(node) {
+      return node.data && node.data.bbox && 
+             (node.data.bbox.x !== 0 || node.data.bbox.y !== 0);
+    });
+    
+    await updateGraph(convertedData, undefined, undefined, tileInfoBoxes);
+    
+    // Apply layout if no layout was found
+    if (!hasLayout && layoutBy) {
+      if (typeof layoutBy === 'function') {
+        layoutBy();
+      }
+    }
+    
+    await $(document).trigger("sbgnvizLoadFileEnd", [filename, cy]);
+    uiUtilities.endSpinner("load-file-spinner");
+  };
 
  // supported versions are either 0.2 or 0.3
  fileUtilities.saveAsSbgnml = function(filename, version, renderInfo, mapProperties, nodes, edges) {
@@ -394,8 +436,8 @@ module.exports = function () {
 }
 
  // supported versions are either 0.2 or 0.3
- fileUtilities.saveAsNwt = function(filename, version, renderInfo, mapProperties, nodes, edges) {
-   var sbgnmlText = jsonToNwt.createNwt(filename, version, renderInfo, mapProperties, nodes, edges);
+ fileUtilities.saveAsNwt = function(filename, version, renderInfo, mapProperties, nodes, edges, annotationLayersData) {
+   var sbgnmlText = jsonToNwt.createNwt(filename, version, renderInfo, mapProperties, nodes, edges, annotationLayersData);
    var blob = new Blob([sbgnmlText], {
      type: "text/plain;charset=utf-8;",
    });
@@ -419,6 +461,23 @@ module.exports = function () {
   });
  };
 
+  fileUtilities.saveAsCellDesignerFromSbml = function(filename, errorCallback){
+  uiUtilities.startSpinner("load-spinner");
+  var sbml = jsonToSbml.createSbml(); 
+  this.convertSbmlToCD(sbml, function(data){
+    if(data == null){
+      errorCallback();
+    }else{
+      var blob = new Blob([data.message], {
+        type: "text/plain;charset=utf-8;",
+      });
+      saveAs(blob, filename); 
+    }
+    uiUtilities.endSpinner("load-spinner");
+    
+  });
+ };
+
  fileUtilities.loadCellDesigner = function(file, successCallback, errorCallback){
   var reader = new FileReader();
 
@@ -427,10 +486,10 @@ module.exports = function () {
     // this.convertCDToSbgnml(e.target.result, function(data){
     cdToSbgnml.convert(e.target.result, function(data){
       uiUtilities.endSpinner("load-spinner");
-      if(data == null){
+      if(data == null || data.result === false){
         errorCallback();
-      }else{
-        successCallback(data);
+      } else {
+        successCallback(data.message);
       }
     });
   }.bind(this);
@@ -492,7 +551,7 @@ fileUtilities.hasLayoutSBML = function(file) {
   });
 };
 
- fileUtilities.loadSbmlForSBML = async function(file, callback1, callback2, layoutBy)
+ fileUtilities.loadSbmlForSBML = async function(file, errorCallback, layoutBy)
  {
   var convert = function( text ) {
     var converted = sbmlToJson.convert(text)
@@ -516,13 +575,18 @@ fileUtilities.hasLayoutSBML = function(file) {
 
     cy.fit( cy.elements(":visible"), 20 );
   };
+  
   let layoutFound = await fileUtilities.hasLayoutSBML(file);
-  if (layoutFound){
-    fileUtilities.loadFile( file, convert, callback1, callback2, fileUtilities.collapseMarkedNodes, undefined);
-  }
-  else{
-    fileUtilities.loadFile( file, convert, callback1, callback2, fileUtilities.collapseMarkedNodes, runLayout);
-  }
+  
+  var postLoadCallback = function(cyGraph) {
+    fileUtilities.collapseMarkedNodes();
+    if (!layoutFound) {
+      runLayout();
+    }
+    $(document).trigger("sbgnvizLoadFileEnd", [file.name, cy]);
+  };
+  
+  fileUtilities.loadFile( file, convert, undefined, errorCallback, postLoadCallback, undefined);
  }
  fileUtilities.loadSbml = function(file, successCallback, errorCallback){
   var reader = new FileReader();
@@ -612,8 +676,6 @@ fileUtilities.hasLayoutSBML = function(file) {
  };
  
 fileUtilities.createJsonFromSBGN = function(){
-
-
     var sbgnmlText = jsonToSbgnml.createSbgnml();
     return sbgnmlToJson.convert(textToXmlObject(sbgnmlText));
 };
@@ -635,6 +697,10 @@ fileUtilities.createJsonFromSif = function(){
 fileUtilities.convertSbgnmlToCD = function(sbgnml, callback){
    
   return sbgnmlToCd.convert(sbgnml,callback);
+};
+
+fileUtilities.convertSbmlToCD = function(sbml, callback){
+  return sbmlToCd.convert(sbml,callback);
 };
 
 fileUtilities.convertCDToSbgnml = function(xml,callback){

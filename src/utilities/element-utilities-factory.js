@@ -30,6 +30,7 @@ module.exports = function () {
 
   elementUtilities.PD = {}; // namespace for all PD specific stuff
   elementUtilities.AF = {}; // namespace for all AF specific stuff
+  elementUtilities.HybridPDAF = {}; // namespace for all HybridPDAF specific stuff
   elementUtilities.SIF = {}; // namespace for all SIF specific stuff
   elementUtilities.SBML = {}; // namespace for all SIF specific stuff
 
@@ -47,7 +48,7 @@ module.exports = function () {
     ) {
       d += performance.now(); //use high-precision timer if available
     }
-    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(
+    return "xxxxxxxx_xxxx_4xxx_yxxx_xxxxxxxxxxxx".replace(
       /[xy]/g,
       function (c) {
         var r = (d + Math.random() * 16) % 16 | 0;
@@ -182,7 +183,7 @@ module.exports = function () {
       "omitted process": { asSource: {}, asTarget: { isAllowed: true } },
       "uncertain process": { asSource: {}, asTarget: { isAllowed: true } },
       phenotype: { asSource: {}, asTarget: { isAllowed: true } },
-      association: { asSource: {}, asTarget: {} },
+      association: { asSource: {}, asTarget: {isAllowed:true} },
       dissociation: { asSource: {}, asTarget: {} },
       and: {
         asSource: { isAllowed: true, maxEdge: 1, maxTotal: 1 },
@@ -467,14 +468,20 @@ module.exports = function () {
       phenotype: { asSource: {}, asTarget: {} },
       tag: { asSource: {}, asTarget: {} },
       submap: { asSource: {}, asTarget: {} },
-      and: { asSource: {}, asTarget: { isAllowed: true } },
-      or: { asSource: {}, asTarget: { isAllowed: true } },
+      and: { 
+        asSource: { isAllowed: true, maxEdge: 1, maxTotal: 1 }, 
+        asTarget: { isAllowed: true } 
+      },
+      or: { 
+        asSource: { isAllowed: true, maxEdge: 1, maxTotal: 1 }, 
+        asTarget: { isAllowed: true } 
+      },
       not: {
-        asSource: {},
+        asSource: { isAllowed: true, maxEdge: 1, maxTotal: 1 },
         asTarget: { isAllowed: true, maxEdge: 1, maxTotal: 1 },
       },
       delay: {
-        asSource: {},
+        asSource: { isAllowed: true, maxEdge: 1, maxTotal: 1 },
         asTarget: { isAllowed: true, maxEdge: 1, maxTotal: 1 },
       },
       compartment: { asSource: {}, asTarget: {} },
@@ -491,6 +498,60 @@ module.exports = function () {
       compartment: { asSource: {}, asTarget: {} },
     },
   };
+  // HybridPDAF connectivity constraints are the union of PD and AF connectivity constraints, with some specificities for performance arcs
+  elementUtilities.HybridPDAF.connectivityConstraints = {};
+
+  const pd = elementUtilities.PD.connectivityConstraints;
+  const af = elementUtilities.AF.connectivityConstraints;
+
+  for (const key of new Set([...Object.keys(pd), ...Object.keys(af)])) {
+    elementUtilities.HybridPDAF.connectivityConstraints[key] = {
+      ...(pd[key] || {}),
+      ...(af[key] || {})
+    };
+  }
+  elementUtilities.HybridPDAF.connectivityConstraints["performance arc"] = {
+    macromolecule: { asSource: { isAllowed: true }, asTarget: {} },
+    "simple chemical": { asSource: { isAllowed: true }, asTarget: {} },
+    "unspecified entity": { asSource: { isAllowed: true }, asTarget: {} },
+    complex: { asSource: { isAllowed: true }, asTarget: {} },
+    "nucleic acid feature": { asSource: { isAllowed: true }, asTarget: {} },
+    compartment: { asSource: {}, asTarget: {} },
+    tag: { asSource: {}, asTarget: {} },
+    "empty set": { asSource: {}, asTarget: {} },
+    "perturbing agent": { asSource: { isAllowed: true }, asTarget: {} },
+    submap: { asSource: {}, asTarget: {} },
+    process: { asSource: {}, asTarget: {} },
+    "omitted process": { asSource: {}, asTarget: {} },
+    "uncertain process": { asSource: {}, asTarget: {} },
+    phenotype: { asSource: {}, asTarget: {} },
+    association: { asSource: {}, asTarget: {} },
+    dissociation: { asSource: {}, asTarget: {} },
+    and: { asSource: {}, asTarget: {} },
+    or: { asSource: {}, asTarget: {} },
+    not: { asSource: {}, asTarget: {} },
+    "biological activity": { asSource: {}, asTarget: { isAllowed: true } },
+    delay: { asSource: {}, asTarget: {} },
+  };
+
+  const constraint1 = { asSource: {}, asTarget: {} };
+  const constraint2 = { asSource: {}, asTarget: { isAllowed: true } };
+  const keys1 = ["consumption", "production", "modulation", "stimulation", "catalysis", "inhibition"];
+  for (const k of keys1) {
+    elementUtilities.HybridPDAF.connectivityConstraints[k]["biological activity"] = constraint1;
+    elementUtilities.HybridPDAF.connectivityConstraints[k]["delay"] = constraint1;
+  }
+  const keys2 = ["positive influence", "negative influence", "unknown influence"];
+  const PD_node_set1 = ["macromolecule", "simple chemical", "unspecified entity", "complex", "nucleic acid feature", "empty set", "perturbing agent"];
+  const PD_node_set2 = ["process", "omitted process", "uncertain process", "association", "dissociation"];
+  for (const k of keys2) {
+    for (const node_class of PD_node_set1) {
+      elementUtilities.HybridPDAF.connectivityConstraints[k][node_class] = constraint1;
+    }
+    for (const node_class of PD_node_set2) {
+      elementUtilities.HybridPDAF.connectivityConstraints[k][node_class] = constraint2;
+    }
+  }
 
   elementUtilities.SIF.connectivityConstraints = {
     "controls-state-change-of": {
@@ -674,6 +735,7 @@ module.exports = function () {
       gene: { asSource: { isAllowed: true }, asTarget: {} },
       compartment: { asSource: {}, asTarget: {} },
       rna: { asSource: { isAllowed: true }, asTarget: {} },
+      "antisense rna": { asSource: { isAllowed: true }, asTarget: {} },
       degradation: { asSource: { isAllowed: true }, asTarget: {} },
       drug: { asSource: { isAllowed: true }, asTarget: {} },
       "truncated protein": { asSource: { isAllowed: true }, asTarget: {} },
@@ -718,6 +780,7 @@ module.exports = function () {
       gene: { asSource: {}, asTarget: { isAllowed: true } },
       compartment: { asSource: {}, asTarget: {} },
       rna: { asSource: {}, asTarget: { isAllowed: true } },
+      "antisense rna": { asSource: {}, asTarget: { isAllowed: true } },
       degradation: { asSource: {}, asTarget: { isAllowed: true } },
       drug: { asSource: {}, asTarget: { isAllowed: true } },
       "truncated protein": { asSource: {}, asTarget: { isAllowed: true } },
@@ -762,6 +825,7 @@ module.exports = function () {
       gene: { asSource: { isAllowed: true }, asTarget: {} },
       compartment: { asSource: {}, asTarget: {} },
       rna: { asSource: { isAllowed: true }, asTarget: {} },
+      "antisense rna": { asSource: { isAllowed: true }, asTarget: {} },
       degradation: { asSource: { isAllowed: true }, asTarget: {} },
       drug: { asSource: { isAllowed: true }, asTarget: {} },
       "truncated protein": { asSource: { isAllowed: true }, asTarget: {} },
@@ -791,6 +855,7 @@ module.exports = function () {
       gene: { asSource: { isAllowed: true }, asTarget: {} },
       compartment: { asSource: {}, asTarget: {} },
       rna: { asSource: { isAllowed: true }, asTarget: {} },
+      "antisense rna": { asSource: { isAllowed: true }, asTarget: {} },
       degradation: { asSource: { isAllowed: true }, asTarget: {} },
       drug: { asSource: { isAllowed: true }, asTarget: {} },
       "truncated protein": { asSource: { isAllowed: true }, asTarget: {} },
@@ -820,6 +885,7 @@ module.exports = function () {
       gene: { asSource: { isAllowed: true }, asTarget: {} },
       compartment: { asSource: {}, asTarget: {} },
       rna: { asSource: { isAllowed: true }, asTarget: {} },
+      "antisense rna": { asSource: { isAllowed: true }, asTarget: {} },
       degradation: { asSource: { isAllowed: true }, asTarget: {} },
       drug: { asSource: { isAllowed: true }, asTarget: {} },
       "truncated protein": { asSource: { isAllowed: true }, asTarget: {} },
@@ -849,6 +915,7 @@ module.exports = function () {
       gene: { asSource: { isAllowed: true }, asTarget: {} },
       compartment: { asSource: {}, asTarget: {} },
       rna: { asSource: { isAllowed: true }, asTarget: {} },
+      "antisense rna": { asSource: { isAllowed: true }, asTarget: {} },
       degradation: { asSource: { isAllowed: true }, asTarget: {} },
       drug: { asSource: { isAllowed: true }, asTarget: {} },
       "truncated protein": { asSource: { isAllowed: true }, asTarget: {} },
@@ -878,6 +945,7 @@ module.exports = function () {
       gene: { asSource: { isAllowed: true }, asTarget: {} },
       compartment: { asSource: {}, asTarget: {} },
       rna: { asSource: { isAllowed: true }, asTarget: {} },
+      "antisense rna": { asSource: { isAllowed: true }, asTarget: {} },
       degradation: { asSource: { isAllowed: true }, asTarget: {} },
       drug: { asSource: { isAllowed: true }, asTarget: {} },
       "truncated protein": { asSource: { isAllowed: true }, asTarget: {} },
@@ -907,6 +975,7 @@ module.exports = function () {
       gene: { asSource: {}, asTarget: { isAllowed: true } },
       compartment: { asSource: {}, asTarget: {} },
       rna: { asSource: {}, asTarget: { isAllowed: true } },
+      "antisense rna": { asSource: {}, asTarget: { isAllowed: true } },
       degradation: { asSource: {}, asTarget: { isAllowed: true } },
       drug: { asSource: {}, asTarget: { isAllowed: true } },
       "truncated protein": { asSource: {}, asTarget: { isAllowed: true } },
@@ -936,6 +1005,7 @@ module.exports = function () {
       gene: { asSource: {isAllowed: true}, asTarget: {} },
       compartment: { asSource: {}, asTarget: {} },
       rna: { asSource: {isAllowed: true}, asTarget: {} },
+      "antisense rna": { asSource: {isAllowed: true}, asTarget: {} },
       degradation: { asSource: {isAllowed: true}, asTarget: {} },
       drug: { asSource: {isAllowed: true}, asTarget: {} },
       "truncated protein": { asSource: {isAllowed: true}, asTarget: {} },
@@ -974,6 +1044,7 @@ module.exports = function () {
       gene: { asSource: { isAllowed: true }, asTarget: {} },
       compartment: { asSource: {}, asTarget: {} },
       rna: { asSource: { isAllowed: true }, asTarget: {} },
+      "antisense rna": { asSource: { isAllowed: true }, asTarget: {} },
       degradation: { asSource: { isAllowed: true }, asTarget: {} },
       drug: { asSource: { isAllowed: true }, asTarget: {} },
       "truncated protein": { asSource: { isAllowed: true }, asTarget: {} },
@@ -1003,6 +1074,7 @@ module.exports = function () {
       gene: { asSource: { isAllowed: true }, asTarget: {} },
       compartment: { asSource: {}, asTarget: {} },
       rna: { asSource: { isAllowed: true }, asTarget: {} },
+      "antisense rna": { asSource: { isAllowed: true }, asTarget: {} },
       degradation: { asSource: { isAllowed: true }, asTarget: {} },
       drug: { asSource: { isAllowed: true }, asTarget: {} },
       "truncated protein": { asSource: { isAllowed: true }, asTarget: {} },
@@ -1032,6 +1104,7 @@ module.exports = function () {
       gene: { asSource: { isAllowed: true }, asTarget: {} },
       compartment: { asSource: {}, asTarget: {} },
       rna: { asSource: { isAllowed: true }, asTarget: {} },
+      "antisense rna": { asSource: { isAllowed: true }, asTarget: {} },
       degradation: { asSource: { isAllowed: true }, asTarget: {} },
       drug: { asSource: { isAllowed: true }, asTarget: {} },
       "truncated protein": { asSource: { isAllowed: true }, asTarget: {} },
@@ -1072,6 +1145,7 @@ module.exports = function () {
       gene: { asSource: {}, asTarget: { isAllowed: true } },
       compartment: { asSource: {}, asTarget: {} },
       rna: { asSource: {}, asTarget: { isAllowed: true } },
+      "antisense rna": { asSource: {}, asTarget: { isAllowed: true } },
       degradation: { asSource: {}, asTarget: { isAllowed: true } },
       drug: { asSource: {}, asTarget: { isAllowed: true } },
       "truncated protein": { asSource: {}, asTarget: { isAllowed: true } },
@@ -1107,6 +1181,7 @@ module.exports = function () {
       gene: { asSource: { isAllowed: true }, asTarget: {} },
       compartment: { asSource: {}, asTarget: {} },
       rna: { asSource: { isAllowed: true }, asTarget: {} },
+      "antisense rna": { asSource: { isAllowed: true }, asTarget: {} },
       degradation: { asSource: { isAllowed: true }, asTarget: {} },
       drug: { asSource: { isAllowed: true }, asTarget: {} },
       "truncated protein": { asSource: { isAllowed: true }, asTarget: {} },
@@ -1145,6 +1220,7 @@ module.exports = function () {
       gene: { asSource: {}, asTarget: { isAllowed: true } },
       compartment: { asSource: {}, asTarget: {} },
       rna: { asSource: {}, asTarget: { isAllowed: true } },
+      "antisense rna": { asSource: {}, asTarget: { isAllowed: true } },
       degradation: { asSource: {}, asTarget: { isAllowed: true } },
       drug: { asSource: {}, asTarget: { isAllowed: true } },
       "truncated protein": { asSource: {}, asTarget: { isAllowed: true } },
@@ -1189,6 +1265,7 @@ module.exports = function () {
       gene: { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
       compartment: { asSource: {}, asTarget: {} },
       rna: { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
+      "antisense rna": { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
       degradation: {
         asSource: { isAllowed: true },
         asTarget: { isAllowed: true },
@@ -1239,6 +1316,7 @@ module.exports = function () {
       gene: { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
       compartment: { asSource: {}, asTarget: {} },
       rna: { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
+      "antisense rna": { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
       degradation: {
         asSource: { isAllowed: true },
         asTarget: { isAllowed: true },
@@ -1289,6 +1367,7 @@ module.exports = function () {
       gene: { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
       compartment: { asSource: {}, asTarget: {} },
       rna: { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
+      "antisense rna": { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
       degradation: {
         asSource: { isAllowed: true },
         asTarget: { isAllowed: true },
@@ -1339,6 +1418,7 @@ module.exports = function () {
       gene: { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
       compartment: { asSource: {}, asTarget: {} },
       rna: { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
+      "antisense rna": { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
       degradation: {
         asSource: { isAllowed: true },
         asTarget: { isAllowed: true },
@@ -1389,6 +1469,7 @@ module.exports = function () {
       gene: { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
       compartment: { asSource: {}, asTarget: {} },
       rna: { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
+      "antisense rna": { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
       degradation: {
         asSource: { isAllowed: true },
         asTarget: { isAllowed: true },
@@ -1439,6 +1520,7 @@ module.exports = function () {
       gene: { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
       compartment: { asSource: {}, asTarget: {} },
       rna: { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
+      "antisense rna": { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
       degradation: {
         asSource: { isAllowed: true },
         asTarget: { isAllowed: true },
@@ -1489,6 +1571,7 @@ module.exports = function () {
       gene: { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
       compartment: { asSource: {}, asTarget: {} },
       rna: { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
+      "antisense rna": { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
       degradation: {
         asSource: { isAllowed: true },
         asTarget: { isAllowed: true },
@@ -1539,6 +1622,7 @@ module.exports = function () {
       gene: { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
       compartment: { asSource: {}, asTarget: {} },
       rna: { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
+      "antisense rna": { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
       degradation: {
         asSource: { isAllowed: true },
         asTarget: { isAllowed: true },
@@ -1589,6 +1673,7 @@ module.exports = function () {
       gene: { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
       compartment: { asSource: {}, asTarget: {} },
       rna: { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
+      "antisense rna": { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
       degradation: {
         asSource: { isAllowed: true },
         asTarget: { isAllowed: true },
@@ -1639,6 +1724,7 @@ module.exports = function () {
       gene: { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
       compartment: { asSource: {}, asTarget: {} },
       rna: { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
+      "antisense rna": { asSource: { isAllowed: true }, asTarget: { isAllowed: true } },
       degradation: {
         asSource: { isAllowed: true },
         asTarget: { isAllowed: true },
@@ -1724,6 +1810,7 @@ module.exports = function () {
   elementUtilities.sbmlType = [
     "gene",
     "rna",
+    "antisense rna",
     "simple molecule",
     "unknown molecule",
     "drug",
@@ -1740,6 +1827,7 @@ module.exports = function () {
   elementUtilities.sbmlTypeMultimer = [
     "gene multimer",
     "rna multimer",
+    "antisense rna multimer",
     "ion channel multimer",
     "receptor multimer",
     "truncated protein multimer",
@@ -1749,7 +1837,6 @@ module.exports = function () {
     "drug multimer",
     "complex multimer",
     "phenotype sbml multimer",
-    "receptor multimer",
     "complex sbml multimer",
     "protein multimer",
   ];
@@ -1767,9 +1854,11 @@ module.exports = function () {
     "hypothetical ion channel",
     "hypothetical gene",
     "hypothetical rna",
+    "hypothetical antisense rna",
     "hypothetical phenotype sbml",
     "hypothetical ion",
-    "hypothetical uknown molecule",
+    "hypothetical simple molecule",
+    "hypothetical unknown molecule",
     "hypothetical drug",
     "hypothetical complex sbml",
     "hypothetical degradation",
@@ -1778,7 +1867,7 @@ module.exports = function () {
     "active hypothetical protein",
     "active hypothetical receptor",
     "active hypothetical truncated protein",
-    "hypothetical ion channel",
+    "active hypothetical ion channel",
     "active hypothetical complex sbml",
   ];
   elementUtilities.sbmlTypeActiveMultimer = [
@@ -1786,7 +1875,7 @@ module.exports = function () {
     "active receptor multimer",
     "active ion channel multimer",
     "active truncated protein multimer",
-    "active complex multimer",
+    "active complex sbml multimer",
   ];
   elementUtilities.sbmlTypeHypotheticalMultimer = [
     "hypothetical protein multimer",
@@ -1795,19 +1884,21 @@ module.exports = function () {
     "hypothetical ion channel multimer",
     "hypothetical gene multimer",
     "hypothetical rna multimer",
+    "hypothetical antisense rna multimer",
     "hypothetical phenotype sbml multimer",
     "hypothetical ion multimer",
-    "hypothetical uknown molecule multimer",
+    "hypothetical simple molecule multimer",
+    "hypothetical unknown molecule multimer",
     "hypothetical drug multimer",
-    "hypothetical complex sbml  multimer",
-    "hypothetical degradation  multimer",
+    "hypothetical complex sbml multimer",
+    "hypothetical degradation multimer",
   ];
   elementUtilities.sbmlTypeActiveHypotheticalMultimer = [
     "active hypothetical protein multimer",
     "active hypothetical receptor multimer",
     "active hypothetical ion channel multimer",
     "active hypothetical truncated protein multimer",
-    "active hypothetical complex multimer",
+    "active hypothetical complex sbml multimer",
   ];
 
   //elementUtilities.sbmlTypeHypothetical = [''] //Do I need this?
@@ -1874,6 +1965,7 @@ module.exports = function () {
     "unknown influence",
     "positive influence",
     "negative influence",
+    "performance arc",
     "controls-state-change-of",
     "controls-transport-of",
     "controls-phosphorylation-of",
@@ -1985,8 +2077,13 @@ module.exports = function () {
       (!node ||
         node.connectedEdges().length == 0 || // Complexes can only include EPNs which do not have edges
         elementUtilities.mapType == "HybridAny" ||
-        elementUtilities.mapType == "HybridSbgn")
+        elementUtilities.mapType == "HybridPDAF")
     ) {
+      if(elementUtilities.mapType == "SBML"){
+        
+        return elementUtilities.isSBMLNode(nodeClass) 
+        && nodeClass != "phenotype sbml" && nodeClass != "degradation";
+      }
       // When map type is unknown, allow complexes to include EPNs with edges
       return elementUtilities.isEPNClass(nodeClass);
     }
@@ -2136,10 +2233,10 @@ module.exports = function () {
       sbgnclass == "rna multimer" ||
       sbgnclass == "hypothetical rna" ||
       sbgnclass == "hypothetical rna multimer" ||
-      sbgnclass == "phenotype sbml" ||
-      sbgnclass == "phenotype sbml multimer" ||
-      sbgnclass == "hypothetical phenotype sbml" ||
-      sbgnclass == "hypothetical phenotype sbml multimer" ||
+      sbgnclass == "antisense rna" ||
+      sbgnclass == "antisense rna multimer" ||
+      sbgnclass == "hypothetical antisense rna" ||
+      sbgnclass == "hypothetical antisense rna multimer" ||
       sbgnclass == "ion" ||
       sbgnclass == "ion multimer" ||
       sbgnclass == "hypothetical ion" ||
@@ -2148,18 +2245,10 @@ module.exports = function () {
       sbgnclass == "simple molecule multimer" ||
       sbgnclass == "hypothetical simple molecule" ||
       sbgnclass == "hypothetical simple molecule multimer" ||
-      sbgnclass == "unknown molecule" ||
-      sbgnclass == "unknown molecule multimer" ||
-      sbgnclass == "hypothetical unknown molecule" ||
-      sbgnclass == "hypothetical unknown molecule multimer" ||
       sbgnclass == "drug" ||
       sbgnclass == "drug multimer" ||
       sbgnclass == "hypothetical drug" ||
-      sbgnclass == "hypothetical drug multimer" ||
-      sbgnclass == "degradation" ||
-      sbgnclass == "degradation multimer" ||
-      sbgnclass == "hypothetical degradation" ||
-      sbgnclass == "hypothetical degradation multimer"
+      sbgnclass == "hypothetical drug multimer" 
     ) {
       return true;
     }
@@ -2172,6 +2261,7 @@ module.exports = function () {
     if (
       sbgnclass == "gene" ||
       sbgnclass == "rna" ||
+      sbgnclass == "antisense rna" ||
       sbgnclass == "simple molecule" ||
       sbgnclass == "unknown molecule" ||
       sbgnclass == "phenotype sbml" ||
@@ -2195,16 +2285,14 @@ module.exports = function () {
     if (
       sbgnclass == "gene" ||
       sbgnclass == "rna" ||
+      sbgnclass == "antisense rna" ||
       sbgnclass == "simple molecule" ||
-      sbgnclass == "unknown molecule" ||
-      sbgnclass == "phenotype sbml" ||
       sbgnclass == "drug" ||
       sbgnclass == "protein" ||
       sbgnclass == "truncated protein" ||
       sbgnclass == "ion channel" ||
       sbgnclass == "receptor" ||
       sbgnclass == "ion" ||
-      sbgnclass == "degradation" ||
       sbgnclass == "complex sbml"
     ) {
       return true;
@@ -2222,7 +2310,15 @@ module.exports = function () {
       sbgnclass == "complex" ||
       sbgnclass == "macromolecule multimer" ||
       sbgnclass == "nucleic acid feature multimer" ||
-      sbgnclass == "complex multimer"
+      sbgnclass == "complex multimer" ||
+      sbgnclass == "gene" ||
+      sbgnclass == "rna" ||
+      sbgnclass == "complex sbml" ||
+      sbgnclass == "protein" ||
+      sbgnclass == "receptor" ||
+      sbgnclass == "ion channel" ||
+      sbgnclass == "truncated protein" ||
+      sbgnclass == "antisense rna" 
     ) {
       return true;
     }
@@ -2232,39 +2328,8 @@ module.exports = function () {
   elementUtilities.canHaveResidueVariable = function (ele) {
     var sbgnclass = elementUtilities.getPureSbgnClass(ele);
 
-    if (
-      sbgnclass == "protein" ||
-      sbgnclass == "protein multimer" ||
-      sbgnclass == "active protein" ||
-      sbgnclass == "hypothetical protein" ||
-      sbgnclass == "active protein multimer" ||
-      sbgnclass == "hypothetical protein multimer" ||
-      sbgnclass == "active hypothetical protein" ||
-      sbgnclass == "active hypothetical protein multimer" ||
-      sbgnclass == "receptor" ||
-      sbgnclass == "receptor multimer" ||
-      sbgnclass == "active receptor" ||
-      sbgnclass == "hypothetical receptor" ||
-      sbgnclass == "active receptor multimer" ||
-      sbgnclass == "hypothetical receptor multimer" ||
-      sbgnclass == "active hypothetical receptor" ||
-      sbgnclass == "active hypothetical receptor multimer" ||
-      sbgnclass == "ion channel" ||
-      sbgnclass == "ion channel multimer" ||
-      sbgnclass == "active ion channel" ||
-      sbgnclass == "hypothetical ion channel" ||
-      sbgnclass == "active ion channel multimer" ||
-      sbgnclass == "hypothetical ion channel multimer" ||
-      sbgnclass == "active hypothetical ion channel" ||
-      sbgnclass == "active hypothetical ion channel multimer" ||
-      sbgnclass == "truncated protein" ||
-      sbgnclass == "truncated protein multimer" ||
-      sbgnclass == "active truncated protein" ||
-      sbgnclass == "hypothetical truncated protein" ||
-      sbgnclass == "active truncated protein multimer" ||
-      sbgnclass == "hypothetical truncated protein multimer" ||
-      sbgnclass == "active hypothetical truncated protein" ||
-      sbgnclass == "active hypothetical truncated protein multimer"
+    if (false
+      //classes that have residue variable can be added here
     ) {
       return true;
     }
@@ -2274,39 +2339,8 @@ module.exports = function () {
   elementUtilities.canHaveBindingRegion = function (ele) {
     var sbgnclass = elementUtilities.getPureSbgnClass(ele);
 
-    if (
-      sbgnclass == "protein" ||
-      sbgnclass == "protein multimer" ||
-      sbgnclass == "active protein" ||
-      sbgnclass == "hypothetical protein" ||
-      sbgnclass == "active protein multimer" ||
-      sbgnclass == "hypothetical protein multimer" ||
-      sbgnclass == "active hypothetical protein" ||
-      sbgnclass == "active hypothetical protein multimer" ||
-      sbgnclass == "receptor" ||
-      sbgnclass == "receptor multimer" ||
-      sbgnclass == "active receptor" ||
-      sbgnclass == "hypothetical receptor" ||
-      sbgnclass == "active receptor multimer" ||
-      sbgnclass == "hypothetical receptor multimer" ||
-      sbgnclass == "active hypothetical receptor" ||
-      sbgnclass == "active hypothetical receptor multimer" ||
-      sbgnclass == "ion channel" ||
-      sbgnclass == "ion channel multimer" ||
-      sbgnclass == "active ion channel" ||
-      sbgnclass == "hypothetical ion channel" ||
-      sbgnclass == "active ion channel multimer" ||
-      sbgnclass == "hypothetical ion channel multimer" ||
-      sbgnclass == "active hypothetical ion channel" ||
-      sbgnclass == "active hypothetical ion channel multimer" ||
-      sbgnclass == "truncated protein" ||
-      sbgnclass == "truncated protein multimer" ||
-      sbgnclass == "active truncated protein" ||
-      sbgnclass == "hypothetical truncated protein" ||
-      sbgnclass == "active truncated protein multimer" ||
-      sbgnclass == "hypothetical truncated protein multimer" ||
-      sbgnclass == "active hypothetical truncated protein" ||
-      sbgnclass == "active hypothetical truncated protein multimer"
+    if (false
+      //classes that have binding regions can be added here
     ) {
       return true;
     }
@@ -2372,6 +2406,7 @@ module.exports = function () {
       "truncated protein": true,
       gene: true,
       rna: true,
+      "antisense rna": true,
       ion: true,
       "simple molecule": true,
       "unknown molecule": true,
@@ -2411,6 +2446,7 @@ module.exports = function () {
       "truncated protein": true,
       gene: true,
       rna: true,
+      "antisense rna": true,
       "phenotype sbml": true,
       ion: true,
       "simple molecule": true,
@@ -2448,6 +2484,12 @@ module.exports = function () {
 
   elementUtilities.isDirectedEdge = function (ele) {
     return !elementUtilities.isUndirectedEdge(ele);
+  };
+
+  elementUtilities.isSBMLNode = function (ele) {
+    var sbgnclass = elementUtilities.getPureSbgnClass(ele);
+
+    return inArray(sbgnclass, elementUtilities.sbmlType);
   };
 
   // Returns whether the given element is an EPN
@@ -2547,7 +2589,6 @@ module.exports = function () {
     var sbgnclass = elementUtilities.getPureSbgnClass(ele);
     return (
       sbgnclass != "phenotype" &&
-      sbgnclass != "delay" &&
       (elementUtilities.isLogicalOperator(sbgnclass) ||
         elementUtilities.isPNClass(sbgnclass))
     );
@@ -2910,6 +2951,7 @@ module.exports = function () {
       _class == "truncated protein" ||
       _class == "ion channel" ||
       _class == "rna" ||
+      _class == "antisense rna" ||
       _class == "simple molecule" ||
       _class == "phenotype sbml" ||
       _class == "receptor" ||
@@ -2951,6 +2993,7 @@ module.exports = function () {
       _class == "inhibition" ||
       _class == "negative influence" ||
       _class == "production" ||
+      _class == "performance arc" ||
       _class == "transport" ||
       _class == "transcription production" ||
       _class == "translation production" ||
@@ -3017,7 +3060,8 @@ module.exports = function () {
         return "triangle";
       case "positive influence sbml":
       case "unknown positive influence":
-        return "vee";
+      case "performance arc":
+        return "chevron";
       case "modulation":
       case "unknown influence":
       case "reduced modulation":
@@ -3065,6 +3109,7 @@ module.exports = function () {
       _class == "complex sbml" ||
       _class == "gene" ||
       _class == "rna" ||
+      _class == "antisense rna" ||
       _class == "simple molecule" ||
       _class == "unknown molecule" ||
       _class == "phenotype sbml" ||
@@ -3136,6 +3181,7 @@ module.exports = function () {
         coeff = 1.5;
       }
 
+
       var ports = ele.data("ports");
 
       if (graphUtilities.portsEnabled === true && ports.length === 2) {
@@ -3149,12 +3195,11 @@ module.exports = function () {
             : Math.abs(port.x) / 50;
         coeff /= ratio; // Divide the coeff by ratio to fit into the bbox of the actual shape (discluding ports)
       }
+      if (_class === "delay") {
+        coeff *= 1.4;
+      }
 
       return this.getDynamicLabelTextSize(ele, coeff);
-    }
-
-    if (_class === "delay") {
-      return this.getDynamicLabelTextSize(ele, 2);
     }
 
     return this.getDynamicLabelTextSize(ele);
@@ -3712,6 +3757,7 @@ module.exports = function () {
         ele.data("class") === "and" ||
         ele.data("class") === "or" ||
         ele.data("class") === "not" ||
+        ele.data("class") === "delay" ||
         ele.data("class") === "unknown logical operator"
       ) {
         if (ele.data("ports").length === 2) {
@@ -3803,6 +3849,7 @@ module.exports = function () {
       ele.data("class") === "and" ||
       ele.data("class") === "or" ||
       ele.data("class") === "not" ||
+      ele.data("class") === "delay" ||
       ele.data("class") === "unknown logical operator"
     ) {
       targetingEdges.forEach(function (edge) {
@@ -3990,6 +4037,7 @@ module.exports = function () {
       ele.data("class") === "and" ||
       ele.data("class") === "or" ||
       ele.data("class") === "not" ||
+      ele.data("class") === "delay" ||
       ele.data("class") === "unknown logical operator"
     ) {
       targetingEdges.forEach(function (edge) {
@@ -4063,7 +4111,7 @@ module.exports = function () {
       //Checks if free nodes belong to the same compound
       var firstNode = cy.getElementById(inputPortEle.id);
       var secondNode = cy.getElementById(outputPortEle.id);
-      if (firstNode.data("parent") !== secondNode.data("parent")) {
+      if (firstNode.data("parent") !== secondNode.data("parent")  || firstNode.data("boundaryParentId") !== secondNode.data("boundaryParentId")) {
         continue;
       }
       elementUtilities.swapElements(inputPortEle, outputPortEle);
@@ -4079,7 +4127,7 @@ module.exports = function () {
         //Checks if free nodes belong to the same compound
         var firstNode = cy.getElementById(effector.id);
         var secondNode = cy.getElementById(firstOutput.id);
-        if (firstNode.data("parent") !== secondNode.data("parent")) {
+        if (firstNode.data("parent") !== secondNode.data("parent") || firstNode.data("boundaryParentId") !== secondNode.data("boundaryParentId")) {
           continue;
         }
 
@@ -4097,7 +4145,7 @@ module.exports = function () {
         //Checks if free nodes belong to the same compound
         var firstNode = cy.getElementById(effector.id);
         var secondNode = cy.getElementById(firstInput.id);
-        if (firstNode.data("parent") !== secondNode.data("parent")) {
+        if (firstNode.data("parent") !== secondNode.data("parent") || firstNode.data("boundaryParentId") !== secondNode.data("boundaryParentId")) {
           continue;
         }
 
@@ -4233,6 +4281,30 @@ module.exports = function () {
     firstNode.position("y", secondNode.position("y"));
     secondNode.position("x", tempx);
     secondNode.position("y", tempy);
+  };
+
+  // Returns the largest dimension of the boundary nodes associated with the given compartment
+  elementUtilities.getBoundaryPadding = function (ele) {
+    if (!options.calculateBoundaryPadding) {
+      return 0;
+    }
+    
+    var maxDim = 0;
+    if (ele && ele.cy) {
+      var cy = ele.cy();
+      if (cy) {
+        var bNodes = cy.nodes('[boundaryParentId="' + ele.id() + '"]');
+        if (bNodes.length > 0) {
+          bNodes.forEach(function (bNode) {
+            var w = bNode.width();
+            var h = bNode.height();
+            if (w > maxDim) maxDim = w;
+            if (h > maxDim) maxDim = h;
+          });
+        }
+      }
+    }
+    return maxDim / 2;
   };
 
   // used for handling the variable property of complexes
@@ -4520,15 +4592,19 @@ module.exports = function () {
       height: 44,
     },
     gene: {
-      width: 50,
+      width: 60,
       height: 30,
     },
     rna: {
-      width: 50,
-      height: 44,
+      width: 70,
+      height: 30,
+    },
+    "antisense rna": {
+      width: 70,
+      height: 30,
     },
     "simple-molecule": {
-      width: 30,
+      width: 60,
       height: 30,
     },
     "unknown molecule": {
@@ -4541,27 +4617,27 @@ module.exports = function () {
     },
     drug: {
       width: 60,
-      height: 40,
+      height: 30,
     },
     // phenotype: {
     //   width: 30,
     //   height: 30,
     // },
     "simple molecule": {
-      width: 50,
-      height: 40,
+      width: 60,
+      height: 30,
     },
     "truncated protein": {
       width: 60,
-      height: 40,
+      height: 30,
     },
     "ion channel": {
       width: 60,
-      height: 40,
+      height: 30,
     },
     receptor: {
       width: 60,
-      height: 40,
+      height: 30,
     },
     "phenotype sbml": {
       width: 50,
@@ -4753,7 +4829,6 @@ module.exports = function () {
     if (!className) {
       return;
     }
-
     var defaultProps = elementUtilities.getDefaultProperties(className);
 
     Object.keys(defaultProps).forEach(function (name) {
@@ -4761,6 +4836,49 @@ module.exports = function () {
         data[name] = getProp(defaultProps, name);
       }
     });
+    if(data.language && data.language == 'SBML') {
+      var defaultSimulationProps = elementUtilities.getSBMLSimulationDefaults(className);
+      if(!data['simulation']){
+        data['simulation'] = defaultSimulationProps;
+        return;
+      }
+      Object.keys(defaultSimulationProps).forEach(function (name) {
+        if( !Object.hasOwn(data['simulation'], name) )
+          data['simulation'][name] = defaultSimulationProps[name];
+      });
+    }
+  }
+
+  elementUtilities.getSBMLSimulationDefaults = function (className) {
+    var pureClass = elementUtilities.getPureSbgnClass(className);
+    if(pureClass == 'compartment'){
+      return {
+        'spatialDimensions': 3,
+        'size': 1,
+        'units': "",
+        'constant': true
+      };
+    } else if (elementUtilities.processTypes.includes(pureClass)) {  // SBML Process
+      return {
+        'localParameters': [],  // {id: , name: , value: , units: }
+        'kineticLaw': "0"
+      };
+    } else if (elementUtilities.edgeTypes.includes(pureClass)) {  // SBML Edge
+      return {
+        'stoichiometry': 1,
+        'constant': true
+      }
+    } else {    // SBML Species
+      return {
+        'initial': 0.0,
+        'initialType': "amount",
+        'substanceUnits': "",
+        'hasOnlySubstanceUnits': true, // true for amount, false for density
+        'constant': false,
+        'boundaryCondition': false,
+        'conversionFactor': 1
+      };
+    }
   }
 
   elementUtilities.extendNodeDataWithClassDefaults = function (
@@ -4853,8 +4971,8 @@ module.exports = function () {
         return "SIF";
       case "sbml":
         return "SBML";
-      case "hybrid sbgn":
-        return "HybridSbgn";
+      case "hybrid pd-af":
+        return "HybridPDAF";
       default:
         return "HybridAny";
     }
@@ -4870,8 +4988,8 @@ module.exports = function () {
         return "sif";
       case "SBML":
         return "sbml";
-      case "HybridSbgn":
-        return "hybrid sbgn";
+      case "HybridPDAF":
+        return "hybrid pd-af";
       default:
         return "hybrid any";
     }

@@ -41,6 +41,8 @@
     var sbmlToSbgnmlConverter = require('./utilities/sbml-to-sbgnml-converter-factory')();
     var sbgnmlToGpmlConverter = require('./utilities/sbgnml-to-gpml-converter-factory')();
     var gpmlToSbgnmlConverter = require('./utilities/gpml-to-sbgnml-converter-factory')();
+    var sbmlSimulationUtilities = require('./utilities/sbml-simulation-utilities-factory')();
+    var cdToSbmlConverter = require('./utilities/sbml-to-cd-converter-factory')();
     // Fill param object to use it utilities internally
     
     param.optionUtilities = optionUtilities;
@@ -66,12 +68,14 @@
     param.jsonToSifConverter = jsonToSifConverter;
     param.cdToSbgnmlConverter = cdToSbgnmlConverter;
     param.sbgnmlToCdConverter = sbgnmlToCdConverter;
+    param.cdToSbmlConverter = cdToSbmlConverter;
     param.sbgnmlToSbmlConverter = sbgnmlToSbmlConverter;
     param.sbmlToSbgnmlConverter = sbmlToSbgnmlConverter;
     param.sbgnmlToGpmlConverter = sbgnmlToGpmlConverter;
     param.gpmlToSbgnmlConverter = gpmlToSbgnmlConverter;
     param.experimentalDataOverlay = experimentalDataOverlay;
     param.libsbmlInstance = libsbmlInstance;
+    param.sbmlSimulationUtilities = sbmlSimulationUtilities;
 
     // call constructors of objects with param
     
@@ -102,6 +106,7 @@
     sbgnmlToGpmlConverter(param);
     gpmlToSbgnmlConverter(param);    
     experimentalDataOverlay(param);
+    sbmlSimulationUtilities(param);
 
     // set scratch pad for sbgnviz and init sbgnvizParams inside it
     sbgnCyInstance.getCy().scratch('_sbgnviz', {});
@@ -139,6 +144,14 @@
     for (var prop in graphUtilities) {
       api[prop] = graphUtilities[prop];
     }
+
+    // Expose each sbgn graph utility seperately
+    for (var prop in sbmlSimulationUtilities) {
+      api[prop] = sbmlSimulationUtilities[prop];
+    }
+
+    // Expose createSbml
+    api["createSbml"] = jsonToSbmlConverter.createSbml;
 
     // Expose get cy function to enable accessing related cy instance
     api.getCy = sbgnCyInstance.getCy;

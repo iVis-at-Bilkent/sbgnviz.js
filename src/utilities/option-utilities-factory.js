@@ -38,7 +38,8 @@ module.exports = function () {
     },
     // extra padding for compound nodes except for complexes
     extraCompartmentPadding: 14,
-
+    // Whether boundary paddings will be computed and applied
+    calculateBoundaryPadding: false,
     //extra padding for complex compound nodes, refer to elementUtilities.getComplexPadding function to see details
     extraComplexPadding: 10,
     // Wether to display the complex's labels, like compartments.

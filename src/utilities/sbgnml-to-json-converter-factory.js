@@ -431,6 +431,11 @@ module.exports = function () {
 
       infobox.bbox = self.stateAndInfoBboxProp(glyph, parentBbox);
       infobox.style = self.getDefaultStateAndInfoStyle(glyph, parent.class);
+      var visibleString = "";
+      if(glyph.extension && glyph.extension.list && glyph.extension.list.visible){
+        visibleString = glyph.extension.list.visible;
+      }
+      infobox.visible = !visibleString.includes("false");
       //classes.StateVariable.setAnchorSide(infobox);
       stateAndInfoArray.push(infobox);
     }
@@ -527,7 +532,7 @@ module.exports = function () {
     var mapType = elementUtilities.mapType;
     if(mapType == 'PD' || mapType == 'AF' || mapType == 'SIF' || mapType == 'SBML'){
       nodeObj.language = elementUtilities.mapType;
-    }else if(mapType == 'HybridSbgn'){
+    }else if(mapType == 'HybridPDAF'){
       if(nodeObj.class == 'delay' || nodeObj.class.startsWith("BA")){
         nodeObj.language = 'AF';
       }else{
@@ -645,6 +650,15 @@ module.exports = function () {
       });
     }
 
+    if (nodeObj.class === "tag") {
+      if (ele.orientation) {
+        nodeObj.orientation = ele.orientation;
+      }
+      else if (ele.extension && ele.extension.has("orientation")) {
+        nodeObj.orientation = ele.extension.get("orientation");
+      }
+    }
+
     var cytoscapeJsNode = {data: nodeObj, style: styleObj};
     jsonArray.push(cytoscapeJsNode);
   };
@@ -655,7 +669,7 @@ module.exports = function () {
   sbgnmlToJson.handleAnnotations = function(cyObject, rdfElement) {
     // local utility function
     function dbFromUrl(url) {
-      var regexp = /^http:\/\/identifiers.org\/(.+?)\/.+$/;
+      var regexp = /^http:\/\/identifiers.org\/([^/:_]+).*$/;
       return url.replace(regexp, '$1');
     }
 
@@ -716,7 +730,7 @@ module.exports = function () {
 
     var eleClass = ele.class_;
 
-    if (eleClass === 'complex' || eleClass === 'complex multimer' || eleClass === 'submap' || eleClass === 'topology group') {
+    if (eleClass.includes('complex') || eleClass === 'submap' || eleClass === 'topology group') {
       self.addCytoscapeJsNode(ele, jsonArray, parent, compartments);
 
       var childGlyphs = ele.glyphMembers;
@@ -901,15 +915,18 @@ module.exports = function () {
 
     // add language info, this will always be the mapType if not hybrid
     var PdEdges = ["consumption","production","modulation","stimulation","catalysis","inhibition","necessary stimulation","logic arc","equivalence arc"];
-    var AfEdges = ["positive influence","negative influence","unknown influence"];  
+    var AfEdges = ["positive influence","negative influence","unknown influence"];
+    var hybridPdAfEdges = ["performance arc"]; 
     var mapType = elementUtilities.mapType;
     if(mapType == 'PD' || mapType == 'AF' || mapType == 'SIF' || mapType == 'SBML'){
       edgeObj.language = elementUtilities.mapType;
-    }else if(mapType == 'HybridSbgn'){
+    }else if(mapType == 'HybridPDAF'){
       if(PdEdges.indexOf(edgeObj.class) > -1){
         edgeObj.language = 'PD';
-      }else{
+      } else if(AfEdges.indexOf(edgeObj.class) > -1){
         edgeObj.language = 'AF';
+      } else{
+        edgeObj.language = 'HybridPDAF';
       }
     }else{//maptype == HybridAny
       if(PdEdges.indexOf(edgeObj.class) > -1){
@@ -976,7 +993,8 @@ module.exports = function () {
 
     // convert style list to elementId-indexed object pointing to style
     // also convert color references to color values
-    var styleList = renderInformation.listOfStyles.styles;
+    // We allow listOfStyles to not be present in renderInformation as it is a valid case in the docs
+    var styleList = renderInformation.listOfStyles ? renderInformation.listOfStyles.styles : [];
     var memberIDToStyle = {};
     for (var i=0; i < styleList.length; i++) {
       var style = styleList[i];
@@ -1200,6 +1218,7 @@ module.exports = function () {
     var glyphs = map.glyphs;
     var arcs = map.arcs;
 
+
     var i;
     for (i = 0; i < glyphs.length; i++) {
       var glyph = glyphs[i];
@@ -1359,7 +1378,6 @@ module.exports = function () {
       var arc = arcs[i];
       self.addCytoscapeJsEdge(arc, cytoscapeJsEdges, xmlObject);
     }
-
     if (map.extension && map.extension.has('renderInformation')) { // render extension was found
       self.applyStyle(map.extension.get('renderInformation'), cytoscapeJsNodes, cytoscapeJsEdges);
     }
