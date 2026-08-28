@@ -50,17 +50,23 @@ module.exports = function() {
     var lines = tdParser.getLinesArray( graphText.toString() );
 
     lines.forEach( function( line ) {
+      if ( !line || line.trim() === '' ) {
+        return;
+      }
+
       var tabs = tdParser.getTabsArray( line );
 
       // line represents a node
       if ( tabs.length === 1 ) {
         var nodeName = tabs[ 0 ];
-        // create the node if does not exist yet
-        // if the node is just created it will have the default node class
-        sifToJson.getOrCreateNode( nodeName );
+        if ( nodeName && nodeName.trim() !== '' ) {
+          // create the node if does not exist yet
+          // if the node is just created it will have the default node class
+          sifToJson.getOrCreateNode( nodeName );
+        }
       }
       // line represents an edge and the connected nodes
-      else {
+      else if ( tabs.length >= 3 ) {
         var srcName = tabs[ 0 ];
         var edgeType = tabs[ 1 ];
         var tgtName = tabs[ 2 ];
