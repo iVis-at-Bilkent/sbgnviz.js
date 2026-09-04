@@ -123,7 +123,7 @@ module.exports = function () {
   undoRedoActionFunctions.unhideAllUndo = function(param){
     var visibleFile = param.visibleFile;
     var visibleExp = param.visibleExp;
-    return experimentalDataOverlay.unhideFileUndo(visibleFile, visibleExp);
+    return experimentalDataOverlay.unhideAllUndo(visibleFile, visibleExp);
   }
 
   undoRedoActionFunctions.hideFile = function(param){
