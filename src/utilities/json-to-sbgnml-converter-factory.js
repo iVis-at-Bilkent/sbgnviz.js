@@ -682,10 +682,11 @@ module.exports = function () {
 
   jsonToSbgnml.addInfoBoxGlyph = function (node, id, mainGlyph) {
       var glyph = new libsbgnjs.Glyph({id: id, class_: 'unit of information'});
-      var label = new libsbgnjs.Label();
-      if(typeof node.label.text != 'undefined')
+      if(typeof node.label.text != 'undefined' && node.label.text !== '') {
+          var label = new libsbgnjs.Label();
           label.text = node.label.text;
-      glyph.setLabel(label);
+          glyph.setLabel(label);
+      }
       glyph.setBbox(this.addStateAndInfoBbox(mainGlyph, node));
       glyph.setExtension(new libsbgnjs.Extension());
       var xmlext = "<visible>" + node.visible +"</visible>";
