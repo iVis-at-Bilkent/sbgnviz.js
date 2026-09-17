@@ -13,7 +13,7 @@ module.exports = function() {
 
        $.ajax({
             type: 'post',             
-            url: "http://web.newteditor.org:8080/sbgnml2cd",
+            url: "/sbgnml2cd",
             data: xml,
             success: function (data) {
                 callback(data);              

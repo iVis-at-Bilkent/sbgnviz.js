@@ -451,10 +451,14 @@ module.exports = function () {
     if(data == null){
       errorCallback();
     }else{
-      var blob = new Blob([data], {
-        type: "text/plain;charset=utf-8;",
+      var xmlText = (data && data.nodeType === 9)
+        ? new XMLSerializer().serializeToString(data)
+        : data;
+
+      var blob = new Blob([xmlText], {
+        type: "text/xml;charset=utf-8;",
       });
-      saveAs(blob, filename); 
+      saveAs(blob, filename);
     }
     uiUtilities.endSpinner("load-spinner");
     
