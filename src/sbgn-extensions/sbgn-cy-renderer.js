@@ -894,7 +894,7 @@ module.exports = function () {
 
         if ( canBeActive && $$.sbgn.isActive(node) ) {
           var activeIntersectionLines = plainIntersectLineFcn(
-                  centerX + activePadding, centerY + activePadding, width,
+                  centerX, centerY, width,
                   height, x, y, padding);
 
           intersections = intersections.concat( activeIntersectionLines );
@@ -943,8 +943,8 @@ module.exports = function () {
         var activeCheck = function() {
           return canBeActive && $$.sbgn.isActive(node)
                   && plainCheckPointFcn( x, y, padding, width, height,
-                                          centerX + activePadding,
-                                          centerY + activePadding );
+                                          centerX,
+                                          centerY );
         };
 
         var hypotheticalCheck = function() {
