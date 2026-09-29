@@ -1919,20 +1919,27 @@ module.exports = function () {
 
   $$.sbgn.intersectLineEllipse = function (
           x1, y1, x2, y2, centerX, centerY, width, height, padding) {
+    var radiusX = width / 2 + padding;
+    var radiusY = height / 2 + padding;
 
-    var w = width / 2 + padding;
-    var h = height / 2 + padding;
-    var an = centerX;
-    var bn = centerY;
+    var dx = x2 - x1;
+    var dy = y2 - y1;
 
-    var d = [x2 - x1, y2 - y1];
+    var offsetX = x1 - centerX;
+    var offsetY = y1 - centerY;
 
-    var m = d[1] / d[0];
-    var n = -1 * m * x2 + y2;
-    var a = h * h + w * w * m * m;
-    var b = -2 * an * h * h + 2 * m * n * w * w - 2 * bn * m * w * w;
-    var c = an * an * h * h + n * n * w * w - 2 * bn * w * w * n +
-            bn * bn * w * w - h * h * w * w;
+    var radiusXSquared = radiusX * radiusX;
+    var radiusYSquared = radiusY * radiusY;
+
+    var a = (dx * dx) / radiusXSquared + (dy * dy) / radiusYSquared;
+
+    if (a === 0) {
+      return [];
+    }
+
+    var b = 2 * ((offsetX * dx) / radiusXSquared + (offsetY * dy) / radiusYSquared);
+
+    var c = (offsetX * offsetX) / radiusXSquared + (offsetY * offsetY) / radiusYSquared - 1;
 
     var discriminant = b * b - 4 * a * c;
 
@@ -1940,16 +1947,16 @@ module.exports = function () {
       return [];
     }
 
-    var t1 = (-b + Math.sqrt(discriminant)) / (2 * a);
-    var t2 = (-b - Math.sqrt(discriminant)) / (2 * a);
+    var squareRoot = Math.sqrt(discriminant);
+    var t1 = (-b + squareRoot) / (2 * a);
+    var t2 = (-b - squareRoot) / (2 * a);
 
-    var xMin = Math.min(t1, t2);
-    var xMax = Math.max(t1, t2);
-
-    var yMin = m * xMin - m * x2 + y2;
-    var yMax = m * xMax - m * x2 + y2;
-
-    return [xMin, yMin, xMax, yMax];
+    return [
+      x1 + t1 * dx,
+      y1 + t1 * dy,
+      x1 + t2 * dx,
+      y1 + t2 * dy
+    ];
   };
 
   $$.sbgn.intersectLineStateAndInfoBoxes = function (node, x, y) {
