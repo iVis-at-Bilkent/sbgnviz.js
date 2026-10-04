@@ -2716,12 +2716,16 @@ module.exports = function () {
     return elesToReturn;
   };
 
-  elementUtilities.extendNodeList = function (nodesToShow) {
+  elementUtilities.extendNodeList = function (nodesToShow, excludeCompartments = false) {
     var self = this;
     //add children
     nodesToShow = nodesToShow.add(nodesToShow.nodes().descendants());
     //add parents
-    nodesToShow = nodesToShow.add(nodesToShow.parents());
+    if (excludeCompartments) {
+      nodesToShow = nodesToShow.add(nodesToShow.parents().filter(function (ele) { return ele.data("class") !== "compartment"; }))
+    } else {
+      nodesToShow = nodesToShow.add(nodesToShow.parents());
+    }
     //add complex children
     nodesToShow = nodesToShow.add(
       nodesToShow.nodes("node[class^='complex']").descendants()
@@ -2790,7 +2794,11 @@ module.exports = function () {
     });
 
     //add parents
-    nodesToShow = nodesToShow.add(nodesToShow.nodes().parents());
+    if (excludeCompartments) {
+      nodesToShow = nodesToShow.add(nodesToShow.parents().filter(function (ele) { return ele.data("class") !== "compartment"; }))
+    } else {
+      nodesToShow = nodesToShow.add(nodesToShow.parents());
+    }
     //add children
     nodesToShow = nodesToShow.add(
       nodesToShow.nodes("node[class^='complex']").descendants()

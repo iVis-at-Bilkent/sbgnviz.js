@@ -526,9 +526,9 @@ module.exports = function () {
   };
 
   // Highlights processes of the given nodes. Requires viewUtilities extension and considers 'undoable' option.
-  mainUtilities.highlightProcesses = function(_nodes) {
+  mainUtilities.highlightProcesses = function(_nodes, excludeCompartments = false) {
     var nodes = _nodes.nodes(); // Ensure that nodes list just include nodes
-    var elesToHighlight = elementUtilities.extendNodeList(nodes);
+    var elesToHighlight = elementUtilities.extendNodeList(nodes, excludeCompartments);
     if (!isNeed2Highligth(elesToHighlight)) {
       return;
     }
